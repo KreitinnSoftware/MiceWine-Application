@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <color android:color="@android:color/white" />
+    </item>
+    <item android:id="@+id/shortcut_foreground">
+        <bitmap android:src="@drawable/default_icon" />
+    </item>
+
+</layer-list>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     xmlns:tools="http://schemas.android.com/tools"
+     android:layout_height="wrap_content"
+     android:layout_width="match_parent"
+     android:background="?attr/selectableItemBackground"
+     android:clickable="true"
+     app:cardElevation="0dp"
+     android:clipToPadding="false"
+     style="?attr/materialCardViewElevatedStyle"
+     android:transitionName="card_game"
+     app:cardCornerRadius="4dp"
+     android:focusable="true"
+     android:id="@+id/card_settings"
+     android:layout_gravity="center">
+
+    <LinearLayout
+         android:layout_height="wrap_content"
+         android:layout_width="match_parent"
+         android:gravity="center_horizontal"
+         android:padding="10dp"
+         android:orientation="horizontal">
+
+        <ImageView
+             android:layout_height="30dp"
+             android:layout_width="30dp"
+             android:layout_marginEnd="10dp"
+             android:src="@drawable/ic_settings_outline"
+             android:layout_gravity="center"
+             android:id="@+id/set_img" />
+
+        <LinearLayout
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:orientation="vertical">
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="match_parent"
+                 android:layout_marginBottom="5dp"
+                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                 android:textSize="18sp"
+                 android:id="@+id/title_preferences_model"
+                 android:textStyle="bold"
+                 android:text="Title Settings" />
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="match_parent"
+                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                 android:ellipsize="marquee"
+                 android:textSize="15sp"
+                 android:id="@+id/description_preferences_model"
+                 android:text="Description Settings" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

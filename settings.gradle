@@ -1,0 +1,3 @@
+include ':shell-loader:stub'
+include ':shell-loader'
+include ':app'

@@ -1,0 +1,35 @@
+{
+  "allFiles": [
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/MiceApp/app/src/main/java/com/micewine/emu/activities/logShellOutput.java",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 2477,
+          "line": 80
+        },
+        "start": {
+          "column": 0,
+          "index": 2477,
+          "line": 80
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/MiceApp/app/src/main/AndroidManifest.xml",
+      "selection": {
+        "end": {
+          "column": 28,
+          "index": 4856,
+          "line": 97
+        },
+        "start": {
+          "column": 28,
+          "index": 4856,
+          "line": 97
+        }
+      }
+    }
+  ],
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/MiceApp/app/src/main/AndroidManifest.xml"
+}
