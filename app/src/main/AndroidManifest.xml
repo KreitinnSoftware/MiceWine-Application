@@ -116,6 +116,11 @@
             android:enabled="true"
             android:exported="false">
         </service>
+        <service
+            android:name=".core.services.pulseaudio.PulseAudioService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
     </application>
    
     <queries>

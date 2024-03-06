@@ -4,6 +4,7 @@ import android.content.Context;
 
 //import com.micewine.emu.core.services.pulseaudio.PulseAudioService;
 //import com.micewine.emu.core.services.virglrenderer.VirGLService;
+import com.micewine.emu.core.services.pulseaudio.PulseAudioService;
 import com.micewine.emu.core.services.wine.WineService;
 import com.micewine.emu.coreutils.RunServiceClass;
 import com.micewine.emu.overlay.OverlayService;
@@ -17,7 +18,7 @@ public class Init {
         this.ctx = ctx;
         runServices.runService(OverlayService.class, this.ctx);
         runServices.runService(XServerLoader.class, this.ctx);
-        //runServices.runService(PulseAudioService.class, this.ctx);
+        runServices.runService(PulseAudioService.class, this.ctx);
         //runServices.runService(VirGLService.class, this.ctx);
         runServices.runService(WineService.class, this.ctx);
     }
