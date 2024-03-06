@@ -1,18 +1,15 @@
 plugins {
     id 'com.android.application'
-    
 }
 
 android {
     namespace 'com.micewine.emu'
     compileSdkVersion 33
-    buildToolsVersion '34.0.4'
+    buildToolsVersion '34.0.0'
     ndkVersion "26.1.10909125"
     defaultConfig {
    def signingConfig = project(':app').android.signingConfigs.debug
    def keyStore = java.security.KeyStore.getInstance(java.security.KeyStore.getDefaultType())
-keyStore.load(new FileInputStream(signingConfig.storeFile), signingConfig.keyPassword.toCharArray())
-
         applicationId "com.micewine.emu"
         minSdkVersion 26
         targetSdkVersion 28
@@ -20,7 +17,6 @@ keyStore.load(new FileInputStream(signingConfig.storeFile), signingConfig.keyPas
         versionName "1.0.beta"
         buildConfigField "String", "COMMIT", "\"" + ("git rev-parse HEAD\n".execute().getText().trim() ?: (System.getenv('CURRENT_COMMIT') ?: "NO_COMMIT")) + "\""
         buildConfigField "String", "logTag", "\"Termux:X11 loader\""
-        buildConfigField "int", "SIGNATURE", String.valueOf(Arrays.hashCode(keyStore.getCertificate(signingConfig.keyAlias).getEncoded()))
         buildConfigField "String", "CLASS_ID", "\"com.micewine.emu.CmdEntryPoint\""
         buildConfigField "String", "packageNotInstalledErrorText",
         """\"Termux:X11 application is not found.\" +
@@ -49,8 +45,8 @@ keyStore.load(new FileInputStream(signingConfig.storeFile), signingConfig.keyPas
     }
 
 
-    compileOptions.sourceCompatibility JavaVersion.VERSION_11
-    compileOptions.targetCompatibility JavaVersion.VERSION_11
+    compileOptions.sourceCompatibility JavaVersion.VERSION_1_9
+    compileOptions.targetCompatibility JavaVersion.VERSION_1_9
     packagingOptions.jniLibs.useLegacyPackaging false
     buildFeatures.aidl true
     buildFeatures.buildConfig true

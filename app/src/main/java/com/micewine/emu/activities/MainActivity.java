@@ -1,5 +1,7 @@
 package com.micewine.emu.activities;
 
+import static com.micewine.emu.coreutils.ShellExecutorCmd.ExecuteCMD;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
@@ -24,8 +26,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.micewine.emu.EntryPoint.Init;
 import com.micewine.emu.R;
 import com.micewine.emu.activities.logAppOutput;
-import com.micewine.emu.core.services.xserver.XserverLoader;
-import com.micewine.emu.core.services.xserver.destroyXserver;
+import com.micewine.emu.core.services.xserver.XServerLoader;
 import com.micewine.emu.coreutils.GeneralUtils;
 import com.micewine.emu.coreutils.ObbExtractor;
 import com.micewine.emu.coreutils.RunServiceClass;
@@ -50,19 +51,22 @@ public class MainActivity extends AppCompatActivity {
   private static final int PERMISSION_REQUEST_CODE = 123;
   private TextView progressUpdate;
   private ObbExtractor obbManager = new ObbExtractor();
-  public static String appRootDir = "/data/data/com.micewine.emu/files";
+  @SuppressLint("SdCardPath")
+  public static File appRootDir = new File("/data/data/com.micewine.emu/files");
   public static File shellLoader = new File(appRootDir + "/loader.apk");
-  public static String box64 = appRootDir + "/box64";
-  public static String usrDir = appRootDir + "/usr";
-  public static String wineFolder = appRootDir + "/wine";
-  public static String homeDir = appRootDir + "/home";
-  public static String tmpDir = usrDir + "/tmp";
-  public static String wineUtilsFolder = appRootDir + "/wine-utils";
+  public static File box64 = new File(appRootDir + "/box64");
+  public static File usrDir = new File(appRootDir + "/usr");
+  public static File homeDir = new File(appRootDir + "/home");
+  public static File tmpDir = new File(usrDir + "/tmp");
+  public static File wineFolder = new File(appRootDir + "/wine");
+  public static File wineUtilsFolder = new File(appRootDir + "/wine-utils");
+  public static File wine = new File(wineFolder + "/x86_64/bin/wine");
+  public static File pulseAudio = new File(usrDir + "/bin/pulseaudio");
+  public static File virgl_test_server = new File(usrDir + "/virglrenderer/bin/virgl_test_server");
 
   private ShellExecutorCmd shellExec = new ShellExecutorCmd();
   private logAppOutput logApp = new logAppOutput();
   private Init init = new Init();
-    private destroyXserver destroy = new destroyXserver();
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -79,10 +83,6 @@ public class MainActivity extends AppCompatActivity {
       actionBar.setTitle(R.string.app_name);
     }
 
-    if (!shellLoader.exists()) {
-      copyAssets(this, "loader.apk", appRootDir);
-    }
-
     BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
     bottomNavigation.setOnItemSelectedListener(
         item -> {
@@ -95,23 +95,58 @@ public class MainActivity extends AppCompatActivity {
           return true;
         });
 
-      String root = "storage/emulated/0/root.zip";
-      new Thread(
-              () -> {
-                obbManager.extractZip(
-                    this,
-                    root,
-                    appRootDir,
-                    progressExtractBar,
-                    progressUpdate,
-                    MainActivity.this);
-              })
-          .start();
-        
     manageFilesPath();
     checkPermission();
+
     FragmentLoader(new HomeFragment(), true);
-    XServerInicialization.run();
+  }
+
+  @Override
+  protected void onPostCreate(Bundle savedInstanceState) {
+    super.onPostCreate(savedInstanceState);
+
+    progressExtractBar = findViewById(R.id.progressBar);
+    progressUpdate = findViewById(R.id.updateProgress);
+
+    progressExtractBar.setIndeterminate(true);
+    progressExtractBar.setVisibility(View.VISIBLE);
+
+    new Thread(() -> {
+      if (!shellLoader.exists()) {
+        copyAssets(this, "loader.apk", appRootDir.toString());
+        ExecuteCMD("chmod 400 " + shellLoader);
+      }
+
+      if (!box64.exists()) {
+        copyAssets(this, "box64", appRootDir.toString());
+        ExecuteCMD("chmod 755 " + box64);
+      }
+
+      if (!usrDir.exists()) {
+        copyAssets(this, "rootfs.zip", appRootDir.toString());
+        ExecuteCMD("unzip -o " + appRootDir + "/rootfs.zip -d " + appRootDir);
+        ExecuteCMD("rm " + appRootDir + "/rootfs.zip");
+        ExecuteCMD("chmod 775 -R " + usrDir);
+      }
+
+      if (!wineFolder.exists()) {
+        copyAssets(this, "wine.zip", appRootDir.toString());
+        ExecuteCMD("unzip -o " + appRootDir + "/wine.zip -d " + appRootDir);
+        ExecuteCMD("rm " + appRootDir + "/wine.zip");
+      }
+
+      if (!tmpDir.exists()) {
+        tmpDir.mkdirs();
+      }
+
+      if (!homeDir.exists()) {
+        homeDir.mkdirs();
+      }
+
+      runOnUiThread(() -> {
+        progressExtractBar.setVisibility(View.GONE);
+      });
+    }).start();
   }
 
   @Override
@@ -148,20 +183,15 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void manageFilesPath() {
-    // Obtém o diretório raiz do armazenamento interno do aplicativo
-    File rootDir = new File("/data/data/com.micewine.emu/files");
-
-    // Cria a pasta principal se não existir
-    if (!rootDir.exists()) {
-      rootDir.mkdirs();
+    if (!appRootDir.exists()) {
+      appRootDir.mkdirs();
     }
   }
 
   @Override
   protected void onDestroy() {
     super.onDestroy();
-    destroy.stopXserver();
-    init.stop();
+    init.stopAll();
     this.binding = null;
   }
 
@@ -175,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
       File outFile = new File(outputPath, filename);
       out = new FileOutputStream(outFile);
       copyFile(in, out);
-    } catch (IOException e) {
+    } catch(IOException e) {
       e.printStackTrace();
     } finally {
       try {
@@ -198,7 +228,4 @@ public class MainActivity extends AppCompatActivity {
       out.write(buffer, 0, read);
     }
   }
-
-  private Runnable XServerInicialization =
-      () -> runServices.runService(XserverLoader.class, this);
 }

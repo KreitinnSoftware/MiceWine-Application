@@ -6,12 +6,12 @@
     android:installLocation="internalOnly"
     >
    
-  <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -50,7 +50,7 @@
             </intent-filter>
         </activity>
         
-          <activity
+        <activity
             android:theme="@style/Theme.AppCompat.DayNight"
             android:name=".EmulationActivity"
             android:taskAffinity=".EmulationActivity"
@@ -80,13 +80,11 @@
             </intent-filter>
         </activity>
         
-        
         <activity
             android:theme="@style/AppTheme.Main"
             android:name=".activities.logAppOutput"
             android:exported="true">
-        
-       </activity>
+        </activity>
             
 	    <meta-data android:name="com.samsung.android.multidisplay.keep_process_alive" android:value="false"/>
 	    <meta-data android:name="android.allow_multiple_resumed_activities" android:value="true" />
@@ -103,34 +101,24 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
-        
-            
-           <service
+        <service
             android:name=".overlay.OverlayService"
             android:enabled="true"
             android:exported="false">
-            <!-- Declare quaisquer intenções ou configurações adicionais aqui -->
         </service>
-        
-       <service
-            android:name=".core.services.xserver.XserverLoader"
+        <service
+            android:name=".core.services.xserver.XServerLoader"
             android:enabled="true"
             android:exported="false">
-            <!-- Declare quaisquer intenções ou configurações adicionais aqui -->
         </service>
-        
         <service
             android:name=".core.services.wine.WineService"
             android:enabled="true"
             android:exported="false">
-            <!-- Declare quaisquer intenções ou configurações adicionais aqui -->
         </service>
-        
-        
     </application>
    
     <queries>
         <package android:name="com.micewine.emu" />
     </queries>
-    
 </manifest>

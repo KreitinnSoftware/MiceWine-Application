@@ -15,6 +15,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 import com.micewine.emu.adapters.AdapterSettings;
 import com.micewine.emu.core.services.wine.WineService;
+import com.micewine.emu.coreutils.ShellExecutorCmd;
 import com.micewine.emu.databinding.LayoutlogShellOutputBinding;
 import com.micewine.emu.models.SettingsList;
 import com.micewine.emu.viewmodels.ViewModelAppLogs;
@@ -51,25 +52,23 @@ public class logAppOutput extends AppCompatActivity {
     
         ActionBar action = getSupportActionBar();
         
-        if(action != null)
-        action.hide();
-    
-        
+        if(action != null) {
+            action.hide();
+        }
+
         MaterialToolbar toolBar = findViewById(R.id.toolbar_log);
         
         setSupportActionBar(toolBar);
-        
-        
+
         CollapsingToolbarLayout collapsingToolBar = findViewById(R.id.toolbar_log_layout);
     
         collapsingToolBar.setTitle("Logs");
         
-       
         metods_natives = new NativeLoader();
         
         sharedLogs = new ViewModelProvider(this).get(ViewModelAppLogs.class);
         
-       sharedLogs.setText(WineService.getStdOut()); 
+        sharedLogs.setText(ShellExecutorCmd.stdOut);
         
         sharedLogs.getTextLiveData().observe(this , out -> {
             binding.logShell.setText(out);

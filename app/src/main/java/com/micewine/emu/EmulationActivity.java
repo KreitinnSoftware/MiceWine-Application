@@ -84,7 +84,7 @@ import com.micewine.emu.utils.FullscreenWorkaround;
 import com.micewine.emu.utils.KeyInterceptor;
 import com.micewine.emu.R;
 import com.micewine.emu.activities.MainActivity;
-import com.micewine.emu.core.services.xserver.XserverLoader;
+import com.micewine.emu.core.services.xserver.XServerLoader;
 import java.util.Map;
 import java.util.Objects;
 
@@ -177,7 +177,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
                 Intent i = new Intent(this , MainActivity.class);
                 startActivity(i);  
             }
-             return true;   
+            return true;
         });
 
         mInputHandler = new TouchInputHandler(this, new RenderStub.NullStub() {
@@ -246,21 +246,19 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
         initStylusAuxButtons();
         initMouseAuxButtons();
         init.run(this);
-        init.runEspecificServices(this);
 
         if (SDK_INT >= VERSION_CODES.TIRAMISU
                 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PERMISSION_GRANTED
                 && !shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
             requestPermissions(new String[] { Manifest.permission.POST_NOTIFICATIONS }, 0);
         }
-       
     }
 
     
     @Override
     protected void onDestroy() {
         unregisterReceiver(receiver);
-       init.stop();
+        init.stopAll();
         super.onDestroy();
     }
     
@@ -549,7 +547,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
     @Override
     public void onPause() {
         super.onPause();
-        init.stop();
+        init.stopAll();
     }
 
     public LorieView getLorieView() {

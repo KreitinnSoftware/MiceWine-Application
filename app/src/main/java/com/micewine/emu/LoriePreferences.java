@@ -103,27 +103,10 @@ public class LoriePreferences extends AppCompatActivity {
             scalePreference.setSeekBarIncrement(10);
             scalePreference.setShowSeekBarValue(true);
 
-            switch (p.getString("displayResolutionMode", "native")) {
-                case "scaled":
-                    findPreference("displayScale").setVisible(true);
-                    findPreference("displayResolutionExact").setVisible(false);
-                    findPreference("displayResolutionCustom").setVisible(false);
-                    break;
-                case "exact":
-                    findPreference("displayScale").setVisible(false);
-                    findPreference("displayResolutionExact").setVisible(true);
-                    findPreference("displayResolutionCustom").setVisible(false);
-                    break;
-                case "custom":
-                    findPreference("displayScale").setVisible(false);
-                    findPreference("displayResolutionExact").setVisible(false);
-                    findPreference("displayResolutionCustom").setVisible(true);
-                    break;
-                default:
-                    findPreference("displayScale").setVisible(false);
-                    findPreference("displayResolutionExact").setVisible(true);
-                    findPreference("displayResolutionCustom").setVisible(false);
-            }
+
+            findPreference("displayScale").setVisible(false);
+            findPreference("displayResolutionExact").setVisible(true);
+            findPreference("displayResolutionCustom").setVisible(false);
 
             findPreference("dexMetaKeyCapture").setEnabled(!p.getBoolean("enableAccessibilityServiceAutomatically", false));
             findPreference("enableAccessibilityServiceAutomatically").setEnabled(!p.getBoolean("dexMetaKeyCapture", false));
@@ -132,10 +115,9 @@ public class LoriePreferences extends AppCompatActivity {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P)
                 findPreference("hideCutout").setVisible(false);
 
-            findPreference("displayResolutionMode").setSummary(p.getString("displayResolutionMode", "native"));
-            findPreference("displayResolutionExact").setSummary(p.getString("displayResolutionExact", "1280x1024"));
-            findPreference("displayResolutionCustom").setSummary(p.getString("displayResolutionCustom", "1280x1024"));
-            findPreference("displayStretch").setEnabled("exact".contentEquals(p.getString("displayResolutionMode", "native")) || "custom".contentEquals(p.getString("displayResolutionMode", "native")));
+            findPreference("displayResolutionExact").setSummary(p.getString("displayResolutionExact", "1280x720"));
+            findPreference("displayResolutionCustom").setSummary(p.getString("displayResolutionCustom", "1280x720"));
+            findPreference("displayStretch").setEnabled(true);
 
             int modeValue = Integer.parseInt(p.getString("touchMode", "1")) - 1;
             String mode = getResources().getStringArray(R.array.touchscreenInputModesEntries)[modeValue];
