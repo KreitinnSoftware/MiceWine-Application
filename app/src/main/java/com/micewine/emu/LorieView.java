@@ -138,31 +138,10 @@ public class LorieView extends SurfaceView implements InputStub {
         int height = getMeasuredHeight();
         int w = width;
         int h = height;
-        switch(preferences.getString("displayResolutionMode", "native")) {
-            case "scaled": {
-                int scale = preferences.getInt("displayScale", 100);
-                w = width / scale * 100;
-                h = height / scale * 100;
-                break;
-            }
-            case "exact": {
-                String[] resolution = preferences.getString("displayResolutionExact", "1280x1024").split("x");
-                w = Integer.parseInt(resolution[0]);
-                h = Integer.parseInt(resolution[1]);
-                break;
-            }
-            case "custom": {
-                try {
-                    String[] resolution = preferences.getString("displayResolutionCustom", "1280x1024").split("x");
-                    w = Integer.parseInt(resolution[0]);
-                    h = Integer.parseInt(resolution[1]);
-                } catch (NumberFormatException | PatternSyntaxException ignored) {
-                    w = 1280;
-                    h = 1024;
-                }
-                break;
-            }
-        }
+
+        String[] resolution = preferences.getString("displayResolutionExact", "1280x720").split("x");
+        w = Integer.parseInt(resolution[0]);
+        h = Integer.parseInt(resolution[1]);
 
         if ((width < height && w > h) || (width > height && w < h))
             p.set(h, w);
@@ -175,9 +154,7 @@ public class LorieView extends SurfaceView implements InputStub {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        if (preferences.getBoolean("displayStretch", false)
-              || "native".equals(preferences.getString("displayResolutionMode", "native"))
-              || "scaled".equals(preferences.getString("displayResolutionMode", "native"))) {
+        if (preferences.getBoolean("displayStretch", false)) {
             getHolder().setSizeFromLayout();
             return;
         }

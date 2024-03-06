@@ -20,8 +20,8 @@ public class EnvVars {
 
     public static String exportVariables() {
         String variables = "";
-        for (String key : vars.keySet()) {
-            variables = variables.concat(" " + getVar(key));
+        for (String chave : vars.keySet()) {
+            variables = variables.concat(" " + getVar(chave));
         }
 
         return "export " + variables;
@@ -29,11 +29,14 @@ public class EnvVars {
 
     public static void setVariables() {
         putVar("TMPDIR", "TMPDIR=" + tmpDir);
-        putVar("XKB_CONFIG_ROOT", "XKB_CONFIG_ROOT=" + "/sdcard/x11/X11/xkb");
-        putVar("CLASSPATH", "CLASSPATH=/data/data/com.micewine.emu/files/loader.apk");
+        putVar("XKB_CONFIG_ROOT", "XKB_CONFIG_ROOT=" + usrDir + "/share/X11/xkb");
+        putVar("CLASSPATH", "CLASSPATH=" + shellLoader);
         putVar("HOME", "HOME=" + homeDir);
         putVar("LANG", "LANG=en_US.UTF-8");
+        putVar("DISPLAY_SESSION", "DISPLAY=:0");
         putVar("BOX64_LOG", "BOX64_LOG=1");
         putVar("LD_LIBRARY_PATH", "LD_LIBRARY_PATH=" + usrDir + "/lib");
+        putVar("OPENGL_DRIVER", "GALLIUM_DRIVER=virpipe");
+        putVar("LIBGL_DRIVERS_PATH", "LIBGL_DRIVERS_PATH=" + usrDir + "/lib/dri");
     }
 }
