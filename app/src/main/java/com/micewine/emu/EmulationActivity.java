@@ -158,6 +158,10 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
             if (id == R.id.exit_fromXserver) {
                 Intent i = new Intent(this, MainActivity.class);
                 startActivity(i);
+            } else if (id == R.id.openKeyboard) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                drawerLayout.closeDrawers();
             }
             return true;
         });
@@ -182,7 +186,9 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
                     if (e.getAction() == ACTION_UP)
                         if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
                             drawerLayout.openDrawer(GravityCompat.START);
-                        } else drawerLayout.closeDrawers();
+                        } else {
+                            drawerLayout.closeDrawers();
+                        };
                     return true;
                 }
             }
@@ -607,7 +613,6 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
 
     @Override
     public void onBackPressed() {
-
     }
 
 

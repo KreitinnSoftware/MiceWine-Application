@@ -1,6 +1,6 @@
 <!DOCTYPE resources [
     <!ENTITY MICEWINE_PACKAGE_NAME "com.micewine.emu">
-    <!ENTITY MICEWINE_APP_NAME "MiceApp">
+    <!ENTITY MICEWINE_APP_NAME "MiceWine">
 ]>
 <resources>
     <string name="plugin_info">&MICEWINE_APP_NAME; is a plugin app for the &MICEWINE_APP_NAME; app.
