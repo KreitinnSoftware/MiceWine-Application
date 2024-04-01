@@ -19,75 +19,36 @@ import java.lang.ref.WeakReference;
  * Android gesture-detectors only detect taps/long-presses made with one finger.
  */
 public class TapGestureDetector {
-    /** The listener for receiving notifications of tap gestures. */
-    public interface OnTapListener {
-        /**
-         * Notified when a tap event occurs.
-         *
-         * @param pointerCount The number of fingers that were tapped.
-         * @param x The x coordinate of the initial finger tapped.
-         * @param y The y coordinate of the initial finger tapped.
-         */
-        void onTap(int pointerCount, float x, float y);
-
-        /**
-         * Notified when a long-touch event occurs.
-         *
-         * @param pointerCount The number of fingers held down.
-         * @param x The x coordinate of the initial finger tapped.
-         * @param y The y coordinate of the initial finger tapped.
-         */
-        void onLongPress(int pointerCount, float x, float y);
-    }
-
-    /** The listener to which notifications are sent. */
+    /**
+     * The listener to which notifications are sent.
+     */
     private final OnTapListener mListener;
-
-    /** Handler used for posting tasks to be executed in the future. */
+    /**
+     * Handler used for posting tasks to be executed in the future.
+     */
     private final Handler mHandler;
-
     /**
      * Stores the location of each down MotionEvent (by pointer ID), for detecting motion of any
      * pointer beyond the TouchSlop region.
      */
     private final SparseArray<PointF> mInitialPositions = new SparseArray<>();
-
     /**
      * Threshold squared-distance, in pixels, to use for motion-detection. If a finger moves less
      * than this distance, the gesture is still eligible to be a tap event.
      */
     private final int mTouchSlopSquare;
-
-    /** The maximum number of fingers seen in the gesture. */
+    /**
+     * The maximum number of fingers seen in the gesture.
+     */
     private int mPointerCount;
-
-    /** The coordinates of the first finger down seen in the gesture. */
+    /**
+     * The coordinates of the first finger down seen in the gesture.
+     */
     private PointF mInitialPoint;
-
-    /** Set to true whenever motion is detected in the gesture, or a long-touch is triggered. */
+    /**
+     * Set to true whenever motion is detected in the gesture, or a long-touch is triggered.
+     */
     private boolean mTapCancelled;
-
-    /** @noinspection NullableProblems*/
-    // This static inner class holds a WeakReference to the outer object, to avoid triggering the
-    // lint HandlerLeak warning.
-    @SuppressWarnings("deprecation")
-    private static class EventHandler extends Handler {
-        private final WeakReference<TapGestureDetector> mDetector;
-
-        public EventHandler(TapGestureDetector detector) {
-            mDetector = new WeakReference<>(detector);
-        }
-
-        @Override
-        public void handleMessage(Message message) {
-            TapGestureDetector detector = mDetector.get();
-            if (detector != null) {
-                detector.mTapCancelled = true;
-                detector.mListener.onLongPress(detector.mPointerCount, detector.mInitialPoint.x, detector.mInitialPoint.y);
-                detector.mInitialPoint = null;
-            }
-        }
-    }
 
     public TapGestureDetector(Context context, OnTapListener listener) {
         mListener = listener;
@@ -146,7 +107,9 @@ public class TapGestureDetector {
         }
     }
 
-    /** Stores the location of the ACTION_DOWN or ACTION_POINTER_DOWN event. */
+    /**
+     * Stores the location of the ACTION_DOWN or ACTION_POINTER_DOWN event.
+     */
     private void trackDownEvent(MotionEvent event) {
         int pointerIndex = 0;
         if (event.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN) {
@@ -161,7 +124,9 @@ public class TapGestureDetector {
         }
     }
 
-    /** Removes the ACTION_UP or ACTION_POINTER_UP event from the stored list. */
+    /**
+     * Removes the ACTION_UP or ACTION_POINTER_UP event from the stored list.
+     */
     private void trackUpEvent(MotionEvent event) {
         int pointerIndex = 0;
         if (event.getActionMasked() == MotionEvent.ACTION_POINTER_UP) {
@@ -199,7 +164,9 @@ public class TapGestureDetector {
         return false;
     }
 
-    /** Cleans up any stored data for the gesture. */
+    /**
+     * Cleans up any stored data for the gesture.
+     */
     private void reset() {
         cancelLongTouchNotification();
         mPointerCount = 0;
@@ -207,8 +174,57 @@ public class TapGestureDetector {
         mTapCancelled = false;
     }
 
-    /** Cancels any pending long-touch notifications from the message-queue. */
+    /**
+     * Cancels any pending long-touch notifications from the message-queue.
+     */
     private void cancelLongTouchNotification() {
         mHandler.removeMessages(0);
+    }
+
+    /**
+     * The listener for receiving notifications of tap gestures.
+     */
+    public interface OnTapListener {
+        /**
+         * Notified when a tap event occurs.
+         *
+         * @param pointerCount The number of fingers that were tapped.
+         * @param x            The x coordinate of the initial finger tapped.
+         * @param y            The y coordinate of the initial finger tapped.
+         */
+        void onTap(int pointerCount, float x, float y);
+
+        /**
+         * Notified when a long-touch event occurs.
+         *
+         * @param pointerCount The number of fingers held down.
+         * @param x            The x coordinate of the initial finger tapped.
+         * @param y            The y coordinate of the initial finger tapped.
+         */
+        void onLongPress(int pointerCount, float x, float y);
+    }
+
+    /**
+     * @noinspection NullableProblems
+     */
+    // This static inner class holds a WeakReference to the outer object, to avoid triggering the
+    // lint HandlerLeak warning.
+    @SuppressWarnings("deprecation")
+    private static class EventHandler extends Handler {
+        private final WeakReference<TapGestureDetector> mDetector;
+
+        public EventHandler(TapGestureDetector detector) {
+            mDetector = new WeakReference<>(detector);
+        }
+
+        @Override
+        public void handleMessage(Message message) {
+            TapGestureDetector detector = mDetector.get();
+            if (detector != null) {
+                detector.mTapCancelled = true;
+                detector.mListener.onLongPress(detector.mPointerCount, detector.mInitialPoint.x, detector.mInitialPoint.y);
+                detector.mInitialPoint = null;
+            }
+        }
     }
 }

@@ -1,7 +1,7 @@
 package com.micewine.emu.models;
 
 public class GameList {
-   private int titleGame;
+    private int titleGame;
     private int GameImage;
 
     public GameList(int titleGame, int GameImage) {
@@ -25,5 +25,5 @@ public class GameList {
         this.GameImage = GameImage;
     }
 
-    
+
 }

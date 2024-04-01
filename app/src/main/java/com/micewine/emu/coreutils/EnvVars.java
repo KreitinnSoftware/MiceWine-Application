@@ -8,7 +8,7 @@ import static com.micewine.emu.activities.MainActivity.usrDir;
 import java.util.LinkedHashMap;
 
 public class EnvVars {
-    private static final LinkedHashMap<String , String> vars = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> vars = new LinkedHashMap<>();
 
     public static void putVar(String name, Object value) {
         vars.put(name, String.valueOf(value));
@@ -35,8 +35,13 @@ public class EnvVars {
         putVar("LANG", "LANG=en_US.UTF-8");
         putVar("DISPLAY_SESSION", "DISPLAY=:0");
         putVar("BOX64_LOG", "BOX64_LOG=1");
-        putVar("LD_LIBRARY_PATH", "LD_LIBRARY_PATH=" + usrDir + "/lib");
-        putVar("OPENGL_DRIVER", "GALLIUM_DRIVER=virpipe");
-        putVar("LIBGL_DRIVERS_PATH", "LIBGL_DRIVERS_PATH=" + usrDir + "/lib/dri");
+        putVar("LD_LIBRARY_PATH", "LD_LIBRARY_PATH=" + usrDir + "/lib/");
+        putVar("OPENGL_DRIVER", "GALLIUM_DRIVER=softpipe");
+        putVar("LIBGL_DRIVERS_PATH", "LIBGL_DRIVERS_PATH=" + usrDir + "/lib/dri/");
+        putVar("VULKAN_DRIVER", "VK_ICD_FILENAMES=" + usrDir + "/share/vulkan/icd.d/freedreno_icd.aarch64.json");
+        putVar("PATH", "PATH+=:" + usrDir + "/bin");
+        putVar("PREFIX", "PREFIX=" + usrDir);
+        putVar("DXVK_HUD", "DXVK_HUD=1");
+        putVar("FIX_FLICKERING", "MESA_VK_WSI_PRESENT_MODE=mailbox");
     }
 }

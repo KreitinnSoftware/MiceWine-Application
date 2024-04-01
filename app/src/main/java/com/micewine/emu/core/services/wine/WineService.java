@@ -3,7 +3,6 @@ package com.micewine.emu.core.services.wine;
 import static com.micewine.emu.activities.MainActivity.box64;
 import static com.micewine.emu.activities.MainActivity.usrDir;
 import static com.micewine.emu.activities.MainActivity.wine;
-import static com.micewine.emu.activities.MainActivity.wineFolder;
 import static com.micewine.emu.coreutils.EnvVars.exportVariables;
 import static com.micewine.emu.coreutils.EnvVars.setVariables;
 import static com.micewine.emu.coreutils.ShellExecutorCmd.ExecuteCMD;
@@ -19,11 +18,11 @@ public class WineService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         setVariables();
 
-        new Thread(() -> ExecuteCMD(exportVariables() + "; sleep 4;" +
-                box64 + " " + wine + " " + "explorer /desktop=shell,1280x720 explorer")).start();
+        new Thread(() -> ExecuteCMD(exportVariables() + "; wait-xserver; sleep 1;" +
+                usrDir + "/bin/start-wine.sh", "WineService")).start();
         return START_STICKY;
     }
-    
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {

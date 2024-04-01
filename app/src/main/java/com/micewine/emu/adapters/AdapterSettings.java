@@ -1,20 +1,21 @@
 package com.micewine.emu.adapters;
+
 import android.content.Context;
 import android.content.Intent;
-import android.sax.RootElement;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.micewine.emu.LoriePreferences;
 import com.micewine.emu.R;
-
 import com.micewine.emu.activities.logAppOutput;
 import com.micewine.emu.models.SettingsList;
+
 import java.util.List;
 
 public class AdapterSettings extends RecyclerView.Adapter<AdapterSettings.ViewHolder> {
@@ -34,7 +35,7 @@ public class AdapterSettings extends RecyclerView.Adapter<AdapterSettings.ViewHo
         return new ViewHolder(itemView);
     }
 
-    
+
     @Override
     public void onBindViewHolder(@NonNull AdapterSettings.ViewHolder holder, int position) {
 
@@ -75,10 +76,10 @@ public class AdapterSettings extends RecyclerView.Adapter<AdapterSettings.ViewHo
                 context.startActivity(intent);
             } else if (R.string.log_level_normal == settingsModel.getTitleSettings()) {
                 Intent intent = new Intent(context, logAppOutput.class);
-           context.startActivity(intent);
-            }else if (R.string.about_preferences_title == settingsModel.getTitleSettings()){
+                context.startActivity(intent);
+            } else if (R.string.about_preferences_title == settingsModel.getTitleSettings()) {
                 //dispois
             }
+        }
     }
 }
-    }

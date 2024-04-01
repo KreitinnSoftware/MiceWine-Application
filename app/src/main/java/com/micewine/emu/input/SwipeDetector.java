@@ -15,14 +15,18 @@ import android.view.ViewConfiguration;
  */
 @SuppressWarnings("ConstantConditions")
 public class SwipeDetector {
+    /**
+     * Threshold squared-distance, in pixels, to use for motion-detection.
+     */
+    private final int mTouchSlopSquare;
     private boolean mInSwipe = false;
-
-    /** Initial coordinates of the two pointers in the current gesture. */
+    /**
+     * Initial coordinates of the two pointers in the current gesture.
+     */
     private float mFirstX0;
     private float mFirstY0;
     private float mFirstX1;
     private float mFirstY1;
-
     /**
      * The initial coordinates above are valid when this flag is set. Used to determine whether a
      * MotionEvent's pointer coordinates are the first ones of the gesture.
@@ -30,23 +34,22 @@ public class SwipeDetector {
     private boolean mInGesture;
 
     /**
-     * Threshold squared-distance, in pixels, to use for motion-detection.
+     * Construct a new detector, using the context to determine movement thresholds.
      */
-    private final int mTouchSlopSquare;
-
-    private void reset() {
-        mInSwipe = false;
-        mInGesture = false;
-    }
-
-    /** Construct a new detector, using the context to determine movement thresholds. */
     public SwipeDetector(Context context) {
         ViewConfiguration config = ViewConfiguration.get(context);
         int touchSlop = config.getScaledTouchSlop();
         mTouchSlopSquare = touchSlop * touchSlop;
     }
 
-    /** Returns whether a swipe is in progress. */
+    private void reset() {
+        mInSwipe = false;
+        mInGesture = false;
+    }
+
+    /**
+     * Returns whether a swipe is in progress.
+     */
     public boolean isSwiping() {
         return mInSwipe;
     }

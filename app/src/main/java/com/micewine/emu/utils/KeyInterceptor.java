@@ -6,14 +6,12 @@ import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 
 import com.micewine.emu.EmulationActivity;
-import com.micewine.emu.R;
 
 import java.util.LinkedHashSet;
 
 public class KeyInterceptor extends AccessibilityService {
-    LinkedHashSet<Integer> pressedKeys = new LinkedHashSet<>();
-
     private static KeyInterceptor self;
+    LinkedHashSet<Integer> pressedKeys = new LinkedHashSet<>();
 
     public KeyInterceptor() {
         self = this;
@@ -36,12 +34,12 @@ public class KeyInterceptor extends AccessibilityService {
             return false;
 
         else
-        // We should send key releases to activity for the case if user was pressing some keys when Activity lost focus.
-        // I.e. if user switched window with Win+Tab or if he was pressing Ctrl while switching activity.
-        if (event.getAction() == KeyEvent.ACTION_UP)
-            pressedKeys.remove(event.getKeyCode());
+            // We should send key releases to activity for the case if user was pressing some keys when Activity lost focus.
+            // I.e. if user switched window with Win+Tab or if he was pressing Ctrl while switching activity.
+            if (event.getAction() == KeyEvent.ACTION_UP)
+                pressedKeys.remove(event.getKeyCode());
 
-        Log.d("KeyInterceptor", "" + (event.getUnicodeChar() != 0 ? (char) event.getUnicodeChar() : "") + " " + (event.getCharacters() != null ? event.getCharacters() : "") + " " + (ret ? " " : " not ") + "intercepted event " + event);
+        Log.d("KeyInterceptor", (event.getUnicodeChar() != 0 ? (char) event.getUnicodeChar() : "") + " " + (event.getCharacters() != null ? event.getCharacters() : "") + " " + (ret ? " " : " not ") + "intercepted event " + event);
 
         return ret;
     }

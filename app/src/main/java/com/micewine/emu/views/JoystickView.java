@@ -112,18 +112,10 @@ public class JoystickView extends SurfaceView implements SurfaceHolder.Callback 
                 }
 
                 // Button 1
-                if (Math.sqrt(Math.pow(x - button1CenterX, 2) + Math.pow(y - button1CenterY, 2)) <= BUTTON_RADIUS) {
-                    isButton1Pressed = true;
-                } else {
-                    isButton1Pressed = false;
-                }
+                isButton1Pressed = Math.sqrt(Math.pow(x - button1CenterX, 2) + Math.pow(y - button1CenterY, 2)) <= BUTTON_RADIUS;
 
                 // Button 2
-                if (Math.sqrt(Math.pow(x - button2CenterX, 2) + Math.pow(y - button2CenterY, 2)) <= BUTTON_RADIUS) {
-                    isButton2Pressed = true;
-                } else {
-                    isButton2Pressed = false;
-                }
+                isButton2Pressed = Math.sqrt(Math.pow(x - button2CenterX, 2) + Math.pow(y - button2CenterY, 2)) <= BUTTON_RADIUS;
 
                 drawControls();
                 break;

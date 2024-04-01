@@ -4,10 +4,30 @@
 
 package com.micewine.emu.input;
 
-import static android.view.KeyEvent.*;
-import static android.view.MotionEvent.*;
+import static android.view.KeyEvent.ACTION_MULTIPLE;
+import static android.view.KeyEvent.KEYCODE_2;
+import static android.view.KeyEvent.KEYCODE_3;
+import static android.view.KeyEvent.KEYCODE_8;
+import static android.view.KeyEvent.KEYCODE_ALT_RIGHT;
+import static android.view.KeyEvent.KEYCODE_AT;
+import static android.view.KeyEvent.KEYCODE_ENTER;
+import static android.view.KeyEvent.KEYCODE_EQUALS;
+import static android.view.KeyEvent.KEYCODE_ESCAPE;
+import static android.view.KeyEvent.KEYCODE_PLUS;
+import static android.view.KeyEvent.KEYCODE_POUND;
+import static android.view.KeyEvent.KEYCODE_SHIFT_LEFT;
+import static android.view.KeyEvent.KEYCODE_STAR;
+import static android.view.KeyEvent.META_ALT_RIGHT_ON;
+import static android.view.MotionEvent.ACTION_HOVER_ENTER;
+import static android.view.MotionEvent.ACTION_HOVER_EXIT;
+import static android.view.MotionEvent.ACTION_HOVER_MOVE;
+import static android.view.MotionEvent.ACTION_MOVE;
+import static android.view.MotionEvent.ACTION_POINTER_DOWN;
 import static androidx.core.math.MathUtils.clamp;
-import static com.micewine.emu.input.InputStub.*;
+import static com.micewine.emu.input.InputStub.BUTTON_LEFT;
+import static com.micewine.emu.input.InputStub.BUTTON_MIDDLE;
+import static com.micewine.emu.input.InputStub.BUTTON_RIGHT;
+import static com.micewine.emu.input.InputStub.BUTTON_UNDEFINED;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import android.graphics.PointF;
@@ -26,15 +46,16 @@ public final class InputEventSender {
     private static final int XI_TouchBegin = 18;
     private static final int XI_TouchUpdate = 19;
     private static final int XI_TouchEnd = 20;
-
+    private static final List<Integer> buttons = List.of(BUTTON_UNDEFINED, BUTTON_LEFT, BUTTON_MIDDLE, BUTTON_RIGHT);
+    final boolean[] pointers = new boolean[10];
     private final InputStub mInjector;
-
+    /**
+     * Set of pressed keys for which we've sent TextEvent.
+     */
+    private final TreeSet<Integer> mPressedTextKeys;
     public boolean tapToMove = false;
     public boolean preferScancodes = false;
     public boolean pointerCapture = false;
-
-    /** Set of pressed keys for which we've sent TextEvent. */
-    private final TreeSet<Integer> mPressedTextKeys;
 
     public InputEventSender(InputStub injector) {
         if (injector == null)
@@ -43,7 +64,6 @@ public final class InputEventSender {
         mPressedTextKeys = new TreeSet<>();
     }
 
-    private static final List<Integer> buttons = List.of(BUTTON_UNDEFINED, BUTTON_LEFT, BUTTON_MIDDLE, BUTTON_RIGHT);
     public void sendMouseEvent(PointF pos, int button, boolean down, boolean relative) {
         if (!buttons.contains(button))
             return;
@@ -51,7 +71,7 @@ public final class InputEventSender {
     }
 
     public void sendMouseDown(int button, boolean relative) {
-        if (!buttons.contains(button)) 
+        if (!buttons.contains(button))
             return;
         mInjector.sendMouseEvent(0, 0, button, true, relative);
     }
@@ -77,7 +97,6 @@ public final class InputEventSender {
         mInjector.sendMouseWheelEvent(distanceX, distanceY);
     }
 
-    final boolean[] pointers = new boolean[10];
     /**
      * Extracts the touch point data from a MotionEvent, converts each point into a marshallable
      * object and passes the set of points to the JNI layer to be transmitted to the remote host.
@@ -116,8 +135,8 @@ public final class InputEventSender {
             // cause confusion on the remote OS side and result in broken touch gestures.
             int activePointerIndex = event.getActionIndex();
             int id = event.getPointerId(activePointerIndex);
-            int x =  clamp((int) (event.getX(activePointerIndex) * renderData.scale.x), 0, renderData.screenWidth);
-            int y =  clamp((int) (event.getY(activePointerIndex) * renderData.scale.y), 0, renderData.screenHeight);
+            int x = clamp((int) (event.getX(activePointerIndex) * renderData.scale.x), 0, renderData.screenWidth);
+            int y = clamp((int) (event.getY(activePointerIndex) * renderData.scale.y), 0, renderData.screenHeight);
             int a = (action == MotionEvent.ACTION_DOWN || action == ACTION_POINTER_DOWN) ? XI_TouchBegin : XI_TouchEnd;
             if (a == XI_TouchEnd)
                 mInjector.sendTouchEvent(XI_TouchUpdate, id, x, y);
@@ -145,7 +164,7 @@ public final class InputEventSender {
             if (e.getCharacters() != null)
                 mInjector.sendTextEvent(e.getCharacters().getBytes(UTF_8));
             else if (e.getUnicodeChar() != 0)
-                mInjector.sendTextEvent(String.valueOf((char)e.getUnicodeChar()).getBytes(UTF_8));
+                mInjector.sendTextEvent(String.valueOf((char) e.getUnicodeChar()).getBytes(UTF_8));
             return true;
         }
 
@@ -154,7 +173,7 @@ public final class InputEventSender {
         // For Enter getUnicodeChar() returns 10 (line feed), but we still
         // want to send it as KeyEvent.
         char unicode = keyCode != KEYCODE_ENTER ? (char) e.getUnicodeChar() : 0;
-        int scancode = (preferScancodes || !no_modifiers) ? e.getScanCode(): 0;
+        int scancode = (preferScancodes || !no_modifiers) ? e.getScanCode() : 0;
 
         if (!preferScancodes) {
             if (pressed && unicode != 0 && no_modifiers) {
@@ -180,13 +199,13 @@ public final class InputEventSender {
         // third-party keyboards that may still generate these events. See
         // https://source.android.com/devices/input/keyboard-devices.html#legacy-unsupported-keys
         char[][] chars = {
-                { KEYCODE_AT, '@', KEYCODE_2 },
-                { KEYCODE_POUND, '#', KEYCODE_3 },
-                { KEYCODE_STAR, '*', KEYCODE_8 },
-                { KEYCODE_PLUS, '+', KEYCODE_EQUALS }
+                {KEYCODE_AT, '@', KEYCODE_2},
+                {KEYCODE_POUND, '#', KEYCODE_3},
+                {KEYCODE_STAR, '*', KEYCODE_8},
+                {KEYCODE_PLUS, '+', KEYCODE_EQUALS}
         };
 
-        for (char[] i: chars) {
+        for (char[] i : chars) {
             if (e.getKeyCode() != i[0])
                 continue;
 

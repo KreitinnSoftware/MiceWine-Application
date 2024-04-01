@@ -8,8 +8,8 @@ android {
     buildToolsVersion '34.0.0'
     ndkVersion "26.1.10909125"
     defaultConfig {
-   def signingConfig = project(':app').android.signingConfigs.debug
-   def keyStore = java.security.KeyStore.getInstance(java.security.KeyStore.getDefaultType())
+        def signingConfig = project(':app').android.signingConfigs.debug
+        def keyStore = java.security.KeyStore.getInstance(java.security.KeyStore.getDefaultType())
         applicationId "com.micewine.emu"
         minSdkVersion 26
         targetSdkVersion 28
@@ -25,25 +25,22 @@ android {
         buildConfigField "String", "packageSignatureMismatchErrorText",
         "\"Signature verification of target application " + android.namespace + " failed.\\nPlease, reinstall both micewine-emu package and Termux:X11 application from the same source\""
         buildConfigField "String", "COMMIT", "\"" + ("git rev-parse HEAD\n".execute().getText().trim() ?: (System.getenv('CURRENT_COMMIT') ?: "NO_COMMIT")) + "\""
-  }
+    }
 
     signingConfigs.debug {
         storeFile file('testkey_untrusted.jks')
         keyAlias 'alias'
         storePassword 'xrj45yWGLbsO7W0v'
         keyPassword 'xrj45yWGLbsO7W0v'
-        
-        
     }
 
     splits.abi {
         enable true
         reset()
 
-        include "armeabi-v7a", "arm64-v8a"
-        universalApk true
+        include "arm64-v8a"
+        universalApk false
     }
-
 
     compileOptions.sourceCompatibility JavaVersion.VERSION_1_9
     compileOptions.targetCompatibility JavaVersion.VERSION_1_9
@@ -59,8 +56,8 @@ android {
             optimizeCode true
         }
     }
-    
-   sourceSets {
+
+    sourceSets {
         main {
             jniLibs.srcDirs += ['libs']
         }
@@ -85,22 +82,19 @@ android {
             version '3.22.1'
         }
     }
-    
 }
 
 dependencies {
-
-implementation 'net.lingala.zip4j:zip4j:2.11.5'
-
+    implementation 'net.lingala.zip4j:zip4j:2.11.5'
     //noinspection DifferentStdlibGradleVersion
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.material:material:1.9.0")
-   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.20"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.20"
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
     implementation 'androidx.preference:preference:1.2.1'
  // implementation 'com.squareup.picasso:picasso:2.71828'
-implementation 'com.github.luben:zstd-jni:1.5.2-3@aar'
+    implementation 'com.github.luben:zstd-jni:1.5.2-3@aar'
     implementation 'org.tukaani:xz:1.7'
     implementation 'org.apache.commons:commons-compress:1.20'
 

@@ -7,12 +7,10 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.PixelFormat;
-import android.graphics.Point;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Color; 
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
@@ -23,42 +21,36 @@ import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 
 import com.micewine.emu.input.InputStub;
-
 import com.micewine.emu.systemutils.SystemMemoryInfo;
-import java.util.regex.PatternSyntaxException;
 
 @SuppressLint("WrongConstant")
 @SuppressWarnings("deprecation")
 public class LorieView extends SurfaceView implements InputStub {
 
+    public static long BYTES_FOR_MEGABYTES = (1024 * 1024);
+
+    static {
+        System.loadLibrary("Xlorie");
+    }
+
+    private final Point p = new Point();
     private long totalMemory = SystemMemoryInfo.getTotalRAM(getContext());
     private long freeMemory = SystemMemoryInfo.getFreeRAM(getContext());
-    private Handler handler = new Handler();
-    public static long BYTES_FOR_MEGABYTES = (1024*1024);
-    
-    
-    interface Callback {
-        void changed(Surface sfc, int surfaceWidth, int surfaceHeight, int screenWidth, int screenHeight);
-    }
-
-    interface PixelFormat {
-        int BGRA_8888 = 5; // Stands for HAL_PIXEL_FORMAT_BGRA_8888
-    }
-
+    private final Handler handler = new Handler();
     private Callback mCallback;
-    private final Point p = new Point();
     private final SurfaceHolder.Callback mSurfaceCallback = new SurfaceHolder.Callback() {
-        @Override public void surfaceCreated(@NonNull SurfaceHolder holder) {
-           updateRamCounter();
+        @Override
+        public void surfaceCreated(@NonNull SurfaceHolder holder) {
+            updateRamCounter();
             holder.setFormat(PixelFormat.BGRA_8888);
         }
 
-        @Override public void surfaceChanged(@NonNull SurfaceHolder holder, int f, int width, int height) {
+        @Override
+        public void surfaceChanged(@NonNull SurfaceHolder holder, int f, int width, int height) {
             width = getMeasuredWidth();
             height = getMeasuredHeight();
 
@@ -66,23 +58,45 @@ public class LorieView extends SurfaceView implements InputStub {
             if (mCallback == null)
                 return;
 
-            
-            
+
             getDimensionsFromSettings();
             mCallback.changed(holder.getSurface(), width, height, p.x, p.y);
         }
 
-        @Override public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
+        @Override
+        public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
             if (mCallback != null)
                 mCallback.changed(holder.getSurface(), 0, 0, 0, 0);
         }
     };
+    public LorieView(Context context) {
+        super(context);
+        init();
+    }
 
-    public LorieView(Context context) { super(context); init(); }
-    public LorieView(Context context, AttributeSet attrs) { super(context, attrs); init(); }
-    public LorieView(Context context, AttributeSet attrs, int defStyleAttr) { super(context, attrs, defStyleAttr); init(); }
+    public LorieView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public LorieView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
     @SuppressWarnings("unused")
-    public LorieView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) { super(context, attrs, defStyleAttr, defStyleRes); init(); }
+    public LorieView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        init();
+    }
+
+    static native void connect(int fd);
+
+    static native void startLogcat(int fd);
+
+    static native void setClipboardSyncEnabled(boolean enabled);
+
+    static native void sendWindowChange(int width, int height, int framerate);
 
     private void init() {
         getHolder().addCallback(mSurfaceCallback);
@@ -111,6 +125,7 @@ public class LorieView extends SurfaceView implements InputStub {
             public boolean isStateful() {
                 return true;
             }
+
             public boolean hasFocusStateSpecified() {
                 return true;
             }
@@ -152,7 +167,7 @@ public class LorieView extends SurfaceView implements InputStub {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        
+
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         if (preferences.getBoolean("displayStretch", false)) {
             getHolder().setSizeFromLayout();
@@ -179,30 +194,27 @@ public class LorieView extends SurfaceView implements InputStub {
         getHolder().setFixedSize(p.x, p.y);
         setMeasuredDimension(width, height);
     }
-    
-    
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         // TODO: Implement this method
         ramCounter(canvas);
     }
-    
+
     public void ramCounter(Canvas c) {
-    Paint paint = new Paint();
+        Paint paint = new Paint();
         paint.setColor(Color.WHITE);
         paint.setTextSize(15);
         c.drawText("RAM: " + (totalMemory - freeMemory) / BYTES_FOR_MEGABYTES + "/" + (totalMemory / BYTES_FOR_MEGABYTES), 10, 40, paint);
     }
-    
-    
-   private void updateRamCounter() {
-    totalMemory = SystemMemoryInfo.getTotalRAM(getContext());
-    freeMemory = SystemMemoryInfo.getFreeRAM(getContext());
-    invalidate();
-    handler.postDelayed(this::updateRamCounter, 50);
-}
-    
+
+    private void updateRamCounter() {
+        totalMemory = SystemMemoryInfo.getTotalRAM(getContext());
+        freeMemory = SystemMemoryInfo.getFreeRAM(getContext());
+        invalidate();
+        handler.postDelayed(this::updateRamCounter, 50);
+    }
 
     @Override
     public void sendMouseWheelEvent(float deltaX, float deltaY) {
@@ -221,18 +233,23 @@ public class LorieView extends SurfaceView implements InputStub {
         clipboard.setPrimaryClip(ClipData.newPlainText("X11 clipboard", text));
     }
 
-    static native void connect(int fd);
     native void handleXEvents();
-    static native void startLogcat(int fd);
-    static native void setClipboardSyncEnabled(boolean enabled);
-    static native void sendWindowChange(int width, int height, int framerate);
+
     public native void sendMouseEvent(float x, float y, int whichButton, boolean buttonDown, boolean relative);
+
     public native void sendTouchEvent(int action, int id, int x, int y);
+
     public native boolean sendKeyEvent(int scanCode, int keyCode, boolean keyDown);
+
     public native void sendTextEvent(byte[] text);
+
     public native void sendUnicodeEvent(int code);
 
-    static {
-        System.loadLibrary("Xlorie");
+    interface Callback {
+        void changed(Surface sfc, int surfaceWidth, int surfaceHeight, int screenWidth, int screenHeight);
+    }
+
+    interface PixelFormat {
+        int BGRA_8888 = 5; // Stands for HAL_PIXEL_FORMAT_BGRA_8888
     }
 }

@@ -1,35 +1,28 @@
 package com.micewine.emu.adapters;
-import android.content.Context;
-import android.os.Handler;
-import android.widget.FrameLayout;
-import com.micewine.emu.EmulationActivity;
-import com.micewine.emu.databinding.MainActivityBinding;
-import com.micewine.emu.models.GameList;
 
 import android.content.Context;
 import android.content.Intent;
-import android.sax.RootElement;
-import androidx.recyclerview.widget.RecyclerView;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-import androidx.annotation.NonNull;
-import com.micewine.emu.LoriePreferences;
-import com.micewine.emu.R;
 
-import com.micewine.emu.activities.logAppOutput;
-import com.micewine.emu.models.SettingsList;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.micewine.emu.EmulationActivity;
+import com.micewine.emu.R;
+import com.micewine.emu.models.GameList;
+
 import java.util.List;
-import kotlin.jvm.Throws;
 
 public class AdapterGame extends RecyclerView.Adapter<AdapterGame.ViewHolder> {
-    
-   private final Context context;
-    private Handler handler = new Handler();
+
+    private final Context context;
     private final List<GameList> GameList;
+    private final Handler handler = new Handler();
 
     public AdapterGame(List<GameList> GameList, Context context) {
         this.GameList = GameList;
@@ -66,30 +59,26 @@ public class AdapterGame extends RecyclerView.Adapter<AdapterGame.ViewHolder> {
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            
-           
+
 
             titleGame = itemView.findViewById(R.id.title_game_model);
             GameImage = itemView.findViewById(R.id.img_game);
             itemView.setOnClickListener(this);
         }
 
-      @Override
+        @Override
         public void onClick(View v) {
             GameList gameModel = GameList.get(getAdapterPosition());
-            if (R.string.desktop_mode_init == gameModel.getTitleGame()){
-               Intent intent = new Intent(context, EmulationActivity.class);
-                   context.startActivity(intent);
-                
+            if (R.string.desktop_mode_init == gameModel.getTitleGame()) {
+                Intent intent = new Intent(context, EmulationActivity.class);
+                context.startActivity(intent);
+
             }
         }
-        
-        
-        
-        
-            
-}
-    
-    
+
+
+    }
+
+
 }
     

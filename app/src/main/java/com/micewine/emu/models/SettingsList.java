@@ -1,7 +1,7 @@
 package com.micewine.emu.models;
 
 public class SettingsList {
-   private int SettingsTitle, DescriptionSettings;
+    private int SettingsTitle, DescriptionSettings;
     private int ImageSettings;
 
     public SettingsList(int SettingsTitle, int DescriptionSettings, int ImageSettings) {

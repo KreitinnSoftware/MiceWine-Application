@@ -1,7 +1,6 @@
 package com.micewine.emu;
 
 import static android.system.Os.getuid;
-import static android.system.Os.getenv;
 
 import android.annotation.SuppressLint;
 import android.app.IActivityManager;
@@ -30,7 +29,8 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.Arrays;
 
-@Keep @SuppressLint({"StaticFieldLeak", "UnsafeDynamicallyLoadedCode"})
+@Keep
+@SuppressLint({"StaticFieldLeak", "UnsafeDynamicallyLoadedCode"})
 public class CmdEntryPoint extends ICmdEntryInterface.Stub {
     public static final String ACTION_START = "com.micewine.emu.CmdEntryPoint.ACTION_START";
     public static final int PORT = 7892;
@@ -38,9 +38,40 @@ public class CmdEntryPoint extends ICmdEntryInterface.Stub {
     private static final Handler handler;
     public static Context ctx = createContext();
 
-    
-    
-    
+    static {
+        String path = "lib/" + Build.SUPPORTED_ABIS[0] + "/libXlorie.so";
+        ClassLoader loader = CmdEntryPoint.class.getClassLoader();
+        URL res = loader != null ? loader.getResource(path) : null;
+        String libPath = res != null ? res.getFile().replace("file:", "") : null;
+        if (libPath != null) {
+            try {
+                System.load(libPath);
+            } catch (Exception e) {
+                Log.e("CmdEntryPoint", "Failed to dlopen " + libPath, e);
+                System.err.println("Failed to load native library. Did you install the right apk? Try the universal one.");
+                System.exit(134);
+            }
+        } else {
+            // It is critical only when it is not running in Android application process
+            if (EmulationActivity.getInstance() == null) {
+                System.err.println("Failed to acquire native library. Did you install the right apk? Try the universal one.");
+                System.exit(134);
+            }
+        }
+
+        if (Looper.getMainLooper() == null)
+            Looper.prepareMainLooper();
+        handler = new Handler();
+    }
+
+    CmdEntryPoint(String[] args) {
+        if (!start(args))
+            System.exit(1);
+
+        spawnListeningThread();
+        sendBroadcastDelayed();
+    }
+
     /**
      * Command-line entry point.
      *
@@ -52,13 +83,44 @@ public class CmdEntryPoint extends ICmdEntryInterface.Stub {
         Looper.loop();
     }
 
-    CmdEntryPoint(String[] args) {
-        if (!start(args))
-            System.exit(1);
-
-        spawnListeningThread();
-        sendBroadcastDelayed();
+    public static void requestConnection() {
+        System.err.println("Requesting connection...");
+        new Thread(() -> { // New thread is needed to avoid android.os.NetworkOnMainThreadException
+            try (Socket socket = new Socket("127.0.0.1", CmdEntryPoint.PORT)) {
+                socket.getOutputStream().write(CmdEntryPoint.MAGIC);
+            } catch (ConnectException e) {
+                if (e.getMessage() != null && e.getMessage().contains("Connection refused")) {
+                    Log.e("CmdEntryPoint", "ECONNREFUSED: Connection has been refused by the server");
+                } else
+                    Log.e("CmdEntryPoint", "Something went wrong when we requested connection", e);
+            } catch (Exception e) {
+                Log.e("CmdEntryPoint", "Something went wrong when we requested connection", e);
+            }
+        }).start();
     }
+
+    /**
+     * @noinspection DataFlowIssue
+     */
+    @SuppressLint("DiscouragedPrivateApi")
+    public static Context createContext() {
+        try {
+            java.lang.reflect.Field f = Class.forName("sun.misc.Unsafe").getDeclaredField("theUnsafe");
+            f.setAccessible(true);
+            Object unsafe = f.get(null);
+            return ((android.app.ActivityThread) Class.
+                    forName("sun.misc.Unsafe").
+                    getMethod("allocateInstance", Class.class).
+                    invoke(unsafe, android.app.ActivityThread.class))
+                    .getSystemContext();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static native boolean start(String[] args);
+
+    private static native boolean connected();
 
     @SuppressLint({"WrongConstant", "PrivateApi"})
     void sendBroadcast() {
@@ -103,14 +165,16 @@ public class CmdEntryPoint extends ICmdEntryInterface.Stub {
             }
 
             assert am != null;
-            IIntentSender sender = am.getIntentSender(1, packageName, null, null, 0, new Intent[] { intent },
+            IIntentSender sender = am.getIntentSender(1, packageName, null, null, 0, new Intent[]{intent},
                     null, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_ONE_SHOT, null, 0);
             try {
                 //noinspection JavaReflectionMemberAccess
                 IIntentSender.class
                         .getMethod("send", int.class, Intent.class, String.class, IBinder.class, IIntentReceiver.class, String.class, Bundle.class)
                         .invoke(sender, 0, intent, null, null, new IIntentReceiver.Stub() {
-                            @Override public void performReceive(Intent i, int r, String d, Bundle e, boolean o, boolean s, int a) {}
+                            @Override
+                            public void performReceive(Intent i, int r, String d, Bundle e, boolean o, boolean s, int a) {
+                            }
                         }, null, null);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
@@ -139,7 +203,7 @@ public class CmdEntryPoint extends ICmdEntryInterface.Stub {
             try (ServerSocket listeningSocket =
                          new ServerSocket(PORT, 0, InetAddress.getByName("127.0.0.1"))) {
                 listeningSocket.setReuseAddress(true);
-                while(true) {
+                while (true) {
                     try (Socket client = listeningSocket.accept()) {
                         Log.e("CmdEntryPoint", "Somebody connected!");
                         // We should ensure that it is some
@@ -160,68 +224,9 @@ public class CmdEntryPoint extends ICmdEntryInterface.Stub {
         }).start();
     }
 
-    public static void requestConnection() {
-        System.err.println("Requesting connection...");
-        new Thread(() -> { // New thread is needed to avoid android.os.NetworkOnMainThreadException
-            try (Socket socket = new Socket("127.0.0.1", CmdEntryPoint.PORT)) {
-                socket.getOutputStream().write(CmdEntryPoint.MAGIC);
-            } catch (ConnectException e) {
-                if (e.getMessage() != null && e.getMessage().contains("Connection refused")) {
-                    Log.e("CmdEntryPoint", "ECONNREFUSED: Connection has been refused by the server");
-                } else
-                    Log.e("CmdEntryPoint", "Something went wrong when we requested connection", e);
-            } catch (Exception e) {
-                Log.e("CmdEntryPoint", "Something went wrong when we requested connection", e);
-            }
-        }).start();
-    }
-
-    /** @noinspection DataFlowIssue*/
-    @SuppressLint("DiscouragedPrivateApi")
-    public static Context createContext() {
-        try {
-            java.lang.reflect.Field f = Class.forName("sun.misc.Unsafe").getDeclaredField("theUnsafe");
-            f.setAccessible(true);
-            Object unsafe = f.get(null);
-            return ((android.app.ActivityThread) Class.
-                    forName("sun.misc.Unsafe").
-                    getMethod("allocateInstance", Class.class).
-                    invoke(unsafe, android.app.ActivityThread.class))
-                    .getSystemContext();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static native boolean start(String[] args);
     public native void windowChanged(Surface surface);
+
     public native ParcelFileDescriptor getXConnection();
+
     public native ParcelFileDescriptor getLogcatOutput();
-    private static native boolean connected();
-
-    static {
-        String path = "lib/" + Build.SUPPORTED_ABIS[0] + "/libXlorie.so";
-        ClassLoader loader = CmdEntryPoint.class.getClassLoader();
-        URL res = loader != null ? loader.getResource(path) : null;
-        String libPath = res != null ? res.getFile().replace("file:", "") : null;
-        if (libPath != null) {
-            try {
-                System.load(libPath);
-            } catch (Exception e) {
-                Log.e("CmdEntryPoint", "Failed to dlopen " + libPath, e);
-                System.err.println("Failed to load native library. Did you install the right apk? Try the universal one.");
-                System.exit(134);
-            }
-        } else {
-            // It is critical only when it is not running in Android application process
-            if (EmulationActivity.getInstance() == null) {
-                System.err.println("Failed to acquire native library. Did you install the right apk? Try the universal one.");
-                System.exit(134);
-            }
-        }
-
-        if (Looper.getMainLooper() == null)
-            Looper.prepareMainLooper();
-        handler = new Handler();
-    }
 }

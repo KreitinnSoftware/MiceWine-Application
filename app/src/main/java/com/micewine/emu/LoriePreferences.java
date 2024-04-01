@@ -8,44 +8,28 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.Settings;
+import android.util.Log;
+import android.view.MenuItem;
+import android.widget.Toast;
 
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.Preference;
-
-import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.provider.Settings;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.Preference.OnPreferenceChangeListener;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceGroup;
-
-import androidx.preference.Preference.OnPreferenceChangeListener;
 import androidx.preference.SeekBarPreference;
 
-import android.text.method.LinkMovementMethod;
-import android.util.Log;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.android.material.appbar.MaterialToolbar;
 import com.micewine.emu.utils.KeyInterceptor;
 import com.micewine.emu.utils.SamsungDexUtils;
-
 
 import java.util.Objects;
 import java.util.regex.PatternSyntaxException;
@@ -54,6 +38,7 @@ import java.util.regex.PatternSyntaxException;
 public class LoriePreferences extends AppCompatActivity {
     static final String ACTION_PREFERENCES_CHANGED = "com.termux.x11.ACTION_PREFERENCES_CHANGED";
     static final String SHOW_IME_WITH_HARD_KEYBOARD = "show_ime_with_hard_keyboard";
+    static Handler handler = new Handler();
     LoriePreferenceFragment loriePreferenceFragment;
 
     @Override
@@ -61,8 +46,6 @@ public class LoriePreferences extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         loriePreferenceFragment = new LoriePreferenceFragment();
         getSupportFragmentManager().beginTransaction().replace(android.R.id.content, loriePreferenceFragment).commit();
-
-   
     }
 
     @Override
@@ -78,7 +61,7 @@ public class LoriePreferences extends AppCompatActivity {
     }
 
     public static class LoriePreferenceFragment extends PreferenceFragmentCompat implements OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
-        
+
         @Override
         public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
             SharedPreferences p = getPreferenceManager().getSharedPreferences();
@@ -122,11 +105,12 @@ public class LoriePreferences extends AppCompatActivity {
             int modeValue = Integer.parseInt(p.getString("touchMode", "1")) - 1;
             String mode = getResources().getStringArray(R.array.touchscreenInputModesEntries)[modeValue];
             findPreference("touchMode").setSummary(mode);
-            findPreference("showMouseHelper").setEnabled("1".equals(p.getString("touchMode", "1")));
+            findPreference("showMouseHelper").setEnabled(("" +
+                    "1").equals(p.getString("touchMode", "1")));
 
             boolean requestNotificationPermissionVisible =
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                    && ContextCompat.checkSelfPermission(requireContext(), POST_NOTIFICATIONS) == PERMISSION_DENIED;
+                            && ContextCompat.checkSelfPermission(requireContext(), POST_NOTIFICATIONS) == PERMISSION_DENIED;
             findPreference("requestNotificationPermission").setVisible(requestNotificationPermissionVisible);
         }
 
@@ -146,7 +130,7 @@ public class LoriePreferences extends AppCompatActivity {
         }
 
         void setListeners(PreferenceGroup g) {
-            for (int i=0; i < g.getPreferenceCount(); i++) {
+            for (int i = 0; i < g.getPreferenceCount(); i++) {
                 g.getPreference(i).setOnPreferenceChangeListener(this);
                 g.getPreference(i).setOnPreferenceClickListener(this);
                 g.getPreference(i).setSingleLineTitle(false);
@@ -164,7 +148,7 @@ public class LoriePreferences extends AppCompatActivity {
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && "requestNotificationPermission".contentEquals(preference.getKey()))
-                ActivityCompat.requestPermissions(requireActivity(), new String[]{ POST_NOTIFICATIONS }, 101);
+                ActivityCompat.requestPermissions(requireActivity(), new String[]{POST_NOTIFICATIONS}, 101);
 
             updatePreferencesLayout();
             return false;
@@ -186,8 +170,8 @@ public class LoriePreferences extends AppCompatActivity {
                         new AlertDialog.Builder(requireActivity())
                                 .setTitle("Permission denied")
                                 .setMessage("Android requires WRITE_SECURE_SETTINGS permission to change this setting.\n" +
-                                            "Please, launch this command using ADB:\n" +
-                                            "adb shell pm grant com.termux.x11 android.permission.WRITE_SECURE_SETTINGS")
+                                        "Please, launch this command using ADB:\n" +
+                                        "adb shell pm grant com.termux.x11 android.permission.WRITE_SECURE_SETTINGS")
                                 .setNegativeButton("OK", null)
                                 .create()
                                 .show();
@@ -199,7 +183,7 @@ public class LoriePreferences extends AppCompatActivity {
             if ("displayScale".contentEquals(key)) {
                 int scale = (Integer) newValue;
                 if (scale % 10 != 0) {
-                    scale = Math.round( ( (float) scale ) / 10 ) * 10;
+                    scale = Math.round(((float) scale) / 10) * 10;
                     ((SeekBarPreference) preference).setValue(scale);
                     return false;
                 }
@@ -229,7 +213,6 @@ public class LoriePreferences extends AppCompatActivity {
                 }
             }
 
-   
 
             if ("enableAccessibilityServiceAutomatically".contentEquals(key)) {
                 if (!((Boolean) newValue))
@@ -256,6 +239,4 @@ public class LoriePreferences extends AppCompatActivity {
             return true;
         }
     }
-
-    static Handler handler = new Handler();
 }

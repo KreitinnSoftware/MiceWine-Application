@@ -1,6 +1,7 @@
 package com.micewine.emu.coreutils;
 
 import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -8,9 +9,9 @@ import java.io.InputStreamReader;
 
 public class ShellExecutorCmd {
     public static String stdOut = "";
-    public static void ExecuteCMD(String cmd) {
+    public static void ExecuteCMD(String cmd, String msg) {
         try {
-            Log.e("ShellLoader", "Trying to exec: " + cmd);
+            Log.e(msg, "Trying to exec: " + cmd);
             Process shell = Runtime.getRuntime().exec("/system/bin/sh");
             DataOutputStream os = new DataOutputStream(shell.getOutputStream());
 
@@ -25,12 +26,12 @@ public class ShellExecutorCmd {
 
             try {
                 while ((stdOut = stdout.readLine()) != null)
-                    Log.v("ShellLoader", "stdout: " + stdOut);
+                    Log.v(msg, "stdout: " + stdOut);
             } catch (IOException ignored) {
             }
             try {
                 while ((stdOut = stderr.readLine()) != null)
-                    Log.v("ShellLoader", "stderr: " + stdOut);
+                    Log.v(msg, "stderr: " + stdOut);
             } catch (IOException ignored) {
             }
             shell.destroy();

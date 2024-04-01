@@ -13,23 +13,13 @@ import static android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
 import static android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT;
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN;
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN;
-import android.widget.Toast;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import com.google.android.material.navigation.NavigationView;
 import static com.micewine.emu.CmdEntryPoint.ACTION_START;
-import com.micewine.emu.EntryPoint.Init;
 import static com.micewine.emu.LoriePreferences.ACTION_PREFERENCES_CHANGED;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.FragmentManager;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.Context;
@@ -40,7 +30,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
@@ -49,7 +38,6 @@ import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.service.notification.StatusBarNotification;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.InputDevice;
@@ -69,22 +57,20 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 import androidx.core.math.MathUtils;
-import androidx.viewpager.widget.ViewPager;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.micewine.emu.coreutils.RunServiceClass;
-import com.micewine.emu.databinding.OverlayLayoutBinding;
+import com.google.android.material.navigation.NavigationView;
+import com.micewine.emu.EntryPoint.Init;
+import com.micewine.emu.activities.MainActivity;
 import com.micewine.emu.input.InputEventSender;
 import com.micewine.emu.input.InputStub;
 import com.micewine.emu.input.TouchInputHandler;
 import com.micewine.emu.input.TouchInputHandler.RenderStub;
-import com.micewine.emu.overlay.OverlayService;
 import com.micewine.emu.utils.FullscreenWorkaround;
 import com.micewine.emu.utils.KeyInterceptor;
-import com.micewine.emu.R;
-import com.micewine.emu.activities.MainActivity;
-import com.micewine.emu.core.services.xserver.XServerLoader;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -93,20 +79,15 @@ import java.util.Objects;
 public class EmulationActivity extends AppCompatActivity implements View.OnApplyWindowInsetsListener {
     static final String ACTION_STOP = "com.micewine.emu.ACTION_STOP";
     static final String REQUEST_LAUNCH_EXTERNAL_DISPLAY = "request_launch_external_display";
-
+    private static final int KEY_BACK = 158;
     public static Handler handler = new Handler();
+    @SuppressLint("StaticFieldLeak")
+    private static EmulationActivity instance;
     FrameLayout frm;
+    int orientation;
     private TouchInputHandler mInputHandler;
     private ICmdEntryInterface service = null;
     private boolean mClientConnected = false;
-    private View.OnKeyListener mLorieKeyListener;
-    private static final int KEY_BACK = 158;
-    private Thread overlayThread;
-    private Init init;
-    private FragmentManager fragmentManager;
-    private DrawerLayout drawerLayout;
-    
-
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
         @Override
@@ -119,8 +100,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
                     Objects.requireNonNull(service).asBinder().linkToDeath(() -> {
                         service = null;
                         CmdEntryPoint.requestConnection();
-                            
-         
+
                         Log.v("Lorie", "Disconnected");
                         runOnUiThread(() -> clientConnectedStateChanged(false)); //recreate()); //onPreferencesChanged(""));
                     }, 0);
@@ -138,9 +118,11 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
             }
         }
     };
-
-    @SuppressLint("StaticFieldLeak")
-    private static EmulationActivity instance;
+    private View.OnKeyListener mLorieKeyListener;
+    private Thread overlayThread;
+    private Init init;
+    private FragmentManager fragmentManager;
+    private DrawerLayout drawerLayout;
 
     public EmulationActivity() {
         instance = this;
@@ -168,14 +150,14 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
         drawerLayout = findViewById(R.id.DrawerLayout);
         LorieView lorieView = findViewById(R.id.lorieView);
         View lorieParent = (View) lorieView.getParent();
-        
+
         NavigationView nav = findViewById(R.id.NavigationView);
-    
-        nav.setNavigationItemSelectedListener((item)-> {
+
+        nav.setNavigationItemSelectedListener((item) -> {
             int id = item.getItemId();
-            if(id == R.id.exit_fromXserver){
-                Intent i = new Intent(this , MainActivity.class);
-                startActivity(i);  
+            if (id == R.id.exit_fromXserver) {
+                Intent i = new Intent(this, MainActivity.class);
+                startActivity(i);
             }
             return true;
         });
@@ -186,7 +168,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
             }
         }, new InputEventSender(lorieView));
         mLorieKeyListener = (v, k, e) -> {
-            
+
             if (k == KEYCODE_BACK) {
                 if (e.isFromSource(InputDevice.SOURCE_MOUSE) || e.isFromSource(InputDevice.SOURCE_MOUSE_RELATIVE)) {
                     if (e.getRepeatCount() != 0) // ignore auto-repeat
@@ -198,10 +180,9 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
 
                 if (e.getScanCode() == KEY_BACK && e.getDevice().getKeyboardType() != KEYBOARD_TYPE_ALPHABETIC || e.getScanCode() == 0) {
                     if (e.getAction() == ACTION_UP)
-                   if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                drawerLayout.openDrawer(GravityCompat.START);
-            }
-            else drawerLayout.closeDrawers();
+                        if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                            drawerLayout.openDrawer(GravityCompat.START);
+                        } else drawerLayout.closeDrawers();
                     return true;
                 }
             }
@@ -224,7 +205,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
             LorieView.sendWindowChange(screenWidth, screenHeight, framerate);
 
             if (service !=
-                 null) {
+                    null) {
                 try {
                     service.windowChanged(sfc);
                 } catch (RemoteException e) {
@@ -245,24 +226,24 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
         checkXEvents();
         initStylusAuxButtons();
         initMouseAuxButtons();
+
+        Log.v("?", "Asa delta");
         init.run(this);
 
         if (SDK_INT >= VERSION_CODES.TIRAMISU
                 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PERMISSION_GRANTED
                 && !shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-            requestPermissions(new String[] { Manifest.permission.POST_NOTIFICATIONS }, 0);
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 0);
         }
     }
 
-    
     @Override
     protected void onDestroy() {
         unregisterReceiver(receiver);
         init.stopAll();
         super.onDestroy();
     }
-    
-    
+
     //Register the needed events to handle stylus as left, middle and right click
     @SuppressLint("ClickableViewAccessibility")
     private void initStylusAuxButtons() {
@@ -322,7 +303,8 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
 
         visibility.setOnLongClickListener(v -> {
             v.startDragAndDrop(ClipData.newPlainText("", ""), new View.DragShadowBuilder(visibility) {
-                public void onDrawShadow(Canvas canvas) {}
+                public void onDrawShadow(Canvas canvas) {
+                }
             }, null, View.DRAG_FLAG_GLOBAL);
 
             frm.setOnDragListener((v2, event) -> {
@@ -395,20 +377,20 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
 
         Map.of(left, InputStub.BUTTON_LEFT, middle, InputStub.BUTTON_MIDDLE, right, InputStub.BUTTON_RIGHT)
                 .forEach((v, b) -> v.setOnTouchListener((__, e) -> {
-            switch(e.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                case MotionEvent.ACTION_POINTER_DOWN:
-                    getLorieView().sendMouseEvent(0, 0, b, true, true);
-                    v.setPressed(true);
-                    break;
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_POINTER_UP:
-                    getLorieView().sendMouseEvent(0, 0, b, false, true);
-                    v.setPressed(false);
-                    break;
-            }
-            return true;
-        }));
+                    switch (e.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                        case MotionEvent.ACTION_POINTER_DOWN:
+                            getLorieView().sendMouseEvent(0, 0, b, true, true);
+                            v.setPressed(true);
+                            break;
+                        case MotionEvent.ACTION_UP:
+                        case MotionEvent.ACTION_POINTER_UP:
+                            getLorieView().sendMouseEvent(0, 0, b, false, true);
+                            v.setPressed(false);
+                            break;
+                    }
+                    return true;
+                }));
 
         pos.setOnTouchListener(new View.OnTouchListener() {
             final int touchSlop = (int) Math.pow(ViewConfiguration.get(EmulationActivity.this).getScaledTouchSlop(), 2);
@@ -416,9 +398,10 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
             final float[] startOffset = new float[2];
             final int[] startPosition = new int[2];
             long startTime;
+
             @Override
             public boolean onTouch(View v, MotionEvent e) {
-                switch(e.getAction()) {
+                switch (e.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         primaryLayer.getLocationOnScreen(startPosition);
                         startOffset[0] = e.getX();
@@ -515,7 +498,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
         lorieView.triggerCallback();
 
         boolean filterOutWinKey = false;
-        
+
         if (checkSelfPermission(WRITE_SECURE_SETTINGS) == PERMISSION_GRANTED)
             KeyInterceptor.shutdown();
 
@@ -524,7 +507,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
             setRequestedOrientation(requestedOrientation);
 
         LinearLayout buttons = findViewById(R.id.mouse_helper_visibility);
-        
+
         //Reset default input back to normal
         TouchInputHandler.STYLUS_INPUT_HELPER_MODE = 1;
         final float menuUnselectedTrasparency = 0.66f;
@@ -540,8 +523,6 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
     public void onResume() {
         super.onResume();
         getLorieView().requestFocus();
-        init.run(this);
-
     }
 
     @Override
@@ -558,8 +539,6 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
         mLorieKeyListener.onKey(getLorieView(), e.getKeyCode(), e);
         return true;
     }
-
-    int orientation;
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
@@ -628,7 +607,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
 
     @Override
     public void onBackPressed() {
-        
+
     }
 
 
@@ -643,7 +622,9 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
     }
 
-    /** @noinspection NullableProblems*/
+    /**
+     * @noinspection NullableProblems
+     */
     @SuppressLint("WrongConstant")
     @Override
     public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
@@ -653,10 +634,10 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
 
     @SuppressWarnings("SameParameterValue")
     void clientConnectedStateChanged(boolean connected) {
-        runOnUiThread(()-> {
+        runOnUiThread(() -> {
             SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
             mClientConnected = connected;
-            getLorieView().setVisibility(connected?View.VISIBLE:View.INVISIBLE);
+            getLorieView().setVisibility(connected ? View.VISIBLE : View.INVISIBLE);
             getLorieView().regenerate();
 
             // We should recover connection in the case if file descriptor for some reason was broken...
@@ -672,5 +653,5 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
         getLorieView().handleXEvents();
         handler.postDelayed(this::checkXEvents, 300);
     }
-    
+
 }

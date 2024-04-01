@@ -7,16 +7,14 @@ package com.micewine.emu.nativeLoader;
 
 
 public class NativeLoader {
-    
-   static {
+
+    static {
         System.loadLibrary("micewine");
     }
 
-    
+
     //exec commands in written in c++ in native code this function wait string comand to execute in side c++ language 
     public native String shellExecCmd(String comand);
-    
-    
-    
-    
+
+
 }

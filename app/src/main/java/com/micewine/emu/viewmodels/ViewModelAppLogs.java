@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class ViewModelAppLogs extends ViewModel {
-    private MutableLiveData<String> logsText = new MutableLiveData<>();
+    private final MutableLiveData<String> logsText = new MutableLiveData<>();
 
     public LiveData<String> getTextLiveData() {
         return logsText;

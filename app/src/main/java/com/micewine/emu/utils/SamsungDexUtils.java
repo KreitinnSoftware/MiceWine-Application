@@ -9,13 +9,15 @@ import java.lang.reflect.Method;
 
 public class SamsungDexUtils {
     private static final String TAG = SamsungDexUtils.class.getSimpleName();
+
     static public boolean available() {
         try {
             Class<?> semWindowManager = Class.forName("com.samsung.android.view.SemWindowManager");
             semWindowManager.getMethod("getInstance");
             semWindowManager.getDeclaredMethod("requestMetaKeyEvent", android.content.ComponentName.class, boolean.class);
             return true;
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return false;
     }
 
@@ -42,7 +44,8 @@ public class SamsungDexUtils {
             Class<?> c = config.getClass();
             return c.getField("SEM_DESKTOP_MODE_ENABLED").getInt(c)
                     == c.getField("semDesktopModeEnabled").getInt(config);
-        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException ignored) {}
+        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException ignored) {
+        }
         return false;
     }
 }
