@@ -107,22 +107,7 @@
             android:exported="false">
         </service>
         <service
-            android:name=".core.services.xserver.XServerLoader"
-            android:enabled="true"
-            android:exported="false">
-        </service>
-        <service
-            android:name=".core.services.wine.WineService"
-            android:enabled="true"
-            android:exported="false">
-        </service>
-        <service
-            android:name=".core.services.pulseaudio.PulseAudioService"
-            android:enabled="true"
-            android:exported="false">
-        </service>
-        <service
-            android:name=".core.services.virgl.VirGLService"
+            android:name=".core.MainService"
             android:enabled="true"
             android:exported="false">
         </service>

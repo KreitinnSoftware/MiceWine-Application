@@ -1,12 +1,8 @@
 package com.micewine.emu.EntryPoint;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.micewine.emu.core.services.pulseaudio.PulseAudioService;
-import com.micewine.emu.core.services.virgl.VirGLService;
-import com.micewine.emu.core.services.wine.WineService;
-import com.micewine.emu.core.services.xserver.XServerLoader;
+import com.micewine.emu.core.MainService;
 import com.micewine.emu.coreutils.RunServiceClass;
 
 public class Init {
@@ -16,10 +12,7 @@ public class Init {
     public void run(Context ctx) {
         this.ctx = ctx;
         //runServices.runService(OverlayService.class, this.ctx);
-        runServices.runService(XServerLoader.class, this.ctx);
-        runServices.runService(PulseAudioService.class, this.ctx);
-        runServices.runService(VirGLService.class, this.ctx);
-        runServices.runService(WineService.class, this.ctx);
+        runServices.runService(MainService.class, this.ctx);
     }
 
     public void stopAll() {
