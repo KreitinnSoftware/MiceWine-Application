@@ -1,5 +1,6 @@
 plugins {
     id('com.android.library')
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
@@ -22,8 +23,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
 }
 
 dependencies {
     implementation 'androidx.annotation:annotation:1.7.1'
+    implementation 'androidx.core:core-ktx:1.13.1'
 }

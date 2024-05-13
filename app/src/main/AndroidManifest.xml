@@ -82,7 +82,7 @@
         
         <activity
             android:theme="@style/AppTheme.Main"
-            android:name=".activities.logAppOutput"
+            android:name=".activities.LogAppOutput"
             android:exported="true">
         </activity>
             
