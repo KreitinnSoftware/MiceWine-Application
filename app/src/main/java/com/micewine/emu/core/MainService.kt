@@ -3,6 +3,7 @@ package com.micewine.emu.core
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import com.micewine.emu.activities.MainActivity.Companion.getClassPath
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 
 class MainService : Service() {
@@ -13,8 +14,8 @@ class MainService : Service() {
             ShellExecutorCmd.ExecuteCMD(
                 EnvVars.exportVariables() + ";" +
                         "unset LD_LIBRARY_PATH LIBGL_DRIVERS_PATH; " +
-                        "chmod 400 \$CLASSPATH; " +
-                        "/system/bin/app_process / com.micewine.emu.Loader :0", "XServer"
+                        "export CLASSPATH=" + getClassPath(this) + ";" +
+                        "/system/bin/app_process / com.micewine.emu.CmdEntryPoint :0", "XServer"
             )
         }.start()
 

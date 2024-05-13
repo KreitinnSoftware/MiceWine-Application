@@ -1,7 +1,6 @@
 package com.micewine.emu.core
 
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
-import com.micewine.emu.activities.MainActivity.Companion.shellLoader
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 
@@ -26,7 +25,6 @@ object EnvVars {
     fun setVariables() {
         putVar("TMPDIR", "TMPDIR=$tmpDir")
         putVar("XKB_CONFIG_ROOT", "XKB_CONFIG_ROOT=$usrDir/share/X11/xkb")
-        putVar("CLASSPATH", "CLASSPATH=$shellLoader")
         putVar("HOME", "HOME=$homeDir")
         putVar("LANG", "LANG=en_US.UTF-8")
         putVar("DISPLAY_SESSION", "DISPLAY=:0")

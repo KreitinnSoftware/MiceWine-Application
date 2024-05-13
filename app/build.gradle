@@ -87,5 +87,5 @@ dependencies {
     implementation 'org.apache.commons:commons-compress:1.26.1'
     implementation 'androidx.core:core-ktx:1.13.1'
 
-    compileOnly project(':shell-loader:stub')
+    compileOnly project(':app:stub')
 }

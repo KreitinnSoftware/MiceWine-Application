@@ -73,10 +73,6 @@ class MainActivity : AppCompatActivity() {
                 ShellExecutorCmd.ExecuteCMD("$usrDir/generateSymlinks.sh", "ExtractUtility")
             }
 
-            if (!shellLoader.exists()) {
-                copyAssets(this, "loader.apk", appRootDir.toString())
-            }
-
             if (!tmpDir.exists()) {
                 tmpDir.mkdirs()
             }
@@ -140,7 +136,6 @@ class MainActivity : AppCompatActivity() {
 
         @SuppressLint("SdCardPath")
         var appRootDir = File("/data/data/com.micewine.emu/files")
-        var shellLoader = File("$appRootDir/loader.apk")
         var usrDir = File("$appRootDir/usr")
         var tmpDir = File("$usrDir/tmp")
         var homeDir = File("$appRootDir/home")
@@ -172,6 +167,14 @@ class MainActivity : AppCompatActivity() {
             while (`in`.read(buffer).also { read = it } != -1) {
                 out!!.write(buffer, 0, read)
             }
+        }
+
+        fun getClassPath(context: Context): String {
+            return File(getLibsPath(context)).parentFile?.parentFile?.absolutePath + "/base.apk"
+        }
+
+        fun getLibsPath(context: Context): String {
+            return context.applicationContext.applicationInfo.nativeLibraryDir
         }
     }
 }
