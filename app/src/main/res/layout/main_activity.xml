@@ -15,7 +15,6 @@
         android:theme="@style/Theme.MiceWine"
         android:title="@string/app_name"
         android:titleTextColor="@color/white">
-
     </Toolbar>
 
     <LinearLayout

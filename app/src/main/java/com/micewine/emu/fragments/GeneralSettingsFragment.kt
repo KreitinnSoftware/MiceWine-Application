@@ -6,20 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.android.material.appbar.MaterialToolbar
 import com.micewine.emu.R
 import com.micewine.emu.adapters.AdapterSettings
 import com.micewine.emu.models.SettingsList
 
-class SettingsFragment : Fragment() {
+class GeneralSettingsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_settings, container, false)
-        val recyclerView = rootView.findViewById<RecyclerView>(R.id.recyclerViewSettings)
+        val rootView = inflater.inflate(R.layout.fragment_general_settings, container, false)
+        val recyclerView = rootView.findViewById<RecyclerView>(R.id.recyclerViewGeneralSettings)
         setAdapter(recyclerView)
 
         return rootView
@@ -31,13 +29,16 @@ class SettingsFragment : Fragment() {
         recyclerView.setAdapter(adapterSettings)
         var person: SettingsList?
 
-        person = SettingsList(R.string.settings_title, R.string.settings_description, R.drawable.ic_settings_outline)
+        person = SettingsList(R.string.box64_settings_title, R.string.box64_settings_description, R.drawable.ic_box64_white)
         settingsList.add(person)
 
-        person = SettingsList(R.string.log_title, R.string.log_description, R.drawable.ic_log)
+        person = SettingsList(R.string.wine_settings_title, R.string.wine_settings_description, R.drawable.ic_wine_white)
         settingsList.add(person)
 
-        person = SettingsList(R.string.about_title, R.string.about_description, R.drawable.ic_info_outline)
+        person = SettingsList(R.string.display_settings_title, R.string.display_settings_description, R.drawable.ic_display_white)
+        settingsList.add(person)
+
+        person = SettingsList(R.string.driver_settings_title, R.string.driver_settings_description, R.drawable.ic_gpu_white)
         settingsList.add(person)
     }
 }

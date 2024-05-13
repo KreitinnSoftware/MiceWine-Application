@@ -35,11 +35,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = MainActivityBinding.inflate(layoutInflater)
-        setContentView(binding!!.getRoot())
+        setContentView(binding!!.root)
         progressExtractBar = findViewById(R.id.progressBar)
         findViewById<View>(R.id.updateProgress)
-        val actionBar = supportActionBar
-        actionBar?.setTitle(R.string.app_name)
+
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigation.setOnItemSelectedListener { item: MenuItem ->
             val id = item.itemId

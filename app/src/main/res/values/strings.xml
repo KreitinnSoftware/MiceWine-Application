@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MiceWine</string>
+    <string name="app_name" translatable="false">MiceWine</string>
     <string name="full_screen">Fullscreen</string>
     <string name="settings_title">Settings</string>
     <string name="settings_description">Configure MiceWine</string>
@@ -13,4 +13,13 @@
     <string name="general_settings">General Settings</string>
     <string name="exit">Exit</string>
     <string name="open_keyboard">Open Keyboard</string>
+    <string name="box64_settings_title">Box64 Settings</string>
+    <string name="box64_settings_description">Configure Box64</string>
+    <string name="wine_settings_title">Wine Settings</string>
+    <string name="wine_settings_description">Configure Wine</string>
+    <string name="display_settings_title">Display Settings</string>
+    <string name="display_settings_description">Configure Display</string>
+    <string name="driver_settings_title">Drivers Settings</string>
+    <string name="driver_settings_description">Configure GPU Drivers</string>
+    <string name="home_title">Home</string>
 </resources>

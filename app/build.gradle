@@ -86,6 +86,8 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.2.1'
     implementation 'org.apache.commons:commons-compress:1.26.1'
     implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
 
     compileOnly project(':app:stub')
 }

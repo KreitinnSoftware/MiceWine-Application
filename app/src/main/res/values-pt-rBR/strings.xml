@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="full_screen">Tela Cheia</string>
+    <string name="settings_title">Configurações</string>
+    <string name="settings_description">Configurar MiceWine</string>
+    <string name="app_close">Sair</string>
+    <string name="log_title">Log</string>
+    <string name="log_description">Ver Logs do MiceWine</string>
+    <string name="clear_log">Limpar</string>
+    <string name="desktop_mode_init">Área de Trabalho</string>
+    <string name="about_title">Sobre</string>
+    <string name="about_description">Sobre o MiceWine</string>
+    <string name="general_settings">Configurações Gerais</string>
+    <string name="exit">Sair</string>
+    <string name="open_keyboard">Abrir Teclado´</string>
+    <string name="box64_settings_title">Configurações do Box64</string>
+    <string name="box64_settings_description">Configurar Box64</string>
+    <string name="wine_settings_title">Configurações do Wine</string>
+    <string name="wine_settings_description">Configurar Wine</string>
+    <string name="display_settings_title">Configurações do Display</string>
+    <string name="display_settings_description">Configurar Display</string>
+    <string name="driver_settings_title">Configurações de Drivers</string>
+    <string name="driver_settings_description">Configurar Drivers de GPU</string>
+    <string name="home_title">Início</string>
+</resources>

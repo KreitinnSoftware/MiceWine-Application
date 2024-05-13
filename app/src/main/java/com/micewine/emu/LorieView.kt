@@ -162,7 +162,6 @@ class LorieView : SurfaceView, InputStub {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        // TODO: Implement this method
         ramCounter(canvas)
     }
 
