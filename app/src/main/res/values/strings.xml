@@ -11,4 +11,6 @@
     <string name="about_title">About</string>
     <string name="about_description">About MiceWine</string>
     <string name="general_settings">General Settings</string>
+    <string name="exit">Exit</string>
+    <string name="open_keyboard">Open Keyboard</string>
 </resources>

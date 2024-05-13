@@ -5,11 +5,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/ic_back"
-        android:title="Sair"></item>
+        android:title="@string/exit">
+    </item>
     <item
         android:id="@+id/openKeyboard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/ic_keyboard"
-        android:title="Abrir Teclado"></item>
+        android:title="@string/open_keyboard">
+    </item>
 </menu>

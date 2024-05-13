@@ -4,23 +4,11 @@
         android:key="output"
         android:title="Output">
 
-        <SeekBarPreference
-            android:defaultValue="100"
-            android:key="displayScale"
-            android:max="200"
-            android:title="Display scale, %" />
-
         <ListPreference
             android:defaultValue="1280x720"
             android:entries="@array/displayResolution"
             android:entryValues="@array/displayResolution"
             android:key="displayResolutionExact"
-            android:title="Display resolution" />
-
-        <EditTextPreference
-            android:defaultValue="1280x720"
-            android:key="displayResolutionCustom"
-            android:summary="Example: 1280x720"
             android:title="Display resolution" />
 
         <SwitchPreferenceCompat
@@ -30,124 +18,11 @@
             android:title="Tela Cheia" />
 
         <SwitchPreferenceCompat
-            android:defaultValue="true"
-            android:key="Reseed"
-            android:summary="The screen size will be adjusted while Soft Keyboard is open."
-            android:title="Reseed Screen While Soft Keyboard is open" />
-
-        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="PIP"
             android:summary="Show app in picture-in-picture mode when home button or recents button is pressed"
             android:title="PIP Mode" />
 
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="fullscreen"
-            android:summary="Toggles immersive mode in your device display"
-            android:title="Fullscreen on device display" />
-
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="forceLandscape"
-            android:title="Force landscape orientation" />
-
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="hideCutout"
-            android:title="Hide display cutout (if any)" />
-
-        <SwitchPreferenceCompat
-            android:defaultValue="true"
-            android:key="keepScreenOn"
-            android:title="Keep Screen On" />
-    </PreferenceCategory>
-    <PreferenceCategory
-        android:key="pointer"
-        android:title="Pointer">
-        <ListPreference
-            android:defaultValue="1"
-            android:entries="@array/touchscreenInputModesEntries"
-            android:entryValues="@array/touchscreenInputModesValues"
-            android:key="touchMode"
-            android:title="Touchscreen input mode" />
-
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="showStylusClickOverride"
-            android:summary="Stylus touch override, left middle or right click (Only for the stylus)"
-            android:title="Show stylus click options" />
-
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="showMouseHelper"
-            android:summary="Onscreen mouse buttons usable with touchpad"
-            android:title="Show mouse click helper overlay" />
-
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="pointerCapture"
-            android:summary="Intercept all hardware mouse events. Pointer is back to Android after pressing Escape key."
-            android:title="Capture external mouse when possible" />
-
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="tapToMove"
-            android:title="Enable tap-to-move for touchpads" />
-    </PreferenceCategory>
-    <PreferenceCategory
-        android:key="kbd"
-        android:title="Keyboard">
-
-
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="showIMEWhileExternalConnected"
-            android:summary="Show software keyboard while hardware keyboard is connected. Requires WRITE_SECURE_SETTINGS permission."
-            android:title="Show IME with external keyboard" />
-
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="preferScancodes"
-            android:summary="Let X server handle hardware keyboard layout (with DE settings or setxkbmap)."
-            android:title="Prefer scancodes when possible" />
-
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="dexMetaKeyCapture"
-            android:summary="Samsung Dex only. Allows interception of &quot;Alt+F4&quot;, &quot;Meta+D&quot;, &quot;Meta+E&quot;, etc. "
-            android:title="Intercept system shortcuts" />
-
-        <Preference
-            android:key="enableAccessibilityService"
-            android:summary="Open Accessibility settings."
-            android:title="Enable Accessibility service for intercepting system shortcuts manually." />
-
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="enableAccessibilityServiceAutomatically"
-            android:summary="Requires WRITE_SECURE_SETTINGS permission."
-            android:title="Enable Accessibility service for intercepting system shortcuts automatically." />
-
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="filterOutWinkey"
-            android:summary="Allows you to use Dex shortcuts while intercepting."
-            android:title="Filter out intercepted Win (Meta/Mod4) key." />
-
-
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:key="other"
-        android:title="Other">
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="clipboardSync"
-            android:title="Automatic uploading clipboard to Android" />
-
-        <Preference
-            android:key="requestNotificationPermission"
-            android:title="Request notification permission" />
-    </PreferenceCategory>
 </PreferenceScreen>

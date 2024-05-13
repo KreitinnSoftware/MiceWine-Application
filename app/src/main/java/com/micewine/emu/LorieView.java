@@ -30,7 +30,6 @@ import com.micewine.emu.systemutils.SystemMemoryInfo;
 @SuppressLint("WrongConstant")
 @SuppressWarnings("deprecation")
 public class LorieView extends SurfaceView implements InputStub {
-
     public static long BYTES_FOR_MEGABYTES = (1024 * 1024);
 
     static {

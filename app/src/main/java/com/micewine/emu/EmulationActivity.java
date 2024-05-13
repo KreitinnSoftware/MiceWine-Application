@@ -122,6 +122,11 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    @Override
     @SuppressLint({"AppCompatMethod", "ObsoleteSdkInt", "ClickableViewAccessibility", "WrongConstant", "UnspecifiedRegisterReceiverFlag"})
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,7 +181,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
                             drawerLayout.openDrawer(GravityCompat.START);
                         } else {
                             drawerLayout.closeDrawers();
-                        };
+                        }
                     return true;
                 }
             }
@@ -270,7 +275,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
                 LorieView.connect(fd.detachFd());
                 getLorieView().triggerCallback();
                 clientConnectedStateChanged(true);
-                LorieView.setClipboardSyncEnabled(false);
+                LorieView.setClipboardSyncEnabled(true);
             } else
                 handler.postDelayed(this::tryConnect, 500);
         } catch (Exception e) {
@@ -297,8 +302,6 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
         mInputHandler.setPointerCaptureEnabled(false);
         if (!p.getBoolean("pointerCapture", false) && lorieView.hasPointerCapture())
             lorieView.releasePointerCapture();
-
-        //SamsungDexUtils.dexMetaKeyCapture(this, p.getBoolean("dexMetaKeyCapture", false));
 
         onWindowFocusChanged(true);
         LorieView.setClipboardSyncEnabled(false);
@@ -396,7 +399,6 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
         window.setSoftInputMode(SOFT_INPUT_ADJUST_PAN | SOFT_INPUT_STATE_HIDDEN);
 
         ((FrameLayout) findViewById(android.R.id.content)).getChildAt(0).setFitsSystemWindows(false);
-        //SamsungDexUtils.dexMetaKeyCapture(this, hasFocus && p.getBoolean("dexMetaKeyCapture", false));
 
         if (hasFocus)
             getLorieView().regenerate();
@@ -446,5 +448,4 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
         getLorieView().handleXEvents();
         handler.postDelayed(this::checkXEvents, 300);
     }
-
 }
