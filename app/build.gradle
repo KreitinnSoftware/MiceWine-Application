@@ -4,26 +4,15 @@ plugins {
 
 android {
     namespace 'com.micewine.emu'
-    compileSdkVersion 33
-    buildToolsVersion '34.0.0'
+    compileSdk 34
     ndkVersion "26.1.10909125"
     defaultConfig {
-        def signingConfig = project(':app').android.signingConfigs.debug
-        def keyStore = java.security.KeyStore.getInstance(java.security.KeyStore.getDefaultType())
         applicationId "com.micewine.emu"
-        minSdkVersion 26
-        targetSdkVersion 28
+        minSdk 28
+        //noinspection ExpiredTargetSdkVersion
+        targetSdk 28
         versionCode 1
         versionName "1.0.beta"
-        buildConfigField "String", "COMMIT", "\"" + ("git rev-parse HEAD\n".execute().getText().trim() ?: (System.getenv('CURRENT_COMMIT') ?: "NO_COMMIT")) + "\""
-        buildConfigField "String", "logTag", "\"Termux:X11 loader\""
-        buildConfigField "String", "CLASS_ID", "\"com.micewine.emu.CmdEntryPoint\""
-        buildConfigField "String", "packageNotInstalledErrorText",
-        """\"Termux:X11 application is not found.\" +
-        \"You should choose latest successful workflow here: https://github.com/termux/termux-x11/actions/workflows/debug_build.yml\" +
-        \"After this you should download \\"micewine-emu-ARCH-debug\\" or \\"micewine-emu-universal-debug\\" artifact and install apk contained in this zip file.\""""
-        buildConfigField "String", "packageSignatureMismatchErrorText",
-        "\"Signature verification of target application " + android.namespace + " failed.\\nPlease, reinstall both micewine-emu package and Termux:X11 application from the same source\""
         buildConfigField "String", "COMMIT", "\"" + ("git rev-parse HEAD\n".execute().getText().trim() ?: (System.getenv('CURRENT_COMMIT') ?: "NO_COMMIT")) + "\""
     }
 
@@ -38,15 +27,15 @@ android {
         enable true
         reset()
 
+        //noinspection ChromeOsAbiSupport
         include "arm64-v8a"
         universalApk false
     }
 
-    compileOptions.sourceCompatibility JavaVersion.VERSION_1_9
-    compileOptions.targetCompatibility JavaVersion.VERSION_1_9
+    compileOptions.sourceCompatibility JavaVersion.VERSION_17
+    compileOptions.targetCompatibility JavaVersion.VERSION_17
     packagingOptions.jniLibs.useLegacyPackaging false
-    buildFeatures.aidl true
-    buildFeatures.buildConfig true
+
     buildTypes.debug {
         signingConfig signingConfigs.debug
         postprocessing {
@@ -66,16 +55,16 @@ android {
     sourceSets {
         main {
             aidl.srcDirs += ['src/main/aidl']
-            
         }
-
     }
     
     buildFeatures {
+        aidl true
+        buildConfig true
         viewBinding true
-        
     }
-    
+
+
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
@@ -86,17 +75,12 @@ android {
 
 dependencies {
     implementation 'net.lingala.zip4j:zip4j:2.11.5'
-    //noinspection DifferentStdlibGradleVersion
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("com.google.android.material:material:1.9.0")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.20"
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+    implementation("com.google.android.material:material:1.12.0")
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
     implementation 'androidx.preference:preference:1.2.1'
- // implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.github.luben:zstd-jni:1.5.2-3@aar'
-    implementation 'org.tukaani:xz:1.7'
-    implementation 'org.apache.commons:commons-compress:1.20'
+    implementation 'org.apache.commons:commons-compress:1.26.1'
 
     compileOnly project(':shell-loader:stub')
 }

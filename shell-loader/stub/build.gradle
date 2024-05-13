@@ -4,9 +4,9 @@ plugins {
 
 android {
     namespace 'com.micewine.emu'
-    compileSdkVersion 30
+    compileSdk 34
     defaultConfig {
-        minSdkVersion 24
+        minSdk 28
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
     }
@@ -25,5 +25,5 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.7.0'
+    implementation 'androidx.annotation:annotation:1.7.1'
 }
