@@ -1,10 +1,8 @@
 package com.micewine.emu.activities;
 
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,20 +13,13 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.micewine.emu.R;
 import com.micewine.emu.core.ShellExecutorCmd;
 import com.micewine.emu.databinding.LayoutlogShellOutputBinding;
-import com.micewine.emu.nativeLoader.NativeLoader;
 import com.micewine.emu.viewmodels.ViewModelAppLogs;
 
 
 public class logAppOutput extends AppCompatActivity {
 
-    private Integer transcriptRows;
-    private int exit_code_status;
-    private NativeLoader metods_natives = null;
-    private FragmentManager fragmentManager;
     private LayoutlogShellOutputBinding binding;
-    private TextView logOutAndInStd;
     private ViewModelAppLogs sharedLogs;
-    private final StringBuilder logs = new StringBuilder();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +40,6 @@ public class logAppOutput extends AppCompatActivity {
         CollapsingToolbarLayout collapsingToolBar = findViewById(R.id.toolbar_log_layout);
 
         collapsingToolBar.setTitle("Logs");
-
-        metods_natives = new NativeLoader();
 
         sharedLogs = new ViewModelProvider(this).get(ViewModelAppLogs.class);
 
