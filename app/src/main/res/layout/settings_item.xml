@@ -1,59 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-     xmlns:android="http://schemas.android.com/apk/res/android"
-     xmlns:app="http://schemas.android.com/apk/res-auto"
-     xmlns:tools="http://schemas.android.com/tools"
-     android:layout_height="wrap_content"
-     android:layout_width="match_parent"
-     android:background="?attr/selectableItemBackground"
-     android:clickable="true"
-     app:cardElevation="0dp"
-     android:clipToPadding="false"
-     style="?attr/materialCardViewElevatedStyle"
-     android:transitionName="card_game"
-     app:cardCornerRadius="4dp"
-     android:focusable="true"
-     android:id="@+id/card_settings"
-     android:layout_gravity="center">
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_settings"
+    style="?attr/materialCardViewElevatedStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:clipToPadding="false"
+    android:focusable="true"
+    android:transitionName="card_game"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="0dp">
 
     <LinearLayout
-         android:layout_height="wrap_content"
-         android:layout_width="match_parent"
-         android:gravity="center_horizontal"
-         android:padding="10dp"
-         android:orientation="horizontal">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="10dp">
 
         <ImageView
-             android:layout_height="30dp"
-             android:layout_width="30dp"
-             android:layout_marginEnd="10dp"
-             android:src="@drawable/ic_settings_outline"
-             android:layout_gravity="center"
-             android:id="@+id/set_img" />
+            android:id="@+id/set_img"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_settings_outline" />
 
         <LinearLayout
-             android:layout_height="wrap_content"
-             android:layout_width="match_parent"
-             android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <TextView
-                 android:layout_height="wrap_content"
-                 android:layout_width="match_parent"
-                 android:layout_marginBottom="5dp"
-                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                 android:textSize="18sp"
-                 android:id="@+id/title_preferences_model"
-                 android:textStyle="bold"
-                 android:text="Title Settings" />
+                android:id="@+id/title_preferences_model"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:text="Title Settings"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <TextView
-                 android:layout_height="wrap_content"
-                 android:layout_width="match_parent"
-                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                 android:ellipsize="marquee"
-                 android:textSize="15sp"
-                 android:id="@+id/description_preferences_model"
-                 android:text="Description Settings" />
+                android:id="@+id/description_preferences_model"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:text="Description Settings"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="15sp" />
 
         </LinearLayout>
 

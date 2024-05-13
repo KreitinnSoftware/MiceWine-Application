@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-     <item
+    <item
         android:id="@+id/exit_fromXserver"
-        android:title="Sair"
-        android:icon="@drawable/ic_back"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content">
-     </item>
-     <item
-         android:id="@+id/openKeyboard"
-         android:title="Abrir Teclado"
-         android:icon="@drawable/ic_keyboard"
-         android:layout_height="wrap_content"
-         android:layout_width="wrap_content">
-     </item>
+        android:icon="@drawable/ic_back"
+        android:title="Sair"></item>
+    <item
+        android:id="@+id/openKeyboard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/ic_keyboard"
+        android:title="Abrir Teclado"></item>
 </menu>

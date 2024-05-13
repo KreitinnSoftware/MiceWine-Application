@@ -1,52 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-     xmlns:android="http://schemas.android.com/apk/res/android"
-     xmlns:app="http://schemas.android.com/apk/res-auto"
-     xmlns:tools="http://schemas.android.com/tools"
-     android:layout_height="wrap_content"
-     android:layout_width="wrap_content"
-     android:background="?attr/selectableItemBackground"
-     android:clickable="true"
-     app:cardElevation="0dp"
-     android:clipToPadding="false"
-     style="?attr/materialCardViewElevatedStyle"
-     android:transitionName="card_game"
-     app:cardCornerRadius="4dp"
-     android:focusable="true"
-     android:id="@+id/img_scene"
-     android:layout_gravity="center">
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/img_scene"
+    style="?attr/materialCardViewElevatedStyle"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:clipToPadding="false"
+    android:focusable="true"
+    android:transitionName="card_game"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-         android:layout_height="wrap_content"
-         android:layout_width="wrap_content"
-         android:padding="6dp">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="6dp">
 
         <com.google.android.material.imageview.ShapeableImageView
-             android:layout_height="200dp"
-             android:layout_width="180dp"
-             app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.ExtraSmall"
-             tools:src="@drawable/default_icon"
-             app:layout_constraintTop_toTopOf="parent"
-             app:layout_constraintStart_toStartOf="parent"
-             app:layout_constraintEnd_toEndOf="parent"
-             android:id="@+id/img_game" />
+            android:id="@+id/img_game"
+            android:layout_width="180dp"
+            android:layout_height="200dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.ExtraSmall"
+            tools:src="@drawable/default_icon" />
 
         <com.google.android.material.textview.MaterialTextView
-             android:layout_height="wrap_content"
-             android:layout_width="0dp"
-             android:ellipsize="none"
-             android:marqueeRepeatLimit="marquee_forever"
-             android:textSize="14sp"
-             android:singleLine="true"
-             android:layout_marginTop="8dp"
-             tools:text="The Legend of Zelda: Skyward Sword"
-             app:layout_constraintTop_toBottomOf="@+id/img_game"
-             android:requiresFadingEdge="horizontal"
-             android:textAlignment="center"
-             app:layout_constraintStart_toStartOf="@+id/image_game_screen"
-             app:layout_constraintEnd_toEndOf="@+id/image_game_screen"
-             style="@style/TextAppearance.Material3.TitleMedium"
-             android:id="@+id/title_game_model" />
+            android:id="@+id/title_game_model"
+            style="@style/TextAppearance.Material3.TitleMedium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="none"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:requiresFadingEdge="horizontal"
+            android:singleLine="true"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/image_game_screen"
+            app:layout_constraintStart_toStartOf="@+id/image_game_screen"
+            app:layout_constraintTop_toBottomOf="@+id/img_game"
+            tools:text="The Legend of Zelda: Skyward Sword" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

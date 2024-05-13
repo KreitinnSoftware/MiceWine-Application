@@ -1,225 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.drawerlayout.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/DrawerLayout"
-    app:theme="@style/Theme.Material3.DayNight.NoActionBar"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:theme="@style/Theme.Material3.DayNight.NoActionBar">
+    android:theme="@style/Theme.MiceWine">
 
-    <FrameLayout
-        android:id="@+id/frame"
+
+    <FrameLayout xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:layoutDirection="ltr"
-        android:paddingLeft="0dp"
-        android:paddingTop="0dp"
-        android:paddingRight="0dp"
-        android:paddingBottom="0dp"
-        android:background="@color/black">
+        android:theme="@style/Theme.MiceWine">
 
-        <com.micewine.emu.LorieView
-            android:id="@+id/lorieView"
+        <FrameLayout
+            android:id="@+id/frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible"
-            android:layout_gravity="center" />
+            android:background="@color/black"
+            android:clipToPadding="false"
+            android:layoutDirection="ltr"
+            android:paddingLeft="0dp"
+            android:paddingTop="0dp"
+            android:paddingRight="0dp"
+            android:paddingBottom="0dp">
 
-   
+            <com.micewine.emu.LorieView
+                android:id="@+id/lorieView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:visibility="visible" />
+
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/mouse_helper_visibility"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:translationX="0px"
+            android:translationY="0px">
+
+            <Button
+                android:id="@+id/button_visibility"
+                android:layout_width="64px"
+                android:layout_height="64px"
+                android:minWidth="44dip"
+                android:minHeight="22dip"
+                android:padding="0px"
+                android:paddingStart="0px"
+                android:paddingLeft="0px"
+                android:paddingTop="0px"
+                android:paddingEnd="0px"
+                android:paddingRight="0px"
+                android:paddingBottom="0px"
+                android:text="X"
+                android:textSize="8sp"
+                tools:ignore="HardcodedText,PxUsage,SmallSp" />
+
+            <LinearLayout
+                android:id="@+id/mouse_helper_secondary_layer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:visibility="visible">
+
+                <Button
+                    android:id="@+id/button_left_click"
+                    android:layout_width="64px"
+                    android:layout_height="64px"
+                    android:minWidth="44dip"
+                    android:minHeight="22dip"
+                    android:padding="0px"
+                    android:paddingStart="0px"
+                    android:paddingLeft="0px"
+                    android:paddingTop="0px"
+                    android:paddingEnd="0px"
+                    android:paddingRight="0px"
+                    android:paddingBottom="0px"
+                    android:text="L"
+                    android:textSize="8sp"
+                    tools:ignore="HardcodedText,PxUsage,SmallSp" />
+
+                <Button
+                    android:id="@+id/button_middle_click"
+                    android:layout_width="64px"
+                    android:layout_height="64px"
+                    android:minWidth="44dip"
+                    android:minHeight="22dip"
+                    android:padding="0px"
+                    android:paddingStart="0px"
+                    android:paddingLeft="0px"
+                    android:paddingTop="0px"
+                    android:paddingEnd="0px"
+                    android:paddingRight="0px"
+                    android:paddingBottom="0px"
+                    android:text="M"
+                    android:textSize="8sp"
+                    tools:ignore="HardcodedText,PxUsage,SmallSp" />
+
+                <Button
+                    android:id="@+id/button_right_click"
+                    android:layout_width="64px"
+                    android:layout_height="64px"
+                    android:minWidth="44dip"
+                    android:minHeight="22dip"
+                    android:padding="0px"
+                    android:paddingStart="0px"
+                    android:paddingLeft="0px"
+                    android:paddingTop="0px"
+                    android:paddingEnd="0px"
+                    android:paddingRight="0px"
+                    android:paddingBottom="0px"
+                    android:text="R"
+                    android:textSize="8sp"
+                    tools:ignore="HardcodedText,PxUsage,SmallSp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/mouse_buttons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_marginBottom="40dp"
+            android:alpha="0.7"
+            android:orientation="vertical"
+            android:translationX="0px"
+            android:translationY="0px">
+
+            <LinearLayout
+                android:id="@+id/mouse_buttons_secondary_layer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:visibility="visible">
+
+                <Button
+                    android:id="@+id/mouse_button_left_click"
+                    android:layout_width="96dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/mouse_buttons"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp"
+                    android:padding="0px"
+                    android:paddingStart="0px"
+                    android:paddingLeft="0px"
+                    android:paddingTop="0px"
+                    android:paddingEnd="0px"
+                    android:paddingRight="0px"
+                    android:paddingBottom="0px"
+                    android:text="L"
+                    android:textColor="@android:color/black"
+                    android:textSize="8sp"
+                    tools:ignore="HardcodedText,PxUsage,SmallSp" />
+
+                <Button
+                    android:id="@+id/mouse_button_middle_click"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/mouse_buttons"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp"
+                    android:padding="0px"
+                    android:paddingStart="0px"
+                    android:paddingLeft="0px"
+                    android:paddingTop="0px"
+                    android:paddingEnd="0px"
+                    android:paddingRight="0px"
+                    android:paddingBottom="0px"
+                    android:text="M"
+                    android:textColor="@android:color/black"
+                    android:textSize="8sp"
+                    tools:ignore="HardcodedText,PxUsage,SmallSp" />
+
+                <Button
+                    android:id="@+id/mouse_button_right_click"
+                    android:layout_width="96dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/mouse_buttons"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp"
+                    android:padding="0px"
+                    android:paddingStart="0px"
+                    android:paddingLeft="0px"
+                    android:paddingTop="0px"
+                    android:paddingEnd="0px"
+                    android:paddingRight="0px"
+                    android:paddingBottom="0px"
+                    android:text="R"
+                    android:textColor="@android:color/black"
+                    android:textSize="8sp"
+                    tools:ignore="HardcodedText,PxUsage,SmallSp" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/mouse_buttons_position"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:background="@drawable/mouse_buttons"
+                android:contentDescription="MOVE"
+                android:minWidth="40dp"
+                android:minHeight="40dp"
+                android:padding="2dp"
+                android:scaleType="fitCenter"
+                android:src="@android:drawable/ic_menu_mylocation"
+                tools:ignore="HardcodedText,PxUsage,SmallSp" />
+        </LinearLayout>
     </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/mouse_helper_visibility"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:translationX="0px"
-        android:translationY="0px">
 
-        <Button
-            android:id="@+id/button_visibility"
-            android:layout_width="64px"
-            android:layout_height="64px"
-            android:minWidth="44dip"
-            android:minHeight="22dip"
-            android:padding="0px"
-            android:paddingStart="0px"
-            android:paddingLeft="0px"
-            android:paddingTop="0px"
-            android:paddingEnd="0px"
-            android:paddingRight="0px"
-            android:paddingBottom="0px"
-            android:text="X"
-            android:textSize="8sp"
-            tools:ignore="HardcodedText,PxUsage,SmallSp" />
-
-        <LinearLayout
-            android:id="@+id/mouse_helper_secondary_layer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:visibility="visible">
-
-            <Button
-                android:id="@+id/button_left_click"
-                android:layout_width="64px"
-                android:layout_height="64px"
-                android:minWidth="44dip"
-                android:minHeight="22dip"
-                android:padding="0px"
-                android:paddingStart="0px"
-                android:paddingLeft="0px"
-                android:paddingTop="0px"
-                android:paddingEnd="0px"
-                android:paddingRight="0px"
-                android:paddingBottom="0px"
-                android:text="L"
-                android:textSize="8sp"
-                tools:ignore="HardcodedText,PxUsage,SmallSp" />
-
-            <Button
-                android:id="@+id/button_middle_click"
-                android:layout_width="64px"
-                android:layout_height="64px"
-                android:minWidth="44dip"
-                android:minHeight="22dip"
-                android:padding="0px"
-                android:paddingStart="0px"
-                android:paddingLeft="0px"
-                android:paddingTop="0px"
-                android:paddingEnd="0px"
-                android:paddingRight="0px"
-                android:paddingBottom="0px"
-                android:text="M"
-                android:textSize="8sp"
-                tools:ignore="HardcodedText,PxUsage,SmallSp" />
-
-            <Button
-                android:id="@+id/button_right_click"
-                android:layout_width="64px"
-                android:layout_height="64px"
-                android:minWidth="44dip"
-                android:minHeight="22dip"
-                android:padding="0px"
-                android:paddingStart="0px"
-                android:paddingLeft="0px"
-                android:paddingTop="0px"
-                android:paddingEnd="0px"
-                android:paddingRight="0px"
-                android:paddingBottom="0px"
-                android:text="R"
-                android:textSize="8sp"
-                tools:ignore="HardcodedText,PxUsage,SmallSp" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/mouse_buttons"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_marginBottom="40dp"
-        android:orientation="vertical"
-        android:alpha="0.7"
-        android:translationX="0px"
-        android:translationY="0px">
-
-        <LinearLayout
-            android:id="@+id/mouse_buttons_secondary_layer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:visibility="visible">
-
-            <Button
-                android:id="@+id/mouse_button_left_click"
-                android:layout_width="96dp"
-                android:layout_height="48dp"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
-                android:padding="0px"
-                android:paddingStart="0px"
-                android:paddingLeft="0px"
-                android:paddingTop="0px"
-                android:paddingEnd="0px"
-                android:paddingRight="0px"
-                android:paddingBottom="0px"
-                android:text="L"
-                android:textColor="@android:color/black"
-                android:background="@drawable/mouse_buttons"
-                android:textSize="8sp"
-                tools:ignore="HardcodedText,PxUsage,SmallSp" />
-
-            <Button
-                android:id="@+id/mouse_button_middle_click"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
-                android:padding="0px"
-                android:paddingStart="0px"
-                android:paddingLeft="0px"
-                android:paddingTop="0px"
-                android:paddingEnd="0px"
-                android:paddingRight="0px"
-                android:paddingBottom="0px"
-                android:text="M"
-                android:textColor="@android:color/black"
-                android:background="@drawable/mouse_buttons"
-                android:textSize="8sp"
-                tools:ignore="HardcodedText,PxUsage,SmallSp" />
-
-            <Button
-                android:id="@+id/mouse_button_right_click"
-                android:layout_width="96dp"
-                android:layout_height="48dp"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
-                android:padding="0px"
-                android:paddingStart="0px"
-                android:paddingLeft="0px"
-                android:paddingTop="0px"
-                android:paddingEnd="0px"
-                android:paddingRight="0px"
-                android:paddingBottom="0px"
-                android:text="R"
-                android:textColor="@android:color/black"
-                android:background="@drawable/mouse_buttons"
-                android:textSize="8sp"
-                tools:ignore="HardcodedText,PxUsage,SmallSp" />
-        </LinearLayout>
-
-        <ImageButton
-            android:id="@+id/mouse_buttons_position"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:minWidth="40dp"
-            android:minHeight="40dp"
-            android:adjustViewBounds="true"
-            android:padding="2dp"
-            android:scaleType="fitCenter"
-            android:src="@android:drawable/ic_menu_mylocation"
-            android:contentDescription="MOVE"
-            android:layout_gravity="center"
-            android:background="@drawable/mouse_buttons"
-            tools:ignore="HardcodedText,PxUsage,SmallSp" />
-    </LinearLayout>
-</FrameLayout>
-    
-   
     <com.google.android.material.navigation.NavigationView
+        android:id="@+id/NavigationView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:id="@+id/NavigationView"
-        android:theme="@style/Theme.Material3.DayNight.NoActionBar"
-        app:menu="@menu/xserver_menu"/>
+        android:theme="@style/Theme.MiceWine"
+        app:menu="@menu/xserver_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <corners  android:topRightRadius="16dp" /> <!-- Ajuste o valor "16dp" conforme necessário -->
+    <corners android:topRightRadius="16dp" /> <!-- Ajuste o valor "16dp" conforme necessário -->
     <solid android:color="@color/gray_900" /> <!-- Cor de fundo da gaveta -->
 </shape>
