@@ -1,9 +1,9 @@
 package com.micewine.emu.core;
 
 import static com.micewine.emu.activities.MainActivity.usrDir;
-import static com.micewine.emu.coreutils.EnvVars.exportVariables;
-import static com.micewine.emu.coreutils.EnvVars.setVariables;
-import static com.micewine.emu.coreutils.ShellExecutorCmd.ExecuteCMD;
+import static com.micewine.emu.core.EnvVars.exportVariables;
+import static com.micewine.emu.core.EnvVars.setVariables;
+import static com.micewine.emu.core.ShellExecutorCmd.ExecuteCMD;
 
 import android.app.Service;
 import android.content.Intent;

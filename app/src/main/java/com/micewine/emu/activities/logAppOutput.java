@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.micewine.emu.R;
-import com.micewine.emu.coreutils.ShellExecutorCmd;
+import com.micewine.emu.core.ShellExecutorCmd;
 import com.micewine.emu.databinding.LayoutlogShellOutputBinding;
 import com.micewine.emu.nativeLoader.NativeLoader;
 import com.micewine.emu.viewmodels.ViewModelAppLogs;

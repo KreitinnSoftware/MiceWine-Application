@@ -1,9 +1,9 @@
-package com.micewine.emu.EntryPoint;
+package com.micewine.emu.core;
 
 import android.content.Context;
 
 import com.micewine.emu.core.MainService;
-import com.micewine.emu.coreutils.RunServiceClass;
+import com.micewine.emu.core.RunServiceClass;
 
 public class Init {
     private final RunServiceClass runServices = new RunServiceClass();

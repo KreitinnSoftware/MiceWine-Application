@@ -62,7 +62,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
-import com.micewine.emu.EntryPoint.Init;
+import com.micewine.emu.core.Init;
 import com.micewine.emu.activities.MainActivity;
 import com.micewine.emu.input.InputEventSender;
 import com.micewine.emu.input.InputStub;

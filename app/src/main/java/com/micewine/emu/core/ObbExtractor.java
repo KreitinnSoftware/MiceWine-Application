@@ -1,4 +1,4 @@
-package com.micewine.emu.coreutils;
+package com.micewine.emu.core;
 
 import static com.micewine.emu.activities.MainActivity.appRootDir;
 

@@ -1,6 +1,6 @@
 package com.micewine.emu.activities;
 
-import static com.micewine.emu.coreutils.ShellExecutorCmd.ExecuteCMD;
+import static com.micewine.emu.core.ShellExecutorCmd.ExecuteCMD;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -23,12 +23,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.micewine.emu.EntryPoint.Init;
+import com.micewine.emu.core.Init;
 import com.micewine.emu.R;
-import com.micewine.emu.coreutils.GeneralUtils;
-import com.micewine.emu.coreutils.ObbExtractor;
-import com.micewine.emu.coreutils.RunServiceClass;
-import com.micewine.emu.coreutils.ShellExecutorCmd;
+import com.micewine.emu.core.GeneralUtils;
+import com.micewine.emu.core.ObbExtractor;
+import com.micewine.emu.core.RunServiceClass;
+import com.micewine.emu.core.ShellExecutorCmd;
 import com.micewine.emu.databinding.ActivityMainBinding;
 import com.micewine.emu.fragments.HomeFragment;
 import com.micewine.emu.fragments.SettingsFragment;

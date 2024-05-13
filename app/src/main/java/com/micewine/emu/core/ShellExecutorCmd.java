@@ -1,4 +1,4 @@
-package com.micewine.emu.coreutils;
+package com.micewine.emu.core;
 
 import android.util.Log;
 
