@@ -19,10 +19,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class ObbExtractor {
-    private final ShellExecutorCmd shellExec = new ShellExecutorCmd();
     private Context ctx;
-    private final RunServiceClass runServices = new RunServiceClass();
-    private final GeneralUtils generalAppUtils = new GeneralUtils();
 
     public void extractZip(Context ctx, String zipFilePath, String destinationPath, ProgressBar progressBar, TextView tvProgress, Activity atv) {
         this.ctx = ctx;

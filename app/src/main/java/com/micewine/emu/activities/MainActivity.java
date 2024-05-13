@@ -13,9 +13,7 @@ import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,10 +23,6 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.micewine.emu.core.Init;
 import com.micewine.emu.R;
-import com.micewine.emu.core.GeneralUtils;
-import com.micewine.emu.core.ObbExtractor;
-import com.micewine.emu.core.RunServiceClass;
-import com.micewine.emu.core.ShellExecutorCmd;
 import com.micewine.emu.databinding.ActivityMainBinding;
 import com.micewine.emu.fragments.HomeFragment;
 import com.micewine.emu.fragments.SettingsFragment;
@@ -38,31 +32,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 123;
     @SuppressLint("SdCardPath")
     public static File appRootDir = new File("/data/data/com.micewine.emu/files");
     public static File shellLoader = new File(appRootDir + "/loader.apk");
-    public static File box64 = new File(appRootDir + "/box64");
     public static File usrDir = new File(appRootDir + "/usr");
     public static File tmpDir = new File(usrDir + "/tmp");
-    public static File pulseAudio = new File(usrDir + "/bin/pulseaudio");
     public static File virgl_test_server = new File(usrDir + "/virglrenderer/bin/virgl_test_server");
     public static File homeDir = new File(appRootDir + "/home");
-    public static File wineFolder = new File(appRootDir + "/wine");
-    public static File wine = new File(wineFolder + "/x86_64/bin/wine");
-    public static File wineUtilsFolder = new File(appRootDir + "/wine-utils");
     private ActivityMainBinding binding;
     private ProgressBar progressExtractBar;
     private FragmentManager fragmentManager;
-    private final RunServiceClass runServices = new RunServiceClass();
-    private final GeneralUtils generalAppUtils = new GeneralUtils();
-    private FrameLayout content;
-    private TextView progressUpdate;
-    private final ObbExtractor obbManager = new ObbExtractor();
-    private final ShellExecutorCmd shellExec = new ShellExecutorCmd();
-    private final logAppOutput logApp = new logAppOutput();
     private final Init init = new Init();
 
     private static void copyAssets(Context context, String filename, String outputPath) {
@@ -73,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             in = assetManager.open(filename);
             File outFile = new File(outputPath, filename);
-            out = new FileOutputStream(outFile);
+            out = Files.newOutputStream(outFile.toPath());
             copyFile(in, out);
         } catch (IOException e) {
             e.printStackTrace();
@@ -106,9 +89,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         fragmentManager = getFragmentManager();
-        content = findViewById(R.id.content);
         progressExtractBar = findViewById(R.id.progressBar);
-        progressUpdate = findViewById(R.id.updateProgress);
+        findViewById(R.id.updateProgress);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -138,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
 
         progressExtractBar = findViewById(R.id.progressBar);
-        progressUpdate = findViewById(R.id.updateProgress);
+        findViewById(R.id.updateProgress);
 
         progressExtractBar.setIndeterminate(true);
         progressExtractBar.setVisibility(View.VISIBLE);
@@ -186,16 +168,15 @@ public class MainActivity extends AppCompatActivity {
     private void checkPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-            // Se não foi concedida, solicita a permissão
             ActivityCompat.requestPermissions(
                     this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
         }
     }
 
-    private void FragmentLoader(Fragment fragment, boolean appinit) {
+    private void FragmentLoader(Fragment fragment, boolean appInit) {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        if (appinit) {
+        if (appInit) {
             fragmentTransaction.add(R.id.content, fragment);
         } else {
             fragmentTransaction.replace(R.id.content, fragment);
