@@ -234,7 +234,7 @@ public class TouchInputHandler {
         else if (inputMode == InputMode.SIMULATED_TOUCH)
             mInputStrategy = new InputStrategyInterface.SimulatedTouchInputStrategy(mRenderData, mInjector, mContext);
         else
-            mInputStrategy = new InputStrategyInterface.TrackpadInputStrategy(mInjector);
+            mInputStrategy = new InputStrategyInterface.TrackpadInputStrategy();
     }
 
     public void setTapToMove(boolean enabled) {
@@ -462,16 +462,12 @@ public class TouchInputHandler {
          * Maps the number of fingers in a tap or long-press gesture to a mouse-button.
          */
         private int mouseButtonFromPointerCount(int pointerCount) {
-            switch (pointerCount) {
-                case 1:
-                    return InputStub.BUTTON_LEFT;
-                case 2:
-                    return InputStub.BUTTON_RIGHT;
-                case 3:
-                    return InputStub.BUTTON_MIDDLE;
-                default:
-                    return InputStub.BUTTON_UNDEFINED;
-            }
+            return switch (pointerCount) {
+                case 1 -> InputStub.BUTTON_LEFT;
+                case 2 -> InputStub.BUTTON_RIGHT;
+                case 3 -> InputStub.BUTTON_MIDDLE;
+                default -> InputStub.BUTTON_UNDEFINED;
+            };
         }
 
         /**
