@@ -14,7 +14,7 @@ import static android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_M
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN;
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN;
 import static com.micewine.emu.CmdEntryPoint.ACTION_START;
-import static com.micewine.emu.LoriePreferences.ACTION_PREFERENCES_CHANGED;
+import static com.micewine.emu.Preferences.ACTION_PREFERENCES_CHANGED;
 
 import android.Manifest;
 import android.annotation.SuppressLint;

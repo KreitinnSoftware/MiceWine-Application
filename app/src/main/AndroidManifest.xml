@@ -69,7 +69,7 @@
         <activity
             android:theme="@style/AppTheme.Main"
             android:excludeFromRecents="true"
-            android:name=".LoriePreferences"
+            android:name=".Preferences"
             android:taskAffinity=".LoriePreferences"
             android:supportsPictureInPicture="false"
             android:resizeableActivity="true"

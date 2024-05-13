@@ -11,7 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.micewine.emu.LoriePreferences;
+import com.micewine.emu.Preferences;
 import com.micewine.emu.R;
 import com.micewine.emu.activities.logAppOutput;
 import com.micewine.emu.models.SettingsList;
@@ -72,7 +72,7 @@ public class AdapterSettings extends RecyclerView.Adapter<AdapterSettings.ViewHo
         public void onClick(View v) {
             SettingsList settingsModel = SettingsList.get(getAdapterPosition());
             if (R.string.x11_preference_title == settingsModel.getTitleSettings()) {
-                Intent intent = new Intent(context, LoriePreferences.class);
+                Intent intent = new Intent(context, Preferences.class);
                 context.startActivity(intent);
             } else if (R.string.log_level_normal == settingsModel.getTitleSettings()) {
                 Intent intent = new Intent(context, logAppOutput.class);

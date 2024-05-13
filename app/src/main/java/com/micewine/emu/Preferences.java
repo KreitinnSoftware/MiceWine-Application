@@ -35,7 +35,7 @@ import java.util.Objects;
 import java.util.regex.PatternSyntaxException;
 
 @SuppressWarnings("deprecation")
-public class LoriePreferences extends AppCompatActivity {
+public class Preferences extends AppCompatActivity {
     static final String ACTION_PREFERENCES_CHANGED = "com.termux.x11.ACTION_PREFERENCES_CHANGED";
     static final String SHOW_IME_WITH_HARD_KEYBOARD = "show_ime_with_hard_keyboard";
     static Handler handler = new Handler();
