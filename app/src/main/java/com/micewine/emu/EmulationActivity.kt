@@ -190,22 +190,31 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             )
         }
         lorieView.setOnKeyListener(mLorieKeyListener)
-        lorieView.setCallback { sfc: Surface?, surfaceWidth: Int, surfaceHeight: Int, screenWidth: Int, screenHeight: Int ->
-            val framerate =
-                (if (lorieView.display != null) lorieView.display.refreshRate else 30).toInt()
-            mInputHandler!!.handleHostSizeChanged(surfaceWidth, surfaceHeight)
-            mInputHandler!!.handleClientSizeChanged(screenWidth, screenHeight)
-            LorieView.sendWindowChange(screenWidth, screenHeight, framerate)
-            if (service !=
-                null
+
+        val callback = object : LorieView.Callback {
+            override fun changed(
+                sfc: Surface?,
+                surfaceWidth: Int,
+                surfaceHeight: Int,
+                screenWidth: Int,
+                screenHeight: Int
             ) {
-                try {
-                    service!!.windowChanged(sfc)
-                } catch (e: RemoteException) {
-                    e.printStackTrace()
+                val framerate = (lorieView.display?.refreshRate ?: 30).toInt()
+                mInputHandler?.handleHostSizeChanged(surfaceWidth, surfaceHeight)
+                mInputHandler?.handleClientSizeChanged(screenWidth, screenHeight)
+                LorieView.sendWindowChange(screenWidth, screenHeight, framerate)
+                service?.let {
+                    try {
+                        it.windowChanged(sfc)
+                    } catch (e: RemoteException) {
+                        e.printStackTrace()
+                    }
                 }
             }
         }
+
+        lorieView.setCallback(callback)
+
         registerReceiver(receiver, object : IntentFilter(CmdEntryPoint.ACTION_START) {
             init {
                 addAction(Preferences.ACTION_PREFERENCES_CHANGED)
