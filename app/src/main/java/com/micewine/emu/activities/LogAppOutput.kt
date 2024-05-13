@@ -9,22 +9,22 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.micewine.emu.R
 import com.micewine.emu.core.ShellExecutorCmd
-import com.micewine.emu.databinding.LayoutlogShellOutputBinding
+import com.micewine.emu.databinding.LogViewerBinding
 import com.micewine.emu.viewmodels.ViewModelAppLogs
 
 class LogAppOutput : AppCompatActivity() {
-    private var binding: LayoutlogShellOutputBinding? = null
+    private var binding: LogViewerBinding? = null
     private var sharedLogs: ViewModelAppLogs? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = LayoutlogShellOutputBinding.inflate(layoutInflater)
+        binding = LogViewerBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
         val action = supportActionBar
         action?.hide()
         val toolBar = findViewById<MaterialToolbar>(R.id.toolbar_log)
         setSupportActionBar(toolBar)
         val collapsingToolBar = findViewById<CollapsingToolbarLayout>(R.id.toolbar_log_layout)
-        collapsingToolBar.title = "Logs"
+        collapsingToolBar.title = getResources().getString(R.string.log_title)
         sharedLogs = ViewModelProvider(this)[ViewModelAppLogs::class.java]
         sharedLogs!!.setText(ShellExecutorCmd.stdOut)
         sharedLogs!!.textLiveData.observe(this) { out: String? -> binding!!.logShell.text = out }

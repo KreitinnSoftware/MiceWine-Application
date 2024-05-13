@@ -1,98 +1,14 @@
-<!DOCTYPE resources [<!ENTITY MICEWINE_PACKAGE_NAME "com.micewine.emu"><!ENTITY MICEWINE_APP_NAME "MiceWine">]>
 <resources>
-    <string name="plugin_info">&MICEWINE_APP_NAME; is a plugin app for the &MICEWINE_APP_NAME; app.
-        \n\nCheck &MICEWINE_APP_NAME; app github %1$s and &MICEWINE_APP_NAME; app github %2$s for more info.</string>
-
-    <!-- TermuxX11Activity -->
-    <string name="msg_storage_permission_not_granted_warning">The storage permission must be granted
-        to &MICEWINE_APP_NAME; app to...</string>
-    <string name="action_grant_storage_permission">Grant Storage Permission</string>
-
-    <string name="msg_battery_optimization_not_disabled_warning">Android battery optimizations
-        should be disabled for the &MICEWINE_APP_NAME; app so that…
-        Check https://developer.android.com/about/versions/oreo/background for more info and
-        https://developer.android.com/guide/components/foreground-services#background-start-restrictions
-        for more info.
-
-        \n\nAlso check https://dontkillmyapp.com for info on vendor specific app killers.
-        Depending on vendor you may need to do things like enable AutoStart, disable DuraSpeed,
-        enable `Display pop-up windows while running in the background` for the app.</string>
-    <string name="action_disable_battery_optimizations">Disable Battery Optimizations</string>
-
-    <string name="msg_display_over_other_apps_permission_not_granted_warning">The display over other
-        apps permission should be granted to &MICEWINE_APP_NAME; app for starting foreground
-        activities from background. Check https://developer.android.com/guide/components/activities/background-starts
-        for more info.
-</string>
-    <string name="action_grant_display_over_other_apps_permission">Grant Draw Over Apps Permission</string>
-
-    <string name="action_already_granted">Already Granted</string>
-    <string name="action_already_disabled">Already Disabled</string>
-    <string name="not_connected">Erro de Execução!</string>
-    <string name="help_button_text">   Ajuda   </string>
-    <string name="preferences_button_text">   Preferences   </string>
-    <string name="extra_keys_config_desc">
-        Aqui você pode definir o valor da variável de teclas extras. Leia
-        <a href="http://wiki.termux.com/wiki/Touch_Keyboard#Extra_Keys_Row">isto</a>
-        . Coloque uma string vazia para o valor padrão.
-    </string>
-
-    <!-- Log Level -->
-    <string name="log_level_title">Log Level</string>
-    <string name="log_level_off">Desligado</string>
-    <string name="log_level_normal">Normal</string>
-    <string name="log_level_debug">Debug</string>
-    <string name="log_level_verbose">Verbose</string>
-    <string name="log_level_unknown">*Unknown*</string>
-    <string name="log_level_value">Logcat log level set to \"%1$s\"</string>
-
-    <string name="app_name">&MICEWINE_APP_NAME;</string>
-    <string name="full_screen">Tela Cheia</string>
-    <string name="start_main_micewine">Iniciar</string>
-    <string name="term_start">Help/log</string>
-    <string name="start_x11">Termux-X11</string>
-    <string name="init">Termux/x11</string>
-    <string name="tool_bar">Termux/X11</string>
-    <string name="autor_dev">@deployment</string>
-    <string name="preferences">Configurar</string>
-    <string name="resources">descompactando recursos aguarde..</string>
-    <string name="path_text">Diretorio padrao para o mice wine e:"</string>
-    <string name="set_path">Definir Diretorio</string>
-    <string name="open_nav">Navegar</string>
-    <string name="close_nav">Close Navigation Drawer</string>
-    <string name="secondary_nav_text">Mice Wine Native</string>
-    <string name="drawer_item_home">Inicio</string>
-    <string name="drawer_item_settings">Configurações</string>
-    <string name="drawer_item_aboutus">Ajuda/Mais</string>
-    <string name="app_close">Sair</string>
-    <string name="download_text_release">Selecione a versão desejada:</string>
-    <string name="cancel_dialog_text_others">Cancelar</string>
-    <string name="download_string_botton">Baixar</string>
-    <string name="selected_version_text">Release Selecionada:</string>
-    <string name="version_one">https://github.com/KreitinnSoftware/MiceWine/releases/download/v0.0.5.3/MiceWine-Alpha-V5.3.zip</string>
-    <string name="not_versions_avaible_or_downloaded">[Sem versões disponiveis!]</string>
-    <string name="release_instaled">Release Baixada Crie Um Container!!</string>
-    <string name="explore">VER MAIS</string>
-    <string name="share">COMPARTILHAR</string>
-    <string name="changelog_version_one">changelog:\n•Apenas uma versão alpha\n•Possuindo somente o core para visualizacão\n•Somente devs...</string>
-    <string name="back_x11_bottom_text">Voltar</string>
-    <string name="x11_preference_title">Configurar Exibição</string>
-    <string name="x11_preferences_description">Configure a exibição do servidor micewine</string>
-    <string name="preferences_driver_title">Gerenciar Drivers</string>
-    <string name="preferences_drivers_description">Gerencie e Defina drivers Graficos para melhor desempenho</string>
-    <string name="themes_preferences_title">Configurar UI</string>
-    <string name="themes_preferences_description">Configure Temas e Modifique a interface do usuario da forma que desejar</string>
-    <string name="adv_preferences_title">Opcões Avançadas</string>
-    <string name="adv_preferences_description">Configure a Saída de log e desfrute de um terminal shell para debug</string>
-    <string name="screen_lan_preferences">Configurações</string>
-    <string name="log_level_preferencies">Log</string>
-    <string name="log_description">Saida de log da aplicacao</string>
-    <string name="mice_init">Iniciar</string>
+    <string name="app_name">MiceWine</string>
+    <string name="full_screen">Fullscreen</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_description">Configure MiceWine</string>
+    <string name="app_close">Exit</string>
+    <string name="log_title">Log</string>
+    <string name="log_description">See MiceWine Logs</string>
     <string name="clear_log">Clear</string>
     <string name="desktop_mode_init">Desktop</string>
-    <string name="game_test">Burnout Paradise</string>
-    <string name="mice_init_desc">começe sua aventura!!</string>
-    <string name="about_preferences_title">Sobre</string>
-    <string name="about_preferences_description">Sobre micewine,créditos midias sociais e mais</string>
-
+    <string name="about_title">About</string>
+    <string name="about_description">About MiceWine</string>
+    <string name="general_settings">General Settings</string>
 </resources>

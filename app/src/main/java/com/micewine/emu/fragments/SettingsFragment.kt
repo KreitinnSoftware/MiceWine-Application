@@ -26,7 +26,7 @@ class SettingsFragment : Fragment() {
             rootView.findViewById<CollapsingToolbarLayout>(R.id.toolbar_fragment_settings_layout)
 
         rootView.findViewById<MaterialToolbar>(R.id.toolbar_fragment_settings)
-        collapsingToolbarLayout.title = "Configurações Gerais"
+        collapsingToolbarLayout.title = getString(R.string.general_settings)
         return rootView
     }
 
@@ -35,17 +35,17 @@ class SettingsFragment : Fragment() {
         val adapterSettings = AdapterSettings(settingsList, requireContext())
         recyclerView.setAdapter(adapterSettings)
         var person = SettingsList(
-            R.string.x11_preference_title,
-            R.string.x11_preferences_description,
+            R.string.settings_title,
+            R.string.settings_description,
             R.drawable.ic_settings_outline
         )
         settingsList.add(person)
         person =
-            SettingsList(R.string.log_level_normal, R.string.log_description, R.drawable.ic_log)
+            SettingsList(R.string.log_title, R.string.log_description, R.drawable.ic_log)
         settingsList.add(person)
         person = SettingsList(
-            R.string.about_preferences_title,
-            R.string.about_preferences_description,
+            R.string.about_title,
+            R.string.about_description,
             R.drawable.ic_info_outline
         )
         settingsList.add(person)

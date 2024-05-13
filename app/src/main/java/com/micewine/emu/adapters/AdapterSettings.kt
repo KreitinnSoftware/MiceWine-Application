@@ -47,10 +47,10 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
 
         override fun onClick(v: View) {
             val settingsModel = settingsList[getAdapterPosition()]
-            if (R.string.x11_preference_title == settingsModel.titleSettings) {
+            if (R.string.settings_title == settingsModel.titleSettings) {
                 val intent = Intent(context, Preferences::class.java)
                 context.startActivity(intent)
-            } else if (R.string.log_level_normal == settingsModel.titleSettings) {
+            } else if (R.string.log_title == settingsModel.titleSettings) {
                 val intent = Intent(context, LogAppOutput::class.java)
                 context.startActivity(intent)
             }

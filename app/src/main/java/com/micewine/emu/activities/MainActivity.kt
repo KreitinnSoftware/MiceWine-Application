@@ -16,7 +16,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.R
 import com.micewine.emu.core.Init
 import com.micewine.emu.core.ShellExecutorCmd
-import com.micewine.emu.databinding.ActivityMainBinding
+import com.micewine.emu.databinding.MainActivityBinding
 import com.micewine.emu.fragments.HomeFragment
 import com.micewine.emu.fragments.SettingsFragment
 import java.io.File
@@ -26,12 +26,12 @@ import java.io.OutputStream
 import java.nio.file.Files
 
 class MainActivity : AppCompatActivity() {
-    private var binding: ActivityMainBinding? = null
+    private var binding: MainActivityBinding? = null
     private var progressExtractBar: ProgressBar? = null
     private val init = Init()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = MainActivityBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
         progressExtractBar = findViewById(R.id.progressBar)
         findViewById<View>(R.id.updateProgress)

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?><!-- scale_down.xml -->
-<scale xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="300"
-    android:fromXScale="1.5"
-    android:fromYScale="1.5"
-    android:toXScale="1.0"
-    android:toYScale="1.0" />

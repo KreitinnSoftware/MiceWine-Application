@@ -5,11 +5,11 @@
         android:enabled="true"
         android:icon="@drawable/ic_settings"
         android:shortcutId="preferences"
-        android:shortcutShortLabel="@string/preferences_button_text"
+        android:shortcutShortLabel="@string/settings_title"
         tools:ignore="UnusedAttribute">
         <intent
             android:action="android.intent.action.MAIN"
-            android:targetClass="com.termux.x11.LoriePreferences"
-            android:targetPackage="com.termux.x11" />
+            android:targetClass="com.micewine.emu.Preferences"
+            android:targetPackage="com.micewine.emu" />
     </shortcut>
 </shortcuts>
