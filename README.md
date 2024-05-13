@@ -11,7 +11,7 @@ It's use a XServer based on Termux-X11
 ### Compatible Android Versions
 
 | Android    | Support     |
-| ---------- | ----------- |
+|------------|-------------|
 | Android 9  | Unsupported |
 | Android 10 | Supported   |
 | Android 11 | Supported   |
