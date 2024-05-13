@@ -26,11 +26,6 @@ class HomeFragment : Fragment() {
         val recyclerView = rootView?.findViewById<RecyclerView>(R.id.recyclerViewGame)
         setAdapter(recyclerView!!)
 
-        val collapsingToolBar = rootView?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_fragment_home_layout)
-
-        rootView?.findViewById<MaterialToolbar>(R.id.toolbar_fragment_home)
-        collapsingToolBar?.title = "Home Screen"
-
         return rootView
     }
 

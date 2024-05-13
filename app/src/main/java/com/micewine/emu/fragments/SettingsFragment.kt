@@ -22,11 +22,6 @@ class SettingsFragment : Fragment() {
         val recyclerView = rootView.findViewById<RecyclerView>(R.id.recyclerViewSettings)
         setAdapter(recyclerView)
 
-        val collapsingToolbarLayout =
-            rootView.findViewById<CollapsingToolbarLayout>(R.id.toolbar_fragment_settings_layout)
-
-        rootView.findViewById<MaterialToolbar>(R.id.toolbar_fragment_settings)
-        collapsingToolbarLayout.title = getString(R.string.general_settings)
         return rootView
     }
 

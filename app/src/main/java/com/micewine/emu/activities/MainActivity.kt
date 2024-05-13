@@ -9,12 +9,14 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.R
 import com.micewine.emu.core.Init
+import com.micewine.emu.core.ObbExtractor
 import com.micewine.emu.core.ShellExecutorCmd
 import com.micewine.emu.databinding.MainActivityBinding
 import com.micewine.emu.fragments.HomeFragment
@@ -28,6 +30,7 @@ import java.nio.file.Files
 class MainActivity : AppCompatActivity() {
     private var binding: MainActivityBinding? = null
     private var progressExtractBar: ProgressBar? = null
+    private var progressTextBar: TextView? = null
     private val init = Init()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,14 +58,16 @@ class MainActivity : AppCompatActivity() {
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         progressExtractBar = findViewById(R.id.progressBar)
-        findViewById<View>(R.id.updateProgress)
+        progressTextBar = findViewById(R.id.updateProgress)
         progressExtractBar?.isIndeterminate = true
         progressExtractBar?.visibility = View.VISIBLE
 
         Thread {
             if (!usrDir.exists()) {
                 copyAssets(this, "rootfs.zip", appRootDir.toString())
-                ShellExecutorCmd.ExecuteCMD("unzip -o $appRootDir/rootfs.zip -d $appRootDir", "ExtractUtility")
+
+                ObbExtractor().extractZip("$appRootDir/rootfs.zip", "$appRootDir", progressExtractBar, progressTextBar, this)
+
                 ShellExecutorCmd.ExecuteCMD("rm $appRootDir/rootfs.zip", "ExtractUtility")
                 ShellExecutorCmd.ExecuteCMD("chmod 775 -R $appRootDir", "ExtractUtility")
                 ShellExecutorCmd.ExecuteCMD("$usrDir/generateSymlinks.sh", "ExtractUtility")
@@ -82,6 +87,7 @@ class MainActivity : AppCompatActivity() {
 
             runOnUiThread {
                 progressExtractBar?.visibility = View.GONE
+                progressTextBar?.visibility = View.GONE
             }
         }.start()
     }
