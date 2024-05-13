@@ -10,7 +10,6 @@ import static android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACK
 import static android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN;
 import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 import static android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
-import static android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT;
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN;
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN;
 import static com.micewine.emu.CmdEntryPoint.ACTION_START;
@@ -135,7 +134,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
         init = new Init();
         getWindow().setFlags(FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS | FLAG_KEEP_SCREEN_ON | FLAG_TRANSLUCENT_STATUS, 0);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.main_activity);
+        setContentView(R.layout.emulation_activity);
         drawerLayout = findViewById(R.id.DrawerLayout);
         LorieView lorieView = findViewById(R.id.lorieView);
         View lorieParent = (View) lorieView.getParent();
