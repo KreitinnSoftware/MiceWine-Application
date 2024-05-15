@@ -234,7 +234,7 @@ public class TouchInputHandler {
         else if (inputMode == InputMode.SIMULATED_TOUCH)
             mInputStrategy = new InputStrategyInterface.SimulatedTouchInputStrategy(mRenderData, mInjector, mContext);
         else
-            mInputStrategy = new InputStrategyInterface.TrackpadInputStrategy();
+            mInputStrategy = new InputStrategyInterface.TrackpadInputStrategy(mInjector);
     }
 
     public void setTapToMove(boolean enabled) {
@@ -251,7 +251,7 @@ public class TouchInputHandler {
 
     private void moveCursorByOffset(float deltaX, float deltaY) {
         if (mInputStrategy instanceof InputStrategyInterface.TrackpadInputStrategy)
-            mInjector.sendCursorMove(-deltaX, -deltaY, true);
+            mInjector.sendCursorMove((int) -deltaX, (int) -deltaY, true);
         else if (mInputStrategy instanceof InputStrategyInterface.SimulatedTouchInputStrategy) {
             PointF cursorPos = mRenderData.getCursorPosition();
             cursorPos.offset(-deltaX, -deltaY);
@@ -462,12 +462,16 @@ public class TouchInputHandler {
          * Maps the number of fingers in a tap or long-press gesture to a mouse-button.
          */
         private int mouseButtonFromPointerCount(int pointerCount) {
-            return switch (pointerCount) {
-                case 1 -> InputStub.BUTTON_LEFT;
-                case 2 -> InputStub.BUTTON_RIGHT;
-                case 3 -> InputStub.BUTTON_MIDDLE;
-                default -> InputStub.BUTTON_UNDEFINED;
-            };
+            switch (pointerCount) {
+                case 1:
+                    return InputStub.BUTTON_LEFT;
+                case 2:
+                    return InputStub.BUTTON_RIGHT;
+                case 3:
+                    return InputStub.BUTTON_MIDDLE;
+                default:
+                    return InputStub.BUTTON_UNDEFINED;
+            }
         }
 
         /**
