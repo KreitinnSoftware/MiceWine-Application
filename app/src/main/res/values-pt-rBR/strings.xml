@@ -22,4 +22,5 @@
     <string name="driver_settings_title">Configurações de Drivers</string>
     <string name="driver_settings_description">Configurar Drivers de GPU</string>
     <string name="home_title">Início</string>
+    <string name="box64_bigblock_description">Ativa/Desativa Criação de Blocos Grandes do Box64</string>
 </resources>

@@ -2,17 +2,18 @@ package com.micewine.emu.adapters
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.micewine.emu.Preferences
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings
+import com.micewine.emu.activities.GeneralSettings.Companion.ACTION_PREF_TEST
+import com.micewine.emu.activities.GeneralSettings.Companion.buttonPressed
 import com.micewine.emu.activities.LogAppOutput
-import com.micewine.emu.models.SettingsList
 
 class AdapterSettings(private val settingsList: List<SettingsList>, private val context: Context) :
     RecyclerView.Adapter<AdapterSettings.ViewHolder>() {
@@ -48,13 +49,20 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
 
         override fun onClick(v: View) {
             val settingsModel = settingsList[getAdapterPosition()]
+
             if (R.string.settings_title == settingsModel.titleSettings) {
                 val intent = Intent(context, GeneralSettings::class.java)
                 context.startActivity(intent)
             } else if (R.string.log_title == settingsModel.titleSettings) {
                 val intent = Intent(context, LogAppOutput::class.java)
                 context.startActivity(intent)
+            } else {
+                val intent = Intent(ACTION_PREF_TEST)
+                buttonPressed = context.resources.getString(settingsModel.titleSettings)
+                context.sendBroadcast(intent)
             }
         }
     }
+
+    class SettingsList(var titleSettings: Int, var descriptionSettings: Int, var imageSettings: Int)
 }

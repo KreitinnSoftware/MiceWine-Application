@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.adapters.AdapterSettings
-import com.micewine.emu.models.SettingsList
+import com.micewine.emu.adapters.AdapterSettings.SettingsList
 
 class GeneralSettingsFragment : Fragment() {
     override fun onCreateView(

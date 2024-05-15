@@ -14,6 +14,7 @@
         android:layout_height="wrap_content">
 
         <ImageButton
+            android:id="@+id/backButton"
             android:layout_width="50dp"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
@@ -24,6 +25,7 @@
         <Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/generalSettingsToolbar"
             android:title="@string/general_settings"
             android:titleTextColor="@color/white">
         </Toolbar>

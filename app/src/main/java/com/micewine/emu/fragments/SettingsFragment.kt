@@ -6,11 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.android.material.appbar.MaterialToolbar
 import com.micewine.emu.R
 import com.micewine.emu.adapters.AdapterSettings
-import com.micewine.emu.models.SettingsList
+import com.micewine.emu.adapters.AdapterSettings.SettingsList
 
 class SettingsFragment : Fragment() {
     override fun onCreateView(
@@ -29,7 +27,7 @@ class SettingsFragment : Fragment() {
         val settingsList: MutableList<SettingsList> = ArrayList()
         val adapterSettings = AdapterSettings(settingsList, requireContext())
         recyclerView.setAdapter(adapterSettings)
-        var person: SettingsList?
+        var person: AdapterSettings.SettingsList?
 
         person = SettingsList(R.string.settings_title, R.string.settings_description, R.drawable.ic_settings_outline)
         settingsList.add(person)

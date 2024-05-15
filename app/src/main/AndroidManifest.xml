@@ -27,7 +27,8 @@
         <activity
             android:name=".activities.GeneralSettings"
             android:exported="false"
-            android:theme="@style/Theme.MiceWine" />
+            android:theme="@style/Theme.MiceWine">
+        </activity>
         <activity
             android:name=".activities.MainActivity"
             android:exported="true"
@@ -74,16 +75,19 @@
         <activity
             android:name=".activities.LogAppOutput"
             android:exported="true"
-            android:theme="@style/Theme.MiceWine"></activity>
+            android:theme="@style/Theme.MiceWine">
+        </activity>
 
         <service
             android:name=".overlay.OverlayService"
             android:enabled="true"
-            android:exported="false"></service>
+            android:exported="false">
+        </service>
         <service
             android:name=".core.MainService"
             android:enabled="true"
-            android:exported="false"></service>
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

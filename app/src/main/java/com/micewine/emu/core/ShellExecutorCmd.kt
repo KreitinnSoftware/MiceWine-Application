@@ -22,14 +22,14 @@ object ShellExecutorCmd {
             try {
                 while (stdout.readLine().also { stdOut = it } != null) Log.v(
                     msg,
-                    "stdout: " + stdOut
+                    "stdout: $stdOut"
                 )
             } catch (ignored: IOException) {
             }
             try {
                 while (stderr.readLine().also { stdOut = it } != null) Log.v(
                     msg,
-                    "stderr: " + stdOut
+                    "stderr: $stdOut"
                 )
             } catch (ignored: IOException) {
             }

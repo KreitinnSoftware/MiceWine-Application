@@ -15,6 +15,7 @@ class MainService : Service() {
                 EnvVars.exportVariables() + ";" +
                         "unset LD_LIBRARY_PATH LIBGL_DRIVERS_PATH; " +
                         "export CLASSPATH=" + getClassPath(this) + ";" +
+                        "ls -la " + getClassPath(this) + ";" +
                         "/system/bin/app_process / com.micewine.emu.CmdEntryPoint :0", "XServer"
             )
         }.start()
@@ -24,14 +25,14 @@ class MainService : Service() {
                 EnvVars.exportVariables() + ";" +
                         usrDir + "/bin/start-virglrenderer.sh", "VirGLServer"
             )
-        }.start()
+        }//.start()
 
         Thread {
             ShellExecutorCmd.ExecuteCMD(
                 EnvVars.exportVariables() + ";" +
                         usrDir + "/bin/start-wine.sh", "WineService"
             )
-        }.start()
+        }//.start()
         return START_STICKY
     }
 
