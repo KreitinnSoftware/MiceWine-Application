@@ -23,16 +23,16 @@ class MainService : Service() {
         Thread {
             ShellExecutorCmd.ExecuteCMD(
                 EnvVars.exportVariables() + ";" +
-                        usrDir + "/bin/start-virglrenderer.sh", "VirGLServer"
+                        usrDir + "/bin/virgl_test_server", "VirGLServer"
             )
-        }//.start()
+        }.start()
 
         Thread {
             ShellExecutorCmd.ExecuteCMD(
                 EnvVars.exportVariables() + ";" +
                         usrDir + "/bin/start-wine.sh", "WineService"
             )
-        }//.start()
+        }.start()
         return START_STICKY
     }
 
