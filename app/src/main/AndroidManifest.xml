@@ -33,7 +33,6 @@
             android:name=".activities.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:supportsPictureInPicture="true"
             android:theme="@style/Theme.MiceWine">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -64,7 +63,6 @@
             android:excludeFromRecents="true"
             android:exported="true"
             android:resizeableActivity="true"
-            android:supportsPictureInPicture="false"
             android:taskAffinity=".Preferences"
             android:theme="@style/Theme.MiceWine">
             <intent-filter>

@@ -27,6 +27,7 @@ import java.net.ServerSocket
 import java.net.Socket
 import kotlin.system.exitProcess
 
+@Suppress("DEPRECATION")
 @Keep
 @SuppressLint("StaticFieldLeak", "UnsafeDynamicallyLoadedCode")
 class CmdEntryPoint internal constructor(args: Array<String>?) : ICmdEntryInterface.Stub() {
@@ -153,7 +154,7 @@ class CmdEntryPoint internal constructor(args: Array<String>?) : ICmdEntryInterf
         const val ACTION_START = "com.micewine.emu.CmdEntryPoint.ACTION_START"
         const val PORT = 7892
         val MAGIC = "0xDEADBEEF".toByteArray()
-        private var handler: Handler? = Handler(Looper.getMainLooper())
+        private var handler: Handler? = null
         var ctx = createContext()
 
         init {
@@ -170,6 +171,12 @@ class CmdEntryPoint internal constructor(args: Array<String>?) : ICmdEntryInterf
                     exitProcess(134)
                 }
             }
+
+            if (Looper.getMainLooper() == null) {
+                Looper.prepareMainLooper()
+            }
+
+            handler = Handler()
         }
 
         /**
@@ -184,7 +191,6 @@ class CmdEntryPoint internal constructor(args: Array<String>?) : ICmdEntryInterf
             Looper.loop()
         }
 
-        @JvmStatic
         fun requestConnection() {
             System.err.println("Requesting connection...")
             Thread { // New thread is needed to avoid android.os.NetworkOnMainThreadException
