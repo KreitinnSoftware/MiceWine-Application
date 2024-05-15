@@ -161,7 +161,8 @@ class CmdEntryPoint internal constructor(args: Array<String>?) : ICmdEntryInterf
             val path = "lib/" + Build.SUPPORTED_ABIS[0] + "/libXlorie.so"
             val loader = CmdEntryPoint::class.java.getClassLoader()
             val res = loader?.getResource(path)
-            val libPath = res?.file?.replace("file:", "")
+            val libPath = res?.file?.replace("file:", "")?.replace("-v8a", "")?.replace("/base.apk!", "")
+
             if (libPath != null) {
                 try {
                     System.load(libPath)
