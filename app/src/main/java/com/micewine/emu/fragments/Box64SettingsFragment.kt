@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
+import com.micewine.emu.activities.GeneralSettings
 import com.micewine.emu.adapters.AdapterSettingsWithOption
 import com.micewine.emu.adapters.AdapterSettingsWithOption.SettingsListWithOption
 
@@ -30,7 +32,10 @@ class Box64SettingsFragment : Fragment() {
         recyclerView.setAdapter(adapterSettingsWithOption)
         var person: SettingsListWithOption?
 
-        person = SettingsListWithOption(R.string.box64_bigblock_title, R.string.box64_bigblock_description, arrayOf("1", "2", "3"))
+        person = SettingsListWithOption(R.string.box64_bigblock_title, R.string.box64_bigblock_description, arrayOf("0", "1", "2", "3"))
+        settingsList.add(person)
+
+        person = SettingsListWithOption(R.string.box64_strongmem_title, R.string.box64_strongmem_description, arrayOf("0", "1", "2", "3"))
         settingsList.add(person)
     }
 }

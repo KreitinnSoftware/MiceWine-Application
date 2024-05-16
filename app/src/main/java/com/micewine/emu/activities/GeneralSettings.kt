@@ -70,6 +70,8 @@ class GeneralSettings : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this, callback)
 
         registerReceiver(receiver, object : IntentFilter(ACTION_PREF_TEST) {})
+
+        getSharedPreferences(getString(R.string.box64_settings_preferences_key), Context.MODE_PRIVATE)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

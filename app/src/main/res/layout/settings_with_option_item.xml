@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card2_settings"
     style="?attr/materialCardViewElevatedStyle"
     android:layout_width="match_parent"
@@ -20,7 +21,7 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="288dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="10dp">
@@ -39,7 +40,8 @@
                     android:text="Title Settings"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/description_preferences_model"
@@ -48,22 +50,22 @@
                     android:ellipsize="marquee"
                     android:text="Description Settings"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"
+                    tools:ignore="HardcodedText" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-
+        <Spinner
+            android:id="@+id/optionSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:dropDownWidth="80dp"
+            android:gravity="center">
+        </Spinner>
 
     </LinearLayout>
-
-    <Spinner
-        android:id="@+id/optionSpinner"
-        android:layout_width="50dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="end">
-    </Spinner>
-
 
 </com.google.android.material.card.MaterialCardView>

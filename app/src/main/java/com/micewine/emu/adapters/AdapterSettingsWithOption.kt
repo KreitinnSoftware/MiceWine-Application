@@ -1,19 +1,25 @@
 package com.micewine.emu.adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 
-
 class AdapterSettingsWithOption(private val settingsList: List<SettingsListWithOption>, private val context: Context) :
     RecyclerView.Adapter<AdapterSettingsWithOption.ViewHolder>() {
+
+    val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView =
             LayoutInflater.from(parent.context).inflate(R.layout.settings_with_option_item, parent, false)
@@ -25,6 +31,23 @@ class AdapterSettingsWithOption(private val settingsList: List<SettingsListWithO
         holder.settingsName.setText(sList.titleSettings)
         holder.settingsDescription.setText(sList.descriptionSettings)
         holder.spinnerOptions.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, sList.spinnerOptions)
+
+        holder.spinnerOptions.setSelection(preferences.getString(context.resources.getString(sList.titleSettings), "1")!!.toInt())
+
+        holder.spinnerOptions.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedItem = parent?.getItemAtPosition(position).toString()
+
+                val editor = preferences.edit()
+
+                editor.putString(context.resources.getString(sList.titleSettings), selectedItem)
+
+                editor.apply()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
     }
 
     override fun getItemCount(): Int {
@@ -46,8 +69,6 @@ class AdapterSettingsWithOption(private val settingsList: List<SettingsListWithO
 
         override fun onClick(v: View) {
             val settingsModel = settingsList[getAdapterPosition()]
-
-
         }
     }
 
