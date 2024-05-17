@@ -43,6 +43,7 @@ android {
             removeUnusedResources false
             obfuscate false
             optimizeCode true
+            minifyEnabled false
         }
     }
 

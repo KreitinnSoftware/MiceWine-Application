@@ -30,7 +30,7 @@ class MainService : Service() {
         Thread {
             ShellExecutorCmd.ExecuteCMD(
                 EnvVars.exportVariables() + ";" +
-                        usrDir + "/bin/start-wine.sh", "WineService"
+                        usrDir + "/bin/start-wine.sh &> /sdcard/aaaa", "WineService"
             )
         }.start()
         return START_STICKY

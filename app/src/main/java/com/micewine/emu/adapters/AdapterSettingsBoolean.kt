@@ -6,23 +6,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.Spinner
 import android.widget.TextView
-import android.widget.Toast
+import androidx.appcompat.widget.SwitchCompat
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 
-class AdapterSettingsWithOption(private val settingsList: List<SettingsListWithOption>, private val context: Context) :
-    RecyclerView.Adapter<AdapterSettingsWithOption.ViewHolder>() {
+class AdapterSettingsBoolean(private val settingsList: List<SettingsListBoolean>, private val context: Context) :
+    RecyclerView.Adapter<AdapterSettingsBoolean.ViewHolder>() {
 
     val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView =
-            LayoutInflater.from(parent.context).inflate(R.layout.settings_with_option_item, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.settings_boolean_item, parent, false)
         return ViewHolder(itemView)
     }
 
@@ -30,23 +27,14 @@ class AdapterSettingsWithOption(private val settingsList: List<SettingsListWithO
         val sList = settingsList[position]
         holder.settingsName.setText(sList.titleSettings)
         holder.settingsDescription.setText(sList.descriptionSettings)
-        holder.spinnerOptions.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, sList.spinnerOptions)
+        holder.settingsSwitch.isChecked = preferences.getBoolean(context.resources.getString(sList.titleSettings), false)
 
-        holder.spinnerOptions.setSelection(preferences.getString(context.resources.getString(sList.titleSettings), "1")!!.toInt())
+        holder.settingsSwitch.setOnClickListener {
+            val editor = preferences.edit()
 
-        holder.spinnerOptions.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedItem = parent?.getItemAtPosition(position).toString()
+            editor.putBoolean(context.resources.getString(sList.titleSettings), !preferences.getBoolean(context.resources.getString(sList.titleSettings), false))
 
-                val editor = preferences.edit()
-
-                editor.putString(context.resources.getString(sList.titleSettings), selectedItem)
-
-                editor.apply()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
+            editor.apply()
         }
     }
 
@@ -58,12 +46,12 @@ class AdapterSettingsWithOption(private val settingsList: List<SettingsListWithO
         View.OnClickListener {
         val settingsName: TextView
         val settingsDescription: TextView
-        var spinnerOptions: Spinner
+        val settingsSwitch: SwitchCompat
 
         init {
             settingsName = itemView.findViewById(R.id.title_preferences_model)
             settingsDescription = itemView.findViewById(R.id.description_preferences_model)
-            spinnerOptions = itemView.findViewById(R.id.optionSpinner)
+            settingsSwitch = itemView.findViewById(R.id.optionSwitch)
             itemView.setOnClickListener(this)
         }
 
@@ -72,5 +60,5 @@ class AdapterSettingsWithOption(private val settingsList: List<SettingsListWithO
         }
     }
 
-    class SettingsListWithOption(var titleSettings: Int, var descriptionSettings: Int, var spinnerOptions: Array<String>)
+    class SettingsListBoolean(var titleSettings: Int, var descriptionSettings: Int)
 }

@@ -1,17 +1,16 @@
 package com.micewine.emu.fragments
 
-import androidx.fragment.app.Fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Spinner
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettings
-import com.micewine.emu.adapters.AdapterSettingsWithOption
-import com.micewine.emu.adapters.AdapterSettingsWithOption.SettingsListWithOption
+import com.micewine.emu.adapters.AdapterSettingsBoolean
+import com.micewine.emu.adapters.AdapterSettingsBoolean.SettingsListBoolean
+import com.micewine.emu.adapters.AdapterSettingsSpinner
+import com.micewine.emu.adapters.AdapterSettingsSpinner.SettingsListWithOption
 
 class Box64SettingsFragment : Fragment() {
     override fun onCreateView(
@@ -28,14 +27,18 @@ class Box64SettingsFragment : Fragment() {
 
     private fun setAdapter(recyclerView: RecyclerView) {
         val settingsList: MutableList<SettingsListWithOption> = ArrayList()
-        val adapterSettingsWithOption = AdapterSettingsWithOption(settingsList, requireContext())
-        recyclerView.setAdapter(adapterSettingsWithOption)
+        val settingsBooleanList: MutableList<SettingsListBoolean> = ArrayList()
+
+
+
+        val adapterSettingsBoolean = AdapterSettingsBoolean(settingsBooleanList, requireContext())
+        recyclerView.setAdapter(adapterSettingsBoolean)
+
         var person: SettingsListWithOption?
+        val personBoolean: SettingsListBoolean?
 
-        person = SettingsListWithOption(R.string.box64_bigblock_title, R.string.box64_bigblock_description, arrayOf("0", "1", "2", "3"))
-        settingsList.add(person)
 
-        person = SettingsListWithOption(R.string.box64_strongmem_title, R.string.box64_strongmem_description, arrayOf("0", "1", "2", "3"))
-        settingsList.add(person)
+        personBoolean = SettingsListBoolean(R.string.box64_strongmem_title, R.string.box64_strongmem_description)
+        settingsBooleanList.add(personBoolean)
     }
 }
