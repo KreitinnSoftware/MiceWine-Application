@@ -138,6 +138,7 @@ class MainActivity : AppCompatActivity() {
         var usrDir = File("$appRootDir/usr")
         var tmpDir = File("$usrDir/tmp")
         var homeDir = File("$appRootDir/home")
+        
         private fun copyAssets(context: Context, filename: String, outputPath: String) {
             val assetManager = context.assets
             var `in`: InputStream? = null

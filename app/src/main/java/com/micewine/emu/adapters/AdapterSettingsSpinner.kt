@@ -12,7 +12,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 
-class AdapterSettingsSpinner(private val settingsList: List<SettingsListWithOption>, private val context: Context) :
+class AdapterSettingsSpinner(private val settingsList: List<SettingsListSpinner>, private val context: Context) :
     RecyclerView.Adapter<AdapterSettingsSpinner.ViewHolder>() {
 
     val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
@@ -69,5 +69,5 @@ class AdapterSettingsSpinner(private val settingsList: List<SettingsListWithOpti
         }
     }
 
-    class SettingsListWithOption(var titleSettings: Int, var descriptionSettings: Int, var spinnerOptions: Array<String>)
+    class SettingsListSpinner(var titleSettings: Int, var descriptionSettings: Int, var spinnerOptions: Array<String>)
 }
