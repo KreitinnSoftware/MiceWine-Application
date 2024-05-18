@@ -16,7 +16,7 @@
     app:cardElevation="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp">
 
@@ -28,14 +28,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.ExtraSmall"
+            tools:ignore="ImageContrastCheck"
             tools:src="@drawable/default_icon" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/title_game_model"
             style="@style/TextAppearance.Material3.TitleMedium"
-            android:layout_width="0dp"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:ellipsize="none"
             android:marqueeRepeatLimit="marquee_forever"
             android:requiresFadingEdge="horizontal"
@@ -45,7 +45,8 @@
             app:layout_constraintEnd_toEndOf="@+id/image_game_screen"
             app:layout_constraintStart_toStartOf="@+id/image_game_screen"
             app:layout_constraintTop_toBottomOf="@+id/img_game"
-            tools:text="The Legend of Zelda: Skyward Sword" />
+            tools:text="Desktop"
+            tools:ignore="UnknownId" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

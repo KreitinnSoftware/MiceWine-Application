@@ -85,6 +85,10 @@ class MainActivity : AppCompatActivity() {
                 progressExtractBar?.visibility = View.GONE
                 progressTextBar?.visibility = View.GONE
             }
+
+            extractedAssets = true
+
+            fragmentLoader(HomeFragment(), false)
         }.start()
 
         setSharedVars(this)
@@ -141,6 +145,7 @@ class MainActivity : AppCompatActivity() {
         var usrDir = File("$appRootDir/usr")
         var tmpDir = File("$usrDir/tmp")
         var homeDir = File("$appRootDir/home")
+        var extractedAssets: Boolean = false
         var box64_dynarec_bigblock: String? = null
         var box64_dynarec_strongmem: String? = null
         var box64_dynarec_x87double: String? = null
