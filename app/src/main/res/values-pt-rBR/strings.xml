@@ -24,4 +24,9 @@
     <string name="home_title">Início</string>
     <string name="box64_bigblock_description">Ativa/Desativa Criação de Blocos Grandes do Box64</string>
     <string name="box64_strongmem_description">Ativa/Desativa a simulação do modelo de Memória Forte</string>
+    <string name="box64_x87double_description">Forçar o uso de Double para emulação de x87</string>
+    <string name="box64_fastnan_description">Ativa/Desativa geração de -NAN</string>
+    <string name="box64_fastround_description">Ativa/Desativa a geração de arredondamento x86 preciso</string>
+    <string name="box64_safeflags_description">Manuseamento de flags em opcodes CALL/RET</string>
+    <string name="box64_callret_description">Otimização de opcodes CALL/RET (não compativel com jit/dynarec/smc)</string>
 </resources>

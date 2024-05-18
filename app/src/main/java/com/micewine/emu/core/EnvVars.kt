@@ -1,5 +1,12 @@
 package com.micewine.emu.core
 
+import com.micewine.emu.activities.MainActivity.Companion.box64_dynarec_bigblock
+import com.micewine.emu.activities.MainActivity.Companion.box64_dynarec_callret
+import com.micewine.emu.activities.MainActivity.Companion.box64_dynarec_fastnan
+import com.micewine.emu.activities.MainActivity.Companion.box64_dynarec_fastround
+import com.micewine.emu.activities.MainActivity.Companion.box64_dynarec_safeflags
+import com.micewine.emu.activities.MainActivity.Companion.box64_dynarec_strongmem
+import com.micewine.emu.activities.MainActivity.Companion.box64_dynarec_x87double
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
@@ -43,5 +50,12 @@ object EnvVars {
         putVar("D3DX_RENDERER", "D3DX_RENDERER=WineD3D")
         putVar("WINED3D_VERSION", "WINED3D_VERSION=\"WineD3D-(9.0)\"")
         putVar("DXVK_VERSION", "DXVK_VERSION=1.10.3-async")
+        putVar("BOX64_DYNAREC_BIGBLOCK", "BOX64_DYNAREC_BIGBLOCK=$box64_dynarec_bigblock")
+        putVar("BOX64_DYNAREC_STRONGMEM", "BOX64_DYNAREC_STRONGMEM=$box64_dynarec_strongmem")
+        putVar("BOX64_DYNAREC_X87DOUBLE", "BOX64_DYNAREC_X87DOUBLE=$box64_dynarec_x87double")
+        putVar("BOX64_DYNAREC_FASTNAN", "BOX64_DYNAREC_FASTNAN=$box64_dynarec_fastnan")
+        putVar("BOX64_DYNAREC_FASTROUND", "BOX64_DYNAREC_FASTROUND=$box64_dynarec_fastround")
+        putVar("BOX64_DYNAREC_SAFEFLAGS", "BOX64_DYNAREC_SAFEFLAGS=$box64_dynarec_safeflags")
+        putVar("BOX64_DYNAREC_CALLRET", "BOX64_DYNAREC_CALLRET=$box64_dynarec_callret")
     }
 }

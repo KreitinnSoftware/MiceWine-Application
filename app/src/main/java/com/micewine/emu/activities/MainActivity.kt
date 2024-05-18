@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.R
 import com.micewine.emu.core.Init
@@ -85,6 +86,8 @@ class MainActivity : AppCompatActivity() {
                 progressTextBar?.visibility = View.GONE
             }
         }.start()
+
+        setSharedVars(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -138,6 +141,33 @@ class MainActivity : AppCompatActivity() {
         var usrDir = File("$appRootDir/usr")
         var tmpDir = File("$usrDir/tmp")
         var homeDir = File("$appRootDir/home")
+        var box64_dynarec_bigblock: String? = null
+        var box64_dynarec_strongmem: String? = null
+        var box64_dynarec_x87double: String? = null
+        var box64_dynarec_fastnan: String? = null
+        var box64_dynarec_fastround: String? = null
+        var box64_dynarec_safeflags: String? = null
+        var box64_dynarec_callret: String? = null
+
+        private fun booleanToString(boolean: Boolean): String {
+            return if (boolean) {
+                "1"
+            } else {
+                "0"
+            }
+        }
+
+        fun setSharedVars(context: Context) {
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
+
+            box64_dynarec_bigblock = preferences.getString(context.resources.getString(R.string.box64_bigblock_title), "1")!!
+            box64_dynarec_strongmem = preferences.getString(context.resources.getString(R.string.box64_strongmem_title), "0")!!
+            box64_dynarec_x87double = booleanToString(preferences.getBoolean(context.resources.getString(R.string.box64_x87double_title), false))
+            box64_dynarec_fastnan = booleanToString(preferences.getBoolean(context.resources.getString(R.string.box64_fastnan_title), true))
+            box64_dynarec_fastround = booleanToString(preferences.getBoolean(context.resources.getString(R.string.box64_fastround_title), true))
+            box64_dynarec_safeflags = preferences.getString(context.resources.getString(R.string.box64_safeflags_title), "1")!!
+            box64_dynarec_callret = booleanToString(preferences.getBoolean(context.resources.getString(R.string.box64_callret_title), true))
+        }
         
         private fun copyAssets(context: Context, filename: String, outputPath: String) {
             val assetManager = context.assets

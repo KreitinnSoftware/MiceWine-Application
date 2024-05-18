@@ -23,8 +23,18 @@
     <string name="driver_settings_description">Configure GPU Drivers</string>
     <string name="home_title">Home</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="box64_bigblock_title">BOX64_DYNAREC_BIGBLOCK</string>
+    <string name="box64_bigblock_title" translatable="false">BOX64_DYNAREC_BIGBLOCK</string>
     <string name="box64_bigblock_description">Enables/Disables Box64\'s Dynarec building BigBlock</string>
-    <string name="box64_strongmem_title">BOX64_DYNAREC_STRONGMEM</string>
+    <string name="box64_strongmem_title" translatable="false">BOX64_DYNAREC_STRONGMEM</string>
     <string name="box64_strongmem_description">Enable/Disable simulation of Strong Memory model</string>
+    <string name="box64_x87double_title" translatable="false">BOX64_DYNAREC_X87DOUBLE</string>
+    <string name="box64_x87double_description">Force the use of Double for x87 emulation</string>
+    <string name="box64_fastnan_title" translatable="false">BOX64_DYNAREC_FASTNAN</string>
+    <string name="box64_fastnan_description">Enable/Disable generation of -NAN</string>
+    <string name="box64_fastround_title" translatable="false">BOX64_DYNAREC_FASTROUND</string>
+    <string name="box64_fastround_description">Enable/Disable generation of precise x86 rounding</string>
+    <string name="box64_safeflags_title" translatable="false">BOX64_DYNAREC_SAFEFLAGS</string>
+    <string name="box64_safeflags_description">Handling of flags on CALL/RET opcodes</string>
+    <string name="box64_callret_title" translatable="false">BOX64_DYNAREC_CALLRET</string>
+    <string name="box64_callret_description">Optimization of CALL/RET opcodes (not compatible with jit/dynarec/smc)</string>
 </resources>

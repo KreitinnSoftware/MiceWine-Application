@@ -14,6 +14,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.databinding.GeneralSettingsBinding
 import com.micewine.emu.fragments.Box64SettingsFragment
 import com.micewine.emu.fragments.GeneralSettingsFragment
@@ -85,6 +86,7 @@ class GeneralSettings : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        setSharedVars(this)
         unregisterReceiver(receiver)
     }
 
@@ -102,6 +104,8 @@ class GeneralSettings : AppCompatActivity() {
 
     companion object {
         const val ACTION_PREF_TEST = "com.micewine.emu.ACTION_PREF_TEST"
+        const val SWITCH = 1
+        const val SPINNER = 2
 
         var buttonPressed = ""
     }

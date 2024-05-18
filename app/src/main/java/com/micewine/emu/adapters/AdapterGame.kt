@@ -43,6 +43,7 @@ class AdapterGame(private val gameList: List<GameList>, private val context: Con
 
         override fun onClick(v: View) {
             val gameModel = gameList[getAdapterPosition()]
+
             if (R.string.desktop_mode_init == gameModel.titleGame) {
                 val intent = Intent(context, EmulationActivity::class.java)
                 context.startActivity(intent)

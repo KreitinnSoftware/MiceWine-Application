@@ -58,6 +58,15 @@
             >
         </Spinner>
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/optionSwitch"
+            android:theme="@style/Theme.MiceWine"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+        </com.google.android.material.materialswitch.MaterialSwitch>
+
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
