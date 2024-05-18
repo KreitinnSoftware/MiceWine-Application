@@ -57,7 +57,7 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
                 context.startActivity(intent)
             } else {
                 val intent = Intent(ACTION_PREF_TEST)
-                buttonPressed = context.resources.getString(settingsModel.titleSettings)
+                intent.putExtra("preference", context.resources.getString(settingsModel.titleSettings))
                 context.sendBroadcast(intent)
             }
         }

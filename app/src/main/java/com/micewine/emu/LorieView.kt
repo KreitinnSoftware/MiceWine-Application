@@ -11,14 +11,13 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
-import android.os.Handler
-import android.preference.PreferenceManager
 import android.util.AttributeSet
 import android.util.Log
 import android.view.KeyEvent
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import androidx.preference.PreferenceManager
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.systemutils.SystemMemoryInfo
 
@@ -27,7 +26,6 @@ class LorieView : SurfaceView, InputStub {
     private val p = Point()
     private var totalMemory = SystemMemoryInfo.getTotalRAM(context)
     private var freeMemory = SystemMemoryInfo.getFreeRAM(context)
-    private val handler = Handler()
     private var mCallback: Callback? = null
     private val mSurfaceCallback: SurfaceHolder.Callback = object : SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
@@ -36,14 +34,10 @@ class LorieView : SurfaceView, InputStub {
         }
 
         override fun surfaceChanged(holder: SurfaceHolder, f: Int, width: Int, height: Int) {
-            var width = width
-            var height = height
-            width = measuredWidth
-            height = measuredHeight
-            Log.d("SurfaceChangedListener", "Surface was changed: " + width + "x" + height)
+            Log.d("SurfaceChangedListener", "Surface was changed: " + measuredWidth + "x" + measuredHeight)
             if (mCallback == null) return
             dimensionsFromSettings
-            mCallback!!.changed(holder.surface, width, height, p.x, p.y)
+            mCallback!!.changed(holder.surface, measuredWidth, measuredHeight, p.x, p.y)
         }
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
@@ -119,7 +113,7 @@ class LorieView : SurfaceView, InputStub {
     }
 
     private val activity: Activity
-        private get() {
+        get() {
             var context = context
             while (context is ContextWrapper) {
                 if (context is Activity) {
@@ -131,7 +125,7 @@ class LorieView : SurfaceView, InputStub {
         }
     val dimensionsFromSettings: Unit
         get() {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
             val width = measuredWidth
             val height = measuredHeight
             val w: Int
@@ -165,12 +159,23 @@ class LorieView : SurfaceView, InputStub {
         ramCounter(canvas)
     }
 
-    fun ramCounter(c: Canvas) {
+    private fun ramCounter(c: Canvas) {
         val paint = Paint()
-        paint.setColor(Color.WHITE)
-        paint.textSize = 15f
+        paint.textSize = 30f
+        paint.style = Paint.Style.STROKE
+        paint.setColor(Color.BLACK)
+        val ramCounterBorderWidth = 8f
+        paint.strokeWidth = ramCounterBorderWidth
         c.drawText(
-            "RAM: " + (totalMemory - freeMemory) / BYTES_FOR_MEGABYTES + "/" + totalMemory / BYTES_FOR_MEGABYTES,
+            ("RAM: " + (totalMemory - freeMemory) / BYTES_FOR_MEGABYTES) + "/" + totalMemory / BYTES_FOR_MEGABYTES,
+            10f,
+            40f,
+            paint
+        )
+        paint.style = Paint.Style.FILL
+        paint.setColor(Color.WHITE)
+        c.drawText(
+            ("RAM: " + (totalMemory - freeMemory) / BYTES_FOR_MEGABYTES) + "/" + totalMemory / BYTES_FOR_MEGABYTES,
             10f,
             40f,
             paint
@@ -185,7 +190,7 @@ class LorieView : SurfaceView, InputStub {
     }
 
     override fun sendMouseWheelEvent(deltaX: Float, deltaY: Float) {
-        sendMouseEvent(deltaX, deltaY, InputStub.BUTTON_SCROLL, false, true)
+        sendMouseEvent(deltaX, deltaY, InputStub.BUTTON_SCROLL, buttonDown = false, relative = true)
     }
 
     override fun dispatchKeyEventPreIme(event: KeyEvent): Boolean {

@@ -111,18 +111,29 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.emulation_activity)
         drawerLayout = findViewById(R.id.DrawerLayout)
+        drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         val lorieView = findViewById<LorieView>(R.id.lorieView)
         val lorieParent = lorieView.parent as View
         val nav = findViewById<NavigationView>(R.id.NavigationView)
         nav.setNavigationItemSelectedListener { item: MenuItem ->
             val id = item.itemId
-            if (id == R.id.exit_fromXserver) {
-                val i = Intent(this, MainActivity::class.java)
-                startActivity(i)
-            } else if (id == R.id.openKeyboard) {
-                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.showSoftInput(lorieView, InputMethodManager.SHOW_IMPLICIT)
-                drawerLayout?.closeDrawers()
+            when (id) {
+                R.id.exitFromEmulation -> {
+                    val i = Intent(this, MainActivity::class.java)
+                    startActivity(i)
+                }
+                R.id.openKeyboard -> {
+                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.showSoftInput(lorieView, InputMethodManager.SHOW_IMPLICIT)
+                    drawerLayout?.closeDrawers()
+                }
+                R.id.setScreenStretch -> {
+                    val editPrefs = preferences.edit()
+                    editPrefs.putBoolean("displayStretch", !preferences.getBoolean("displayStretch", false))
+                    editPrefs.apply()
+
+                    lorieView.requestLayout()
+                }
             }
             true
         }
@@ -227,8 +238,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         requestConnection()
         onPreferencesChanged("")
         checkXEvents()
-        Log.v("?", "Asa delta")
+
         init!!.run(this)
+
         if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU && checkSelfPermission(permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED && !shouldShowRequestPermissionRationale(
                 permission.POST_NOTIFICATIONS
             )

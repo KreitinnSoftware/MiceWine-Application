@@ -26,9 +26,7 @@ class GeneralSettings : AppCompatActivity() {
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
             if (ACTION_PREF_TEST == intent.action) {
-                Log.v("A", buttonPressed)
-
-                if (buttonPressed == context.resources.getString(R.string.box64_settings_title)) {
+                if (intent.getStringExtra("preference") == context.resources.getString(R.string.box64_settings_title)) {
                     fragmentLoader(Box64SettingsFragment(), false)
                     findViewById<Toolbar>(R.id.generalSettingsToolbar).title = context.resources.getString(R.string.box64_settings_title)
                 }

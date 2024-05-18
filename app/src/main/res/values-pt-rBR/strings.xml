@@ -12,7 +12,7 @@
     <string name="about_description">Sobre o MiceWine</string>
     <string name="general_settings">Configurações Gerais</string>
     <string name="exit">Sair</string>
-    <string name="open_keyboard">Abrir Teclado´</string>
+    <string name="open_keyboard">Abrir Teclado</string>
     <string name="box64_settings_title">Configurações do Box64</string>
     <string name="box64_settings_description">Configurar Box64</string>
     <string name="wine_settings_title">Configurações do Wine</string>
@@ -29,4 +29,5 @@
     <string name="box64_fastround_description">Ativa/Desativa a geração de arredondamento x86 preciso</string>
     <string name="box64_safeflags_description">Manuseamento de flags em opcodes CALL/RET</string>
     <string name="box64_callret_description">Otimização de opcodes CALL/RET (não compativel com jit/dynarec/smc)</string>
+    <string name="strech_display">Esticar Tela</string>
 </resources>

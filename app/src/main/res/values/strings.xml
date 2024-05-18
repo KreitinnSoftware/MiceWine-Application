@@ -37,4 +37,5 @@
     <string name="box64_safeflags_description">Handling of flags on CALL/RET opcodes</string>
     <string name="box64_callret_title" translatable="false">BOX64_DYNAREC_CALLRET</string>
     <string name="box64_callret_description">Optimization of CALL/RET opcodes (not compatible with jit/dynarec/smc)</string>
+    <string name="strech_display">Stretch Display</string>
 </resources>
