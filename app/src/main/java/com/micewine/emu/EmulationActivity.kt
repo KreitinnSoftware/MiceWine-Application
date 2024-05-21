@@ -36,7 +36,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
 import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
-import com.micewine.emu.activities.MainActivity
+import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.core.Init
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
@@ -119,12 +119,14 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             val id = item.itemId
             when (id) {
                 R.id.exitFromEmulation -> {
-                    val i = Intent(this, MainActivity::class.java)
-                    startActivity(i)
+                    //val i = Intent(this, MainActivity::class.java)
+                    //startActivity(i)
+                    enableRamCounter = false
+                    finish()
                 }
                 R.id.openKeyboard -> {
                     val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.showSoftInput(lorieView, InputMethodManager.SHOW_IMPLICIT)
+                    imm.showSoftInput(lorieView, InputMethodManager.SHOW_FORCED)
                     drawerLayout?.closeDrawers()
                 }
                 R.id.setScreenStretch -> {

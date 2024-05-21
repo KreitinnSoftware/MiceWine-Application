@@ -6,10 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.widget.ImageButton
-import android.widget.Toolbar
+import androidx.appcompat.widget.Toolbar
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -17,6 +16,8 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.databinding.GeneralSettingsBinding
 import com.micewine.emu.fragments.Box64SettingsFragment
+import com.micewine.emu.fragments.DisplaySettingsFragment
+import com.micewine.emu.fragments.DriversSettingsFragment
 import com.micewine.emu.fragments.GeneralSettingsFragment
 
 class GeneralSettings : AppCompatActivity() {
@@ -25,10 +26,16 @@ class GeneralSettings : AppCompatActivity() {
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
-            if (ACTION_PREF_TEST == intent.action) {
+            if (ACTION_PREFERENCE_SELECT == intent.action) {
                 if (intent.getStringExtra("preference") == context.resources.getString(R.string.box64_settings_title)) {
                     fragmentLoader(Box64SettingsFragment(), false)
                     findViewById<Toolbar>(R.id.generalSettingsToolbar).title = context.resources.getString(R.string.box64_settings_title)
+                } else if (intent.getStringExtra("preference") == context.resources.getString(R.string.display_settings_title)) {
+                    fragmentLoader(DisplaySettingsFragment(), false)
+                    findViewById<Toolbar>(R.id.generalSettingsToolbar).title = context.resources.getString(R.string.display_settings_title)
+                } else if (intent.getStringExtra("preference") == context.resources.getString(R.string.driver_settings_title)) {
+                    fragmentLoader(DriversSettingsFragment(), false)
+                    findViewById<Toolbar>(R.id.generalSettingsToolbar).title = context.resources.getString(R.string.driver_settings_title)
                 }
             }
         }
@@ -42,6 +49,8 @@ class GeneralSettings : AppCompatActivity() {
         setContentView(binding!!.root)
 
         fragmentLoader(GeneralSettingsFragment(), true)
+
+        findViewById<Toolbar>(R.id.generalSettingsToolbar).title = this.resources.getString(R.string.general_settings)
 
         backButton = findViewById(R.id.backButton)
 
@@ -68,7 +77,7 @@ class GeneralSettings : AppCompatActivity() {
 
         onBackPressedDispatcher.addCallback(this, callback)
 
-        registerReceiver(receiver, object : IntentFilter(ACTION_PREF_TEST) {})
+        registerReceiver(receiver, object : IntentFilter(ACTION_PREFERENCE_SELECT) {})
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -101,10 +110,25 @@ class GeneralSettings : AppCompatActivity() {
     }
 
     companion object {
-        const val ACTION_PREF_TEST = "com.micewine.emu.ACTION_PREF_TEST"
+        const val ACTION_PREFERENCE_SELECT = "com.micewine.emu.ACTION_PREFERENCE_SELECT"
         const val SWITCH = 1
         const val SPINNER = 2
 
-        var buttonPressed = ""
+        const val BOX64_DYNAREC_BIGBLOCK_KEY = "BOX64_DYNAREC_BIGBLOCK"
+        const val BOX64_DYNAREC_STRONGMEM_KEY = "BOX64_DYNAREC_STRONGMEM"
+        const val BOX64_DYNAREC_X87DOUBLE_KEY = "BOX64_DYNAREC_X87DOUBLE"
+        const val BOX64_DYNAREC_FASTNAN_KEY = "BOX64_DYNAREC_FASTNAN"
+        const val BOX64_DYNAREC_FASTROUND_KEY = "BOX64_DYNAREC_FASTROUND"
+        const val BOX64_DYNAREC_SAFEFLAGS_KEY = "BOX64_DYNAREC_SAFEFLAGS"
+        const val BOX64_DYNAREC_CALLRET_KEY = "BOX64_DYNAREC_CALLRET"
+        const val SELECTED_DRIVER_KEY = "selectedDriver"
+        const val SELECTED_THEME_KEY = "selectedTheme"
+        const val SELECTED_D3DX_RENDERER_KEY = "d3dxRenderer"
+        const val SELECTED_WINED3D_KEY = "selectedWineD3D"
+        const val SELECTED_DXVK_KEY = "selectedDXVK"
+        const val SELECTED_IB_KEY = "selectedIb"
+        const val SELECTED_VIRGL_PROFILE_KEY = "selectedVirGLProfile"
+        const val SELECTED_DXVK_HUD_PRESET_KEY = "selectedDXVKHudPreset"
+        const val DISPLAY_RESOLUTION_KEY = "displayResolution"
     }
 }

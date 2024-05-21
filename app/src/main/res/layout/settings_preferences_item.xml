@@ -54,7 +54,7 @@
             android:id="@+id/optionSpinner"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:dropDownWidth="80dp"
+            android:dropDownWidth="wrap_content"
             >
         </Spinner>
 

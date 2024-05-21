@@ -1,57 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar_log"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:touchscreenBlocksFocus="false"
-        app:elevation="0dp">
+        >
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/toolbar_log_layout"
-            style="?attr/collapsingToolbarLayoutMediumStyle"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/collapsingToolbarLayoutMediumSize"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/exit"
+            android:src="@drawable/ic_back"
+            android:layout_weight="1"
+            >
+        </ImageButton>
 
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar_log"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:touchscreenBlocksFocus="false"
-                app:layout_collapseMode="pin"
-                app:navigationIcon="@drawable/ic_back" />
+        <androidx.appcompat.widget.Toolbar
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/logViewerToolbar"
+            android:title="@string/general_settings"
+            android:titleTextColor="@color/white"
+            android:layout_weight="4"
+            >
+        </androidx.appcompat.widget.Toolbar>
 
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
+        <ImageButton
+            android:id="@+id/clearButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_clear"
+            android:layout_weight="1"
+            android:layout_gravity="end"
+            android:contentDescription="@string/clear_log">
+        </ImageButton>
 
-    </com.google.android.material.appbar.AppBarLayout>
+    </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="20dp"
+        android:padding="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="@color/black"
+            >
 
             <TextView
                 android:id="@+id/log_shell"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal|center_vertical"
-                android:textSize="20sp"
-                android:theme="@style/Theme.MiceWine" />
+                android:gravity="start"
+                android:textSize="16sp"
+                android:textIsSelectable="true"
+                android:theme="@style/Theme.MiceWine"
+                android:layout_margin="8dp"
+                >
+            </TextView>
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>

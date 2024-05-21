@@ -1,14 +1,12 @@
 package com.micewine.emu.activities
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.android.material.appbar.MaterialToolbar
 import com.micewine.emu.R
-import com.micewine.emu.core.ShellExecutorCmd
+import com.micewine.emu.core.ShellExecutorCmd.stdErrOut
 import com.micewine.emu.databinding.LogViewerBinding
 import com.micewine.emu.viewmodels.ViewModelAppLogs
 
@@ -19,31 +17,27 @@ class LogAppOutput : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = LogViewerBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
-        val action = supportActionBar
-        action?.hide()
-        val toolBar = findViewById<MaterialToolbar>(R.id.toolbar_log)
-        setSupportActionBar(toolBar)
-        val collapsingToolBar = findViewById<CollapsingToolbarLayout>(R.id.toolbar_log_layout)
-        collapsingToolBar.title = getResources().getString(R.string.log_title)
-        sharedLogs = ViewModelProvider(this)[ViewModelAppLogs::class.java]
-        sharedLogs!!.setText(ShellExecutorCmd.stdOut)
-        sharedLogs!!.textLiveData.observe(this) { out: String? -> binding!!.logShell.text = out }
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_clear, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
+        val toolBar = findViewById<Toolbar>(R.id.logViewerToolbar)
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
+        toolBar.title = resources.getString(R.string.log_title)
+
+        val backButton = findViewById<ImageButton>(R.id.backButton)
+
+        backButton?.setOnClickListener {
             finish()
-            return true
-        } else if (id == R.id.clear) {
-            binding!!.logShell.text = ""
         }
-        return super.onOptionsItemSelected(item)
+
+        val clearButton = findViewById<ImageButton>(R.id.clearButton)
+
+        clearButton?.setOnClickListener {
+            stdErrOut = ""
+            sharedLogs!!.setText("")
+        }
+
+        sharedLogs = ViewModelProvider(this)[ViewModelAppLogs::class.java]
+        sharedLogs!!.setText(stdErrOut)
+        sharedLogs!!.textLiveData.observe(this) { out: String? -> binding!!.logShell.text = out }
     }
 
     override fun onDestroy() {

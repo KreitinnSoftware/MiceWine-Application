@@ -2,7 +2,6 @@ package com.micewine.emu.adapters
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,8 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings
-import com.micewine.emu.activities.GeneralSettings.Companion.ACTION_PREF_TEST
-import com.micewine.emu.activities.GeneralSettings.Companion.buttonPressed
+import com.micewine.emu.activities.GeneralSettings.Companion.ACTION_PREFERENCE_SELECT
 import com.micewine.emu.activities.LogAppOutput
 
 class AdapterSettings(private val settingsList: List<SettingsList>, private val context: Context) :
@@ -56,7 +54,7 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
                 val intent = Intent(context, LogAppOutput::class.java)
                 context.startActivity(intent)
             } else {
-                val intent = Intent(ACTION_PREF_TEST)
+                val intent = Intent(ACTION_PREFERENCE_SELECT)
                 intent.putExtra("preference", context.resources.getString(settingsModel.titleSettings))
                 context.sendBroadcast(intent)
             }

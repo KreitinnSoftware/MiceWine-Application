@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.EmulationActivity
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.models.GameList
 
 class AdapterGame(private val gameList: List<GameList>, private val context: Context) :
@@ -45,6 +46,7 @@ class AdapterGame(private val gameList: List<GameList>, private val context: Con
             val gameModel = gameList[getAdapterPosition()]
 
             if (R.string.desktop_mode_init == gameModel.titleGame) {
+                enableRamCounter = true
                 val intent = Intent(context, EmulationActivity::class.java)
                 context.startActivity(intent)
             }

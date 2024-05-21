@@ -22,13 +22,13 @@
             android:src="@drawable/ic_back">
         </ImageButton>
 
-        <Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/generalSettingsToolbar"
             android:title="@string/general_settings"
             android:titleTextColor="@color/white">
-        </Toolbar>
+        </androidx.appcompat.widget.Toolbar>
     </LinearLayout>
 
     <FrameLayout

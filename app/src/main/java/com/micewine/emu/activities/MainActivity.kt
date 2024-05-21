@@ -16,6 +16,21 @@ import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.R
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTROUND_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_SAFEFLAGS_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_STRONGMEM_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_IB_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_THEME_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VIRGL_PROFILE_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
 import com.micewine.emu.core.Init
 import com.micewine.emu.core.ObbExtractor
 import com.micewine.emu.core.ShellExecutorCmd
@@ -68,9 +83,9 @@ class MainActivity : AppCompatActivity() {
 
                 ObbExtractor().extractZip("$appRootDir/rootfs.zip", "$appRootDir", progressExtractBar, progressTextBar, this)
 
-                ShellExecutorCmd.ExecuteCMD("rm $appRootDir/rootfs.zip", "ExtractUtility")
-                ShellExecutorCmd.ExecuteCMD("chmod 775 -R $appRootDir", "ExtractUtility")
-                ShellExecutorCmd.ExecuteCMD("$usrDir/generateSymlinks.sh", "ExtractUtility")
+                ShellExecutorCmd.executeShell("rm $appRootDir/rootfs.zip", "ExtractUtility")
+                ShellExecutorCmd.executeShell("chmod 775 -R $appRootDir", "ExtractUtility")
+                ShellExecutorCmd.executeShell("$usrDir/generateSymlinks.sh", "ExtractUtility")
             }
 
             if (!tmpDir.exists()) {
@@ -146,13 +161,23 @@ class MainActivity : AppCompatActivity() {
         var tmpDir = File("$usrDir/tmp")
         var homeDir = File("$appRootDir/home")
         var extractedAssets: Boolean = false
-        var box64_dynarec_bigblock: String? = null
-        var box64_dynarec_strongmem: String? = null
-        var box64_dynarec_x87double: String? = null
-        var box64_dynarec_fastnan: String? = null
-        var box64_dynarec_fastround: String? = null
-        var box64_dynarec_safeflags: String? = null
-        var box64_dynarec_callret: String? = null
+        var enableRamCounter: Boolean = false
+        var appLang: String? = null
+        var box64DynarecBigblock: String? = null
+        var box64DynarecStrongmem: String? = null
+        var box64DynarecX87double: String? = null
+        var box64DynarecFastnan: String? = null
+        var box64DynarecFastround: String? = null
+        var box64DynarecSafeflags: String? = null
+        var box64DynarecCallret: String? = null
+        var selectedDriver: String? = null
+        var selectedTheme: String? = null
+        var d3dxRenderer: String? = null
+        var selectedWineD3D: String? = null
+        var selectedDXVK: String? = null
+        var selectedIbVersion: String? = null
+        var selectedVirGLProfile: String? = null
+        var selectedDXVKHud: String? = null
 
         private fun booleanToString(boolean: Boolean): String {
             return if (boolean) {
@@ -163,31 +188,41 @@ class MainActivity : AppCompatActivity() {
         }
 
         fun setSharedVars(context: Context) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-            box64_dynarec_bigblock = preferences.getString(context.resources.getString(R.string.box64_bigblock_title), "1")!!
-            box64_dynarec_strongmem = preferences.getString(context.resources.getString(R.string.box64_strongmem_title), "0")!!
-            box64_dynarec_x87double = booleanToString(preferences.getBoolean(context.resources.getString(R.string.box64_x87double_title), false))
-            box64_dynarec_fastnan = booleanToString(preferences.getBoolean(context.resources.getString(R.string.box64_fastnan_title), true))
-            box64_dynarec_fastround = booleanToString(preferences.getBoolean(context.resources.getString(R.string.box64_fastround_title), true))
-            box64_dynarec_safeflags = preferences.getString(context.resources.getString(R.string.box64_safeflags_title), "1")!!
-            box64_dynarec_callret = booleanToString(preferences.getBoolean(context.resources.getString(R.string.box64_callret_title), true))
+            appLang = context.resources.getString(R.string.app_lang)
+
+            box64DynarecBigblock = preferences.getString(BOX64_DYNAREC_BIGBLOCK_KEY, "1")
+            box64DynarecStrongmem = preferences.getString(BOX64_DYNAREC_STRONGMEM_KEY, "0")
+            box64DynarecX87double = booleanToString(preferences.getBoolean(BOX64_DYNAREC_X87DOUBLE_KEY, false))
+            box64DynarecFastnan = booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTNAN_KEY, true))
+            box64DynarecFastround = booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTROUND_KEY, true))
+            box64DynarecSafeflags = preferences.getString(BOX64_DYNAREC_SAFEFLAGS_KEY, "1")
+            box64DynarecCallret = booleanToString(preferences.getBoolean(BOX64_DYNAREC_CALLRET_KEY, true))
+            selectedDriver = preferences.getString(SELECTED_DRIVER_KEY, "Turnip/Zink")
+            selectedTheme = preferences.getString(SELECTED_THEME_KEY, "DarkBlue")
+            d3dxRenderer = preferences.getString(SELECTED_D3DX_RENDERER_KEY, "DXVK")
+            selectedWineD3D = preferences.getString(SELECTED_WINED3D_KEY, "WineD3D-9.0")
+            selectedDXVK = preferences.getString(SELECTED_DXVK_KEY, "DXVK")
+            selectedIbVersion = preferences.getString(SELECTED_IB_KEY, "0.1.8")
+            selectedVirGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
+            selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "fps,devinfo,gpuload")
         }
         
         private fun copyAssets(context: Context, filename: String, outputPath: String) {
             val assetManager = context.assets
-            var `in`: InputStream? = null
+            var input: InputStream? = null
             var out: OutputStream? = null
             try {
-                `in` = assetManager.open(filename)
+                input = assetManager.open(filename)
                 val outFile = File(outputPath, filename)
                 out = Files.newOutputStream(outFile.toPath())
-                copyFile(`in`, out)
+                copyFile(input, out)
             } catch (e: IOException) {
                 e.printStackTrace()
             } finally {
                 try {
-                    `in`?.close()
+                    input?.close()
                     out?.close()
                 } catch (e: IOException) {
                     e.printStackTrace()
@@ -196,10 +231,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         @Throws(IOException::class)
-        private fun copyFile(`in`: InputStream, out: OutputStream?) {
+        private fun copyFile(input: InputStream, out: OutputStream?) {
             val buffer = ByteArray(1024)
             var read: Int
-            while (`in`.read(buffer).also { read = it } != -1) {
+            while (input.read(buffer).also { read = it } != -1) {
                 out!!.write(buffer, 0, read)
             }
         }

@@ -18,6 +18,7 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import androidx.preference.PreferenceManager
+import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.systemutils.SystemMemoryInfo
 
@@ -130,7 +131,7 @@ class LorieView : SurfaceView, InputStub {
             val height = measuredHeight
             val w: Int
             val h: Int
-            val resolution = preferences.getString("displayResolutionExact", "1280x720")!!
+            val resolution = preferences.getString("displayResolution", "1280x720")!!
                 .split("x".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             w = resolution[0].toInt()
             h = resolution[1].toInt()
@@ -186,7 +187,10 @@ class LorieView : SurfaceView, InputStub {
         totalMemory = SystemMemoryInfo.getTotalRAM(context)
         freeMemory = SystemMemoryInfo.getFreeRAM(context)
         invalidate()
-        handler.postDelayed({ updateRamCounter() }, 50)
+
+        if (enableRamCounter) {
+            handler.postDelayed({ updateRamCounter() }, 50)
+        }
     }
 
     override fun sendMouseWheelEvent(deltaX: Float, deltaY: Float) {

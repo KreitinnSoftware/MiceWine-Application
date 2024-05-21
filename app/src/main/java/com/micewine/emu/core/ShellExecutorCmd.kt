@@ -7,35 +7,69 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 object ShellExecutorCmd {
-    var stdOut = ""
-    fun ExecuteCMD(cmd: String, msg: String?) {
+    var stdErrOut = ""
+
+    fun executeShell(cmd: String, msg: String?) {
         try {
             Log.e(msg, "Trying to exec: $cmd")
             val shell = Runtime.getRuntime().exec("/system/bin/sh")
             val os = DataOutputStream(shell.outputStream)
-            os.writeBytes(cmd + "\n")
+            os.writeBytes("$cmd\nexit\n")
             os.flush()
-            os.writeBytes("exit\n")
-            os.flush()
+
             val stdout = BufferedReader(InputStreamReader(shell.inputStream))
             val stderr = BufferedReader(InputStreamReader(shell.errorStream))
-            try {
-                while (stdout.readLine().also { stdOut = it } != null) Log.v(
-                    msg,
-                    "stdout: $stdOut"
-                )
-            } catch (ignored: IOException) {
+
+            val stdoutThread = Thread {
+                try {
+                    var stdOut: String?
+                    while (stdout.readLine().also { stdOut = it } != null) {
+                        stdErrOut += stdOut + "\n"
+                    }
+                } catch (e: IOException) {
+                    Log.e(msg, "Error reading stdout", e)
+                } finally {
+                    try {
+                        stdout.close()
+                    } catch (e: IOException) {
+                        Log.e(msg, "Error closing stdout", e)
+                    }
+                }
             }
-            try {
-                while (stderr.readLine().also { stdOut = it } != null) Log.v(
-                    msg,
-                    "stderr: $stdOut"
-                )
-            } catch (ignored: IOException) {
+
+            val stderrThread = Thread {
+                try {
+                    var stdErr: String?
+                    while (stderr.readLine().also { stdErr = it } != null) {
+                        stdErrOut += stdErr + "\n"
+                    }
+                } catch (e: IOException) {
+                    Log.e(msg, "Error reading stderr", e)
+                } finally {
+                    try {
+                        stderr.close()
+                    } catch (e: IOException) {
+                        Log.e(msg, "Error closing stderr", e)
+                    }
+                }
             }
+
+            stdoutThread.start()
+            stderrThread.start()
+
+            stdoutThread.join()
+            stderrThread.join()
+
+            os.close()
+
+            shell.waitFor()
             shell.destroy()
         } catch (e: IOException) {
+            Log.e(msg, "IOException occurred", e)
             throw RuntimeException(e)
+        } catch (e: InterruptedException) {
+            Log.e(msg, "InterruptedException occurred", e)
+            Thread.currentThread().interrupt()
         }
     }
 }

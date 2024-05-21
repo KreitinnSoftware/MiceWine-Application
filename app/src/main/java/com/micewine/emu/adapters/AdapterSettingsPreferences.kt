@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
@@ -30,15 +31,20 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
         holder.settingsName.setText(sList.titleSettings)
         holder.settingsDescription.setText(sList.descriptionSettings)
 
+        if (context.getString(sList.descriptionSettings)  == " ") {
+            holder.settingsDescription.visibility = View.GONE
+            holder.settingsName.gravity = com.google.android.material.R.id.center
+        }
+
         if (sList.type == SWITCH) {
             holder.spinnerOptions.visibility = View.GONE
 
-            holder.settingsSwitch.isChecked = preferences.getBoolean(context.resources.getString(sList.titleSettings), sList.defaultValue.toBoolean())
+            holder.settingsSwitch.isChecked = preferences.getBoolean(sList.key, sList.defaultValue.toBoolean())
 
             holder.settingsSwitch.setOnClickListener {
                 val editor = preferences.edit()
 
-                editor.putBoolean(context.resources.getString(sList.titleSettings), !preferences.getBoolean(context.resources.getString(sList.titleSettings), false))
+                editor.putBoolean(context.resources.getString(sList.titleSettings), !preferences.getBoolean(sList.key, false))
 
                 editor.apply()
             }
@@ -47,8 +53,7 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
 
             holder.spinnerOptions.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, sList.spinnerOptions)
 
-            holder.spinnerOptions.setSelection(preferences.getString(context.resources.getString(sList.titleSettings), sList.defaultValue)!!.toInt()
-            )
+            holder.spinnerOptions.setSelection(sList.spinnerOptions.indexOf(preferences.getString(sList.key, sList.defaultValue)))
 
             holder.spinnerOptions.onItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
@@ -62,10 +67,7 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
 
                         val editor = preferences.edit()
 
-                        editor.putString(
-                            context.resources.getString(sList.titleSettings),
-                            selectedItem
-                        )
+                        editor.putString(sList.key, selectedItem)
 
                         editor.apply()
                     }
@@ -96,9 +98,11 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
         }
 
         override fun onClick(v: View) {
-            val settingsModel = settingsList[getAdapterPosition()]
+            // val settingsModel = settingsList[getAdapterPosition()]
+
+            // TODO Small Dialog that shows description of preference
         }
     }
 
-    class SettingsListSpinner(var titleSettings: Int, var descriptionSettings: Int, var spinnerOptions: Array<String>, var type: Int, var defaultValue: String)
+    class SettingsListSpinner(var titleSettings: Int, var descriptionSettings: Int, var spinnerOptions: Array<String>, var type: Int, var defaultValue: String, var key: String)
 }

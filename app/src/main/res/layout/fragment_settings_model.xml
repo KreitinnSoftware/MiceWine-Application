@@ -15,7 +15,7 @@
         android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewBox64Settings"
+            android:id="@+id/recyclerViewSettingsModel"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="10dp"

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_lang">pt_BR</string>
     <string name="full_screen">Tela Cheia</string>
     <string name="settings_title">Configurações</string>
     <string name="settings_description">Configurar MiceWine</string>
@@ -30,4 +31,17 @@
     <string name="box64_safeflags_description">Manuseamento de flags em opcodes CALL/RET</string>
     <string name="box64_callret_description">Otimização de opcodes CALL/RET (não compativel com jit/dynarec/smc)</string>
     <string name="strech_display">Esticar Tela</string>
+    <string name="display_resolution_title">Resolução do Display</string>
+    <string name="display_resolution_description">Mudar a resolução do display virtual</string>
+    <string name="select_driver_title">Selecionar Driver</string>
+    <string name="select_driver_description">Selecionar Driver a ser usado</string>
+    <string name="null_description">" "</string>
+    <string name="select_dxvk_title">Selecionar versão do DXVK</string>
+    <string name="select_wined3d_title">"Selecionar versão do WineD3D "</string>
+    <string name="select_d3dx_title">Selecionar Renderizador de DirectX 9/10/11</string>
+    <string name="select_virgl_profile_title">Selecionar Perfil VirGL</string>
+    <string name="select_virgl_profile_description">Selecionar um Perfil OpenGL para VirGL</string>
+    <string name="select_wined3d_description">Selecionar Versão do WineD3D</string>
+    <string name="select_dxvk_hud_preset_title">Selecionar Preset do DXVK HUD</string>
+    <string name="select_dxvk_hud_preset_description">Selecionar Preset do DXVK HUD para mais ou menos informação</string>
 </resources>
