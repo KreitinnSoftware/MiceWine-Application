@@ -5,7 +5,7 @@
         android:enabled="true"
         android:icon="@drawable/ic_settings"
         android:shortcutId="preferences"
-        android:shortcutShortLabel="@string/settings_title"
+        android:shortcutShortLabel="@string/settingsTitle"
         tools:ignore="UnusedAttribute">
         <intent
             android:action="android.intent.action.MAIN"

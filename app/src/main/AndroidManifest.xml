@@ -24,6 +24,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MiceWine">
         <activity
+            android:name=".activities.ControllerMapper"
+            android:exported="false">
+        </activity>
+        <activity
             android:name=".activities.GeneralSettings"
             android:exported="false"
             android:theme="@style/Theme.MiceWine">

@@ -2,14 +2,14 @@
 <resources>
     <string name="app_lang">pt_BR</string>
     <string name="full_screen">Tela Cheia</string>
-    <string name="settings_title">Configurações</string>
+    <string name="settingsTitle">Configurações</string>
     <string name="settings_description">Configurar MiceWine</string>
     <string name="app_close">Sair</string>
-    <string name="log_title">Log</string>
+    <string name="logTitle">Log</string>
     <string name="log_description">Ver Logs do MiceWine</string>
     <string name="clear_log">Limpar</string>
     <string name="desktop_mode_init">Área de Trabalho</string>
-    <string name="about_title">Sobre</string>
+    <string name="aboutTitle">Sobre</string>
     <string name="about_description">Sobre o MiceWine</string>
     <string name="general_settings">Configurações Gerais</string>
     <string name="exit">Sair</string>
@@ -44,4 +44,5 @@
     <string name="select_wined3d_description">Selecionar Versão do WineD3D</string>
     <string name="select_dxvk_hud_preset_title">Selecionar Preset do DXVK HUD</string>
     <string name="select_dxvk_hud_preset_description">Selecionar Preset do DXVK HUD para mais ou menos informação</string>
+    <string name="controllerMapperTitle">Controller Mapper</string>
 </resources>

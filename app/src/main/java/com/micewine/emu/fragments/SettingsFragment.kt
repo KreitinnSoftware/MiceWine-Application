@@ -29,13 +29,16 @@ class SettingsFragment : Fragment() {
         recyclerView.setAdapter(adapterSettings)
         var person: AdapterSettings.SettingsList?
 
-        person = SettingsList(R.string.settings_title, R.string.settings_description, R.drawable.ic_settings_outline)
+        person = SettingsList(R.string.settingsTitle, R.string.settings_description, R.drawable.ic_settings_outline)
         settingsList.add(person)
 
-        person = SettingsList(R.string.log_title, R.string.log_description, R.drawable.ic_log)
+        person = SettingsList(R.string.logTitle, R.string.log_description, R.drawable.ic_log)
         settingsList.add(person)
 
-        person = SettingsList(R.string.about_title, R.string.about_description, R.drawable.ic_info_outline)
+        person = SettingsList(R.string.aboutTitle, R.string.about_description, R.drawable.ic_info_outline)
+        settingsList.add(person)
+
+        person = SettingsList(R.string.controllerMapperTitle, R.string.controllerMapperDescription, R.drawable.ic_info_outline)
         settingsList.add(person)
     }
 }

@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
+import com.micewine.emu.activities.ControllerMapper
 import com.micewine.emu.activities.GeneralSettings
 import com.micewine.emu.activities.GeneralSettings.Companion.ACTION_PREFERENCE_SELECT
 import com.micewine.emu.activities.LogAppOutput
@@ -47,11 +48,14 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
         override fun onClick(v: View) {
             val settingsModel = settingsList[getAdapterPosition()]
 
-            if (R.string.settings_title == settingsModel.titleSettings) {
+            if (R.string.settingsTitle == settingsModel.titleSettings) {
                 val intent = Intent(context, GeneralSettings::class.java)
                 context.startActivity(intent)
-            } else if (R.string.log_title == settingsModel.titleSettings) {
+            } else if (R.string.logTitle == settingsModel.titleSettings) {
                 val intent = Intent(context, LogAppOutput::class.java)
+                context.startActivity(intent)
+            } else if (R.string.controllerMapperTitle == settingsModel.titleSettings) {
+                val intent = Intent(context, ControllerMapper::class.java)
                 context.startActivity(intent)
             } else {
                 val intent = Intent(ACTION_PREFERENCE_SELECT)

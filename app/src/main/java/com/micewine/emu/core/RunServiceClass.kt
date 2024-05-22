@@ -13,6 +13,8 @@ class RunServiceClass {
     }
 
     fun stopService() {
-        ctx!!.stopService(service)
+        if (service != null) {
+            ctx!!.stopService(service)
+        }
     }
 }

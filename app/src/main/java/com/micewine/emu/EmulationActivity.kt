@@ -36,6 +36,9 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
 import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
+import com.micewine.emu.ControllerUtils.checkControllerAxis
+import com.micewine.emu.ControllerUtils.checkControllerButtons
+import com.micewine.emu.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.core.Init
 import com.micewine.emu.input.InputEventSender
@@ -106,6 +109,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         preferences.registerOnSharedPreferenceChangeListener { _: SharedPreferences?, key: String? ->
             onPreferencesChanged(key)
         }
+        prepareButtonsAxisValues(this)
         init = Init()
         window.setFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, 0)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -165,7 +169,12 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     return@OnKeyListener true
                 }
             }
-            mInputHandler!!.sendKeyEvent(v, e)
+
+            if (checkControllerButtons(lorieView, e)) {
+                true
+            } else {
+                mInputHandler!!.sendKeyEvent(v, e)
+            }
         }
         lorieParent.setOnTouchListener { _: View?, e: MotionEvent? ->
             mInputHandler!!.handleTouchEvent(
@@ -251,6 +260,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
     }
 
+    override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
+        return checkControllerAxis(lorieView, event!!)
+    }
+
     override fun onDestroy() {
         unregisterReceiver(receiver)
         init!!.stopAll()
@@ -307,7 +320,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         val mode = 1
         mInputHandler!!.setInputMode(mode)
         mInputHandler!!.setTapToMove(false)
-        mInputHandler!!.setPreferScancodes(false)
+        mInputHandler!!.setPreferScancodes(true)
         mInputHandler!!.setPointerCaptureEnabled(false)
         if (!p.getBoolean(
                 "pointerCapture",

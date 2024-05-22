@@ -6,15 +6,20 @@ import androidx.fragment.app.Fragment
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
+import android.view.InputDevice
+import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.micewine.emu.ControllerUtils.getGameControllerNames
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET_KEY
@@ -68,6 +73,8 @@ class MainActivity : AppCompatActivity() {
         manageFilesPath()
         checkPermission()
         fragmentLoader(HomeFragment(), true)
+
+
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -107,8 +114,11 @@ class MainActivity : AppCompatActivity() {
         }.start()
 
         setSharedVars(this)
-    }
 
+        for (name in getGameControllerNames()) {
+            Log.v("Controller", name)
+        }
+    }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == android.R.id.home) {

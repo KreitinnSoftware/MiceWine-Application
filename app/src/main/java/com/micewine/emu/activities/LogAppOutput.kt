@@ -20,7 +20,7 @@ class LogAppOutput : AppCompatActivity() {
 
         val toolBar = findViewById<Toolbar>(R.id.logViewerToolbar)
 
-        toolBar.title = resources.getString(R.string.log_title)
+        toolBar.title = resources.getString(R.string.logTitle)
 
         val backButton = findViewById<ImageButton>(R.id.backButton)
 

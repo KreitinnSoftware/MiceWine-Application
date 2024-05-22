@@ -18,6 +18,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
+import com.micewine.emu.overlay.XKeyCodes.XKEY_CODES_DPAD_UP
 
 class OverlayService : Service() {
     private val handler = Handler()
@@ -74,7 +75,7 @@ class OverlayService : Service() {
                         longClickStart,
                         200
                     ) // Inicia um atraso para detectar o início do clique longo
-                    lorie!!.sendKeyEvent(0, XKeyCodes.DPAD_UP, true)
+                    lorie!!.sendKeyEvent(0, XKEY_CODES_DPAD_UP, true)
                 }
 
                 MotionEvent.ACTION_UP -> {
@@ -82,11 +83,11 @@ class OverlayService : Service() {
                     if (isLongClick) {
                         // Ação quando o clique longo termina
                         isLongClick = false
-                        waitForEventSender(XKeyCodes.DPAD_UP)
+                        waitForEventSender(XKEY_CODES_DPAD_UP)
                         handler.removeCallbacksAndMessages(null) // Remove todos os callbacks para evitar que o clique curto seja detectado após o clique longo
                     } else {
-                        lorie!!.sendKeyEvent(0, XKeyCodes.DPAD_UP, true)
-                        waitForEventSender(XKeyCodes.DPAD_UP)
+                        lorie!!.sendKeyEvent(0, XKEY_CODES_DPAD_UP, true)
+                        waitForEventSender(XKEY_CODES_DPAD_UP)
                     }
                     handler.removeCallbacks(longClickStart) // Remove o callback para o clique longo se o botão for liberado antes do clique longo ser detectado
                 }
@@ -94,7 +95,7 @@ class OverlayService : Service() {
             false
         }
         windowManager!!.addView(overlayLayout, params)
-        stopOverlayBtn.setOnClickListener { v: View? -> stopSelf() }
+        stopOverlayBtn.setOnClickListener { _: View? -> stopSelf() }
     }
 
     override fun onDestroy() {
