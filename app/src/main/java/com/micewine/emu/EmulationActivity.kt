@@ -48,7 +48,6 @@ import com.micewine.emu.input.TouchInputHandler.RenderStub.NullStub
 import com.micewine.emu.utils.FullscreenWorkaround
 import com.micewine.emu.utils.KeyInterceptor
 
-@SuppressLint("ApplySharedPref")
 @Suppress("deprecation", "unused")
 class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
     private var frm: FrameLayout? = null
@@ -97,10 +96,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         instance = this
     }
     @SuppressLint(
-        "AppCompatMethod",
-        "ObsoleteSdkInt",
         "ClickableViewAccessibility",
-        "WrongConstant",
         "UnspecifiedRegisterReceiverFlag"
     )
     override fun onCreate(savedInstanceState: Bundle?) {
