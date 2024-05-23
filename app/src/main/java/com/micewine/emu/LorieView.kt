@@ -14,6 +14,7 @@ import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.util.Log
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -28,6 +29,9 @@ class LorieView : SurfaceView, InputStub {
     private var totalMemory = SystemMemoryInfo.getTotalRAM(context)
     private var freeMemory = SystemMemoryInfo.getFreeRAM(context)
     private var mCallback: Callback? = null
+    private var paint: Paint = Paint()
+    var event: MotionEvent? = null
+
     private val mSurfaceCallback: SurfaceHolder.Callback = object : SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
             updateRamCounter()
@@ -161,7 +165,6 @@ class LorieView : SurfaceView, InputStub {
     }
 
     private fun ramCounter(c: Canvas) {
-        val paint = Paint()
         paint.textSize = 30f
         paint.style = Paint.Style.STROKE
         paint.setColor(Color.BLACK)
