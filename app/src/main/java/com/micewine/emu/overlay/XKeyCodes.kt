@@ -33,6 +33,7 @@ object XKeyCodes {
     private const val XSCAN_CODES_X = 45
     private const val XSCAN_CODES_Y = 21
     private const val XSCAN_CODES_Z = 44
+    private const val XSCAN_CODES_QUOTES = 40
 
     private const val XKEY_CODES_DPAD_UP = 19
     private const val XKEY_CODES_DPAD_DOWN = 20
@@ -66,6 +67,7 @@ object XKeyCodes {
     private const val XKEY_CODES_X = 52
     private const val XKEY_CODES_Y = 53
     private const val XKEY_CODES_Z = 54
+    private const val XKEY_CODES_QUOTES = 75
 
     fun getXKeyScanCodes(key: String): MutableList<Int> {
         when (key) {
@@ -195,6 +197,10 @@ object XKeyCodes {
 
             "Z" -> {
                 return mutableListOf(XSCAN_CODES_Z, XKEY_CODES_Z)
+            }
+
+            "'" -> {
+                return mutableListOf(XSCAN_CODES_QUOTES, XKEY_CODES_QUOTES)
             }
 
             else -> return mutableListOf(0, 0)
