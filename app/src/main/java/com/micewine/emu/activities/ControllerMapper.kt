@@ -1,9 +1,7 @@
 package com.micewine.emu.activities
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -19,7 +17,6 @@ class ControllerMapper : AppCompatActivity() {
     private var backButton: ImageButton? = null
     private var controllerConnected: TextView? = null
 
-    @SuppressLint("UnspecifiedRegisterReceiverFlag", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -28,17 +25,16 @@ class ControllerMapper : AppCompatActivity() {
 
         fragmentLoader(ControllerMapperFragment(), true)
 
-        findViewById<Toolbar>(R.id.controllerMapperToolbar).title =
-            this.resources.getString(R.string.controllerMapperTitle)
+        findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.controllerMapperTitle)
 
         controllerConnected = findViewById(R.id.controllerConnected)
 
         val connectedControllers = getGameControllerNames()
 
         if (connectedControllers.isNotEmpty()) {
-            controllerConnected?.text = "Connected Controller: ${connectedControllers[0]}"
+            controllerConnected?.text = getString(R.string.connected_controller, connectedControllers[0])
         } else {
-            controllerConnected?.text = "No Controllers Connected."
+            controllerConnected?.text = getString(R.string.no_controllers_connected)
         }
 
         backButton = findViewById(R.id.backButton)

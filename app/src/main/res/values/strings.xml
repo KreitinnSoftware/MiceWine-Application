@@ -53,5 +53,6 @@
     <string name="select_dxvk_hud_preset_description">Select DXVK HUD Preset for more or less information</string>
     <string name="controllerMapperTitle">Controller Mapper</string>
     <string name="controllerMapperDescription">Configure your Gamepad</string>
-    <string name="button_a">A</string>
+    <string name="no_controllers_connected">No Controllers Connected.</string>
+    <string name="connected_controller">Connected Controller: %1$s</string>
 </resources>

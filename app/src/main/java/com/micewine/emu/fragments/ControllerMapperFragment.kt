@@ -25,6 +25,8 @@ import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_L1_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_L2_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_R1_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_R2_KEY
+import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_SELECT_KEY
+import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_START_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_Y_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.availableButtonMappings
@@ -83,6 +85,12 @@ class ControllerMapperFragment : Fragment() {
         settingsList.add(person)
 
         person = SettingsController("LT", availableButtonMappings, BUTTON_L2_KEY)
+        settingsList.add(person)
+
+        person = SettingsController("Start", availableButtonMappings, BUTTON_START_KEY)
+        settingsList.add(person)
+
+        person = SettingsController("Select", availableButtonMappings, BUTTON_SELECT_KEY)
         settingsList.add(person)
 
         person = SettingsController("AxisX+", availableButtonMappings, AXIS_X_PLUS_KEY)

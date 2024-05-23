@@ -44,5 +44,8 @@
     <string name="select_wined3d_description">Selecionar Versão do WineD3D</string>
     <string name="select_dxvk_hud_preset_title">Selecionar Preset do DXVK HUD</string>
     <string name="select_dxvk_hud_preset_description">Selecionar Preset do DXVK HUD para mais ou menos informação</string>
-    <string name="controllerMapperTitle">Controller Mapper</string>
+    <string name="controllerMapperTitle">Mapeador de Controle</string>
+    <string name="no_controllers_connected">Nenhum Controle Conectado.</string>
+    <string name="controllerMapperDescription">Configure seu Controle</string>
+    <string name="connected_controller">Controle Conectado: %1$s</string>
 </resources>

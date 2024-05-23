@@ -36,7 +36,7 @@ class DriversSettingsFragment : Fragment() {
         recyclerView.setAdapter(adapterSettingsPreferences)
 
         settingsList.add(
-            SettingsListSpinner(R.string.select_driver_title, R.string.select_driver_description, arrayOf(
+            SettingsListSpinner(R.string.select_driver_title, R.string.null_description, arrayOf(
             "Turnip/Zink", "Android/Zink",
             "VirGL"
         ), SPINNER, "Turnip/Zink", SELECTED_DRIVER_KEY)
@@ -58,20 +58,20 @@ class DriversSettingsFragment : Fragment() {
         )
 
         settingsList.add(
-            SettingsListSpinner(R.string.select_dxvk_hud_preset_title, R.string.select_dxvk_hud_preset_description, arrayOf(
+            SettingsListSpinner(R.string.select_dxvk_hud_preset_title, R.string.null_description, arrayOf(
             "Off", "FPS", "FPS/GPU Load"
             ), SPINNER, "FPS/GPU Load", SELECTED_DXVK_HUD_PRESET_KEY)
         )
 
         settingsList.add(
-            SettingsListSpinner(R.string.select_wined3d_title, R.string.select_wined3d_description, arrayOf(
+            SettingsListSpinner(R.string.select_wined3d_title, R.string.null_description, arrayOf(
             "WineD3D-3.17", "WineD3D-7.18",
             "WineD3D-8.2", "WineD3D-9.0"
         ), SPINNER, "WineD3D-9.0", SELECTED_WINED3D_KEY)
         )
 
         settingsList.add(
-            SettingsListSpinner(R.string.select_virgl_profile_title, R.string.select_virgl_profile_description, arrayOf(
+            SettingsListSpinner(R.string.select_virgl_profile_title, R.string.null_description, arrayOf(
             "GL 2.1", "GL 3.3"
         ), SPINNER, "GL 3.3", SELECTED_VIRGL_PROFILE_KEY)
         )
