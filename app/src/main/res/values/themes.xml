@@ -1,7 +1,7 @@
 <resources>
 
     <style name="Base.Theme.MiceWine" parent="Theme.Material3.DynamicColors.Light.NoActionBar">
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/darker_gray</item>
     </style>
 
     <style name="Theme.MiceWine" parent="Base.Theme.MiceWine" />

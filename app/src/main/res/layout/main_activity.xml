@@ -9,13 +9,12 @@
     android:theme="@style/Theme.MiceWine"
     tools:context=".activities.MainActivity">
 
-    <Toolbar
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/mainActivityToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.MiceWine"
-        android:title="@string/app_name"
-        android:titleTextColor="@color/white">
-    </Toolbar>
+        android:title="@string/app_name">
+    </androidx.appcompat.widget.Toolbar>
 
     <LinearLayout
         android:layout_width="match_parent"

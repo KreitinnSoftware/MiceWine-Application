@@ -261,7 +261,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
-        lorieView.event = event!!
         return checkControllerAxis(lorieView, event!!)
     }
 

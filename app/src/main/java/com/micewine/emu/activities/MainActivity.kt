@@ -7,14 +7,12 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.view.InputDevice
-import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
@@ -60,10 +58,12 @@ class MainActivity : AppCompatActivity() {
         progressExtractBar = findViewById(R.id.progressBar)
         findViewById<View>(R.id.updateProgress)
 
+        findViewById<Toolbar>(R.id.mainActivityToolbar).title = getString(R.string.app_name)
+
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigation.setOnItemSelectedListener { item: MenuItem ->
             val id = item.itemId
-            if (id == R.id.nav_Home) {
+            if (id == R.id.nav_home) {
                 fragmentLoader(HomeFragment(), false)
             } else if (id == R.id.nav_settings) {
                 fragmentLoader(SettingsFragment(), false)
@@ -73,8 +73,6 @@ class MainActivity : AppCompatActivity() {
         manageFilesPath()
         checkPermission()
         fragmentLoader(HomeFragment(), true)
-
-
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {

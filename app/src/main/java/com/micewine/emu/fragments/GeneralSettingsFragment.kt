@@ -29,16 +29,16 @@ class GeneralSettingsFragment : Fragment() {
         recyclerView.setAdapter(adapterSettings)
         var person: SettingsList?
 
-        person = SettingsList(R.string.box64_settings_title, R.string.box64_settings_description, R.drawable.ic_box64_white)
+        person = SettingsList(R.string.box64_settings_title, R.string.box64_settings_description, R.drawable.ic_box64)
         settingsList.add(person)
 
-        person = SettingsList(R.string.wine_settings_title, R.string.wine_settings_description, R.drawable.ic_wine_white)
+        person = SettingsList(R.string.wine_settings_title, R.string.wine_settings_description, R.drawable.ic_wine)
         settingsList.add(person)
 
-        person = SettingsList(R.string.display_settings_title, R.string.display_settings_description, R.drawable.ic_display_white)
+        person = SettingsList(R.string.display_settings_title, R.string.display_settings_description, R.drawable.ic_display)
         settingsList.add(person)
 
-        person = SettingsList(R.string.driver_settings_title, R.string.driver_settings_description, R.drawable.ic_gpu_white)
+        person = SettingsList(R.string.driver_settings_title, R.string.driver_settings_description, R.drawable.ic_gpu)
         settingsList.add(person)
     }
 }
