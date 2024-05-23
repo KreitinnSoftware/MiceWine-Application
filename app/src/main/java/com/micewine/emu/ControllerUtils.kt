@@ -248,6 +248,9 @@ object ControllerUtils {
                 lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], true)
                 lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], false)
 
+                lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], false)
+                lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], false)
+
                 true
             }
 
@@ -255,6 +258,9 @@ object ControllerUtils {
             axisX < -DEAD_ZONE && axisYNeutral -> {
                 lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], true)
                 lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
+
+                lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], false)
+                lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], false)
 
                 true
             }
@@ -264,6 +270,9 @@ object ControllerUtils {
                 lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], true)
                 lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], false)
 
+                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], false)
+                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
+
                 true
             }
 
@@ -271,6 +280,9 @@ object ControllerUtils {
             axisY < -DEAD_ZONE && axisXNeutral -> {
                 lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], true)
                 lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], false)
+
+                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], false)
+                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
 
                 true
             }
@@ -326,6 +338,9 @@ object ControllerUtils {
                 lorieView.sendKeyEvent(axisZ_plus_mapping[0], axisZ_plus_mapping[1], true)
                 lorieView.sendKeyEvent(axisZ_minus_mapping[0], axisZ_minus_mapping[1], false)
 
+                lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], false)
+                lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], false)
+
                 true
             }
 
@@ -333,6 +348,9 @@ object ControllerUtils {
             axisZ < -DEAD_ZONE && axisRZNeutral -> {
                 lorieView.sendKeyEvent(axisZ_minus_mapping[0], axisZ_minus_mapping[1], true)
                 lorieView.sendKeyEvent(axisZ_plus_mapping[0], axisZ_plus_mapping[1], false)
+
+                lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], false)
+                lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], false)
 
                 true
             }
@@ -342,6 +360,9 @@ object ControllerUtils {
                 lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], true)
                 lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], false)
 
+                lorieView.sendKeyEvent(axisZ_plus_mapping[0], axisZ_plus_mapping[1], false)
+                lorieView.sendKeyEvent(axisZ_minus_mapping[0], axisZ_minus_mapping[1], false)
+
                 true
             }
 
@@ -349,6 +370,9 @@ object ControllerUtils {
             axisRZ < -DEAD_ZONE && axisZNeutral -> {
                 lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], true)
                 lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], false)
+
+                lorieView.sendKeyEvent(axisZ_plus_mapping[0], axisZ_plus_mapping[1], false)
+                lorieView.sendKeyEvent(axisZ_minus_mapping[0], axisZ_minus_mapping[1], false)
 
                 true
             }
@@ -404,6 +428,9 @@ object ControllerUtils {
                 lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], true)
                 lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], false)
 
+                lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], false)
+                lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], false)
+
                 true
             }
 
@@ -411,6 +438,9 @@ object ControllerUtils {
             axisHatX < -DEAD_ZONE && axisHatYNeutral -> {
                 lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], true)
                 lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], false)
+
+                lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], false)
+                lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], false)
 
                 true
             }
@@ -420,6 +450,9 @@ object ControllerUtils {
                 lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], true)
                 lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], false)
 
+                lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], false)
+                lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], false)
+
                 true
             }
 
@@ -427,6 +460,9 @@ object ControllerUtils {
             axisHatY < -DEAD_ZONE && axisHatXNeutral -> {
                 lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], true)
                 lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], false)
+
+                lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], false)
+                lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], false)
 
                 true
             }
