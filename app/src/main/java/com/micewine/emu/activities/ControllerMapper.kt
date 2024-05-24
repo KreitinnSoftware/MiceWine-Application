@@ -73,7 +73,12 @@ class ControllerMapper : AppCompatActivity() {
     }
 
     companion object {
-        val availableButtonMappings = arrayOf("Null", "ESC", "Left", "Right", "Up", "Down", "Enter", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "'")
+        val availableButtonMappings: Array<String> = arrayOf(
+            "Null", "ESC", "Left", "Right", "Up", "Down", "Enter",
+            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
+            "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",
+            "W", "X", "Y", "Z", "'", "LCtrl", "RCtrl", "LShift",
+            "RShift", "Tab", "Space")
 
         const val BUTTON_A_KEY = "buttonA"
         const val BUTTON_B_KEY = "buttonB"
