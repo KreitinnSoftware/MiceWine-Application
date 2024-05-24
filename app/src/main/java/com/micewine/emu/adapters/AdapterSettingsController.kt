@@ -6,20 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.LinearLayout
+import android.widget.ImageView
 import android.widget.Spinner
-import android.widget.TextView
-import androidx.appcompat.widget.SwitchCompat
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
-import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
+import com.micewine.emu.activities.ControllerMapper.Companion.availableButtonMappings
 
-class AdapterSettingsController(private val settingsList: List<SettingsController>, private val context: Context) :
+class AdapterSettingsController(private val settingsControllerList: List<SettingsController>, private val context: Context) :
     RecyclerView.Adapter<AdapterSettingsController.ViewHolder>() {
 
-    val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
+    private val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
+    private val spinnerEntries: Array<String> = availableButtonMappings
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.settings_controller_item, parent, false)
@@ -27,14 +25,15 @@ class AdapterSettingsController(private val settingsList: List<SettingsControlle
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val sList = settingsList[position]
-        holder.settingsName.text = sList.titleSettings
+        val sList = settingsControllerList[position]
 
-        holder.spinnerOptions.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, sList.spinnerOptions)
+        holder.image.setImageResource(sList.image)
 
-        holder.spinnerOptions.setSelection(sList.spinnerOptions.indexOf(preferences.getString(sList.key, "Null")))
+        holder.spinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, spinnerEntries)
 
-        holder.spinnerOptions.onItemSelectedListener =
+        holder.spinner.setSelection(spinnerEntries.indexOf(preferences.getString(sList.key, "Null")))
+
+        holder.spinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
                     parent: AdapterView<*>?,
@@ -57,26 +56,23 @@ class AdapterSettingsController(private val settingsList: List<SettingsControlle
     }
 
     override fun getItemCount(): Int {
-        return settingsList.size
+        return settingsControllerList.size
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener {
-        val settingsName: TextView
-        val spinnerOptions: Spinner
+        val spinner: Spinner
+        val image: ImageView
 
         init {
-            settingsName = itemView.findViewById(R.id.title_preferences_model)
-            spinnerOptions = itemView.findViewById(R.id.optionSpinner)
+            spinner = itemView.findViewById(R.id.optionSpinner)
+            image = itemView.findViewById(R.id.buttonImageView)
             itemView.setOnClickListener(this)
         }
 
         override fun onClick(v: View) {
-            // val settingsModel = settingsList[getAdapterPosition()]
-
-            // TODO Small Dialog that shows description of preference
         }
     }
 
-    class SettingsController(var titleSettings: String, var spinnerOptions: Array<String>, var key: String)
+    class SettingsController(var image: Int, var key: String)
 }

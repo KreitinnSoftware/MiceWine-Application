@@ -1,10 +1,10 @@
 package com.micewine.emu.fragments
 
-import androidx.fragment.app.Fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_HAT_X_MINUS_KEY
@@ -30,19 +30,8 @@ import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_START_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_Y_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.availableButtonMappings
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTROUND_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_SAFEFLAGS_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_STRONGMEM_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
-import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
 import com.micewine.emu.adapters.AdapterSettingsController
 import com.micewine.emu.adapters.AdapterSettingsController.SettingsController
-import com.micewine.emu.adapters.AdapterSettingsPreferences
-import com.micewine.emu.adapters.AdapterSettingsPreferences.SettingsListSpinner
 
 class ControllerMapperFragment : Fragment() {
     override fun onCreateView(
@@ -63,70 +52,70 @@ class ControllerMapperFragment : Fragment() {
         recyclerView.setAdapter(adapterSettingsController)
         var person: SettingsController?
 
-        person = SettingsController("A", availableButtonMappings, BUTTON_A_KEY)
+        person = SettingsController(R.drawable.a_button, BUTTON_A_KEY)
         settingsList.add(person)
 
-        person = SettingsController("X", availableButtonMappings, BUTTON_X_KEY)
+        person = SettingsController(R.drawable.x_button, BUTTON_X_KEY)
         settingsList.add(person)
 
-        person = SettingsController("Y", availableButtonMappings, BUTTON_Y_KEY)
+        person = SettingsController(R.drawable.y_button, BUTTON_Y_KEY)
         settingsList.add(person)
 
-        person = SettingsController("B", availableButtonMappings, BUTTON_B_KEY)
+        person = SettingsController(R.drawable.b_button, BUTTON_B_KEY)
         settingsList.add(person)
 
-        person = SettingsController("RB", availableButtonMappings, BUTTON_R1_KEY)
+        person = SettingsController(R.drawable.rb_button, BUTTON_R1_KEY)
         settingsList.add(person)
 
-        person = SettingsController("RT", availableButtonMappings, BUTTON_R2_KEY)
+        person = SettingsController(R.drawable.rt_button, BUTTON_R2_KEY)
         settingsList.add(person)
 
-        person = SettingsController("LB", availableButtonMappings, BUTTON_L1_KEY)
+        person = SettingsController(R.drawable.lb_button, BUTTON_L1_KEY)
         settingsList.add(person)
 
-        person = SettingsController("LT", availableButtonMappings, BUTTON_L2_KEY)
+        person = SettingsController(R.drawable.lt_button, BUTTON_L2_KEY)
         settingsList.add(person)
 
-        person = SettingsController("Start", availableButtonMappings, BUTTON_START_KEY)
+        person = SettingsController(R.drawable.start_button, BUTTON_START_KEY)
         settingsList.add(person)
 
-        person = SettingsController("Select", availableButtonMappings, BUTTON_SELECT_KEY)
+        person = SettingsController(R.drawable.select_button, BUTTON_SELECT_KEY)
         settingsList.add(person)
 
-        person = SettingsController("AxisX+", availableButtonMappings, AXIS_X_PLUS_KEY)
+        person = SettingsController(R.drawable.l_right, AXIS_X_PLUS_KEY)
         settingsList.add(person)
 
-        person = SettingsController("AxisX-", availableButtonMappings, AXIS_X_MINUS_KEY)
+        person = SettingsController(R.drawable.l_left, AXIS_X_MINUS_KEY)
         settingsList.add(person)
 
-        person = SettingsController("AxisY+", availableButtonMappings, AXIS_Y_PLUS_KEY)
+        person = SettingsController(R.drawable.l_down, AXIS_Y_PLUS_KEY)
         settingsList.add(person)
 
-        person = SettingsController("AxisY-", availableButtonMappings, AXIS_Y_MINUS_KEY)
+        person = SettingsController(R.drawable.l_up, AXIS_Y_MINUS_KEY)
         settingsList.add(person)
 
-        person = SettingsController("AxisZ+", availableButtonMappings, AXIS_Z_PLUS_KEY)
+        person = SettingsController(R.drawable.r_right, AXIS_Z_PLUS_KEY)
         settingsList.add(person)
 
-        person = SettingsController("AxisZ-", availableButtonMappings, AXIS_Z_MINUS_KEY)
+        person = SettingsController(R.drawable.r_left, AXIS_Z_MINUS_KEY)
         settingsList.add(person)
 
-        person = SettingsController("AxisRZ+", availableButtonMappings, AXIS_RZ_PLUS_KEY)
+        person = SettingsController(R.drawable.r_down, AXIS_RZ_PLUS_KEY)
         settingsList.add(person)
 
-        person = SettingsController("AxisRZ-", availableButtonMappings, AXIS_RZ_MINUS_KEY)
+        person = SettingsController(R.drawable.r_up, AXIS_RZ_MINUS_KEY)
         settingsList.add(person)
 
-        person = SettingsController("AxisHatX+", availableButtonMappings, AXIS_HAT_X_PLUS_KEY)
+        person = SettingsController(R.drawable.dpad_right, AXIS_HAT_X_PLUS_KEY)
         settingsList.add(person)
 
-        person = SettingsController("AxisHatX-", availableButtonMappings, AXIS_HAT_X_MINUS_KEY)
+        person = SettingsController(R.drawable.dpad_left, AXIS_HAT_X_MINUS_KEY)
         settingsList.add(person)
 
-        person = SettingsController("AxisHatY+", availableButtonMappings, AXIS_HAT_Y_PLUS_KEY)
+        person = SettingsController(R.drawable.dpad_down, AXIS_HAT_Y_PLUS_KEY)
         settingsList.add(person)
 
-        person = SettingsController("AxisHatY-", availableButtonMappings, AXIS_HAT_Y_MINUS_KEY)
+        person = SettingsController(R.drawable.dpad_up, AXIS_HAT_Y_MINUS_KEY)
         settingsList.add(person)
     }
 }

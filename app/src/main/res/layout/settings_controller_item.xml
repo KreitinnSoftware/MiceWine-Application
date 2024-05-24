@@ -26,18 +26,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.7"
             android:orientation="vertical"
-            android:padding="10dp">
+            >
 
-            <TextView
-                android:id="@+id/title_preferences_model"
+            <ImageView
+                android:id="@+id/buttonImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="0dp"
-                android:text="Title Settings"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                tools:ignore="HardcodedText" />
+                app:srcCompat="@drawable/a_button"
+                android:importantForAccessibility="no" />
 
         </LinearLayout>
 
