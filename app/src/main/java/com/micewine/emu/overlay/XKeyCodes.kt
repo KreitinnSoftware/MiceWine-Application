@@ -7,7 +7,7 @@ object XKeyCodes {
         "D" to 32, "E" to 18, "F" to 33, "G" to 34, "H" to 35,
         "I" to 23, "J" to 36, "K" to 37, "L" to 38, "M" to 50,
         "N" to 49, "O" to 24, "P" to 25, "Q" to 16, "R" to 19,
-        "S" to 47, "T" to 20, "U" to 22, "V" to 47, "W" to 17,
+        "S" to 31, "T" to 20, "U" to 22, "V" to 47, "W" to 17,
         "X" to 45, "Y" to 21, "Z" to 44, "'" to 40, "LCtrl" to 29,
         "RCtrl" to 97, "LShift" to 42, "RShift" to 54, "Tab" to 15,
         "Space" to 57
