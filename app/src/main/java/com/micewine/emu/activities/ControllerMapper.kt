@@ -78,7 +78,9 @@ class ControllerMapper : AppCompatActivity() {
             "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
             "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",
             "W", "X", "Y", "Z", "'", "LCtrl", "RCtrl", "LShift",
-            "RShift", "Tab", "Space")
+            "RShift", "Tab", "Space", "AltLeft", "F1", "F2", "F3",
+            "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
+            "Insert", "Home", "PageUp", "Delete", "End", "PageDown")
 
         const val BUTTON_A_KEY = "buttonA"
         const val BUTTON_B_KEY = "buttonB"
