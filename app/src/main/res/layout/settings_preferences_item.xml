@@ -51,7 +51,7 @@
         </LinearLayout>
 
         <Spinner
-            android:id="@+id/optionSpinner"
+            android:id="@+id/keyBindSpinner"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:dropDownWidth="wrap_content"

@@ -1,7 +1,7 @@
 package com.micewine.emu.overlay
 
 object XKeyCodes {
-    private val xScanCodes = mapOf(
+    private val scanCodes = mapOf(
         "Up" to 103, "Down" to 108, "Left" to 105, "Right" to 106,
         "ESC" to 1, "Enter" to 28, "A" to 30, "B" to 48, "C" to 46,
         "D" to 32, "E" to 18, "F" to 33, "G" to 34, "H" to 35,
@@ -17,7 +17,7 @@ object XKeyCodes {
         "End" to 107, "PageDown" to 109
     )
 
-    private val xKeyCodes = mapOf(
+    private val keyCodes = mapOf(
         "Up" to 19, "Down" to 20, "Left" to 21, "Right" to 22,
         "ESC" to 111, "Enter" to 66, "A" to 29, "B" to 30, "C" to 31,
         "D" to 32, "E" to 33, "F" to 34, "G" to 35, "H" to 36,
@@ -34,8 +34,8 @@ object XKeyCodes {
     )
 
     fun getXKeyScanCodes(key: String): MutableList<Int> {
-        val scanCode = xScanCodes[key] ?: 0
-        val keyCode = xKeyCodes[key] ?: 0
-        return mutableListOf(scanCode, keyCode)
+        val scanCode = scanCodes[key] ?: 0
+        val keyCode = keyCodes[key] ?: 0
+        return mutableListOf(scanCode, keyCode, 0)
     }
 }

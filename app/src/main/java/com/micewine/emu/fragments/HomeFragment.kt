@@ -15,6 +15,7 @@ import com.micewine.emu.models.GameList
 class HomeFragment : Fragment() {
     private var binding: FragmentHomeBinding? = null
     private var rootView: View? = null
+    private val gameList: MutableList<GameList> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -31,11 +32,18 @@ class HomeFragment : Fragment() {
     }
 
     private fun setAdapter(recyclerView: RecyclerView) {
-        val gameList: MutableList<GameList> = ArrayList()
         val adapterGame = context?.let { AdapterGame(gameList, it) }
         recyclerView.setAdapter(adapterGame)
 
-        val game = GameList(R.string.desktop_mode_init, R.drawable.default_icon)
-        gameList.add(game)
+        addToAdapter(R.string.desktop_mode_init, R.drawable.default_icon)
+
+        addToAdapter(R.string.desktop_mode_init, R.drawable.default_icon)
+
+        addToAdapter(R.string.desktop_mode_init, R.drawable.default_icon)
+
+    }
+
+    private fun addToAdapter(titleId: Int, icon: Int) {
+        gameList.add(GameList(titleId, icon))
     }
 }

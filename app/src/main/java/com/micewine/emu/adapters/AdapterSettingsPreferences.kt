@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
@@ -51,7 +50,7 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
         } else if (sList.type == SPINNER) {
             holder.settingsSwitch.visibility = View.GONE
 
-            holder.spinnerOptions.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, sList.spinnerOptions)
+            holder.spinnerOptions.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, sList.spinnerOptions)
 
             holder.spinnerOptions.setSelection(sList.spinnerOptions.indexOf(preferences.getString(sList.key, sList.defaultValue)))
 
@@ -92,7 +91,7 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
         init {
             settingsName = itemView.findViewById(R.id.title_preferences_model)
             settingsDescription = itemView.findViewById(R.id.description_preferences_model)
-            spinnerOptions = itemView.findViewById(R.id.optionSpinner)
+            spinnerOptions = itemView.findViewById(R.id.keyBindSpinner)
             settingsSwitch = itemView.findViewById(R.id.optionSwitch)
             itemView.setOnClickListener(this)
         }

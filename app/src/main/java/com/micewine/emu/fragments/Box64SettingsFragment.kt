@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
@@ -28,6 +29,9 @@ class Box64SettingsFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.fragment_settings_model, container, false)
         val recyclerView = rootView.findViewById<RecyclerView>(R.id.recyclerViewSettingsModel)
         setAdapter(recyclerView)
+
+        val layoutManager = recyclerView.layoutManager as GridLayoutManager
+        layoutManager.spanCount = 1
 
         return rootView
     }

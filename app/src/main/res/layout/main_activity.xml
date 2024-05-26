@@ -27,7 +27,6 @@
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
         </FrameLayout>
 
     </LinearLayout>
@@ -47,12 +46,20 @@
         android:layout_margin="0dp"
         android:theme="@style/Theme.MiceWine" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.MiceWine"
-        app:labelVisibilityMode="selected"
-        app:menu="@menu/bottom_nav_menu" />
+        app:cardCornerRadius="26dp">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/Theme.MiceWine"
+            app:labelVisibilityMode="selected"
+            android:padding="4dp"
+            app:menu="@menu/bottom_nav_menu" />
+
+    </androidx.cardview.widget.CardView>
 
 </LinearLayout>

@@ -2,7 +2,6 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/img_scene"
     style="?attr/materialCardViewElevatedStyle"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -12,13 +11,16 @@
     android:clipToPadding="false"
     android:focusable="true"
     android:transitionName="card_game"
-    app:cardCornerRadius="4dp"
-    app:cardElevation="0dp">
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
+    android:layout_margin="4dp"
+    >
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="6dp">
+        android:orientation="vertical"
+        android:padding="4dp">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/img_game"
@@ -48,6 +50,6 @@
             tools:text="Desktop"
             tools:ignore="UnknownId" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

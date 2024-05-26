@@ -1,6 +1,7 @@
 package com.micewine.emu
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_BUTTON_A
@@ -43,10 +44,17 @@ import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_SELECT_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_START_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_Y_KEY
+import com.micewine.emu.input.InputStub.BUTTON_LEFT
+import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
+import com.micewine.emu.input.InputStub.BUTTON_RIGHT
 import com.micewine.emu.overlay.XKeyCodes.getXKeyScanCodes
 
 object ControllerUtils {
     private const val DEAD_ZONE = 0.35
+
+    private const val KEYBOARD = 0
+
+    private const val MOUSE = 1
 
     private lateinit var axisX_plus_mapping: List<Int>
 
@@ -92,22 +100,42 @@ object ControllerUtils {
 
     private lateinit var axisHatY_minus_mapping: List<Int>
 
+    private fun detectKey(preferences: SharedPreferences, key: String): MutableList<Int> {
+        val list = getXKeyScanCodes(preferences.getString(key, "Null")!!)
+
+        if (preferences.getString("${key}_mappingType", "Keyboard") == "Keyboard") {
+            list[2] = KEYBOARD
+        } else {
+            if (preferences.getString(key, "Null") == "Left") {
+                list[1] = BUTTON_LEFT
+            } else if (preferences.getString(key, "Null") == "Right") {
+                list[1] = BUTTON_RIGHT
+            } else if (preferences.getString(key, "Null") == "Middle") {
+                list[1] = BUTTON_MIDDLE
+            }
+
+            list[2] = MOUSE
+        }
+
+        return list
+    }
+
     fun prepareButtonsAxisValues(context: Context) {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
 
-        buttonA_mapping = getXKeyScanCodes(preferences.getString(BUTTON_A_KEY, "Null")!!)
-        buttonX_mapping = getXKeyScanCodes(preferences.getString(BUTTON_X_KEY, "Null")!!)
-        buttonB_mapping = getXKeyScanCodes(preferences.getString(BUTTON_B_KEY, "Null")!!)
-        buttonY_mapping = getXKeyScanCodes(preferences.getString(BUTTON_Y_KEY, "Null")!!)
+        buttonA_mapping = detectKey(preferences, BUTTON_A_KEY)
+        buttonX_mapping = detectKey(preferences, BUTTON_X_KEY)
+        buttonB_mapping = detectKey(preferences, BUTTON_B_KEY)
+        buttonY_mapping = detectKey(preferences, BUTTON_Y_KEY)
 
-        buttonR1_mapping = getXKeyScanCodes(preferences.getString(BUTTON_R1_KEY, "Null")!!)
-        buttonR2_mapping = getXKeyScanCodes(preferences.getString(BUTTON_R2_KEY, "Null")!!)
+        buttonR1_mapping = detectKey(preferences, BUTTON_R1_KEY)
+        buttonR2_mapping = detectKey(preferences, BUTTON_R2_KEY)
 
-        buttonL1_mapping = getXKeyScanCodes(preferences.getString(BUTTON_L1_KEY, "Null")!!)
-        buttonL2_mapping = getXKeyScanCodes(preferences.getString(BUTTON_L2_KEY, "Null")!!)
+        buttonL1_mapping = detectKey(preferences, BUTTON_L1_KEY)
+        buttonL2_mapping = detectKey(preferences, BUTTON_L2_KEY)
 
-        buttonStart_mapping = getXKeyScanCodes(preferences.getString(BUTTON_START_KEY, "Null")!!)
-        buttonSelect_mapping = getXKeyScanCodes(preferences.getString(BUTTON_SELECT_KEY, "Null")!!)
+        buttonStart_mapping = detectKey(preferences, BUTTON_START_KEY)
+        buttonSelect_mapping = detectKey(preferences, BUTTON_SELECT_KEY)
 
         axisX_plus_mapping = getXKeyScanCodes(preferences.getString(AXIS_X_PLUS_KEY, "Null")!!)
         axisX_minus_mapping = getXKeyScanCodes(preferences.getString(AXIS_X_MINUS_KEY, "Null")!!)
@@ -158,66 +186,78 @@ object ControllerUtils {
         return deviceNames
     }
 
+    private fun handleKey(lorieView: LorieView, pressed: Boolean, mapping: List<Int>) {
+        when (mapping[2]) {
+            KEYBOARD -> {
+                lorieView.sendKeyEvent(mapping[0], mapping[1], pressed)
+            }
+
+            MOUSE -> {
+                lorieView.sendMouseEvent(0F, 0F, mapping[1], pressed, true)
+            }
+        }
+    }
+
     fun checkControllerButtons(lorieView: LorieView, e: KeyEvent): Boolean {
         val pressed = e.action == KeyEvent.ACTION_DOWN
 
         return when (e.keyCode) {
             KEYCODE_BUTTON_Y -> {
-                lorieView.sendKeyEvent(buttonY_mapping[0], buttonY_mapping[1], pressed)
+                handleKey(lorieView, pressed, buttonY_mapping)
 
                 true
             }
 
             KEYCODE_BUTTON_A -> {
-                lorieView.sendKeyEvent(buttonA_mapping[0], buttonA_mapping[1], pressed)
+                handleKey(lorieView, pressed, buttonA_mapping)
 
                 true
             }
 
             KEYCODE_BUTTON_B -> {
-                lorieView.sendKeyEvent(buttonB_mapping[0], buttonB_mapping[1], pressed)
+                handleKey(lorieView, pressed, buttonB_mapping)
 
                 true
             }
 
             KEYCODE_BUTTON_X -> {
-                lorieView.sendKeyEvent(buttonX_mapping[0], buttonX_mapping[1], pressed)
+                handleKey(lorieView, pressed, buttonX_mapping)
 
                 true
             }
 
             KEYCODE_BUTTON_START -> {
-                lorieView.sendKeyEvent(buttonStart_mapping[0], buttonStart_mapping[1], pressed)
+                handleKey(lorieView, pressed, buttonStart_mapping)
 
                 true
             }
 
             KEYCODE_BUTTON_SELECT -> {
-                lorieView.sendKeyEvent(buttonSelect_mapping[0], buttonSelect_mapping[1], pressed)
+                handleKey(lorieView, pressed, buttonSelect_mapping)
 
                 true
             }
 
             KEYCODE_BUTTON_R1 -> {
-                lorieView.sendKeyEvent(buttonR1_mapping[0], buttonR1_mapping[1], pressed)
+                handleKey(lorieView, pressed, buttonR1_mapping)
 
                 true
             }
 
             KEYCODE_BUTTON_R2 -> {
-                lorieView.sendKeyEvent(buttonR2_mapping[0], buttonR2_mapping[1], pressed)
+                handleKey(lorieView, pressed, buttonR2_mapping)
 
                 true
             }
 
             KEYCODE_BUTTON_L1 -> {
-                lorieView.sendKeyEvent(buttonL1_mapping[0], buttonL1_mapping[1], pressed)
+                handleKey(lorieView, pressed, buttonL1_mapping)
 
                 true
             }
 
             KEYCODE_BUTTON_L2 -> {
-                lorieView.sendKeyEvent(buttonL2_mapping[0], buttonL2_mapping[1], pressed)
+                handleKey(lorieView, pressed, buttonL2_mapping)
 
                 true
             }

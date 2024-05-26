@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_HAT_X_MINUS_KEY
@@ -42,6 +43,9 @@ class ControllerMapperFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.fragment_settings_model, container, false)
         val recyclerView = rootView.findViewById<RecyclerView>(R.id.recyclerViewSettingsModel)
         setAdapter(recyclerView)
+
+        val layoutManager = recyclerView.layoutManager as GridLayoutManager
+        layoutManager.spanCount = 2
 
         return rootView
     }

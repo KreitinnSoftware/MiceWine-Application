@@ -7,6 +7,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.ControllerUtils.getGameControllerNames
 import com.micewine.emu.R
 import com.micewine.emu.databinding.ActivityControllerMapperBinding
