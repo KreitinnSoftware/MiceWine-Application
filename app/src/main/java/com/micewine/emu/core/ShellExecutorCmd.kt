@@ -14,6 +14,7 @@ object ShellExecutorCmd {
             Log.e(msg, "Trying to exec: $cmd")
             val shell = Runtime.getRuntime().exec("/system/bin/sh")
             val os = DataOutputStream(shell.outputStream)
+
             os.writeBytes("$cmd\nexit\n")
             os.flush()
 
@@ -25,6 +26,7 @@ object ShellExecutorCmd {
                     var stdOut: String?
                     while (stdout.readLine().also { stdOut = it } != null) {
                         stdErrOut += stdOut + "\n"
+                        Log.v(msg, "$stdOut")
                     }
                 } catch (e: IOException) {
                     Log.e(msg, "Error reading stdout", e)
@@ -42,6 +44,7 @@ object ShellExecutorCmd {
                     var stdErr: String?
                     while (stderr.readLine().also { stdErr = it } != null) {
                         stdErrOut += stdErr + "\n"
+                        Log.v(msg, "$stdErr")
                     }
                 } catch (e: IOException) {
                     Log.e(msg, "Error reading stderr", e)

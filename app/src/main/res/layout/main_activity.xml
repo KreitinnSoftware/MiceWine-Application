@@ -46,10 +46,12 @@
         android:layout_margin="0dp"
         android:theme="@style/Theme.MiceWine" />
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
+        style="@style/RoundTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="26dp">
+        app:strokeWidth="0dp"
+        >
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
@@ -57,9 +59,8 @@
             android:layout_height="wrap_content"
             android:theme="@style/Theme.MiceWine"
             app:labelVisibilityMode="selected"
-            android:padding="4dp"
             app:menu="@menu/bottom_nav_menu" />
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>

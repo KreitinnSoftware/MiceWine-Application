@@ -12,6 +12,8 @@ import com.micewine.emu.adapters.AdapterSettings
 import com.micewine.emu.adapters.AdapterSettings.SettingsList
 
 class GeneralSettingsFragment : Fragment() {
+    private val settingsList: MutableList<SettingsList> = ArrayList()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -25,21 +27,21 @@ class GeneralSettingsFragment : Fragment() {
     }
 
     private fun setAdapter(recyclerView: RecyclerView) {
-        val settingsList: MutableList<SettingsList> = ArrayList()
         val adapterSettings = AdapterSettings(settingsList, requireContext())
         recyclerView.setAdapter(adapterSettings)
-        var person: SettingsList?
 
-        person = SettingsList(R.string.box64_settings_title, R.string.box64_settings_description, R.drawable.ic_box64)
-        settingsList.add(person)
+        settingsList.clear()
 
-        person = SettingsList(R.string.wine_settings_title, R.string.wine_settings_description, R.drawable.ic_wine)
-        settingsList.add(person)
+        addToAdapter(R.string.box64_settings_title, R.string.box64_settings_description, R.drawable.ic_box64)
 
-        person = SettingsList(R.string.display_settings_title, R.string.display_settings_description, R.drawable.ic_display)
-        settingsList.add(person)
+        addToAdapter(R.string.wine_settings_title, R.string.wine_settings_description, R.drawable.ic_wine)
 
-        person = SettingsList(R.string.driver_settings_title, R.string.driver_settings_description, R.drawable.ic_gpu)
-        settingsList.add(person)
+        addToAdapter(R.string.display_settings_title, R.string.display_settings_description, R.drawable.ic_display)
+
+        addToAdapter(R.string.driver_settings_title, R.string.driver_settings_description, R.drawable.ic_gpu)
+    }
+
+    private fun addToAdapter(titleId: Int, descriptionId: Int, icon: Int) {
+        settingsList.add(SettingsList(titleId, descriptionId, icon))
     }
 }

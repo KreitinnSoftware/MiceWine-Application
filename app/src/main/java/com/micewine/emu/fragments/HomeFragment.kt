@@ -35,12 +35,9 @@ class HomeFragment : Fragment() {
         val adapterGame = context?.let { AdapterGame(gameList, it) }
         recyclerView.setAdapter(adapterGame)
 
-        addToAdapter(R.string.desktop_mode_init, R.drawable.default_icon)
+        gameList.clear()
 
         addToAdapter(R.string.desktop_mode_init, R.drawable.default_icon)
-
-        addToAdapter(R.string.desktop_mode_init, R.drawable.default_icon)
-
     }
 
     private fun addToAdapter(titleId: Int, icon: Int) {

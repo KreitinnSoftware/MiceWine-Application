@@ -49,6 +49,7 @@ object EnvVars {
         putVar("PATH", "PATH+=:$usrDir/bin")
         putVar("PREFIX", "PREFIX=$usrDir")
         putVar("IB_VERSION", "IB_VERSION=$selectedIbVersion")
+        putVar("MESA_SHADER_CACHE_DIR", "MESA_SHADER_CACHE_DIR=$homeDir/.cache")
 
         when (selectedDriver) {
             "Turnip/Zink" -> {

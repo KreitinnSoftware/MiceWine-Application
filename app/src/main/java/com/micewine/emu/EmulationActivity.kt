@@ -119,9 +119,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             val id = item.itemId
             when (id) {
                 R.id.exitFromEmulation -> {
-                    //val i = Intent(this, MainActivity::class.java)
-                    //startActivity(i)
                     enableRamCounter = false
+                    init!!.stopAll()
                     finish()
                 }
                 R.id.openKeyboard -> {

@@ -29,7 +29,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.ExtraSmall"
             tools:ignore="ImageContrastCheck"
             tools:src="@drawable/default_icon" />
 

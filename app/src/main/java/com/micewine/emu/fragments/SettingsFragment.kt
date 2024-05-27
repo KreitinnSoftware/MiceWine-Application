@@ -9,8 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.adapters.AdapterSettings
 import com.micewine.emu.adapters.AdapterSettings.SettingsList
+import com.micewine.emu.models.GameList
 
 class SettingsFragment : Fragment() {
+    private val settingsList: MutableList<SettingsList> = ArrayList()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -24,21 +27,21 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setAdapter(recyclerView: RecyclerView) {
-        val settingsList: MutableList<SettingsList> = ArrayList()
         val adapterSettings = AdapterSettings(settingsList, requireContext())
         recyclerView.setAdapter(adapterSettings)
-        var person: AdapterSettings.SettingsList?
 
-        person = SettingsList(R.string.settingsTitle, R.string.settings_description, R.drawable.ic_settings_outline)
-        settingsList.add(person)
+        settingsList.clear()
 
-        person = SettingsList(R.string.logTitle, R.string.log_description, R.drawable.ic_log)
-        settingsList.add(person)
+        addToAdapter(R.string.settingsTitle, R.string.settings_description, R.drawable.ic_settings_outline)
 
-        person = SettingsList(R.string.aboutTitle, R.string.about_description, R.drawable.ic_info_outline)
-        settingsList.add(person)
+        addToAdapter(R.string.logTitle, R.string.log_description, R.drawable.ic_log)
 
-        person = SettingsList(R.string.controllerMapperTitle, R.string.controllerMapperDescription, R.drawable.ic_info_outline)
-        settingsList.add(person)
+        addToAdapter(R.string.aboutTitle, R.string.about_description, R.drawable.ic_info_outline)
+
+        addToAdapter(R.string.controllerMapperTitle, R.string.controllerMapperDescription, R.drawable.ic_info_outline)
+    }
+
+    private fun addToAdapter(titleId: Int, descriptionId: Int, icon: Int) {
+        settingsList.add(SettingsList(titleId, descriptionId, icon))
     }
 }

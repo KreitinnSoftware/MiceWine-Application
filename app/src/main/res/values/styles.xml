@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="RoundTop" parent="@style/Widget.MaterialComponents.CardView">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay_card_top_corners</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay_card_top_corners" parent="">
+        <item name="cornerSizeTopRight">26dp</item>
+        <item name="cornerSizeTopLeft">26dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+</resources>
