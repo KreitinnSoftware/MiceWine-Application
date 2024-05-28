@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
@@ -27,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:title="@string/controllerMapperTitle"
-            android:titleTextColor="@color/white">
+            >
         </androidx.appcompat.widget.Toolbar>
     </LinearLayout>
 
@@ -38,10 +37,41 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="15sp"
         android:textStyle="bold"
-        android:text=""
+        android:text="@string/no_controllers_connected"
         android:padding="14dp"
         >
     </TextView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:text="@string/deadZoneTitle"
+        android:padding="14dp"
+        >
+    </TextView>
+
+    <TextView
+        android:id="@+id/seekBarDeadZoneValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:text=""
+        android:padding="14dp"
+
+        >
+    </TextView>
+
+    <SeekBar
+        android:id="@+id/deadZoneSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+    </SeekBar>
 
     <FrameLayout
         android:id="@+id/controller_mapper_content"

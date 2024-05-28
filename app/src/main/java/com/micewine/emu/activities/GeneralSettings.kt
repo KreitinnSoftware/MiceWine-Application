@@ -8,12 +8,10 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ImageButton
-import androidx.appcompat.widget.Toolbar
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.databinding.GeneralSettingsBinding
@@ -132,5 +130,6 @@ class GeneralSettings : AppCompatActivity() {
         const val SELECTED_VIRGL_PROFILE_KEY = "selectedVirGLProfile"
         const val SELECTED_DXVK_HUD_PRESET_KEY = "selectedDXVKHudPreset"
         const val DISPLAY_RESOLUTION_KEY = "displayResolution"
+        const val DEAD_ZONE_KEY = "deadZone"
     }
 }

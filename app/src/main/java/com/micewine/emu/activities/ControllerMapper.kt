@@ -1,16 +1,20 @@
 package com.micewine.emu.activities
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.widget.ImageButton
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.preference.PreferenceManager
 import com.micewine.emu.ControllerUtils.getGameControllerNames
 import com.micewine.emu.R
+import com.micewine.emu.activities.GeneralSettings.Companion.DEAD_ZONE_KEY
 import com.micewine.emu.databinding.ActivityControllerMapperBinding
 import com.micewine.emu.fragments.ControllerMapperFragment
 
@@ -18,7 +22,10 @@ class ControllerMapper : AppCompatActivity() {
     private var binding: ActivityControllerMapperBinding? = null
     private var backButton: ImageButton? = null
     private var controllerConnected: TextView? = null
+    private var deadZoneSeekbar: SeekBar? = null
+    private var seekBarDeadZoneValue: TextView? = null
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -49,6 +56,38 @@ class ControllerMapper : AppCompatActivity() {
                 finish()
             }
         }
+
+        val preferences = PreferenceManager.getDefaultSharedPreferences(this)!!
+
+        deadZoneSeekbar = findViewById(R.id.deadZoneSeekBar)
+
+        deadZoneSeekbar?.progress = preferences.getInt(DEAD_ZONE_KEY, 25)
+
+        seekBarDeadZoneValue = findViewById(R.id.seekBarDeadZoneValue)
+
+        seekBarDeadZoneValue?.text = "${deadZoneSeekbar?.progress.toString()}%"
+
+        deadZoneSeekbar?.max = 75
+
+        deadZoneSeekbar?.min = 25
+
+        deadZoneSeekbar?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            @SuppressLint("SetTextI18n")
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                seekBarDeadZoneValue?.text = "$progress%"
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                val editor = preferences.edit()
+
+                editor.putInt(DEAD_ZONE_KEY, seekBar!!.progress)
+
+                editor.apply()
+            }
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -55,4 +55,5 @@
     <string name="controllerMapperDescription">Configure your Gamepad</string>
     <string name="no_controllers_connected">No Controllers Connected.</string>
     <string name="connected_controller">Connected Controller: %1$s</string>
+    <string name="deadZoneTitle">Dead Zone</string>
 </resources>

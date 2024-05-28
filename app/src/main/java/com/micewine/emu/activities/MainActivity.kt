@@ -26,6 +26,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTR
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_SAFEFLAGS_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_STRONGMEM_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.DEAD_ZONE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_KEY
@@ -251,7 +252,7 @@ class MainActivity : AppCompatActivity() {
             return File(getLibsPath(context)).parentFile?.parentFile?.absolutePath + "/base.apk"
         }
 
-        fun getLibsPath(context: Context): String {
+        private fun getLibsPath(context: Context): String {
             return context.applicationContext.applicationInfo.nativeLibraryDir
         }
     }
