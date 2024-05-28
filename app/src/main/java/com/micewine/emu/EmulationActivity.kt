@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
+import android.media.AudioManager
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
@@ -106,6 +107,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             onPreferencesChanged(key)
         }
         prepareButtonsAxisValues(this)
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         init = Init()
         window.setFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, 0)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -163,6 +165,18 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     }
                     return@OnKeyListener true
                 }
+            } else if (k == KeyEvent.KEYCODE_VOLUME_DOWN) {
+                audioManager.adjustStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_LOWER,
+                    AudioManager.FLAG_SHOW_UI)
+                return@OnKeyListener true
+            } else if (k == KeyEvent.KEYCODE_VOLUME_UP) {
+                audioManager.adjustStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_RAISE,
+                    AudioManager.FLAG_SHOW_UI)
+                return@OnKeyListener true
             }
 
             if (checkControllerButtons(lorieView, e)) {
