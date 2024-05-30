@@ -48,4 +48,6 @@
     <string name="no_controllers_connected">Nenhum Controle Conectado.</string>
     <string name="controllerMapperDescription">Configure seu Controle</string>
     <string name="connected_controller">Controle Conectado: %1$s</string>
+    <string name="mouseSensibilityTitle">Sensibilidade do Mouse Virtual</string>
+    <string name="deadZoneTitle">Dead Zone</string>
 </resources>

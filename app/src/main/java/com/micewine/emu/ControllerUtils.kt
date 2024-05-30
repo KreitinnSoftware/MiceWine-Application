@@ -46,77 +46,71 @@ import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_START_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_Y_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.DEAD_ZONE_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.MOUSE_SENSIBILITY_KEY
 import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
+import com.micewine.emu.input.InputStub.BUTTON_UNDEFINED
 import com.micewine.emu.overlay.XKeyCodes.getXKeyScanCodes
+import kotlin.math.absoluteValue
 
 object ControllerUtils {
     private const val KEYBOARD = 0
-
     private const val MOUSE = 1
 
     private lateinit var axisX_plus_mapping: List<Int>
-
     private lateinit var axisY_plus_mapping: List<Int>
-
     private lateinit var axisX_minus_mapping: List<Int>
-
     private lateinit var axisY_minus_mapping: List<Int>
-
     private lateinit var axisZ_plus_mapping: List<Int>
-
     private lateinit var axisRZ_plus_mapping: List<Int>
-
     private lateinit var axisZ_minus_mapping: List<Int>
-
     private lateinit var axisRZ_minus_mapping: List<Int>
-
     private lateinit var buttonA_mapping: List<Int>
-
     private lateinit var buttonB_mapping: List<Int>
-
     private lateinit var buttonX_mapping: List<Int>
-
     private lateinit var buttonY_mapping: List<Int>
-
     private lateinit var buttonStart_mapping: List<Int>
-
     private lateinit var buttonSelect_mapping: List<Int>
-
     private lateinit var buttonR1_mapping: List<Int>
-
     private lateinit var buttonL1_mapping: List<Int>
-
     private lateinit var buttonR2_mapping: List<Int>
-
     private lateinit var buttonL2_mapping: List<Int>
-
     private lateinit var axisHatX_plus_mapping: List<Int>
-
     private lateinit var axisHatY_plus_mapping: List<Int>
-
     private lateinit var axisHatX_minus_mapping: List<Int>
-
     private lateinit var axisHatY_minus_mapping: List<Int>
 
     private var deadZone: Float = 0F
+    private var moveVMouse: Int? = null
+    private var mouseSensibility: Float = 1F
+    private var axisXVelocity: Float = 0F
+    private var axisYVelocity: Float = 0F
+
+    private const val LEFT = 1
+    private const val RIGHT = 2
+    private const val UP = 3
+    private const val DOWN = 4
+    private const val LEFT_UP = 5
+    private const val LEFT_DOWN = 6
+    private const val RIGHT_UP = 7
+    private const val RIGHT_DOWN = 8
 
     private fun detectKey(preferences: SharedPreferences, key: String): MutableList<Int> {
         val list = getXKeyScanCodes(preferences.getString(key, "Null")!!)
 
-        if (preferences.getString("${key}_mappingType", "Keyboard") == "Keyboard") {
-            list[2] = KEYBOARD
-        } else {
-            if (preferences.getString(key, "Null") == "Left") {
-                list[1] = BUTTON_LEFT
-            } else if (preferences.getString(key, "Null") == "Right") {
-                list[1] = BUTTON_RIGHT
-            } else if (preferences.getString(key, "Null") == "Middle") {
-                list[1] = BUTTON_MIDDLE
-            }
+        when (preferences.getBoolean("${key}_mappingType", false)) {
+            false -> list[2] = KEYBOARD
 
-            list[2] = MOUSE
+            true -> {
+                when (preferences.getString(key, "Null")) {
+                    "Left" -> list[1] = BUTTON_LEFT
+                    "Right" -> list[1] = BUTTON_RIGHT
+                    "Middle" -> list[1] = BUTTON_MIDDLE
+                }
+
+                list[2] = MOUSE
+            }
         }
 
         return list
@@ -139,27 +133,26 @@ object ControllerUtils {
         buttonStart_mapping = detectKey(preferences, BUTTON_START_KEY)
         buttonSelect_mapping = detectKey(preferences, BUTTON_SELECT_KEY)
 
-        axisX_plus_mapping = getXKeyScanCodes(preferences.getString(AXIS_X_PLUS_KEY, "Null")!!)
-        axisX_minus_mapping = getXKeyScanCodes(preferences.getString(AXIS_X_MINUS_KEY, "Null")!!)
+        axisX_plus_mapping = detectKey(preferences, AXIS_X_PLUS_KEY)
+        axisX_minus_mapping = detectKey(preferences, AXIS_X_MINUS_KEY)
 
-        axisY_plus_mapping = getXKeyScanCodes(preferences.getString(AXIS_Y_PLUS_KEY, "Null")!!)
-        axisY_minus_mapping = getXKeyScanCodes(preferences.getString(AXIS_Y_MINUS_KEY, "Null")!!)
+        axisY_plus_mapping = detectKey(preferences, AXIS_Y_PLUS_KEY)
+        axisY_minus_mapping = detectKey(preferences, AXIS_Y_MINUS_KEY)
 
-        axisZ_plus_mapping = getXKeyScanCodes(preferences.getString(AXIS_Z_PLUS_KEY, "Null")!!)
-        axisZ_minus_mapping = getXKeyScanCodes(preferences.getString(AXIS_Z_MINUS_KEY, "Null")!!)
+        axisZ_plus_mapping = detectKey(preferences, AXIS_Z_PLUS_KEY)
+        axisZ_minus_mapping = detectKey(preferences, AXIS_Z_MINUS_KEY)
 
-        axisRZ_plus_mapping = getXKeyScanCodes(preferences.getString(AXIS_RZ_PLUS_KEY, "Null")!!)
-        axisRZ_minus_mapping = getXKeyScanCodes(preferences.getString(AXIS_RZ_MINUS_KEY, "Null")!!)
+        axisRZ_plus_mapping = detectKey(preferences, AXIS_RZ_PLUS_KEY)
+        axisRZ_minus_mapping = detectKey(preferences, AXIS_RZ_MINUS_KEY)
 
-        axisHatX_plus_mapping = getXKeyScanCodes(preferences.getString(AXIS_HAT_X_PLUS_KEY, "Null")!!)
-        axisHatX_minus_mapping = getXKeyScanCodes(preferences.getString(AXIS_HAT_X_MINUS_KEY, "Null")!!)
+        axisHatX_plus_mapping = detectKey(preferences, AXIS_HAT_X_PLUS_KEY)
+        axisHatX_minus_mapping = detectKey(preferences, AXIS_HAT_X_MINUS_KEY)
 
-        axisHatY_plus_mapping = getXKeyScanCodes(preferences.getString(AXIS_HAT_Y_PLUS_KEY, "Null")!!)
-        axisHatY_minus_mapping = getXKeyScanCodes(preferences.getString(AXIS_HAT_Y_MINUS_KEY, "Null")!!)
+        axisHatY_plus_mapping = detectKey(preferences, AXIS_HAT_Y_PLUS_KEY)
+        axisHatY_minus_mapping = detectKey(preferences, AXIS_HAT_Y_MINUS_KEY)
 
         deadZone = (preferences.getInt(DEAD_ZONE_KEY, 25)).toFloat() / 100
-
-        Log.v("Info", "$deadZone")
+        mouseSensibility = (preferences.getInt(MOUSE_SENSIBILITY_KEY, 100)).toFloat() / 100
     }
 
     private fun getGameControllerIds(): List<Int> {
@@ -194,13 +187,8 @@ object ControllerUtils {
 
     private fun handleKey(lorieView: LorieView, pressed: Boolean, mapping: List<Int>) {
         when (mapping[2]) {
-            KEYBOARD -> {
-                lorieView.sendKeyEvent(mapping[0], mapping[1], pressed)
-            }
-
-            MOUSE -> {
-                lorieView.sendMouseEvent(0F, 0F, mapping[1], pressed, true)
-            }
+            KEYBOARD -> lorieView.sendKeyEvent(mapping[0], mapping[1], pressed)
+            MOUSE -> lorieView.sendMouseEvent(0F, 0F, mapping[1], pressed, true)
         }
     }
 
@@ -272,6 +260,181 @@ object ControllerUtils {
         }
     }
 
+    fun controllerMouseEmulation(lorieView: LorieView) {
+        while (true) {
+            when (moveVMouse) {
+                LEFT -> {
+                    lorieView.sendMouseEvent(-10F * (axisXVelocity * mouseSensibility), 0F, BUTTON_UNDEFINED, false, true)
+                }
+                RIGHT -> {
+                    lorieView.sendMouseEvent(10F * (axisXVelocity * mouseSensibility), 0F, BUTTON_UNDEFINED, false, true)
+                }
+                UP -> {
+                    lorieView.sendMouseEvent(0F, -10F * (axisYVelocity * mouseSensibility), BUTTON_UNDEFINED, false, true)
+                }
+                DOWN -> {
+                    lorieView.sendMouseEvent(0F, 10F * (axisYVelocity * mouseSensibility), BUTTON_UNDEFINED, false, true)
+                }
+                LEFT_UP -> {
+                    lorieView.sendMouseEvent(-10F * (axisXVelocity * mouseSensibility), -10F * (axisYVelocity * mouseSensibility), BUTTON_UNDEFINED, false, true)
+                }
+                LEFT_DOWN -> {
+                    lorieView.sendMouseEvent(-10F * (axisXVelocity * mouseSensibility), 10F * (axisYVelocity * mouseSensibility), BUTTON_UNDEFINED, false, true)
+                }
+                RIGHT_UP -> {
+                    lorieView.sendMouseEvent(10F * (axisXVelocity * mouseSensibility), -10F * (axisYVelocity * mouseSensibility), BUTTON_UNDEFINED, false, true)
+                }
+                RIGHT_DOWN -> {
+                    lorieView.sendMouseEvent(10F * (axisXVelocity * mouseSensibility), 10F * (axisYVelocity * mouseSensibility), BUTTON_UNDEFINED, false, true)
+                }
+            }
+
+            Thread.sleep(16)
+        }
+    }
+
+    private fun checkMouse(axisX: Float, axisY: Float, orientation: Int) {
+        moveVMouse = orientation
+
+        axisXVelocity = axisX.absoluteValue
+        axisYVelocity = axisY.absoluteValue
+    }
+
+    private fun handleAxis(lorieView: LorieView, axisX: Float, axisY: Float, axisXNeutral: Boolean, axisYNeutral: Boolean, axisXPlusMapping: List<Int>, axisXMinusMapping: List<Int>, axisYPlusMapping: List<Int>, axisYMinusMapping: List<Int>): Boolean {
+        return when {
+            // Left
+            axisX < -deadZone && axisYNeutral -> {
+                if (axisXMinusMapping[2] == KEYBOARD) {
+                    lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], false)
+                    lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], true)
+
+                    lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], false)
+                    lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], false)
+                } else {
+                    checkMouse(axisX, axisY, LEFT)
+                }
+
+                true
+            }
+
+            // Right
+            axisX > deadZone && axisYNeutral -> {
+                if (axisXPlusMapping[2] == KEYBOARD) {
+                    lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], true)
+                    lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], false)
+
+                    lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], false)
+                    lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], false)
+                } else {
+                    checkMouse(axisX, axisY, RIGHT)
+                }
+
+                true
+            }
+
+            // Up
+            axisY < -deadZone && axisXNeutral -> {
+                if (axisYMinusMapping[2] == KEYBOARD) {
+                    lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], false)
+                    lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], false)
+
+                    lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], false)
+                    lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], true)
+                } else {
+                    checkMouse(axisX, axisY, UP)
+                }
+
+                true
+            }
+
+            // Down
+            axisY > deadZone && axisXNeutral -> {
+                if (axisYPlusMapping[2] == KEYBOARD) {
+                    lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], false)
+                    lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], false)
+
+                    lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], true)
+                    lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], false)
+                } else {
+                    checkMouse(axisX, axisY, DOWN)
+                }
+
+                true
+            }
+
+            // Left/Up
+            axisX < -deadZone && axisY < -deadZone -> {
+                if (axisXPlusMapping[2] == KEYBOARD && axisYMinusMapping[2] == KEYBOARD) {
+                    lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], false)
+                    lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], true)
+
+                    lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], false)
+                    lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], true)
+                } else {
+                    checkMouse(axisX, axisY, LEFT_UP)
+                }
+
+                true
+            }
+
+            // Left/Down
+            axisX < -deadZone && axisY > deadZone -> {
+                if (axisXPlusMapping[2] == KEYBOARD && axisYMinusMapping[2] == KEYBOARD) {
+                    lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], false)
+                    lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], true)
+
+                    lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], true)
+                    lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], false)
+                } else {
+                    checkMouse(axisX, axisY, LEFT_DOWN)
+                }
+
+                true
+            }
+
+            // Right/Up
+            axisX > deadZone && axisY < -deadZone -> {
+                if (axisXPlusMapping[2] == KEYBOARD && axisYMinusMapping[2] == KEYBOARD) {
+                    lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], true)
+                    lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], false)
+
+                    lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], false)
+                    lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], true)
+                } else {
+                    checkMouse(axisX, axisY, RIGHT_UP)
+                }
+
+                true
+            }
+
+            // Right/Down
+            axisX > deadZone && axisY > deadZone -> {
+                if (axisXPlusMapping[2] == KEYBOARD && axisYMinusMapping[2] == KEYBOARD) {
+                    lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], true)
+                    lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], false)
+
+                    lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], true)
+                    lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], false)
+                } else {
+                    checkMouse(axisX, axisY, RIGHT_DOWN)
+                }
+
+                true
+            }
+
+            else -> {
+                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
+                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], false)
+                lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], false)
+                lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], false)
+
+                moveVMouse = null
+
+                false
+            }
+        }
+    }
+
     fun checkControllerAxis(lorieView: LorieView, event: MotionEvent): Boolean {
         val axisX = event.getAxisValue(AXIS_X)
         val axisY = event.getAxisValue(AXIS_Y)
@@ -288,312 +451,14 @@ object ControllerUtils {
         val axisHatXNeutral = axisHatX < deadZone && axisHatX > -deadZone
         val axisHatYNeutral = axisHatY < deadZone && axisHatY > -deadZone
 
-        when {
-            // Right
-            axisX > deadZone && axisYNeutral -> {
-                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], false)
+        return when {
+            handleAxis(lorieView, axisX, axisY, axisXNeutral, axisYNeutral, axisX_plus_mapping, axisX_minus_mapping, axisY_plus_mapping, axisY_minus_mapping) -> true
 
-                lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], false)
+            handleAxis(lorieView, axisZ, axisRZ, axisZNeutral, axisRZNeutral, axisZ_plus_mapping, axisZ_minus_mapping, axisRZ_plus_mapping, axisRZ_minus_mapping) -> true
 
-                return true
-            }
+            handleAxis(lorieView, axisHatX, axisHatY, axisHatXNeutral, axisHatYNeutral, axisHatX_plus_mapping, axisHatX_minus_mapping, axisHatY_plus_mapping, axisHatY_minus_mapping) -> true
 
-            // Left
-            axisX < -deadZone && axisYNeutral -> {
-                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], true)
-                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], false)
-
-                return true
-            }
-
-            // Down
-            axisY > deadZone && axisXNeutral -> {
-                lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], false)
-                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
-
-                return true
-            }
-
-            // Up
-            axisY < -deadZone && axisXNeutral -> {
-                lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], true)
-                lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], false)
-                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
-
-                return true
-            }
-
-            // Right/Down
-            axisX > deadZone && axisY > deadZone -> {
-                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], false)
-
-                return true
-            }
-
-            // Right/Up
-            axisX > deadZone && axisY < -deadZone -> {
-                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], true)
-
-                return true
-            }
-
-            // Left/Up
-            axisX < -deadZone && axisY < -deadZone -> {
-                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], true)
-
-                lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], true)
-
-                return true
-            }
-
-            // Left/Down
-            axisX < -deadZone && axisY > deadZone -> {
-                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], true)
-
-                lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], false)
-
-                return true
-            }
-
-            else -> {
-                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], false)
-                lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], false)
-            }
+            else -> false
         }
-
-        when {
-            // Right
-            axisZ > deadZone && axisRZNeutral -> {
-                lorieView.sendKeyEvent(axisZ_plus_mapping[0], axisZ_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisZ_minus_mapping[0], axisZ_minus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], false)
-                lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], false)
-
-                return true
-            }
-
-            // Left
-            axisZ < -deadZone && axisRZNeutral -> {
-                lorieView.sendKeyEvent(axisZ_minus_mapping[0], axisZ_minus_mapping[1], true)
-                lorieView.sendKeyEvent(axisZ_plus_mapping[0], axisZ_plus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], false)
-                lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], false)
-
-                return true
-            }
-
-            // Down
-            axisRZ > deadZone && axisZNeutral -> {
-                lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisZ_plus_mapping[0], axisZ_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisZ_minus_mapping[0], axisZ_minus_mapping[1], false)
-
-                return true
-            }
-
-            // Up
-            axisRZ < -deadZone && axisZNeutral -> {
-                lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], true)
-                lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisZ_plus_mapping[0], axisZ_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisZ_minus_mapping[0], axisZ_minus_mapping[1], false)
-
-                return true
-            }
-
-            // Right/Down
-            axisZ > deadZone && axisRZ > deadZone -> {
-                lorieView.sendKeyEvent(axisZ_plus_mapping[0], axisZ_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisZ_minus_mapping[0], axisZ_minus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], false)
-
-                return true
-            }
-
-            // Right/Up
-            axisZ > deadZone && axisRZ < -deadZone -> {
-                lorieView.sendKeyEvent(axisZ_plus_mapping[0], axisZ_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisZ_minus_mapping[0], axisZ_minus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], true)
-                lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], false)
-
-                return true
-            }
-
-            // Left/Up
-            axisZ < -deadZone && axisRZ < -deadZone -> {
-                lorieView.sendKeyEvent(axisZ_minus_mapping[0], axisZ_minus_mapping[1], true)
-                lorieView.sendKeyEvent(axisZ_plus_mapping[0], axisZ_plus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], true)
-                lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], false)
-
-                return true
-            }
-
-            // Left/Down
-            axisZ < -deadZone && axisRZ > deadZone -> {
-                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], true)
-
-                lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], false)
-
-                return true
-            }
-
-            else -> {
-                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], false)
-                lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], false)
-            }
-        }
-
-        when {
-            // Right
-            axisHatX > deadZone && axisHatYNeutral -> {
-                lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], false)
-
-                return true
-            }
-
-            // Left
-            axisHatX < -deadZone && axisHatYNeutral -> {
-                lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], true)
-                lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], false)
-
-                return true
-            }
-
-            // Down
-            axisHatY > deadZone && axisHatXNeutral -> {
-                lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], false)
-
-                return true
-            }
-
-            // Up
-            axisHatY < -deadZone && axisHatXNeutral -> {
-                lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], true)
-                lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], false)
-
-                return true
-            }
-
-            // Right/Down
-            axisHatX > deadZone && axisHatY > deadZone -> {
-                lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], false)
-
-                return true
-            }
-
-            // Right/Up
-            axisHatX > deadZone && axisHatY < -deadZone -> {
-                lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], true)
-                lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], false)
-
-                return true
-            }
-
-            // Left/Up
-            axisHatX < -deadZone && axisHatY < -deadZone -> {
-                lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], true)
-                lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], true)
-                lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], false)
-
-                return true
-            }
-
-            // Left/Down
-            axisHatX < -deadZone && axisHatY > deadZone -> {
-                lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], true)
-                lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], false)
-
-                lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], true)
-                lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], false)
-
-                return true
-            }
-
-            else -> {
-                lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], false)
-                lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], false)
-            }
-        }
-
-        lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
-        lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], false)
-        lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], false)
-        lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], false)
-        //
-        lorieView.sendKeyEvent(axisZ_plus_mapping[0], axisZ_plus_mapping[1], false)
-        lorieView.sendKeyEvent(axisZ_minus_mapping[0], axisZ_minus_mapping[1], false)
-        lorieView.sendKeyEvent(axisRZ_plus_mapping[0], axisRZ_plus_mapping[1], false)
-        lorieView.sendKeyEvent(axisRZ_minus_mapping[0], axisRZ_minus_mapping[1], false)
-        //
-        lorieView.sendKeyEvent(axisHatX_minus_mapping[0], axisHatX_minus_mapping[1], false)
-        lorieView.sendKeyEvent(axisHatX_plus_mapping[0], axisHatX_plus_mapping[1], false)
-        lorieView.sendKeyEvent(axisHatY_minus_mapping[0], axisHatY_minus_mapping[1], false)
-        lorieView.sendKeyEvent(axisHatY_plus_mapping[0], axisHatY_plus_mapping[1], false)
-
-        return false
     }
 }

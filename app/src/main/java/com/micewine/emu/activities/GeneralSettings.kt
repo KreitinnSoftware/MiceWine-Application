@@ -131,5 +131,6 @@ class GeneralSettings : AppCompatActivity() {
         const val SELECTED_DXVK_HUD_PRESET_KEY = "selectedDXVKHudPreset"
         const val DISPLAY_RESOLUTION_KEY = "displayResolution"
         const val DEAD_ZONE_KEY = "deadZone"
+        const val MOUSE_SENSIBILITY_KEY = "mouseSensibility"
     }
 }

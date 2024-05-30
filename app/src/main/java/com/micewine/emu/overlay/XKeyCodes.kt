@@ -14,7 +14,7 @@ object XKeyCodes {
         "F3" to 61, "F4" to 62, "F5" to 63, "F6" to 64, "F7" to 65,
         "F8" to 66, "F9" to 67, "F10" to 68, "F11" to 87, "F12" to 88,
         "Insert" to 110, "Home" to 102, "PageUp" to 104, "Delete" to 111,
-        "End" to 107, "PageDown" to 109
+        "End" to 107, "PageDown" to 109, "0" to 82, "1" to 79
     )
 
     private val keyCodes = mapOf(
@@ -30,7 +30,7 @@ object XKeyCodes {
         "F3" to 133, "F4" to 134, "F5" to 135, "F6" to 136, "F7" to 137,
         "F8" to 138, "F9" to 139, "F10" to 140, "F11" to 141, "F12" to 142,
         "Insert" to 124, "Home" to 122, "PageUp" to 92, "Delete" to 112,
-        "End" to 123, "PageDown" to 93
+        "End" to 123, "PageDown" to 93, "0" to 144, "1" to 145
     )
 
     fun getXKeyScanCodes(key: String): MutableList<Int> {

@@ -10,12 +10,11 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.extractedAssets
 import com.micewine.emu.adapters.AdapterGame
 import com.micewine.emu.databinding.FragmentHomeBinding
-import com.micewine.emu.models.GameList
 
 class HomeFragment : Fragment() {
     private var binding: FragmentHomeBinding? = null
     private var rootView: View? = null
-    private val gameList: MutableList<GameList> = ArrayList()
+    private val gameList: MutableList<AdapterGame.GameList> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -41,6 +40,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun addToAdapter(titleId: Int, icon: Int) {
-        gameList.add(GameList(titleId, icon))
+        gameList.add(AdapterGame.GameList(titleId, icon))
     }
 }

@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.EmulationActivity
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
-import com.micewine.emu.models.GameList
 
 class AdapterGame(private val gameList: List<GameList>, private val context: Context) :
     RecyclerView.Adapter<AdapterGame.ViewHolder>() {
@@ -52,4 +51,6 @@ class AdapterGame(private val gameList: List<GameList>, private val context: Con
             }
         }
     }
+
+    class GameList(var titleGame: Int, var imageGame: Int)
 }

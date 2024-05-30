@@ -17,7 +17,6 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KE
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
 import com.micewine.emu.adapters.AdapterSettingsPreferences
 import com.micewine.emu.adapters.AdapterSettingsPreferences.SettingsListSpinner
-import com.micewine.emu.models.GameList
 
 class DriversSettingsFragment : Fragment() {
     private val settingsList: MutableList<SettingsListSpinner> = ArrayList()

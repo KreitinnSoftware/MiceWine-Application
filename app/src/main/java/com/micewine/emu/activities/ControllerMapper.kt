@@ -15,6 +15,7 @@ import androidx.preference.PreferenceManager
 import com.micewine.emu.ControllerUtils.getGameControllerNames
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings.Companion.DEAD_ZONE_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.MOUSE_SENSIBILITY_KEY
 import com.micewine.emu.databinding.ActivityControllerMapperBinding
 import com.micewine.emu.fragments.ControllerMapperFragment
 
@@ -24,6 +25,8 @@ class ControllerMapper : AppCompatActivity() {
     private var controllerConnected: TextView? = null
     private var deadZoneSeekbar: SeekBar? = null
     private var seekBarDeadZoneValue: TextView? = null
+    private var mouseSensibilitySeekBar: SeekBar? = null
+    private var mouseSensibilityValue: TextView? = null
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,6 +91,36 @@ class ControllerMapper : AppCompatActivity() {
                 editor.apply()
             }
         })
+
+        mouseSensibilitySeekBar = findViewById(R.id.mouseSensibilitySeekBar)
+
+        mouseSensibilitySeekBar?.progress = preferences.getInt(MOUSE_SENSIBILITY_KEY, 100)
+
+        mouseSensibilityValue = findViewById(R.id.mouseSensibilityValue)
+
+        mouseSensibilityValue?.text = "${mouseSensibilitySeekBar?.progress.toString()}%"
+
+        mouseSensibilitySeekBar?.max = 200
+
+        mouseSensibilitySeekBar?.min = 50
+
+        mouseSensibilitySeekBar?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            @SuppressLint("SetTextI18n")
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                mouseSensibilityValue?.text = "$progress%"
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                val editor = preferences.edit()
+
+                editor.putInt(MOUSE_SENSIBILITY_KEY, seekBar!!.progress)
+
+                editor.apply()
+            }
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -121,7 +154,8 @@ class ControllerMapper : AppCompatActivity() {
             "W", "X", "Y", "Z", "'", "LCtrl", "RCtrl", "LShift",
             "RShift", "Tab", "Space", "AltLeft", "F1", "F2", "F3",
             "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
-            "Insert", "Home", "PageUp", "Delete", "End", "PageDown")
+            "Insert", "Home", "PageUp", "Delete", "End", "PageDown",
+            "0", "1")
 
         const val BUTTON_A_KEY = "buttonA"
         const val BUTTON_B_KEY = "buttonB"

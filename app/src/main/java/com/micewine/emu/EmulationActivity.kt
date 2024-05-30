@@ -40,6 +40,7 @@ import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
 import com.micewine.emu.ControllerUtils.checkControllerAxis
 import com.micewine.emu.ControllerUtils.checkControllerButtons
 import com.micewine.emu.ControllerUtils.prepareButtonsAxisValues
+import com.micewine.emu.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.core.Init
 import com.micewine.emu.input.InputEventSender
@@ -116,6 +117,11 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         val lorieView = findViewById<LorieView>(R.id.lorieView)
         val lorieParent = lorieView.parent as View
+
+        Thread {
+            controllerMouseEmulation(lorieView)
+        }.start()
+
         val nav = findViewById<NavigationView>(R.id.NavigationView)
         nav.setNavigationItemSelectedListener { item: MenuItem ->
             val id = item.itemId

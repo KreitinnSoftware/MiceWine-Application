@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.adapters.AdapterSettings
 import com.micewine.emu.adapters.AdapterSettings.SettingsList
-import com.micewine.emu.models.GameList
 
 class SettingsFragment : Fragment() {
     private val settingsList: MutableList<SettingsList> = ArrayList()
