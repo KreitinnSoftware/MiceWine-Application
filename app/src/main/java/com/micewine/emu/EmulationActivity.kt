@@ -47,6 +47,7 @@ import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.input.TouchInputHandler.RenderStub.NullStub
+import com.micewine.emu.overlay.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.utils.FullscreenWorkaround
 import com.micewine.emu.utils.KeyInterceptor
 
@@ -266,6 +267,14 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         checkXEvents()
 
         init!!.run(this)
+
+        val overlayView: OverlayView = findViewById(R.id.overlayView)
+
+        overlayView.addButton(CustomButtonData(1, R.drawable.a_button, 50F, 50F, 150F, getXKeyScanCodes("Enter")))
+        overlayView.addButton(CustomButtonData(2, R.drawable.dpad_right, 50F, 500F, 150F, getXKeyScanCodes("Right")))
+        overlayView.addButton(CustomButtonData(3, R.drawable.dpad_left, 200F, 500F, 150F, getXKeyScanCodes("Left")))
+        overlayView.addButton(CustomButtonData(4, R.drawable.dpad_up, 450F, 500F, 150F, getXKeyScanCodes("Up")))
+        overlayView.addButton(CustomButtonData(5, R.drawable.dpad_down, 600F, 500F, 150F, getXKeyScanCodes("Down")))
 
         if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU && checkSelfPermission(permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED && !shouldShowRequestPermissionRationale(
                 permission.POST_NOTIFICATIONS

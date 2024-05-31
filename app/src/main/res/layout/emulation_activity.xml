@@ -16,14 +16,25 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="bottom"
-            android:background="@color/black" />
+            android:background="@color/black">
+        </View>
 
         <com.micewine.emu.LorieView
             android:id="@+id/lorieView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:visibility="visible" />
+            android:visibility="visible"
+            >
+        </com.micewine.emu.LorieView>
+
+        <com.micewine.emu.OverlayView
+            android:id="@+id/overlayView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="visible">
+        </com.micewine.emu.OverlayView>
 
     </FrameLayout>
 
