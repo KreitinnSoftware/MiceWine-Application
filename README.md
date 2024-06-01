@@ -22,8 +22,8 @@ It's use a XServer based on Termux-X11
 ### Compatible GPUs
 
 | GPU        | Support             | Driver            |
-| ---------- | ------------------- | ----------------- |
-| Adreno 7xx | Supported | Turnip/VirGL/Zink |
+|------------|---------------------|-------------------|
+| Adreno 7xx | Supported           | Turnip/VirGL/Zink |
 | Adreno 6xx | Supported           | Turnip/VirGL/Zink |
 | Others     | Parcially Supported | VirGL/Zink        |
 
