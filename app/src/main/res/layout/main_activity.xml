@@ -46,21 +46,14 @@
         android:layout_margin="0dp"
         android:theme="@style/Theme.MiceWine" />
 
-    <com.google.android.material.card.MaterialCardView
-        style="@style/RoundTop"
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        style="@style/RoundTopCorners"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:strokeWidth="0dp"
-        >
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottom_navigation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/Theme.MiceWine"
-            app:labelVisibilityMode="selected"
-            app:menu="@menu/bottom_nav_menu" />
-
-    </com.google.android.material.card.MaterialCardView>
+        android:padding="8dp"
+        android:theme="@style/Theme.MiceWine"
+        app:labelVisibilityMode="selected"
+        app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>

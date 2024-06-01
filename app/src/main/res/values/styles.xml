@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="RoundTop" parent="@style/Widget.MaterialComponents.CardView">
+    <style name="RoundTopCorners">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay_card_top_corners</item>
     </style>
 

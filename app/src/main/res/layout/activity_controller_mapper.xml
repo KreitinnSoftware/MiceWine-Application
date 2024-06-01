@@ -75,7 +75,6 @@
                 android:textStyle="bold"
                 android:text=""
                 android:padding="14dp"
-
                 >
             </TextView>
 
@@ -115,7 +114,6 @@
                 android:textStyle="bold"
                 android:text=""
                 android:padding="14dp"
-
                 >
             </TextView>
 
