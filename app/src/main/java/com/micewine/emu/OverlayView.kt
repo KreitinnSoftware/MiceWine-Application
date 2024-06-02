@@ -1,5 +1,6 @@
 package com.micewine.emu
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -50,53 +51,35 @@ class OverlayView @JvmOverloads constructor (context: Context, attrs: AttributeS
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_DOWN -> {
                 buttonList.forEach {
-                    if (event.x >= it.x && event.x <= (it.x + it.radius)
-                        && event.y >= it.y && event.y <= (it.y + it.radius)
-                    ) {
+                    if (event.getX(event.actionIndex) >= it.x && event.getX(event.actionIndex) <= (it.x + it.radius)
+                            && event.getY(event.actionIndex) >= it.y && event.getY(event.actionIndex) <= (it.y + it.radius)
+                            ) {
                         handleButton(it, true)
+                    }
+                }
+            }
 
-                        return true
+            MotionEvent.ACTION_POINTER_UP -> {
+                buttonList.forEach {
+                    if (event.getX(event.actionIndex) >= it.x && event.getX(event.actionIndex) <= (it.x + it.radius)
+                            && event.getY(event.actionIndex) >= it.y && event.getY(event.actionIndex) <= (it.y + it.radius)
+                            ) {
+                        handleButton(it, false)
                     }
                 }
             }
 
             MotionEvent.ACTION_UP -> {
                 buttonList.forEach {
-                    if (event.x >= it.x && event.x <= (it.x + it.radius)
-                        && event.y >= it.y && event.y <= (it.y + it.radius)
-                    ) {
-                        handleButton(it, false)
-
-                        return true
-                    }
-                }
-            }
-
-            MotionEvent.ACTION_MOVE -> {
-                buttonList.forEach {
-                    if (event.x >= it.x && event.x <= (it.x + it.radius)
-                        && event.y >= it.y && event.y <= (it.y + it.radius)
-                    ) {
-                        handleButton(it, true)
-
-                        return true
-                    } else {
-                        handleButton(it, false)
-                    }
+                    handleButton(it, false)
                 }
             }
         }
-        performClick()
-
-        return super.onTouchEvent(event)
-    }
-
-    override fun performClick(): Boolean {
-        super.performClick()
 
         return true
     }

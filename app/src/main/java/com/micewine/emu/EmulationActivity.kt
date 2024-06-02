@@ -114,10 +114,22 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         window.setFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, 0)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.emulation_activity)
+
         drawerLayout = findViewById(R.id.DrawerLayout)
         drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+
         val lorieView = findViewById<LorieView>(R.id.lorieView)
         val lorieParent = lorieView.parent as View
+
+        val overlayView: OverlayView = findViewById(R.id.overlayView)
+
+        overlayView.addButton(CustomButtonData(1, R.drawable.a_button, 50F, 50F, 150F, getXKeyScanCodes("Enter")))
+        overlayView.addButton(CustomButtonData(2, R.drawable.dpad_right, 50F, 500F, 150F, getXKeyScanCodes("Right")))
+        overlayView.addButton(CustomButtonData(3, R.drawable.dpad_left, 200F, 500F, 150F, getXKeyScanCodes("Left")))
+        overlayView.addButton(CustomButtonData(4, R.drawable.dpad_up, 450F, 500F, 150F, getXKeyScanCodes("Up")))
+        overlayView.addButton(CustomButtonData(5, R.drawable.dpad_down, 600F, 500F, 150F, getXKeyScanCodes("Down")))
+
+        overlayView.visibility = View.INVISIBLE
 
         Thread {
             controllerMouseEmulation(lorieView)
@@ -267,14 +279,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         checkXEvents()
 
         init!!.run(this)
-
-        val overlayView: OverlayView = findViewById(R.id.overlayView)
-
-        overlayView.addButton(CustomButtonData(1, R.drawable.a_button, 50F, 50F, 150F, getXKeyScanCodes("Enter")))
-        overlayView.addButton(CustomButtonData(2, R.drawable.dpad_right, 50F, 500F, 150F, getXKeyScanCodes("Right")))
-        overlayView.addButton(CustomButtonData(3, R.drawable.dpad_left, 200F, 500F, 150F, getXKeyScanCodes("Left")))
-        overlayView.addButton(CustomButtonData(4, R.drawable.dpad_up, 450F, 500F, 150F, getXKeyScanCodes("Up")))
-        overlayView.addButton(CustomButtonData(5, R.drawable.dpad_down, 600F, 500F, 150F, getXKeyScanCodes("Down")))
 
         if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU && checkSelfPermission(permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED && !shouldShowRequestPermissionRationale(
                 permission.POST_NOTIFICATIONS
