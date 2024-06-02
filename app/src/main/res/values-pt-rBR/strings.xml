@@ -30,7 +30,7 @@
     <string name="box64_fastround_description">Ativa/Desativa a geração de arredondamento x86 preciso</string>
     <string name="box64_safeflags_description">Manuseamento de flags em opcodes CALL/RET</string>
     <string name="box64_callret_description">Otimização de opcodes CALL/RET (não compativel com jit/dynarec/smc)</string>
-    <string name="strech_display">Esticar Tela</string>
+    <string name="stretch_display">Esticar Tela</string>
     <string name="display_resolution_title">Resolução do Display</string>
     <string name="display_resolution_description">Mudar a resolução do display virtual</string>
     <string name="select_driver_title">Selecionar Driver</string>
@@ -50,4 +50,5 @@
     <string name="connected_controller">Controle Conectado: %1$s</string>
     <string name="mouseSensibilityTitle">Sensibilidade do Mouse Virtual</string>
     <string name="deadZoneTitle">Dead Zone</string>
+    <string name="open_overlay">Open/Close Overlay</string>
 </resources>

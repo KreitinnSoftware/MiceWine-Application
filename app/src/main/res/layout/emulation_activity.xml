@@ -26,13 +26,13 @@
             >
         </com.micewine.emu.LorieView>
 
-        <com.micewine.emu.OverlayView
+        <com.micewine.emu.overlay.OverlayView
             android:id="@+id/overlayView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:visibility="visible">
-        </com.micewine.emu.OverlayView>
+        </com.micewine.emu.overlay.OverlayView>
 
     </FrameLayout>
 

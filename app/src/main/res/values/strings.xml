@@ -37,7 +37,7 @@
     <string name="box64_safeflags_description">Handling of flags on CALL/RET opcodes</string>
     <string name="box64_callret_title" translatable="false">BOX64_DYNAREC_CALLRET</string>
     <string name="box64_callret_description">Optimization of CALL/RET opcodes (not compatible with jit/dynarec/smc)</string>
-    <string name="strech_display">Stretch Display</string>
+    <string name="stretch_display">Stretch Display</string>
     <string name="display_resolution_title">Display Resolution</string>
     <string name="display_resolution_description">Change Virtual Display Resolution</string>
     <string name="select_driver_title">Select Driver</string>
@@ -57,4 +57,5 @@
     <string name="connected_controller">Connected Controller: %1$s</string>
     <string name="deadZoneTitle">Dead Zone</string>
     <string name="mouseSensibilityTitle">Virtual Mouse Sensibility</string>
+    <string name="open_overlay">Open/Close Overlay</string>
 </resources>

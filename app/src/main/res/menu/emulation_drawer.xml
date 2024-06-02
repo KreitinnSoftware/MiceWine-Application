@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/exitFromEmulation"
         android:layout_width="wrap_content"
@@ -8,7 +9,7 @@
         android:title="@string/exit">
     </item>
     <item
-        android:id="@+id/openKeyboard"
+        android:id="@+id/openCloseKeyboard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/ic_keyboard"
@@ -19,6 +20,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/ic_keyboard"
-        android:title="@string/strech_display">
+        android:title="@string/stretch_display">
+    </item>
+    <item
+        android:id="@+id/openCloseOverlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/ic_keyboard"
+        android:title="@string/open_overlay">
     </item>
 </menu>

@@ -33,6 +33,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
@@ -41,12 +42,15 @@ import com.micewine.emu.ControllerUtils.checkControllerAxis
 import com.micewine.emu.ControllerUtils.checkControllerButtons
 import com.micewine.emu.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.ControllerUtils.controllerMouseEmulation
+import com.micewine.emu.activities.GeneralSettings
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.core.Init
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.input.TouchInputHandler.RenderStub.NullStub
+import com.micewine.emu.overlay.OverlayView
+import com.micewine.emu.overlay.OverlayView.CustomButtonData
 import com.micewine.emu.overlay.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.utils.FullscreenWorkaround
 import com.micewine.emu.utils.KeyInterceptor
@@ -84,7 +88,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 }
             } else if (ACTION_STOP == intent.action) {
                 finishAffinity()
-            } else if (Preferences.ACTION_PREFERENCES_CHANGED == intent.action) {
+            } else if (GeneralSettings.ACTION_PREFERENCES_CHANGED == intent.action) {
                 Log.d("MainActivity", "preference: " + intent.getStringExtra("key"))
                 if ("additionalKbdVisible" != intent.getStringExtra("key")) onPreferencesChanged("")
             }
@@ -137,24 +141,35 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         val nav = findViewById<NavigationView>(R.id.NavigationView)
         nav.setNavigationItemSelectedListener { item: MenuItem ->
-            val id = item.itemId
-            when (id) {
+            when (item.itemId) {
                 R.id.exitFromEmulation -> {
                     enableRamCounter = false
                     init!!.stopAll()
                     finish()
                 }
-                R.id.openKeyboard -> {
+
+                R.id.openCloseKeyboard -> {
                     val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.showSoftInput(lorieView, InputMethodManager.SHOW_FORCED)
                     drawerLayout?.closeDrawers()
                 }
+
                 R.id.setScreenStretch -> {
                     val editPrefs = preferences.edit()
                     editPrefs.putBoolean("displayStretch", !preferences.getBoolean("displayStretch", false))
                     editPrefs.apply()
 
                     lorieView.requestLayout()
+                }
+
+                R.id.openCloseOverlay -> {
+                    if (overlayView.isVisible) {
+                        overlayView.visibility = View.INVISIBLE
+                    } else {
+                        overlayView.visibility = View.VISIBLE
+                    }
+
+                    drawerLayout?.closeDrawers()
                 }
             }
             true
@@ -267,7 +282,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         registerReceiver(receiver, object : IntentFilter(CmdEntryPoint.ACTION_START) {
             init {
-                addAction(Preferences.ACTION_PREFERENCES_CHANGED)
+                addAction(GeneralSettings.ACTION_PREFERENCES_CHANGED)
                 addAction(ACTION_STOP)
             }
         })
