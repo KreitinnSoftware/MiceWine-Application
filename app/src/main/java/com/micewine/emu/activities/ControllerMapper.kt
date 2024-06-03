@@ -2,7 +2,6 @@ package com.micewine.emu.activities
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.widget.ImageButton
 import android.widget.SeekBar
@@ -12,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
-import com.micewine.emu.ControllerUtils.getGameControllerNames
+import com.micewine.emu.controller.ControllerUtils.getGameControllerNames
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings.Companion.DEAD_ZONE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.MOUSE_SENSIBILITY_KEY

@@ -1,4 +1,4 @@
-package com.micewine.emu.overlay
+package com.micewine.emu.controller
 
 object XKeyCodes {
     private val scanCodes = mapOf(

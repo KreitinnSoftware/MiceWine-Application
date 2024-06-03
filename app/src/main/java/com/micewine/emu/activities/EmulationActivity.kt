@@ -39,10 +39,10 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
 import com.micewine.emu.CmdEntryPoint
 import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
-import com.micewine.emu.ControllerUtils.checkControllerAxis
-import com.micewine.emu.ControllerUtils.checkControllerButtons
-import com.micewine.emu.ControllerUtils.prepareButtonsAxisValues
-import com.micewine.emu.ControllerUtils.controllerMouseEmulation
+import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
+import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
+import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
+import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.ICmdEntryInterface
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
@@ -52,9 +52,9 @@ import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.input.TouchInputHandler.RenderStub.NullStub
-import com.micewine.emu.overlay.OverlayView
-import com.micewine.emu.overlay.OverlayView.CustomButtonData
-import com.micewine.emu.overlay.XKeyCodes.getXKeyScanCodes
+import com.micewine.emu.controller.OverlayView
+import com.micewine.emu.controller.OverlayView.CustomButtonData
+import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.utils.FullscreenWorkaround
 import com.micewine.emu.utils.KeyInterceptor
 

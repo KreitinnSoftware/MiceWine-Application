@@ -1,8 +1,7 @@
-package com.micewine.emu
+package com.micewine.emu.controller
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_BUTTON_A
@@ -23,6 +22,7 @@ import android.view.MotionEvent.AXIS_X
 import android.view.MotionEvent.AXIS_Y
 import android.view.MotionEvent.AXIS_Z
 import androidx.preference.PreferenceManager
+import com.micewine.emu.LorieView
 import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_HAT_X_MINUS_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_HAT_X_PLUS_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_HAT_Y_MINUS_KEY
@@ -51,7 +51,7 @@ import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
 import com.micewine.emu.input.InputStub.BUTTON_UNDEFINED
-import com.micewine.emu.overlay.XKeyCodes.getXKeyScanCodes
+import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import kotlin.math.absoluteValue
 
 object ControllerUtils {
