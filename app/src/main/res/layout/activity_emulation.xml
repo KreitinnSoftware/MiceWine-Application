@@ -8,22 +8,15 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom"
-            android:background="@color/black">
-        </View>
+        android:layout_height="match_parent"
+        android:background="@color/black">
 
         <com.micewine.emu.LorieView
             android:id="@+id/lorieView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:visibility="visible"
-            >
+            android:visibility="visible">
         </com.micewine.emu.LorieView>
 
         <com.micewine.emu.overlay.OverlayView

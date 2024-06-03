@@ -31,21 +31,6 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/updateProgress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:textAlignment="center" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:layout_margin="0dp"
-        android:theme="@style/Theme.MiceWine" />
-
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         style="@style/RoundTopCorners"
@@ -54,6 +39,7 @@
         android:padding="8dp"
         android:theme="@style/Theme.MiceWine"
         app:labelVisibilityMode="selected"
-        app:menu="@menu/bottom_nav_menu" />
+        app:menu="@menu/bottom_nav_menu">
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </LinearLayout>

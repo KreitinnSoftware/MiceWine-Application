@@ -4,7 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.util.Log
 import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
-import com.micewine.emu.EmulationActivity.Companion.instance
+import com.micewine.emu.activities.EmulationActivity.Companion.instance
 
 class KeyInterceptor : AccessibilityService() {
     var pressedKeys = LinkedHashSet<Int>()

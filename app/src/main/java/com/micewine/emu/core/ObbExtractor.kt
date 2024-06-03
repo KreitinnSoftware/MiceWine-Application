@@ -1,30 +1,20 @@
 package com.micewine.emu.core
 
 import android.annotation.SuppressLint
-import android.util.Log
+import android.app.Activity
 import android.widget.ProgressBar
 import android.widget.TextView
-import com.micewine.emu.activities.MainActivity
 import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.progress.ProgressMonitor
 import java.io.IOException
-import android.widget.Toast
-import java.io.File
-import android.view.View
-import android.content.Context
-import android.content.Intent
-import android.os.IBinder
-import java.io.BufferedReader
-import java.io.DataOutputStream
-import java.io.InputStreamReader
 
 class ObbExtractor {
     @SuppressLint("SetTextI18n")
-    fun extractZip(zipFilePath: String?, destinationPath: String, progressExtractBar: ProgressBar?, progressText: TextView?, activity: MainActivity) {
+    fun extractZip(zipFilePath: String?, destinationPath: String, progressExtractBar: ProgressBar?, progressText: TextView?, activity: Activity) {
         try {
-            Log.v("ZipExtract", "Start Extract")
-
-            progressExtractBar?.isIndeterminate = false
+            activity.runOnUiThread {
+                progressExtractBar?.isIndeterminate = false
+            }
 
             val zipFile = ZipFile(zipFilePath)
 

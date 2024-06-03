@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
         android:icon="@drawable/logo"
@@ -24,6 +24,10 @@
         android:roundIcon="@drawable/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MiceWine">
+        <activity
+            android:name=".activities.WelcomeActivity"
+            android:exported="false">
+        </activity>
         <activity
             android:name=".activities.ControllerMapper"
             android:exported="false">
@@ -45,7 +49,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EmulationActivity"
+            android:name=".activities.EmulationActivity"
             android:configChanges="fontScale|orientation|screenSize|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|screenLayout|touchscreen|uiMode|smallestScreenSize|density"
             android:exported="true"
             android:launchMode="singleTop"
@@ -67,6 +71,7 @@
             android:exported="true"
             android:theme="@style/Theme.MiceWine">
         </activity>
+
         <service
             android:name=".core.MainService"
             android:enabled="true"

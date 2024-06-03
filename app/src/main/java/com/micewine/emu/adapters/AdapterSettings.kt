@@ -34,14 +34,11 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener {
-        val settingsName: TextView
-        val settingsDescription: TextView
-        val imageSettings: ImageView
+        val settingsName: TextView = itemView.findViewById(R.id.title_preferences_model)
+        val settingsDescription: TextView = itemView.findViewById(R.id.description_preferences_model)
+        val imageSettings: ImageView = itemView.findViewById(R.id.set_img)
 
         init {
-            settingsName = itemView.findViewById(R.id.title_preferences_model)
-            settingsDescription = itemView.findViewById(R.id.description_preferences_model)
-            imageSettings = itemView.findViewById(R.id.set_img)
             itemView.setOnClickListener(this)
         }
 

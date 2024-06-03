@@ -51,4 +51,11 @@
     <string name="mouseSensibilityTitle">Sensibilidade do Mouse Virtual</string>
     <string name="deadZoneTitle">Dead Zone</string>
     <string name="open_overlay">Abrir/Fechar Overlay</string>
+    <string name="welcomeActivityTitle">Test Welcome Activity</string>
+    <string name="welcome_text_1">Bem-vindo(a) ao MiceWine!</string>
+    <string name="continueText">Continuar</string>
+    <string name="get_file_permission_text">Permita o Gerenciamento de Arquivos</string>
+    <string name="extracting_resources_text">"Extraindo Arquivos…\nPode demorar um pouco"</string>
+    <string name="extracted_resources_text">Extração Concluida!</string>
+    <string name="extracting_from_assets">Extraindo dos Assets</string>
 </resources>

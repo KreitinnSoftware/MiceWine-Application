@@ -35,9 +35,10 @@ class SettingsFragment : Fragment() {
 
         addToAdapter(R.string.logTitle, R.string.log_description, R.drawable.ic_log)
 
+        addToAdapter(R.string.controllerMapperTitle, R.string.controllerMapperDescription, R.drawable.ic_info_outline)
+
         addToAdapter(R.string.aboutTitle, R.string.about_description, R.drawable.ic_info_outline)
 
-        addToAdapter(R.string.controllerMapperTitle, R.string.controllerMapperDescription, R.drawable.ic_info_outline)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, icon: Int) {

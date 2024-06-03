@@ -1,4 +1,4 @@
-package com.micewine.emu
+package com.micewine.emu.activities
 
 import android.Manifest.permission
 import android.annotation.SuppressLint
@@ -37,12 +37,15 @@ import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
+import com.micewine.emu.CmdEntryPoint
 import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
 import com.micewine.emu.ControllerUtils.checkControllerAxis
 import com.micewine.emu.ControllerUtils.checkControllerButtons
 import com.micewine.emu.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.ControllerUtils.controllerMouseEmulation
-import com.micewine.emu.activities.GeneralSettings
+import com.micewine.emu.ICmdEntryInterface
+import com.micewine.emu.LorieView
+import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.core.Init
 import com.micewine.emu.input.InputEventSender
@@ -117,7 +120,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         init = Init()
         window.setFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, 0)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(R.layout.emulation_activity)
+        setContentView(R.layout.activity_emulation)
 
         drawerLayout = findViewById(R.id.DrawerLayout)
         drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)

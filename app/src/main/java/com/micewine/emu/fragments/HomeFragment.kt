@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.MainActivity.Companion.extractedAssets
 import com.micewine.emu.adapters.AdapterGame
 import com.micewine.emu.databinding.FragmentHomeBinding
 
@@ -22,10 +21,8 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         rootView = binding!!.getRoot()
 
-        if (extractedAssets) {
-            val recyclerView = rootView?.findViewById<RecyclerView>(R.id.recyclerViewGame)
-            setAdapter(recyclerView!!)
-        }
+        val recyclerView = rootView?.findViewById<RecyclerView>(R.id.recyclerViewGame)
+        setAdapter(recyclerView!!)
 
         return rootView
     }

@@ -1,20 +1,15 @@
 package com.micewine.emu.activities
 
-import android.Manifest
 import android.annotation.SuppressLint
-import androidx.fragment.app.Fragment
 import android.content.Context
-import android.content.pm.PackageManager
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.ControllerUtils.getGameControllerNames
@@ -26,7 +21,6 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTR
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_SAFEFLAGS_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_STRONGMEM_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.DEAD_ZONE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_KEY
@@ -36,9 +30,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_THEME_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VIRGL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
 import com.micewine.emu.core.Init
-import com.micewine.emu.core.ObbExtractor
-import com.micewine.emu.core.ShellExecutorCmd
-import com.micewine.emu.databinding.MainActivityBinding
+import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.HomeFragment
 import com.micewine.emu.fragments.SettingsFragment
 import java.io.File
@@ -48,16 +40,13 @@ import java.io.OutputStream
 import java.nio.file.Files
 
 class MainActivity : AppCompatActivity() {
-    private var binding: MainActivityBinding? = null
-    private var progressExtractBar: ProgressBar? = null
-    private var progressTextBar: TextView? = null
+    private var binding: ActivityMainBinding? = null
+
     private val init = Init()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = MainActivityBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
-        progressExtractBar = findViewById(R.id.progressBar)
-        findViewById<View>(R.id.updateProgress)
 
         findViewById<Toolbar>(R.id.mainActivityToolbar).title = getString(R.string.app_name)
 
@@ -72,45 +61,19 @@ class MainActivity : AppCompatActivity() {
             true
         }
         manageFilesPath()
-        checkPermission()
+
+        if (!usrDir.exists()) {
+            val intent = Intent(this, WelcomeActivity::class.java)
+            this.startActivity(intent)
+        } else {
+            extractedAssets = true
+        }
+
         fragmentLoader(HomeFragment(), true)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        progressExtractBar = findViewById(R.id.progressBar)
-        progressTextBar = findViewById(R.id.updateProgress)
-        progressExtractBar?.isIndeterminate = true
-        progressExtractBar?.visibility = View.VISIBLE
-
-        Thread {
-            if (!usrDir.exists()) {
-                copyAssets(this, "rootfs.zip", appRootDir.toString())
-
-                ObbExtractor().extractZip("$appRootDir/rootfs.zip", "$appRootDir", progressExtractBar, progressTextBar, this)
-
-                ShellExecutorCmd.executeShell("rm $appRootDir/rootfs.zip", "ExtractUtility")
-                ShellExecutorCmd.executeShell("chmod 775 -R $appRootDir", "ExtractUtility")
-                ShellExecutorCmd.executeShell("$usrDir/generateSymlinks.sh", "ExtractUtility")
-            }
-
-            if (!tmpDir.exists()) {
-                tmpDir.mkdirs()
-            }
-
-            if (!homeDir.exists()) {
-                homeDir.mkdirs()
-            }
-
-            runOnUiThread {
-                progressExtractBar?.visibility = View.GONE
-                progressTextBar?.visibility = View.GONE
-            }
-
-            extractedAssets = true
-
-            fragmentLoader(HomeFragment(), false)
-        }.start()
 
         setSharedVars(this)
 
@@ -125,16 +88,6 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun checkPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_CODE
-            )
-        }
     }
 
     private fun fragmentLoader(fragment: Fragment, appInit: Boolean) {
@@ -162,7 +115,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val PERMISSION_REQUEST_CODE = 123
+        const val PERMISSION_REQUEST_CODE = 123
 
         @SuppressLint("SdCardPath")
         var appRootDir = File("/data/data/com.micewine.emu/files")
@@ -217,8 +170,10 @@ class MainActivity : AppCompatActivity() {
             selectedVirGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
             selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "fps,devinfo,gpuload")
         }
-        
-        private fun copyAssets(context: Context, filename: String, outputPath: String) {
+
+        fun copyAssets(context: Context, filename: String, outputPath: String, textView: TextView) {
+            //textView.text = context.getString(R.string.extracting_from_assets)
+
             val assetManager = context.assets
             var input: InputStream? = null
             var out: OutputStream? = null

@@ -18,6 +18,7 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import androidx.preference.PreferenceManager
+import com.micewine.emu.activities.EmulationActivity
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.systemutils.SystemMemoryInfo

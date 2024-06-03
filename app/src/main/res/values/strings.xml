@@ -58,4 +58,11 @@
     <string name="deadZoneTitle">Dead Zone</string>
     <string name="mouseSensibilityTitle">Virtual Mouse Sensibility</string>
     <string name="open_overlay">Open/Close Overlay</string>
+    <string name="welcomeActivityTitle">Test Welcome Activity</string>
+    <string name="welcome_text_1">Welcome to MiceWine!</string>
+    <string name="continueText">Continue</string>
+    <string name="get_file_permission_text">Allow File Management Permission</string>
+    <string name="extracting_resources_text">"Extracting Files…\nIt may take a while"</string>
+    <string name="extracted_resources_text">Extraction Done!</string>
+    <string name="extracting_from_assets">Extracting From Assets…</string>
 </resources>

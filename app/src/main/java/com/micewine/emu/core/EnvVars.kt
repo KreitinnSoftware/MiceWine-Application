@@ -1,6 +1,5 @@
 package com.micewine.emu.core
 
-import com.micewine.emu.activities.MainActivity.Companion.appLang
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBigblock
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecCallret
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastnan
@@ -42,7 +41,6 @@ object EnvVars {
         putVar("TMPDIR", "TMPDIR=$tmpDir")
         putVar("XKB_CONFIG_ROOT", "XKB_CONFIG_ROOT=$usrDir/share/X11/xkb")
         putVar("HOME", "HOME=$homeDir")
-        putVar("LANG", "LANG=$appLang.UTF-8")
         putVar("DISPLAY_SESSION", "DISPLAY=:0")
         putVar("BOX64_LOG", "BOX64_LOG=1")
         putVar("LD_LIBRARY_PATH", "LD_LIBRARY_PATH=$usrDir/lib")
