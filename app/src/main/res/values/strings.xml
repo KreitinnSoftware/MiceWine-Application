@@ -3,14 +3,14 @@
     <string name="app_lang">en_US</string>
     <string name="full_screen">Fullscreen</string>
     <string name="settingsTitle">Settings</string>
-    <string name="settings_description">Configure MiceWine</string>
+    <string name="settingsDescription">Configure MiceWine</string>
     <string name="app_close">Exit</string>
     <string name="logTitle">Log</string>
-    <string name="log_description">See MiceWine Logs</string>
+    <string name="logDescription">See MiceWine Logs</string>
     <string name="clear_log">Clear</string>
     <string name="desktop_mode_init">Desktop</string>
     <string name="aboutTitle">About</string>
-    <string name="about_description">About MiceWine</string>
+    <string name="aboutDescription">About MiceWine</string>
     <string name="general_settings">General Settings</string>
     <string name="exit">Exit</string>
     <string name="open_keyboard">Open Keyboard</string>
