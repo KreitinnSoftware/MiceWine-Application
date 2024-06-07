@@ -2,6 +2,7 @@ package com.micewine.emu.controller
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_BUTTON_A
@@ -83,7 +84,7 @@ object ControllerUtils {
 
     private var deadZone: Float = 0F
     private var moveVMouse: Int? = null
-    private var mouseSensibility: Float = 2F
+    private var mouseSensibility: Float = 0F
     private var axisXVelocity: Float = 0F
     private var axisYVelocity: Float = 0F
 
@@ -421,21 +422,28 @@ object ControllerUtils {
 
                 true
             }
-
             else -> {
-                lorieView.sendKeyEvent(axisX_plus_mapping[0], axisX_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisX_minus_mapping[0], axisX_minus_mapping[1], false)
-                lorieView.sendKeyEvent(axisY_plus_mapping[0], axisY_plus_mapping[1], false)
-                lorieView.sendKeyEvent(axisY_minus_mapping[0], axisY_minus_mapping[1], false)
+                Log.v("Rarara", "Some Analog was Released")
 
-                moveVMouse = null
+                if (axisXPlusMapping[2] == KEYBOARD &&
+                    axisXMinusMapping[2] == KEYBOARD &&
+                    axisYPlusMapping[2] == KEYBOARD &&
+                    axisYMinusMapping[2] == KEYBOARD) {
+
+                    lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], false)
+                    lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], false)
+                    lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], false)
+                    lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], false)
+                } else {
+                    moveVMouse = null
+                }
 
                 false
             }
         }
     }
 
-    fun checkControllerAxis(lorieView: LorieView, event: MotionEvent): Boolean {
+    fun checkControllerAxis(lorieView: LorieView, event: MotionEvent) {
         val axisX = event.getAxisValue(AXIS_X)
         val axisY = event.getAxisValue(AXIS_Y)
         val axisXNeutral = axisX < deadZone && axisX > -deadZone
@@ -451,14 +459,10 @@ object ControllerUtils {
         val axisHatXNeutral = axisHatX < deadZone && axisHatX > -deadZone
         val axisHatYNeutral = axisHatY < deadZone && axisHatY > -deadZone
 
-        return when {
-            handleAxis(lorieView, axisX, axisY, axisXNeutral, axisYNeutral, axisX_plus_mapping, axisX_minus_mapping, axisY_plus_mapping, axisY_minus_mapping) -> true
+        handleAxis(lorieView, axisX, axisY, axisXNeutral, axisYNeutral, axisX_plus_mapping, axisX_minus_mapping, axisY_plus_mapping, axisY_minus_mapping)
 
-            handleAxis(lorieView, axisZ, axisRZ, axisZNeutral, axisRZNeutral, axisZ_plus_mapping, axisZ_minus_mapping, axisRZ_plus_mapping, axisRZ_minus_mapping) -> true
+        handleAxis(lorieView, axisZ, axisRZ, axisZNeutral, axisRZNeutral, axisZ_plus_mapping, axisZ_minus_mapping, axisRZ_plus_mapping, axisRZ_minus_mapping)
 
-            handleAxis(lorieView, axisHatX, axisHatY, axisHatXNeutral, axisHatYNeutral, axisHatX_plus_mapping, axisHatX_minus_mapping, axisHatY_plus_mapping, axisHatY_minus_mapping) -> true
-
-            else -> false
-        }
+        handleAxis(lorieView, axisHatX, axisHatY, axisHatXNeutral, axisHatYNeutral, axisHatX_plus_mapping, axisHatX_minus_mapping, axisHatY_plus_mapping, axisHatY_minus_mapping)
     }
 }

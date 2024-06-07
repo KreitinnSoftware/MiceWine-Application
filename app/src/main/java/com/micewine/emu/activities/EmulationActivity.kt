@@ -49,7 +49,6 @@ import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.controller.OverlayView
 import com.micewine.emu.controller.OverlayView.CustomButtonData
-import com.micewine.emu.controller.XKeyCodes.getKeyNames
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.core.Init
 import com.micewine.emu.input.InputEventSender
@@ -224,11 +223,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 return@OnKeyListener true
             }
 
-            if (checkControllerButtons(lorieView, e)) {
-                true
-            } else {
-                mInputHandler!!.sendKeyEvent(v, e)
-            }
+            checkControllerButtons(lorieView, e)
+            mInputHandler!!.sendKeyEvent(v, e)
         }
         lorieParent.setOnTouchListener { _: View?, e: MotionEvent? ->
             mInputHandler!!.handleTouchEvent(
@@ -315,7 +311,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
-        return checkControllerAxis(lorieView, event!!)
+        checkControllerAxis(lorieView, event!!)
+
+        return true
     }
 
     override fun onDestroy() {
