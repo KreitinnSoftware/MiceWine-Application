@@ -7,8 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity
+import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.adapters.AdapterGame
 import com.micewine.emu.databinding.FragmentHomeBinding
+import java.io.File
 
 class HomeFragment : Fragment() {
     private var binding: FragmentHomeBinding? = null
@@ -20,6 +23,8 @@ class HomeFragment : Fragment() {
     ): View? {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         rootView = binding!!.getRoot()
+
+        setSharedVars(requireContext())
 
         val recyclerView = rootView?.findViewById<RecyclerView>(R.id.recyclerViewGame)
         setAdapter(recyclerView!!)
@@ -33,10 +38,15 @@ class HomeFragment : Fragment() {
 
         gameList.clear()
 
-        addToAdapter(R.string.desktop_mode_init, R.drawable.default_icon)
+        addToAdapter(File(context?.getString(R.string.desktop_mode_init) ?: ""), R.drawable.default_icon)
+
+        for (i in MainActivity.gameList) {
+            if (i != "")
+                addToAdapter(File(i), R.drawable.default_icon)
+        }
     }
 
-    private fun addToAdapter(titleId: Int, icon: Int) {
-        gameList.add(AdapterGame.GameList(titleId, icon))
+    private fun addToAdapter(exeFile: File, icon: Int) {
+        gameList.add(AdapterGame.GameList(exeFile,  icon))
     }
 }

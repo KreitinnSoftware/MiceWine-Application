@@ -39,22 +39,23 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
 import com.micewine.emu.CmdEntryPoint
 import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
-import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
-import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
-import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
-import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.ICmdEntryInterface
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
+import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
+import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
+import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
+import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
+import com.micewine.emu.controller.OverlayView
+import com.micewine.emu.controller.OverlayView.CustomButtonData
+import com.micewine.emu.controller.XKeyCodes.getKeyNames
+import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.core.Init
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.input.TouchInputHandler.RenderStub.NullStub
-import com.micewine.emu.controller.OverlayView
-import com.micewine.emu.controller.OverlayView.CustomButtonData
-import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.utils.FullscreenWorkaround
 import com.micewine.emu.utils.KeyInterceptor
 
@@ -122,6 +123,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_emulation)
 
+        val exePath = intent.getStringExtra("exePath")
+
         drawerLayout = findViewById(R.id.DrawerLayout)
         drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
 
@@ -173,6 +176,11 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     }
 
                     drawerLayout?.closeDrawers()
+                }
+
+                R.id.editControllerPreferences -> {
+                    val i = Intent(this, ControllerMapper::class.java)
+                    startActivity(i)
                 }
             }
             true
@@ -296,7 +304,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         onPreferencesChanged("")
         checkXEvents()
 
-        init!!.run(this)
+        init!!.run(this, exePath)
 
         if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU && checkSelfPermission(permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED && !shouldShowRequestPermissionRationale(
                 permission.POST_NOTIFICATIONS
@@ -389,6 +397,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     public override fun onResume() {
         super.onResume()
         lorieView.requestFocus()
+        prepareButtonsAxisValues(this)
     }
 
     public override fun onPause() {

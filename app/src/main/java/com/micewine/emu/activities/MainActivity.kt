@@ -1,10 +1,11 @@
 package com.micewine.emu.activities
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +13,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.micewine.emu.controller.ControllerUtils.getGameControllerNames
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET_KEY
@@ -41,8 +42,8 @@ import java.nio.file.Files
 
 class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
-
     private val init = Init()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -53,14 +54,21 @@ class MainActivity : AppCompatActivity() {
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigation.setOnItemSelectedListener { item: MenuItem ->
             val id = item.itemId
+
             if (id == R.id.nav_home) {
                 fragmentLoader(HomeFragment(), false)
             } else if (id == R.id.nav_settings) {
                 fragmentLoader(SettingsFragment(), false)
             }
+
             true
         }
-        manageFilesPath()
+
+        val fab = findViewById<FloatingActionButton>(R.id.addItemFAB)
+
+        fab.setOnClickListener {
+            openFilePicker()
+        }
 
         if (!usrDir.exists()) {
             val intent = Intent(this, WelcomeActivity::class.java)
@@ -76,11 +84,8 @@ class MainActivity : AppCompatActivity() {
         super.onPostCreate(savedInstanceState)
 
         setSharedVars(this)
-
-        for (name in getGameControllerNames()) {
-            Log.v("Controller", name)
-        }
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == android.R.id.home) {
@@ -88,6 +93,33 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(
+        requestCode: Int, resultCode: Int, resultData: Intent?
+    ) {
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            resultData?.data?.also { uri ->
+                saveToGameList(this, uriParser(uri))
+            }
+        }
+
+        setSharedVars(this)
+
+        super.onActivityResult(requestCode, resultCode, resultData)
+    }
+
+
+    @Suppress("DEPRECATION")
+    private fun openFilePicker() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.setType("*/*")
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        startActivityForResult(
+            Intent.createChooser(intent, "Escolha um arquivo .exe"),
+            1
+        )
     }
 
     private fun fragmentLoader(fragment: Fragment, appInit: Boolean) {
@@ -102,16 +134,16 @@ class MainActivity : AppCompatActivity() {
         fragmentTransaction.commit()
     }
 
-    private fun manageFilesPath() {
-        if (!appRootDir.exists()) {
-            appRootDir.mkdirs()
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         init.stopAll()
         binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        fragmentLoader(HomeFragment(), false)
     }
 
     companion object {
@@ -140,6 +172,7 @@ class MainActivity : AppCompatActivity() {
         var selectedIbVersion: String? = null
         var selectedVirGLProfile: String? = null
         var selectedDXVKHud: String? = null
+        var gameList: List<String> = listOf()
 
         private fun booleanToString(boolean: Boolean): String {
             return if (boolean) {
@@ -156,11 +189,15 @@ class MainActivity : AppCompatActivity() {
 
             box64DynarecBigblock = preferences.getString(BOX64_DYNAREC_BIGBLOCK_KEY, "1")
             box64DynarecStrongmem = preferences.getString(BOX64_DYNAREC_STRONGMEM_KEY, "0")
-            box64DynarecX87double = booleanToString(preferences.getBoolean(BOX64_DYNAREC_X87DOUBLE_KEY, false))
-            box64DynarecFastnan = booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTNAN_KEY, true))
-            box64DynarecFastround = booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTROUND_KEY, true))
+            box64DynarecX87double =
+                booleanToString(preferences.getBoolean(BOX64_DYNAREC_X87DOUBLE_KEY, false))
+            box64DynarecFastnan =
+                booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTNAN_KEY, true))
+            box64DynarecFastround =
+                booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTROUND_KEY, true))
             box64DynarecSafeflags = preferences.getString(BOX64_DYNAREC_SAFEFLAGS_KEY, "1")
-            box64DynarecCallret = booleanToString(preferences.getBoolean(BOX64_DYNAREC_CALLRET_KEY, true))
+            box64DynarecCallret =
+                booleanToString(preferences.getBoolean(BOX64_DYNAREC_CALLRET_KEY, true))
             selectedDriver = preferences.getString(SELECTED_DRIVER_KEY, "Turnip/Zink")
             selectedTheme = preferences.getString(SELECTED_THEME_KEY, "DarkBlue")
             d3dxRenderer = preferences.getString(SELECTED_D3DX_RENDERER_KEY, "DXVK")
@@ -168,7 +205,9 @@ class MainActivity : AppCompatActivity() {
             selectedDXVK = preferences.getString(SELECTED_DXVK_KEY, "DXVK-1.10.3-async")
             selectedIbVersion = preferences.getString(SELECTED_IB_KEY, "0.1.8")
             selectedVirGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
-            selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "fps,devinfo,gpuload")
+            selectedDXVKHud =
+                preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "fps,devinfo,gpuload")
+            gameList = preferences.getString("gameList", "")?.split(",")!!
         }
 
         fun copyAssets(context: Context, filename: String, outputPath: String, textView: TextView) {
@@ -209,6 +248,32 @@ class MainActivity : AppCompatActivity() {
 
         private fun getLibsPath(context: Context): String {
             return context.applicationContext.applicationInfo.nativeLibraryDir
+        }
+
+        private fun saveToGameList(context: Context, str: String) {
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+
+            val editor = preferences.edit()
+
+            val oldValue = preferences.getString("gameList", "")
+
+            if (oldValue == "") {
+                editor.putString("gameList", str)
+            } else {
+                editor.putString("gameList", "$oldValue,$str")
+            }
+
+            editor.apply()
+        }
+
+        private fun uriParser(uri: Uri): String {
+            var path = uri.path.toString()
+
+            if (path.contains("primary")) {
+                path = "/storage/emulated/0/" + path.split(":")[1]
+            }
+
+            return path
         }
     }
 }

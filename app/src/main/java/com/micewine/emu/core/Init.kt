@@ -6,10 +6,11 @@ import android.content.Intent
 class Init {
     private var ctx: Context? = null
     private var service: Intent? = null
-    fun run(ctx: Context?) {
+    fun run(ctx: Context?, exePath: String?) {
         this.ctx = ctx
 
         service = Intent(ctx, MainService::class.java)
+        service?.putExtra("exePath", exePath)
 
         ctx!!.startService(service)
     }

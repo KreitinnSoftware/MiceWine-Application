@@ -3,6 +3,8 @@ package com.micewine.emu.activities
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_BACK
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
@@ -46,6 +48,9 @@ class WelcomeActivity : AppCompatActivity() {
         progressExtractBar?.visibility = View.INVISIBLE
 
         val extractThread = Thread {
+            if (!appRootDir.exists())
+                appRootDir.mkdirs()
+
             if (!usrDir.exists()) {
                 MainActivity.copyAssets(this, "rootfs.zip", appRootDir.toString(), progressTextBar!!)
 
@@ -56,13 +61,11 @@ class WelcomeActivity : AppCompatActivity() {
                 ShellExecutorCmd.executeShell("$usrDir/generateSymlinks.sh", "ExtractUtility")
             }
 
-            if (!tmpDir.exists()) {
+            if (!tmpDir.exists())
                 tmpDir.mkdirs()
-            }
 
-            if (!homeDir.exists()) {
+            if (!homeDir.exists())
                 homeDir.mkdirs()
-            }
 
             runOnUiThread {
                 progressExtractBar?.visibility = View.GONE
@@ -104,6 +107,14 @@ class WelcomeActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KEYCODE_BACK && selectedFragment == 0) {
+            return true
+        }
+
+        return super.onKeyDown(keyCode, event)
     }
 
     private fun fragmentLoader(appInit: Boolean) {

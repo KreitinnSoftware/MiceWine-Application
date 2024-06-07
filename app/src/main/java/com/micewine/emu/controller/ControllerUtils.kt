@@ -83,7 +83,7 @@ object ControllerUtils {
 
     private var deadZone: Float = 0F
     private var moveVMouse: Int? = null
-    private var mouseSensibility: Float = 1F
+    private var mouseSensibility: Float = 2F
     private var axisXVelocity: Float = 0F
     private var axisYVelocity: Float = 0F
 

@@ -58,4 +58,5 @@
     <string name="extracting_resources_text">"Extraindo Arquivos…\nPode demorar um pouco"</string>
     <string name="extracted_resources_text">Extração Concluida!</string>
     <string name="extracting_from_assets">Extraindo dos Assets</string>
+    <string name="editControllerPreferences">Editar Preferencias do Controle</string>
 </resources>

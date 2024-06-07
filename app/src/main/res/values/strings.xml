@@ -65,4 +65,5 @@
     <string name="extracting_resources_text">"Extracting Files…\nIt may take a while"</string>
     <string name="extracted_resources_text">Extraction Done!</string>
     <string name="extracting_from_assets">Extracting From Assets…</string>
+    <string name="editControllerPreferences">Edit Controller Preferences</string>
 </resources>

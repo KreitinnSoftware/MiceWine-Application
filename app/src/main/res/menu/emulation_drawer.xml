@@ -29,4 +29,11 @@
         android:icon="@drawable/ic_keyboard"
         android:title="@string/open_overlay">
     </item>
+    <item
+        android:id="@+id/editControllerPreferences"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/ic_keyboard"
+        android:title="@string/editControllerPreferences">
+    </item>
 </menu>

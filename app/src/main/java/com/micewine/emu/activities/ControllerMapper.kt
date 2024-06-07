@@ -15,6 +15,8 @@ import com.micewine.emu.controller.ControllerUtils.getGameControllerNames
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings.Companion.DEAD_ZONE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.MOUSE_SENSIBILITY_KEY
+import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
+import com.micewine.emu.controller.XKeyCodes.getKeyNames
 import com.micewine.emu.databinding.ActivityControllerMapperBinding
 import com.micewine.emu.fragments.ControllerMapperFragment
 
@@ -146,16 +148,6 @@ class ControllerMapper : AppCompatActivity() {
     }
 
     companion object {
-        val availableButtonMappings: Array<String> = arrayOf(
-            "Null", "ESC", "Left", "Right", "Up", "Down", "Enter",
-            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
-            "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",
-            "W", "X", "Y", "Z", "'", "LCtrl", "RCtrl", "LShift",
-            "RShift", "Tab", "Space", "AltLeft", "F1", "F2", "F3",
-            "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
-            "Insert", "Home", "PageUp", "Delete", "End", "PageDown",
-            "0", "1")
-
         const val BUTTON_A_KEY = "buttonA"
         const val BUTTON_B_KEY = "buttonB"
         const val BUTTON_X_KEY = "buttonX"

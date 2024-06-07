@@ -15,13 +15,13 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.ControllerMapper.Companion.availableButtonMappings
+import com.micewine.emu.controller.XKeyCodes
 
 class AdapterSettingsController(private val settingsControllerList: List<SettingsController>, private val context: Context) :
     RecyclerView.Adapter<AdapterSettingsController.ViewHolder>() {
 
     private val preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-    private val keyboardEntries: Array<String> = availableButtonMappings
+    private val keyboardEntries: List<String> = XKeyCodes.getKeyNames()
     private val mouseEntries: Array<String> = arrayOf("Null", "Left", "Middle", "Right")
     private val mappingTypes: Array<String> = arrayOf("Keyboard", "Mouse")
 

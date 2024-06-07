@@ -1,5 +1,6 @@
 package com.micewine.emu.core
 
+import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBigblock
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecCallret
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastnan
@@ -44,7 +45,7 @@ object EnvVars {
         putVar("DISPLAY_SESSION", "DISPLAY=:0")
         putVar("BOX64_LOG", "BOX64_LOG=1")
         putVar("LD_LIBRARY_PATH", "LD_LIBRARY_PATH=$usrDir/lib")
-        putVar("PATH", "PATH+=:$usrDir/bin")
+        putVar("PATH", "PATH+=:$usrDir/bin:$appRootDir/wine/x86_64/bin")
         putVar("PREFIX", "PREFIX=$usrDir")
         putVar("IB_VERSION", "IB_VERSION=$selectedIbVersion")
         putVar("MESA_SHADER_CACHE_DIR", "MESA_SHADER_CACHE_DIR=$homeDir/.cache")
