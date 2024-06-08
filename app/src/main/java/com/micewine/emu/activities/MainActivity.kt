@@ -115,9 +115,10 @@ class MainActivity : AppCompatActivity() {
 
     @Suppress("DEPRECATION")
     private fun openFilePicker() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.setType("*/*")
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "application/*"
+            addCategory(Intent.CATEGORY_OPENABLE)
+        }
         startActivityForResult(
             Intent.createChooser(intent, "Escolha um arquivo .exe"),
             1
