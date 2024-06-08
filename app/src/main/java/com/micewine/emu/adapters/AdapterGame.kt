@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.activities.EmulationActivity
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
+import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
 import java.io.File
 
 class AdapterGame(private val gameList: List<GameList>, private val context: Context) :
@@ -55,7 +56,11 @@ class AdapterGame(private val gameList: List<GameList>, private val context: Con
         }
 
         override fun onLongClick(v: View): Boolean {
-            return true
+            val gameModel = gameList[getAdapterPosition()]
+
+            selectedGameArray = arrayOf(gameModel.name, gameModel.exeFile.path)
+
+            return false
         }
     }
 

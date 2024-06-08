@@ -6,8 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.ContextMenu
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -97,13 +100,40 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onCreateContextMenu(
+        menu: ContextMenu?,
+        v: View?,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.game_list_context_menu, menu)
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        when (item.title) {
+            this.getString(R.string.removeGameItem) -> {
+                removeGameFromList(this, selectedGameArray)
+
+                fragmentLoader(HomeFragment(), false)
+            }
+        }
+
+        return super.onContextItemSelected(item)
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(
         requestCode: Int, resultCode: Int, data: Intent?
     ) {
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
             data?.data?.also { uri ->
-                saveToGameList(this, uriParser(uri), File(uriParser(uri)).nameWithoutExtension)
+                uriParser(uri).also {
+                    if (it.endsWith(".exe") || it.endsWith(".bat")) {
+                        saveToGameList(this, it, File(it).nameWithoutExtension)
+                    } else {
+                        Toast.makeText(this, "Tipo de arquivo selecionado invalido.", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
 
@@ -120,7 +150,7 @@ class MainActivity : AppCompatActivity() {
             addCategory(Intent.CATEGORY_OPENABLE)
         }
         startActivityForResult(
-            Intent.createChooser(intent, "Escolha um arquivo .exe"),
+            Intent.createChooser(intent, getString(R.string.selectExecutableFile)),
             1
         )
     }
@@ -175,6 +205,7 @@ class MainActivity : AppCompatActivity() {
         var selectedIbVersion: String? = null
         var selectedVirGLProfile: String? = null
         var selectedDXVKHud: String? = null
+        var selectedGameArray: Array<String> = arrayOf()
 
         private fun booleanToString(boolean: Boolean): String {
             return if (boolean) {
@@ -257,7 +288,13 @@ class MainActivity : AppCompatActivity() {
 
             val currentList = loadGameList(context)
 
-            currentList.add(arrayOf(prettyName, path))
+            val game = arrayOf(prettyName, path)
+
+            if (!checkIfExists(context, game)) {
+                currentList.add(game)
+            } else {
+                Toast.makeText(context, context.getString(R.string.executableAlreadyAdded), Toast.LENGTH_SHORT).show()
+            }
 
             val gson = Gson()
             val json = gson.toJson(currentList)
@@ -275,6 +312,27 @@ class MainActivity : AppCompatActivity() {
             val listType = object : TypeToken<MutableList<Array<String>>>() {}.type
 
             return gson.fromJson(json, listType) ?: mutableListOf()
+        }
+
+        private fun removeGameFromList(context: Context, array: Array<String>) {
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+            val editor = preferences.edit()
+
+            val currentList = loadGameList(context)
+
+            currentList.removeIf { it[0] == array[0] && it[1] == array[1] }
+
+            val gson = Gson()
+            val json = gson.toJson(currentList)
+
+            editor.putString("gameList", json)
+            editor.apply()
+        }
+
+        private fun checkIfExists(context: Context, array: Array<String>): Boolean {
+            val currentList = loadGameList(context)
+
+            return currentList.any { it[0] == array[0] && it[1] == array[1] }
         }
 
         private fun uriParser(uri: Uri): String {

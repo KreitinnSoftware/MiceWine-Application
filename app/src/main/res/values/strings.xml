@@ -66,4 +66,7 @@
     <string name="extracted_resources_text">Extraction Done!</string>
     <string name="extracting_from_assets">Extracting From Assets…</string>
     <string name="editControllerPreferences">Edit Controller Preferences</string>
+    <string name="removeGameItem">Delete</string>
+    <string name="executableAlreadyAdded">Executable Already Added</string>
+    <string name="selectExecutableFile">Select a .exe/.bat file</string>
 </resources>
