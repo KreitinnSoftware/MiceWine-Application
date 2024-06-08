@@ -23,7 +23,7 @@ class AdapterGame(private val gameList: List<GameList>, private val context: Con
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val sList = gameList[position]
-        holder.titleGame.text = sList.exeFile.nameWithoutExtension
+        holder.titleGame.text = sList.name
         holder.gameImage.setImageResource(sList.imageGame)
     }
 
@@ -59,5 +59,5 @@ class AdapterGame(private val gameList: List<GameList>, private val context: Con
         }
     }
 
-    class GameList(var exeFile: File, var imageGame: Int)
+    class GameList(var exeFile: File, var name: String, var imageGame: Int)
 }

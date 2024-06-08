@@ -14,6 +14,8 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET_KEY
@@ -97,17 +99,17 @@ class MainActivity : AppCompatActivity() {
 
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(
-        requestCode: Int, resultCode: Int, resultData: Intent?
+        requestCode: Int, resultCode: Int, data: Intent?
     ) {
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-            resultData?.data?.also { uri ->
-                saveToGameList(this, uriParser(uri))
+            data?.data?.also { uri ->
+                saveToGameList(this, uriParser(uri), File(uriParser(uri)).nameWithoutExtension)
             }
         }
 
         setSharedVars(this)
 
-        super.onActivityResult(requestCode, resultCode, resultData)
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
 
@@ -172,7 +174,6 @@ class MainActivity : AppCompatActivity() {
         var selectedIbVersion: String? = null
         var selectedVirGLProfile: String? = null
         var selectedDXVKHud: String? = null
-        var gameList: List<String> = listOf()
 
         private fun booleanToString(boolean: Boolean): String {
             return if (boolean) {
@@ -207,11 +208,10 @@ class MainActivity : AppCompatActivity() {
             selectedVirGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
             selectedDXVKHud =
                 preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "fps,devinfo,gpuload")
-            gameList = preferences.getString("gameList", "")?.split(",")!!
         }
 
         fun copyAssets(context: Context, filename: String, outputPath: String, textView: TextView) {
-            //textView.text = context.getString(R.string.extracting_from_assets)
+            textView.text = context.getString(R.string.extracting_from_assets)
 
             val assetManager = context.assets
             var input: InputStream? = null
@@ -250,20 +250,30 @@ class MainActivity : AppCompatActivity() {
             return context.applicationContext.applicationInfo.nativeLibraryDir
         }
 
-        private fun saveToGameList(context: Context, str: String) {
+        private fun saveToGameList(context: Context, path: String, prettyName: String) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-
             val editor = preferences.edit()
 
-            val oldValue = preferences.getString("gameList", "")
+            val currentList = loadGameList(context)
 
-            if (oldValue == "") {
-                editor.putString("gameList", str)
-            } else {
-                editor.putString("gameList", "$oldValue,$str")
-            }
+            currentList.add(arrayOf(prettyName, path))
 
+            val gson = Gson()
+            val json = gson.toJson(currentList)
+
+            editor.putString("gameList", json)
             editor.apply()
+        }
+
+        fun loadGameList(context: Context): MutableList<Array<String>> {
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+            val gson = Gson()
+
+            val json = preferences.getString("gameList", "")
+
+            val listType = object : TypeToken<MutableList<Array<String>>>() {}.type
+
+            return gson.fromJson(json, listType) ?: mutableListOf()
         }
 
         private fun uriParser(uri: Uri): String {
