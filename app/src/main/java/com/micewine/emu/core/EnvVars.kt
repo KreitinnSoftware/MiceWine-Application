@@ -1,5 +1,6 @@
 package com.micewine.emu.core
 
+import com.micewine.emu.activities.MainActivity.Companion.appLang
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBigblock
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecCallret
@@ -39,6 +40,7 @@ object EnvVars {
     }
 
     fun setVariables() {
+        putVar("LANG", "LANG=$appLang")
         putVar("TMPDIR", "TMPDIR=$tmpDir")
         putVar("XKB_CONFIG_ROOT", "XKB_CONFIG_ROOT=$usrDir/share/X11/xkb")
         putVar("HOME", "HOME=$homeDir")
