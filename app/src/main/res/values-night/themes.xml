@@ -2,5 +2,6 @@
 
     <style name="Base.Theme.MiceWine" parent="Theme.Material3.DynamicColors.Dark.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="popupMenuBackground">@drawable/menu_bg</item>
     </style>
 </resources>
