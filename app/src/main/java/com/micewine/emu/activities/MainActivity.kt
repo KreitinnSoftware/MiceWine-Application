@@ -2,8 +2,10 @@ package com.micewine.emu.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.view.ContextMenu
@@ -38,6 +40,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KE
 import com.micewine.emu.core.Init
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.HomeFragment
+import com.micewine.emu.fragments.RenameGameItemFragment
 import com.micewine.emu.fragments.SettingsFragment
 import java.io.File
 import java.io.IOException
@@ -48,7 +51,16 @@ import java.nio.file.Files
 class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
     private val init = Init()
+    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        @SuppressLint("UnspecifiedRegisterReceiverFlag")
+        override fun onReceive(context: Context, intent: Intent) {
+            if (ACTION_UPDATE_HOME == intent.action) {
+                fragmentLoader(HomeFragment(), false)
+            }
+        }
+    }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -83,6 +95,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         fragmentLoader(HomeFragment(), true)
+
+        registerReceiver(receiver, object : IntentFilter(ACTION_UPDATE_HOME) {})
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -111,10 +125,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         when (item.title) {
-            this.getString(R.string.removeGameItem) -> {
+            getString(R.string.removeGameItem) -> {
                 removeGameFromList(this, selectedGameArray)
 
                 fragmentLoader(HomeFragment(), false)
+            }
+
+            getString(R.string.renameGameItem) -> {
+                RenameGameItemFragment().show(supportFragmentManager, "")
             }
         }
 
@@ -131,7 +149,7 @@ class MainActivity : AppCompatActivity() {
                     if (it.endsWith(".exe") || it.endsWith(".bat")) {
                         saveToGameList(this, it, File(it).nameWithoutExtension)
                     } else {
-                        Toast.makeText(this, "Tipo de arquivo selecionado invalido.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.incompatibleSelectedFile), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -171,6 +189,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         init.stopAll()
         binding = null
+        unregisterReceiver(receiver)
     }
 
     override fun onResume() {
@@ -206,6 +225,8 @@ class MainActivity : AppCompatActivity() {
         var selectedVirGLProfile: String? = null
         var selectedDXVKHud: String? = null
         var selectedGameArray: Array<String> = arrayOf()
+
+        const val ACTION_UPDATE_HOME = "com.micewine.emu.ACTION_UPDATE_HOME"
 
         private fun booleanToString(boolean: Boolean): String {
             return if (boolean) {
@@ -327,6 +348,26 @@ class MainActivity : AppCompatActivity() {
 
             editor.putString("gameList", json)
             editor.apply()
+        }
+
+        fun renameGameFromList(context: Context, array: Array<String>, newName: String) {
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+            val editor = preferences.edit()
+
+            val currentList = loadGameList(context)
+
+            val index = currentList.indexOfFirst { it[0] == array[0] }
+
+            currentList[index][0] = newName
+
+            val gson = Gson()
+            val json = gson.toJson(currentList)
+
+            editor.putString("gameList", json)
+            editor.apply()
+
+            val intent = Intent(ACTION_UPDATE_HOME)
+            context.sendBroadcast(intent)
         }
 
         private fun checkIfExists(context: Context, array: Array<String>): Boolean {

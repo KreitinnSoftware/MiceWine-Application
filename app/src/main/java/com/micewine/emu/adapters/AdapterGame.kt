@@ -56,6 +56,10 @@ class AdapterGame(private val gameList: List<GameList>, private val context: Con
         }
 
         override fun onLongClick(v: View): Boolean {
+            if (getAdapterPosition() == 0) {
+                return true
+            }
+
             val gameModel = gameList[getAdapterPosition()]
 
             selectedGameArray = arrayOf(gameModel.name, gameModel.exeFile.path)

@@ -62,4 +62,7 @@
     <string name="removeGameItem">Deletar</string>
     <string name="executableAlreadyAdded">Executável já adicionado</string>
     <string name="selectExecutableFile">Selecione um arquivo .exe/.bat</string>
+    <string name="renameGameItem">Renomear</string>
+    <string name="incompatibleSelectedFile">Arquivo selecionado incompativel</string>
+    <string name="newName">Digite um Novo Nome</string>
 </resources>
