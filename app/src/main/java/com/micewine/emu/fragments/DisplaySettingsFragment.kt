@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
+import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
+import com.micewine.emu.activities.MainActivity.Companion.RAM_COUNTER_KEY
 import com.micewine.emu.adapters.AdapterSettingsPreferences
 import com.micewine.emu.adapters.AdapterSettingsPreferences.SettingsListSpinner
 
@@ -41,6 +43,9 @@ class DisplaySettingsFragment : Fragment() {
             "640x480", "800x600",
             "1024x768", "1280x720"),
             SPINNER, "1280x720", DISPLAY_RESOLUTION_KEY)
+
+        addToAdapter(R.string.enableRamCounter, R.string.enableRamCounterDescription, arrayOf(""),
+            SWITCH, "false", RAM_COUNTER_KEY)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>, type: Int, defaultValue: String, keyId: String) {

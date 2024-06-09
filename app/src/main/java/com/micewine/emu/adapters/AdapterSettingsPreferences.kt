@@ -43,7 +43,7 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
             holder.settingsSwitch.setOnClickListener {
                 val editor = preferences.edit()
 
-                editor.putBoolean(context.resources.getString(sList.titleSettings), !preferences.getBoolean(sList.key, false))
+                editor.putBoolean(sList.key, !preferences.getBoolean(sList.key, false))
 
                 editor.apply()
             }

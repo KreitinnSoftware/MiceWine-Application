@@ -25,6 +25,7 @@ import com.micewine.emu.databinding.ActivityWelcomeBinding
 import com.micewine.emu.fragments.Welcome2Fragment
 import com.micewine.emu.fragments.Welcome3Fragment
 import com.micewine.emu.fragments.WelcomeFragment
+import java.io.File
 
 class WelcomeActivity : AppCompatActivity() {
     private var binding: ActivityWelcomeBinding? = null
@@ -56,7 +57,8 @@ class WelcomeActivity : AppCompatActivity() {
 
                 ObbExtractor().extractZip("$appRootDir/rootfs.zip", "$appRootDir", progressExtractBar, progressTextBar, this)
 
-                ShellExecutorCmd.executeShell("rm $appRootDir/rootfs.zip", "ExtractUtility")
+                File("$appRootDir/rootfs.zip").delete()
+
                 ShellExecutorCmd.executeShell("chmod 775 -R $appRootDir", "ExtractUtility")
                 ShellExecutorCmd.executeShell("$usrDir/generateSymlinks.sh", "ExtractUtility")
             }

@@ -2,12 +2,14 @@ package com.micewine.emu.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
@@ -15,6 +17,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -37,7 +40,6 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_IB_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_THEME_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VIRGL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
-import com.micewine.emu.core.Init
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.HomeFragment
 import com.micewine.emu.fragments.RenameGameItemFragment
@@ -50,15 +52,20 @@ import java.nio.file.Files
 
 class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
-    private val init = Init()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
             if (ACTION_UPDATE_HOME == intent.action) {
-                fragmentLoader(HomeFragment(), false)
+                fragmentLoader(false)
             }
         }
     }
+
+    private val fragmentList: List<Fragment> = listOf(HomeFragment(), SettingsFragment())
+    private var selectedFragment = 0
+
+    private var fab: FloatingActionButton? = null
+    private var bottomNavigation: BottomNavigationView? = null
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,24 +73,26 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
+        fab = findViewById(R.id.addItemFAB)
+        bottomNavigation = findViewById(R.id.bottom_navigation)
+
         findViewById<Toolbar>(R.id.mainActivityToolbar).title = getString(R.string.app_name)
 
-        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        bottomNavigation.setOnItemSelectedListener { item: MenuItem ->
+        bottomNavigation?.setOnItemSelectedListener { item: MenuItem ->
             val id = item.itemId
 
             if (id == R.id.nav_home) {
-                fragmentLoader(HomeFragment(), false)
+                selectedFragment = 0
+                fragmentLoader(false)
             } else if (id == R.id.nav_settings) {
-                fragmentLoader(SettingsFragment(), false)
+                selectedFragment = 1
+                fragmentLoader(false)
             }
 
             true
         }
 
-        val fab = findViewById<FloatingActionButton>(R.id.addItemFAB)
-
-        fab.setOnClickListener {
+        fab?.setOnClickListener {
             openFilePicker()
         }
 
@@ -94,7 +103,8 @@ class MainActivity : AppCompatActivity() {
             extractedAssets = true
         }
 
-        fragmentLoader(HomeFragment(), true)
+        selectedFragment = 0
+        fragmentLoader(true)
 
         registerReceiver(receiver, object : IntentFilter(ACTION_UPDATE_HOME) {})
     }
@@ -128,7 +138,8 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.removeGameItem) -> {
                 removeGameFromList(this, selectedGameArray)
 
-                fragmentLoader(HomeFragment(), false)
+                selectedFragment = 0
+                fragmentLoader(false)
             }
 
             getString(R.string.renameGameItem) -> {
@@ -173,21 +184,22 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun fragmentLoader(fragment: Fragment, appInit: Boolean) {
+    private fun fragmentLoader(appInit: Boolean) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
 
         if (appInit) {
-            fragmentTransaction.add(R.id.content, fragment)
+            fragmentTransaction.add(R.id.content, fragmentList[selectedFragment])
         } else {
-            fragmentTransaction.replace(R.id.content, fragment)
+            fragmentTransaction.replace(R.id.content, fragmentList[selectedFragment])
         }
+
+        fab?.isVisible = selectedFragment == 0
 
         fragmentTransaction.commit()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        init.stopAll()
         binding = null
         unregisterReceiver(receiver)
     }
@@ -195,7 +207,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        fragmentLoader(HomeFragment(), false)
+        fragmentLoader(false)
     }
 
     companion object {
@@ -227,6 +239,7 @@ class MainActivity : AppCompatActivity() {
         var selectedGameArray: Array<String> = arrayOf()
 
         const val ACTION_UPDATE_HOME = "com.micewine.emu.ACTION_UPDATE_HOME"
+        const val RAM_COUNTER_KEY = "ramCounter"
 
         private fun booleanToString(boolean: Boolean): String {
             return if (boolean) {
@@ -243,15 +256,11 @@ class MainActivity : AppCompatActivity() {
 
             box64DynarecBigblock = preferences.getString(BOX64_DYNAREC_BIGBLOCK_KEY, "1")
             box64DynarecStrongmem = preferences.getString(BOX64_DYNAREC_STRONGMEM_KEY, "0")
-            box64DynarecX87double =
-                booleanToString(preferences.getBoolean(BOX64_DYNAREC_X87DOUBLE_KEY, false))
-            box64DynarecFastnan =
-                booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTNAN_KEY, true))
-            box64DynarecFastround =
-                booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTROUND_KEY, true))
+            box64DynarecX87double = booleanToString(preferences.getBoolean(BOX64_DYNAREC_X87DOUBLE_KEY, false))
+            box64DynarecFastnan = booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTNAN_KEY, true))
+            box64DynarecFastround = booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTROUND_KEY, true))
             box64DynarecSafeflags = preferences.getString(BOX64_DYNAREC_SAFEFLAGS_KEY, "1")
-            box64DynarecCallret =
-                booleanToString(preferences.getBoolean(BOX64_DYNAREC_CALLRET_KEY, true))
+            box64DynarecCallret = booleanToString(preferences.getBoolean(BOX64_DYNAREC_CALLRET_KEY, true))
             selectedDriver = preferences.getString(SELECTED_DRIVER_KEY, "Turnip/Zink")
             selectedTheme = preferences.getString(SELECTED_THEME_KEY, "DarkBlue")
             d3dxRenderer = preferences.getString(SELECTED_D3DX_RENDERER_KEY, "DXVK")
@@ -259,8 +268,10 @@ class MainActivity : AppCompatActivity() {
             selectedDXVK = preferences.getString(SELECTED_DXVK_KEY, "DXVK-1.10.3-async")
             selectedIbVersion = preferences.getString(SELECTED_IB_KEY, "0.1.8")
             selectedVirGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
-            selectedDXVKHud =
-                preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "fps,devinfo,gpuload")
+            selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "fps,devinfo,gpuload")
+            enableRamCounter = preferences.getBoolean(RAM_COUNTER_KEY, false)
+
+            Log.v("enableRamCounter", enableRamCounter.toString())
         }
 
         fun copyAssets(context: Context, filename: String, outputPath: String, textView: TextView) {
@@ -384,6 +395,18 @@ class MainActivity : AppCompatActivity() {
             }
 
             return path
+        }
+
+        fun getMemoryInfo(context: Context): String {
+            val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val memoryInfo = ActivityManager.MemoryInfo()
+            activityManager.getMemoryInfo(memoryInfo)
+
+            val totalMemory = memoryInfo.totalMem / (1024 * 1024)
+            val availableMemory = memoryInfo.availMem / (1024 * 1024)
+            val usedMemory = totalMemory - availableMemory
+
+            return "RAM: $usedMemory/$totalMemory"
         }
     }
 }

@@ -72,4 +72,6 @@
     <string name="renameGameItem">Rename</string>
     <string name="incompatibleSelectedFile">Selected File is Incompatible</string>
     <string name="newName">Type a New Name</string>
+    <string name="enableRamCounter">Enable/Disable Ram Counter</string>
+    <string name="enableRamCounterDescription">Enable or Disable RAM Counter on Screen</string>
 </resources>

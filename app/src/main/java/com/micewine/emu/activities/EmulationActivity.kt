@@ -42,13 +42,11 @@ import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
 import com.micewine.emu.ICmdEntryInterface
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
-import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
+import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
-import com.micewine.emu.controller.OverlayView
-import com.micewine.emu.controller.OverlayView.CustomButtonData
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.core.Init
 import com.micewine.emu.input.InputEventSender
@@ -57,6 +55,8 @@ import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.input.TouchInputHandler.RenderStub.NullStub
 import com.micewine.emu.utils.FullscreenWorkaround
 import com.micewine.emu.utils.KeyInterceptor
+import com.micewine.emu.views.OverlayView
+import com.micewine.emu.views.OverlayView.CustomButtonData
 
 @Suppress("deprecation", "unused")
 class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
@@ -148,7 +148,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         nav.setNavigationItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
                 R.id.exitFromEmulation -> {
-                    enableRamCounter = false
                     init!!.stopAll()
                     finish()
                 }
@@ -302,6 +301,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         init!!.run(this, exePath)
 
+        setSharedVars(this)
+
         if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU && checkSelfPermission(permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED && !shouldShowRequestPermissionRationale(
                 permission.POST_NOTIFICATIONS
             )
@@ -400,7 +401,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
     public override fun onPause() {
         super.onPause()
-        init!!.stopAll()
     }
 
     private val lorieView: LorieView
@@ -463,6 +463,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     }
 
     public override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
         PreferenceManager.getDefaultSharedPreferences(this)
     }
 

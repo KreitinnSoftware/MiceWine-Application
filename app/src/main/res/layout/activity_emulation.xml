@@ -19,13 +19,21 @@
             android:visibility="visible">
         </com.micewine.emu.LorieView>
 
-        <com.micewine.emu.controller.OverlayView
+        <com.micewine.emu.views.HWInfoView
+            android:id="@+id/hwView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="visible">
+        </com.micewine.emu.views.HWInfoView>
+
+        <com.micewine.emu.views.OverlayView
             android:id="@+id/overlayView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:visibility="visible">
-        </com.micewine.emu.controller.OverlayView>
+        </com.micewine.emu.views.OverlayView>
 
     </FrameLayout>
 

@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.micewine.emu.R
 import com.micewine.emu.core.ShellExecutorCmd.stdErrOut
 import com.micewine.emu.databinding.LogViewerBinding
-import com.micewine.emu.viewmodels.ViewModelAppLogs
 
 class LogAppOutput : AppCompatActivity() {
     private var binding: LogViewerBinding? = null
@@ -43,5 +45,15 @@ class LogAppOutput : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         binding = null
+    }
+
+    class ViewModelAppLogs : ViewModel() {
+        private val logsText = MutableLiveData<String>()
+        val textLiveData: LiveData<String>
+            get() = logsText
+
+        fun setText(text: String) {
+            logsText.value = text
+        }
     }
 }

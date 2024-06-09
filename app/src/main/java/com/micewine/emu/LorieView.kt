@@ -6,9 +6,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.ContextWrapper
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
@@ -19,21 +17,15 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import androidx.preference.PreferenceManager
 import com.micewine.emu.activities.EmulationActivity
-import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.input.InputStub
-import com.micewine.emu.systemutils.SystemMemoryInfo
 
 @SuppressLint("WrongConstant")
 class LorieView : SurfaceView, InputStub {
     private val p = Point()
-    private var totalMemory = SystemMemoryInfo.getTotalRAM(context)
-    private var freeMemory = SystemMemoryInfo.getFreeRAM(context)
     private var mCallback: Callback? = null
-    private var paint: Paint = Paint()
 
     private val mSurfaceCallback: SurfaceHolder.Callback = object : SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
-            updateRamCounter()
             holder.setFormat(PixelFormat.BGRA_8888)
         }
 
@@ -158,43 +150,6 @@ class LorieView : SurfaceView, InputStub {
         setMeasuredDimension(width, height)
     }
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        ramCounter(canvas)
-    }
-
-    private fun ramCounter(c: Canvas) {
-        paint.textSize = 30f
-        paint.style = Paint.Style.STROKE
-        paint.setColor(Color.BLACK)
-        val ramCounterBorderWidth = 8f
-        paint.strokeWidth = ramCounterBorderWidth
-        c.drawText(
-            ("RAM: " + (totalMemory - freeMemory) / BYTES_FOR_MEGABYTES) + "/" + totalMemory / BYTES_FOR_MEGABYTES,
-            10f,
-            40f,
-            paint
-        )
-        paint.style = Paint.Style.FILL
-        paint.setColor(Color.WHITE)
-        c.drawText(
-            ("RAM: " + (totalMemory - freeMemory) / BYTES_FOR_MEGABYTES) + "/" + totalMemory / BYTES_FOR_MEGABYTES,
-            10f,
-            40f,
-            paint
-        )
-    }
-
-    private fun updateRamCounter() {
-        totalMemory = SystemMemoryInfo.getTotalRAM(context)
-        freeMemory = SystemMemoryInfo.getFreeRAM(context)
-        invalidate()
-
-        if (enableRamCounter) {
-            handler.postDelayed({ updateRamCounter() }, 50)
-        }
-    }
-
     override fun sendMouseWheelEvent(deltaX: Float, deltaY: Float) {
         sendMouseEvent(deltaX, deltaY, InputStub.BUTTON_SCROLL, buttonDown = false, relative = true)
     }
@@ -240,8 +195,6 @@ class LorieView : SurfaceView, InputStub {
     }
 
     companion object {
-        var BYTES_FOR_MEGABYTES = (1024 * 1024).toLong()
-
         init {
             System.loadLibrary("Xlorie")
         }

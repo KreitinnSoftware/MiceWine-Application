@@ -3,6 +3,8 @@ package com.micewine.emu.core
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
+import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.getClassPath
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import kotlinx.coroutines.CoroutineScope
@@ -54,6 +56,12 @@ class MainService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+
+        EnvVars.setVariables()
+
+        ShellExecutorCmd.executeShell(EnvVars.exportVariables() + ";" +
+            "box64 wineserver -k", "WineKiller")
+
         serviceJob.cancel()
     }
 

@@ -65,4 +65,6 @@
     <string name="renameGameItem">Renomear</string>
     <string name="incompatibleSelectedFile">Arquivo selecionado incompativel</string>
     <string name="newName">Digite um Novo Nome</string>
+    <string name="enableRamCounter">Ativar/Desativar Contador de RAM</string>
+    <string name="enableRamCounterDescription">Ativa ou Desativa o Contador de RAM na Tela</string>
 </resources>
