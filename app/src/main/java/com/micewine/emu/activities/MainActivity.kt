@@ -265,7 +265,7 @@ class MainActivity : AppCompatActivity() {
             selectedDXVK = preferences.getString(SELECTED_DXVK_KEY, "DXVK-1.10.3-async")
             selectedIbVersion = preferences.getString(SELECTED_IB_KEY, "0.1.8")
             selectedVirGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
-            selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "fps,devinfo,gpuload")
+            selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "FPS/GPU Load")
             enableRamCounter = preferences.getBoolean(RAM_COUNTER_KEY, false)
         }
 
