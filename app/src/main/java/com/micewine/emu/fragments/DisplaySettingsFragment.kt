@@ -41,7 +41,12 @@ class DisplaySettingsFragment : Fragment() {
 
         addToAdapter(R.string.display_resolution_title, R.string.display_resolution_description, arrayOf(
             "640x480", "800x600",
-            "1024x768", "1280x720"),
+            "960x540", "960x540",
+            "1024x768", "1280x720",
+            "1440x720", "1600x900",
+            "1800x900", "1080x1920",
+            "2160x1080"
+            ),
             SPINNER, "1280x720", DISPLAY_RESOLUTION_KEY)
 
         addToAdapter(R.string.enableRamCounter, R.string.enableRamCounterDescription, arrayOf(""),

@@ -87,6 +87,8 @@ object EnvVars {
         putVar("D3DX_RENDERER", "D3DX_RENDERER=$d3dxRenderer")
         putVar("WINED3D_VERSION", "WINED3D_VERSION=$selectedWineD3D")
         putVar("DXVK_VERSION", "DXVK_VERSION=$selectedDXVK")
+        putVar("DXVK_ASYNC", "DXVK_ASYNC=1")
+        putVar("DXVK_STATE_CACHE_PATH", "DXVK_STATE_CACHE_PATH=$homeDir/.cache/dxvk-shader-cache")
 
         when (selectedDXVKHud) {
             "Off" -> {
@@ -100,6 +102,8 @@ object EnvVars {
             }
         }
 
+        putVar("BOX64_LOG", "BOX64_LOG=1")
+        putVar("BOX64_MMAP32", "BOX64_MMAP32=1")
         putVar("BOX64_DYNAREC_BIGBLOCK", "BOX64_DYNAREC_BIGBLOCK=$box64DynarecBigblock")
         putVar("BOX64_DYNAREC_STRONGMEM", "BOX64_DYNAREC_STRONGMEM=$box64DynarecStrongmem")
         putVar("BOX64_DYNAREC_X87DOUBLE", "BOX64_DYNAREC_X87DOUBLE=$box64DynarecX87double")
@@ -109,5 +113,6 @@ object EnvVars {
         putVar("BOX64_DYNAREC_CALLRET", "BOX64_DYNAREC_CALLRET=$box64DynarecCallret")
         putVar("VKD3D_FEATURE_LEVEL", "VKD3D_FEATURE_LEVEL=12_0")
         putVar("WINEDEBUG", "WINEDEBUG=-virtual")
+        putVar("WINEPREFIX", "WINEPREFIX=$homeDir/.wine")
     }
 }

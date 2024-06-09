@@ -56,14 +56,12 @@ class MainActivity : AppCompatActivity() {
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
             if (ACTION_UPDATE_HOME == intent.action) {
-                fragmentLoader(false)
+                fragmentLoader(HomeFragment(), false)
             }
         }
     }
 
-    private val fragmentList: List<Fragment> = listOf(HomeFragment(), SettingsFragment())
-    private var selectedFragment = 0
-
+    private var selectedFragment = "HomeFragment"
     private var fab: FloatingActionButton? = null
     private var bottomNavigation: BottomNavigationView? = null
 
@@ -76,17 +74,15 @@ class MainActivity : AppCompatActivity() {
         fab = findViewById(R.id.addItemFAB)
         bottomNavigation = findViewById(R.id.bottom_navigation)
 
-        findViewById<Toolbar>(R.id.mainActivityToolbar).title = getString(R.string.app_name)
-
         bottomNavigation?.setOnItemSelectedListener { item: MenuItem ->
             val id = item.itemId
 
             if (id == R.id.nav_home) {
-                selectedFragment = 0
-                fragmentLoader(false)
+                selectedFragment = "HomeFragment"
+                fragmentLoader(HomeFragment(), false)
             } else if (id == R.id.nav_settings) {
-                selectedFragment = 1
-                fragmentLoader(false)
+                selectedFragment = "SettingsFragment"
+                fragmentLoader(SettingsFragment(), false)
             }
 
             true
@@ -103,8 +99,8 @@ class MainActivity : AppCompatActivity() {
             extractedAssets = true
         }
 
-        selectedFragment = 0
-        fragmentLoader(true)
+        selectedFragment = "HomeFragment"
+        fragmentLoader(HomeFragment(), true)
 
         registerReceiver(receiver, object : IntentFilter(ACTION_UPDATE_HOME) {})
     }
@@ -137,9 +133,6 @@ class MainActivity : AppCompatActivity() {
         when (item.title) {
             getString(R.string.removeGameItem) -> {
                 removeGameFromList(this, selectedGameArray)
-
-                selectedFragment = 0
-                fragmentLoader(false)
             }
 
             getString(R.string.renameGameItem) -> {
@@ -184,16 +177,16 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun fragmentLoader(appInit: Boolean) {
+    private fun fragmentLoader(fragment: Fragment, appInit: Boolean) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
 
         if (appInit) {
-            fragmentTransaction.add(R.id.content, fragmentList[selectedFragment])
+            fragmentTransaction.add(R.id.content, fragment)
         } else {
-            fragmentTransaction.replace(R.id.content, fragmentList[selectedFragment])
+            fragmentTransaction.replace(R.id.content, fragment)
         }
 
-        fab?.isVisible = selectedFragment == 0
+        fab?.isVisible = selectedFragment == "HomeFragment"
 
         fragmentTransaction.commit()
     }
@@ -207,7 +200,11 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        fragmentLoader(false)
+        if (selectedFragment == "HomeFragment") {
+            fragmentLoader(HomeFragment(), false)
+        } else if (selectedFragment == "SettingsFragment") {
+            fragmentLoader(SettingsFragment(), false)
+        }
     }
 
     companion object {
@@ -270,14 +267,14 @@ class MainActivity : AppCompatActivity() {
             selectedVirGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
             selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "fps,devinfo,gpuload")
             enableRamCounter = preferences.getBoolean(RAM_COUNTER_KEY, false)
-
-            Log.v("enableRamCounter", enableRamCounter.toString())
         }
 
-        fun copyAssets(context: Context, filename: String, outputPath: String, textView: TextView) {
-            textView.text = context.getString(R.string.extracting_from_assets)
+        fun copyAssets(activity: Activity, filename: String, outputPath: String, textView: TextView) {
+            activity.runOnUiThread {
+                textView.text = activity.getString(R.string.extracting_from_assets)
+            }
 
-            val assetManager = context.assets
+            val assetManager = activity.assets
             var input: InputStream? = null
             var out: OutputStream? = null
             try {
@@ -333,6 +330,9 @@ class MainActivity : AppCompatActivity() {
 
             editor.putString("gameList", json)
             editor.apply()
+
+            val intent = Intent(ACTION_UPDATE_HOME)
+            context.sendBroadcast(intent)
         }
 
         fun loadGameList(context: Context): MutableList<Array<String>> {
@@ -359,6 +359,9 @@ class MainActivity : AppCompatActivity() {
 
             editor.putString("gameList", json)
             editor.apply()
+
+            val intent = Intent(ACTION_UPDATE_HOME)
+            context.sendBroadcast(intent)
         }
 
         fun renameGameFromList(context: Context, array: Array<String>, newName: String) {
