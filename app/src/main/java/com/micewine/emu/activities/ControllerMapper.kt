@@ -101,9 +101,9 @@ class ControllerMapper : AppCompatActivity() {
 
         mouseSensibilityValue?.text = "${mouseSensibilitySeekBar?.progress.toString()}%"
 
-        mouseSensibilitySeekBar?.max = 200
+        mouseSensibilitySeekBar?.max = 350
 
-        mouseSensibilitySeekBar?.min = 50
+        mouseSensibilitySeekBar?.min = 25
 
         mouseSensibilitySeekBar?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             @SuppressLint("SetTextI18n")
