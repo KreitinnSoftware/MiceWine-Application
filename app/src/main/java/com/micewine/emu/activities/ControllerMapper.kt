@@ -17,6 +17,7 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -370,6 +371,13 @@ class ControllerMapper : AppCompatActivity() {
             val editor = preferences.edit()
 
             val currentList = loadControllerPresets(context)
+
+            if (currentList.count() == 1) {
+                Toast.makeText(context,
+                    context.getString(R.string.removeLastPresetError), Toast.LENGTH_SHORT).show()
+
+                return
+            }
 
             currentList.removeIf { it[0] == name }
 

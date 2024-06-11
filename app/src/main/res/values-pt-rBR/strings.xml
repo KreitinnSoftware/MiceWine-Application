@@ -71,4 +71,5 @@
     <string name="mouse">Mouse</string>
     <string name="keyboard">Teclado</string>
     <string name="controllerPresetCreateText">Digite um nome</string>
+    <string name="removeLastPresetError">O Último Preset não pode ser removido</string>
 </resources>
