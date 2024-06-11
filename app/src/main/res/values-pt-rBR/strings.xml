@@ -67,4 +67,7 @@
     <string name="newName">Digite um Novo Nome</string>
     <string name="enableRamCounter">Ativar/Desativar Contador de RAM</string>
     <string name="enableRamCounterDescription">Ativa ou Desativa o Contador de RAM na Tela</string>
+    <string name="selectedControllerPreset">Perfil de Controles Selecionado</string>
+    <string name="mouse">Mouse</string>
+    <string name="keyboard">Teclado</string>
 </resources>

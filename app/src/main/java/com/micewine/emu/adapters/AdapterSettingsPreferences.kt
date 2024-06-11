@@ -83,16 +83,12 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener {
-        val settingsName: TextView
-        val settingsDescription: TextView
-        val spinnerOptions: Spinner
-        val settingsSwitch: SwitchCompat
+        val settingsName: TextView = itemView.findViewById(R.id.title_preferences_model)
+        val settingsDescription: TextView = itemView.findViewById(R.id.description_preferences_model)
+        val spinnerOptions: Spinner = itemView.findViewById(R.id.keyBindSpinner)
+        val settingsSwitch: SwitchCompat = itemView.findViewById(R.id.optionSwitch)
 
         init {
-            settingsName = itemView.findViewById(R.id.title_preferences_model)
-            settingsDescription = itemView.findViewById(R.id.description_preferences_model)
-            spinnerOptions = itemView.findViewById(R.id.keyBindSpinner)
-            settingsSwitch = itemView.findViewById(R.id.optionSwitch)
             itemView.setOnClickListener(this)
         }
 

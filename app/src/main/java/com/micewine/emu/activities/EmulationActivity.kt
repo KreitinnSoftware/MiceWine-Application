@@ -132,11 +132,11 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         val overlayView: OverlayView = findViewById(R.id.overlayView)
 
-        overlayView.addButton(CustomButtonData(1, R.drawable.a_button, 50F, 50F, 150F, getXKeyScanCodes("Enter")))
-        overlayView.addButton(CustomButtonData(2, R.drawable.dpad_right, 50F, 500F, 150F, getXKeyScanCodes("Right")))
-        overlayView.addButton(CustomButtonData(3, R.drawable.dpad_left, 200F, 500F, 150F, getXKeyScanCodes("Left")))
-        overlayView.addButton(CustomButtonData(4, R.drawable.dpad_up, 450F, 500F, 150F, getXKeyScanCodes("Up")))
-        overlayView.addButton(CustomButtonData(5, R.drawable.dpad_down, 600F, 500F, 150F, getXKeyScanCodes("Down")))
+        overlayView.addButton(CustomButtonData(1, "Enter", 50F, 50F, 150F, getXKeyScanCodes("Enter")))
+        overlayView.addButton(CustomButtonData(2, "Right", 50F, 500F, 150F, getXKeyScanCodes("Right")))
+        overlayView.addButton(CustomButtonData(3, "Left", 200F, 500F, 150F, getXKeyScanCodes("Left")))
+        overlayView.addButton(CustomButtonData(4, "Up", 450F, 500F, 150F, getXKeyScanCodes("Up")))
+        overlayView.addButton(CustomButtonData(5, "Down", 600F, 500F, 150F, getXKeyScanCodes("Down")))
 
         overlayView.visibility = View.INVISIBLE
 

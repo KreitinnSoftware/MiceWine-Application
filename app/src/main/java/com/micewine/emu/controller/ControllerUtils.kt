@@ -1,7 +1,6 @@
 package com.micewine.emu.controller
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import android.view.InputDevice
 import android.view.KeyEvent
@@ -24,6 +23,7 @@ import android.view.MotionEvent.AXIS_Y
 import android.view.MotionEvent.AXIS_Z
 import androidx.preference.PreferenceManager
 import com.micewine.emu.LorieView
+import com.micewine.emu.activities.ControllerMapper
 import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_HAT_X_MINUS_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_HAT_X_PLUS_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_HAT_Y_MINUS_KEY
@@ -46,13 +46,14 @@ import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_SELECT_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_START_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_Y_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.DEAD_ZONE_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.MOUSE_SENSIBILITY_KEY
+import com.micewine.emu.activities.ControllerMapper.Companion.SELECTED_CONTROLLER_PRESET_KEY
+import com.micewine.emu.activities.ControllerMapper.Companion.getDeadZone
+import com.micewine.emu.activities.ControllerMapper.Companion.getMouseSensibility
+import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
 import com.micewine.emu.input.InputStub.BUTTON_UNDEFINED
-import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import kotlin.math.absoluteValue
 
 object ControllerUtils {
@@ -97,14 +98,15 @@ object ControllerUtils {
     private const val RIGHT_UP = 7
     private const val RIGHT_DOWN = 8
 
-    private fun detectKey(preferences: SharedPreferences, key: String): MutableList<Int> {
-        val list = getXKeyScanCodes(preferences.getString(key, "Null")!!)
+    private fun detectKey(context: Context, key: String): MutableList<Int> {
+        val mapping = ControllerMapper.getMapping(context, "default", key)
+        val list = getXKeyScanCodes(mapping[0])
 
-        when (preferences.getBoolean("${key}_mappingType", false)) {
+        when (mapping[1].toBoolean()) {
             false -> list[2] = KEYBOARD
 
             true -> {
-                when (preferences.getString(key, "Null")) {
+                when (mapping[0]) {
                     "Left" -> list[1] = BUTTON_LEFT
                     "Right" -> list[1] = BUTTON_RIGHT
                     "Middle" -> list[1] = BUTTON_MIDDLE
@@ -120,40 +122,40 @@ object ControllerUtils {
     fun prepareButtonsAxisValues(context: Context) {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
 
-        buttonA_mapping = detectKey(preferences, BUTTON_A_KEY)
-        buttonX_mapping = detectKey(preferences, BUTTON_X_KEY)
-        buttonB_mapping = detectKey(preferences, BUTTON_B_KEY)
-        buttonY_mapping = detectKey(preferences, BUTTON_Y_KEY)
+        buttonA_mapping = detectKey(context, BUTTON_A_KEY)
+        buttonX_mapping = detectKey(context, BUTTON_X_KEY)
+        buttonB_mapping = detectKey(context, BUTTON_B_KEY)
+        buttonY_mapping = detectKey(context, BUTTON_Y_KEY)
 
-        buttonR1_mapping = detectKey(preferences, BUTTON_R1_KEY)
-        buttonR2_mapping = detectKey(preferences, BUTTON_R2_KEY)
+        buttonR1_mapping = detectKey(context, BUTTON_R1_KEY)
+        buttonR2_mapping = detectKey(context, BUTTON_R2_KEY)
 
-        buttonL1_mapping = detectKey(preferences, BUTTON_L1_KEY)
-        buttonL2_mapping = detectKey(preferences, BUTTON_L2_KEY)
+        buttonL1_mapping = detectKey(context, BUTTON_L1_KEY)
+        buttonL2_mapping = detectKey(context, BUTTON_L2_KEY)
 
-        buttonStart_mapping = detectKey(preferences, BUTTON_START_KEY)
-        buttonSelect_mapping = detectKey(preferences, BUTTON_SELECT_KEY)
+        buttonStart_mapping = detectKey(context, BUTTON_START_KEY)
+        buttonSelect_mapping = detectKey(context, BUTTON_SELECT_KEY)
 
-        axisX_plus_mapping = detectKey(preferences, AXIS_X_PLUS_KEY)
-        axisX_minus_mapping = detectKey(preferences, AXIS_X_MINUS_KEY)
+        axisX_plus_mapping = detectKey(context, AXIS_X_PLUS_KEY)
+        axisX_minus_mapping = detectKey(context, AXIS_X_MINUS_KEY)
 
-        axisY_plus_mapping = detectKey(preferences, AXIS_Y_PLUS_KEY)
-        axisY_minus_mapping = detectKey(preferences, AXIS_Y_MINUS_KEY)
+        axisY_plus_mapping = detectKey(context, AXIS_Y_PLUS_KEY)
+        axisY_minus_mapping = detectKey(context, AXIS_Y_MINUS_KEY)
 
-        axisZ_plus_mapping = detectKey(preferences, AXIS_Z_PLUS_KEY)
-        axisZ_minus_mapping = detectKey(preferences, AXIS_Z_MINUS_KEY)
+        axisZ_plus_mapping = detectKey(context, AXIS_Z_PLUS_KEY)
+        axisZ_minus_mapping = detectKey(context, AXIS_Z_MINUS_KEY)
 
-        axisRZ_plus_mapping = detectKey(preferences, AXIS_RZ_PLUS_KEY)
-        axisRZ_minus_mapping = detectKey(preferences, AXIS_RZ_MINUS_KEY)
+        axisRZ_plus_mapping = detectKey(context, AXIS_RZ_PLUS_KEY)
+        axisRZ_minus_mapping = detectKey(context, AXIS_RZ_MINUS_KEY)
 
-        axisHatX_plus_mapping = detectKey(preferences, AXIS_HAT_X_PLUS_KEY)
-        axisHatX_minus_mapping = detectKey(preferences, AXIS_HAT_X_MINUS_KEY)
+        axisHatX_plus_mapping = detectKey(context, AXIS_HAT_X_PLUS_KEY)
+        axisHatX_minus_mapping = detectKey(context, AXIS_HAT_X_MINUS_KEY)
 
-        axisHatY_plus_mapping = detectKey(preferences, AXIS_HAT_Y_PLUS_KEY)
-        axisHatY_minus_mapping = detectKey(preferences, AXIS_HAT_Y_MINUS_KEY)
+        axisHatY_plus_mapping = detectKey(context, AXIS_HAT_Y_PLUS_KEY)
+        axisHatY_minus_mapping = detectKey(context, AXIS_HAT_Y_MINUS_KEY)
 
-        deadZone = (preferences.getInt(DEAD_ZONE_KEY, 25)).toFloat() / 100
-        mouseSensibility = (preferences.getInt(MOUSE_SENSIBILITY_KEY, 100)).toFloat() / 100
+        deadZone = getDeadZone(context, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
+        mouseSensibility = getMouseSensibility(context, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
     }
 
     private fun getGameControllerIds(): List<Int> {

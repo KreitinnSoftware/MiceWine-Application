@@ -74,4 +74,7 @@
     <string name="newName">Type a New Name</string>
     <string name="enableRamCounter">Enable/Disable Ram Counter</string>
     <string name="enableRamCounterDescription">Enable or Disable RAM Counter on Screen</string>
+    <string name="selectedControllerPreset">Selected Controller Preset</string>
+    <string name="mouse">Mouse</string>
+    <string name="keyboard">Keyboard</string>
 </resources>
