@@ -99,7 +99,8 @@ object ControllerUtils {
     private const val RIGHT_DOWN = 8
 
     private fun detectKey(context: Context, key: String): MutableList<Int> {
-        val mapping = ControllerMapper.getMapping(context, "default", key)
+        val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
+        val mapping = ControllerMapper.getMapping(context, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, key)
         val list = getXKeyScanCodes(mapping[0])
 
         when (mapping[1].toBoolean()) {
