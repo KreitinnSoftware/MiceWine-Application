@@ -57,7 +57,7 @@
     <string name="get_file_permission_text">Permita o Gerenciamento de Arquivos</string>
     <string name="extracting_resources_text">"Extraindo Arquivos…\nPode demorar um pouco"</string>
     <string name="extracted_resources_text">Extração Concluida!</string>
-    <string name="extracting_from_assets">Extraindo dos Assets</string>
+    <string name="extracting_from_assets">Extraindo dos Assets…</string>
     <string name="editControllerPreferences">Editar Preferencias do Controle</string>
     <string name="removeGameItem">Deletar</string>
     <string name="executableAlreadyAdded">Executável já adicionado</string>
@@ -70,4 +70,5 @@
     <string name="selectedControllerPreset">Perfil de Controles Selecionado</string>
     <string name="mouse">Mouse</string>
     <string name="keyboard">Teclado</string>
+    <string name="controllerPresetCreateText">Digite um nome</string>
 </resources>

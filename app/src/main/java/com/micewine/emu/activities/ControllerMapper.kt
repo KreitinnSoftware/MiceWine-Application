@@ -1,7 +1,11 @@
 package com.micewine.emu.activities
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -25,7 +29,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.MOUSE_SENSIBILITY_K
 import com.micewine.emu.controller.ControllerUtils.getGameControllerNames
 import com.micewine.emu.databinding.ActivityControllerMapperBinding
 import com.micewine.emu.fragments.ControllerMapperFragment
-import java.lang.Math.random
+import com.micewine.emu.fragments.CreateControllerPresetFragment
 import java.util.Collections
 
 class ControllerMapper : AppCompatActivity() {
@@ -38,10 +42,28 @@ class ControllerMapper : AppCompatActivity() {
     private var mouseSensibilityValue: TextView? = null
     private var selectedControllerPresetSpinner: Spinner? = null
     private var addNewPresetButton: ImageButton? = null
+    private var deletePresetButton: ImageButton? = null
+    private var preferences: SharedPreferences? = null
+    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        @SuppressLint("UnspecifiedRegisterReceiverFlag")
+        override fun onReceive(context: Context, intent: Intent) {
+            if (ACTION_UPDATE_CONTROLLER_MAPPER == intent.action) {
+                val name = intent.getStringExtra("name")
 
-    @SuppressLint("SetTextI18n")
+                selectedControllerPresetSpinner?.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, getControllerPresetsName(context))
+
+                selectedControllerPresetSpinner?.setSelection(getControllerPresetsName(context).indexOf(name))
+
+                fragmentLoader(ControllerMapperFragment(), true)
+            }
+        }
+    }
+
+    @SuppressLint("SetTextI18n", "UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this)!!
 
         binding = ActivityControllerMapperBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
@@ -71,15 +93,13 @@ class ControllerMapper : AppCompatActivity() {
             }
         }
 
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)!!
-
         deadZoneSeekbar = findViewById(R.id.deadZoneSeekBar)
 
         deadZoneSeekbar?.max = 75
 
         deadZoneSeekbar?.min = 25
 
-        deadZoneSeekbar?.progress = getDeadZone(this, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!)
+        deadZoneSeekbar?.progress = getDeadZone(this, preferences!!.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!)
 
         seekBarDeadZoneValue = findViewById(R.id.seekBarDeadZoneValue)
 
@@ -95,7 +115,7 @@ class ControllerMapper : AppCompatActivity() {
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                putDeadZone(applicationContext, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, seekBar!!.progress)
+                putDeadZone(applicationContext, preferences!!.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, seekBar!!.progress)
             }
         })
 
@@ -105,7 +125,7 @@ class ControllerMapper : AppCompatActivity() {
 
         mouseSensibilitySeekBar?.min = 25
 
-        mouseSensibilitySeekBar?.progress = getMouseSensibility(this, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!)
+        mouseSensibilitySeekBar?.progress = getMouseSensibility(this, preferences!!.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!)
 
         mouseSensibilityValue = findViewById(R.id.mouseSensibilityValue)
 
@@ -121,7 +141,7 @@ class ControllerMapper : AppCompatActivity() {
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                putMouseSensibility(applicationContext, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, seekBar!!.progress)
+                putMouseSensibility(applicationContext, preferences!!.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, seekBar!!.progress)
             }
         })
 
@@ -129,7 +149,8 @@ class ControllerMapper : AppCompatActivity() {
 
         selectedControllerPresetSpinner?.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, getControllerPresetsName(this))
 
-        selectedControllerPresetSpinner?.setSelection(getControllerPresetsName(this).indexOf(preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")))
+        selectedControllerPresetSpinner?.setSelection(getControllerPresetsName(this).indexOf(
+            preferences!!.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")))
 
         selectedControllerPresetSpinner?.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
@@ -139,7 +160,7 @@ class ControllerMapper : AppCompatActivity() {
                     position: Int,
                     id: Long
                 ) {
-                    val edit = preferences.edit()
+                    val edit = preferences!!.edit()
 
                     edit.putString(SELECTED_CONTROLLER_PRESET_KEY, parent?.selectedItem.toString())
 
@@ -155,20 +176,16 @@ class ControllerMapper : AppCompatActivity() {
         addNewPresetButton = findViewById(R.id.addNewPreset)
 
         addNewPresetButton?.setOnClickListener {
-            val name = "Preset-${random()}"
-
-            addControllerPreset(this, name)
-
-            val edit = preferences.edit()
-
-            edit.putString(SELECTED_CONTROLLER_PRESET_KEY, name)
-
-            edit.apply()
-
-            selectedControllerPresetSpinner?.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, getControllerPresetsName(this))
-
-            fragmentLoader(ControllerMapperFragment(), true)
+            CreateControllerPresetFragment().show(supportFragmentManager, "")
         }
+
+        deletePresetButton = findViewById(R.id.deletePreset)
+
+        deletePresetButton?.setOnClickListener {
+            deleteControllerPreset(this, preferences?.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!)
+        }
+
+        registerReceiver(receiver, object : IntentFilter(ACTION_UPDATE_CONTROLLER_MAPPER) {})
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -192,6 +209,11 @@ class ControllerMapper : AppCompatActivity() {
         }
 
         fragmentTransaction.commit()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(receiver)
     }
 
     companion object {
@@ -219,6 +241,8 @@ class ControllerMapper : AppCompatActivity() {
         const val AXIS_HAT_Y_MINUS_KEY = "axisHatY-"
 
         const val SELECTED_CONTROLLER_PRESET_KEY = "selectedControllerPreset"
+
+        const val ACTION_UPDATE_CONTROLLER_MAPPER = "com.micewine.emu.ACTION_UPDATE_CONTROLLER_MAPPER"
 
         private val mappingMap = mapOf(
             BUTTON_A_KEY to 1,
@@ -307,8 +331,6 @@ class ControllerMapper : AppCompatActivity() {
             val index = currentList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
-                currentList[0][0] = name
-
                 return 25
             }
 
@@ -321,8 +343,6 @@ class ControllerMapper : AppCompatActivity() {
             val index = currentList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
-                currentList[0][0] = name
-
                 return 100
             }
 
@@ -345,6 +365,25 @@ class ControllerMapper : AppCompatActivity() {
             return currentList[index][mappingMap[key]!!].split(":")
         }
 
+        fun deleteControllerPreset(context: Context, name: String) {
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+            val editor = preferences.edit()
+
+            val currentList = loadControllerPresets(context)
+
+            currentList.removeIf { it[0] == name }
+
+            val gson = Gson()
+            val json = gson.toJson(currentList)
+
+            editor.putString("controllerPresetList", json)
+            editor.apply()
+
+            val intent = Intent(ACTION_UPDATE_CONTROLLER_MAPPER)
+            intent.putExtra("name", "default")
+            context.sendBroadcast(intent)
+        }
+
         fun addControllerPreset(context: Context, name: String) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
             val editor = preferences.edit()
@@ -363,7 +402,12 @@ class ControllerMapper : AppCompatActivity() {
             val json = gson.toJson(currentList)
 
             editor.putString("controllerPresetList", json)
+            editor.putString(SELECTED_CONTROLLER_PRESET_KEY, name)
             editor.apply()
+
+            val intent = Intent(ACTION_UPDATE_CONTROLLER_MAPPER)
+            intent.putExtra("name", name)
+            context.sendBroadcast(intent)
         }
 
         fun editControllerPreset(context: Context, name: String, key: String, selectedItem: String, mappingType: String) {

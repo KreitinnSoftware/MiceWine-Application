@@ -153,6 +153,16 @@
         </Spinner>
 
         <ImageButton
+            android:id="@+id/deletePreset"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.1"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_menu_delete"
+            android:importantForAccessibility="no">
+        </ImageButton>
+
+        <ImageButton
             android:id="@+id/addNewPreset"
             android:layout_width="0dp"
             android:layout_height="match_parent"

@@ -77,4 +77,5 @@
     <string name="selectedControllerPreset">Selected Controller Preset</string>
     <string name="mouse">Mouse</string>
     <string name="keyboard">Keyboard</string>
+    <string name="controllerPresetCreateText">Type a Name</string>
 </resources>
