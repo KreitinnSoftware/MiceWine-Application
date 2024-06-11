@@ -104,6 +104,7 @@ object EnvVars {
 
         putVar("BOX64_LOG", "BOX64_LOG=1")
         putVar("BOX64_MMAP32", "BOX64_MMAP32=1")
+        putVar("BOX64_AVX", "BOX64_AVX=2")
         putVar("BOX64_DYNAREC_BIGBLOCK", "BOX64_DYNAREC_BIGBLOCK=$box64DynarecBigblock")
         putVar("BOX64_DYNAREC_STRONGMEM", "BOX64_DYNAREC_STRONGMEM=$box64DynarecStrongmem")
         putVar("BOX64_DYNAREC_X87DOUBLE", "BOX64_DYNAREC_X87DOUBLE=$box64DynarecX87double")
