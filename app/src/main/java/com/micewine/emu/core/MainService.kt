@@ -21,9 +21,7 @@ class MainService : Service() {
 
         serviceScope.launch {
             ShellExecutorCmd.executeShell(
-                EnvVars.exportVariables() + ";" +
-                        "unset LD_LIBRARY_PATH LIBGL_DRIVERS_PATH; " +
-                        "export CLASSPATH=" + getClassPath(this@MainService) + ";" +
+                "export CLASSPATH=" + getClassPath(this@MainService) + ";" +
                         "/system/bin/app_process / com.micewine.emu.CmdEntryPoint :0", "XServer"
             )
         }

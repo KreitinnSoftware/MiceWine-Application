@@ -42,7 +42,6 @@ object EnvVars {
     fun setVariables() {
         putVar("LANG", "LANG=$appLang")
         putVar("TMPDIR", "TMPDIR=$tmpDir")
-        putVar("XKB_CONFIG_ROOT", "XKB_CONFIG_ROOT=$usrDir/share/X11/xkb")
         putVar("HOME", "HOME=$homeDir")
         putVar("DISPLAY_SESSION", "DISPLAY=:0")
         putVar("BOX64_LOG", "BOX64_LOG=1")
