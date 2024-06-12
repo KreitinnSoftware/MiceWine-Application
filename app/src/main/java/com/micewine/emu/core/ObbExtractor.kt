@@ -12,8 +12,10 @@ class ObbExtractor {
     @SuppressLint("SetTextI18n")
     fun extractZip(zipFilePath: String?, destinationPath: String, progressExtractBar: ProgressBar?, progressText: TextView?, activity: Activity) {
         try {
-            activity.runOnUiThread {
-                progressExtractBar?.isIndeterminate = false
+            if (progressExtractBar != null) {
+                activity.runOnUiThread {
+                    progressExtractBar.isIndeterminate = false
+                }
             }
 
             val zipFile = ZipFile(zipFilePath)
@@ -23,13 +25,15 @@ class ObbExtractor {
             val progressMonitor = zipFile.progressMonitor
             zipFile.extractAll(destinationPath)
 
-            while (!progressMonitor.state.equals(ProgressMonitor.State.READY)) {
-                activity.runOnUiThread {
-                    progressText?.text = progressMonitor.percentDone.toString() + "%"
-                    progressExtractBar?.progress = progressMonitor.percentDone
-                }
+            if (progressExtractBar != null) {
+                while (!progressMonitor.state.equals(ProgressMonitor.State.READY)) {
+                    activity.runOnUiThread {
+                        progressText?.text = progressMonitor.percentDone.toString() + "%"
+                        progressExtractBar.progress = progressMonitor.percentDone
+                    }
 
-                Thread.sleep(100)
+                    Thread.sleep(100)
+                }
             }
 
         } catch (e: IOException) {

@@ -79,4 +79,6 @@
     <string name="keyboard">Keyboard</string>
     <string name="controllerPresetCreateText">Type a Name</string>
     <string name="removeLastPresetError">The Last Preset Cannot be Removed</string>
+    <string name="editGameIcon">Edit Icon</string>
+    <string name="addGameToHome">Create Shortcut on Launcher</string>
 </resources>

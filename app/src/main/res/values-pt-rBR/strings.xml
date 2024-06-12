@@ -72,4 +72,6 @@
     <string name="keyboard">Teclado</string>
     <string name="controllerPresetCreateText">Digite um nome</string>
     <string name="removeLastPresetError">O Último Preset não pode ser removido</string>
+    <string name="editGameIcon">Editar Icone</string>
+    <string name="addGameToHome">Criar Atalho no Launcher</string>
 </resources>

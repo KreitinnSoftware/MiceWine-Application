@@ -1,14 +1,12 @@
 package com.micewine.emu.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.MainActivity
 import com.micewine.emu.activities.MainActivity.Companion.loadGameList
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.adapters.AdapterGame
@@ -42,17 +40,18 @@ class HomeFragment : Fragment() {
 
         gameList.clear()
 
-        addToAdapter(requireContext().getString(R.string.desktop_mode_init), requireContext().getString(R.string.desktop_mode_init), R.drawable.default_icon)
+        addToAdapter(requireContext().getString(R.string.desktop_mode_init), requireContext().getString(R.string.desktop_mode_init), "")
 
         for (game in loadGameList(requireContext())) {
             val name = game[0]
             val exePath = game[1]
+            val icon = game[2]
 
-            addToAdapter(exePath, name, R.drawable.default_icon)
+            addToAdapter(exePath, name, icon)
         }
     }
 
-    private fun addToAdapter(exeFile: String, name: String, icon: Int) {
-        gameList.add(AdapterGame.GameList(File(exeFile), name,  icon))
+    private fun addToAdapter(exeFile: String, name: String, icon: String) {
+        gameList.add(AdapterGame.GameList(File(exeFile), name, icon))
     }
 }

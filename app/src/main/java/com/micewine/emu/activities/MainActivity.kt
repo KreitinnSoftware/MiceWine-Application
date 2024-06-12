@@ -3,20 +3,23 @@ package com.micewine.emu.activities
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.ShortcutInfo
+import android.content.pm.ShortcutManager
+import android.graphics.BitmapFactory
+import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
@@ -89,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         fab?.setOnClickListener {
-            openFilePicker()
+            openFilePicker(SELECT_EXE)
         }
 
         if (!usrDir.exists()) {
@@ -131,6 +134,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         when (item.title) {
+            getString(R.string.addGameToHome) -> {
+                addGameToHome(this, selectedGameArray)
+            }
+
+            getString(R.string.editGameIcon) -> {
+                openFilePicker(SELECT_ICON)
+            }
+
             getString(R.string.removeGameItem) -> {
                 removeGameFromList(this, selectedGameArray)
             }
@@ -147,14 +158,20 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(
         requestCode: Int, resultCode: Int, data: Intent?
     ) {
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+        if (requestCode == SELECT_EXE && resultCode == Activity.RESULT_OK) {
             data?.data?.also { uri ->
                 uriParser(uri).also {
                     if (it.endsWith(".exe") || it.endsWith(".bat")) {
-                        saveToGameList(this, it, File(it).nameWithoutExtension)
+                        saveToGameList(this, it, File(it).nameWithoutExtension, "")
                     } else {
                         Toast.makeText(this, getString(R.string.incompatibleSelectedFile), Toast.LENGTH_SHORT).show()
                     }
+                }
+            }
+        } else if (requestCode == SELECT_ICON && resultCode == Activity.RESULT_OK) {
+            data?.data?.also { uri ->
+                uriParser(uri).also {
+                    setIconToGame(this, it, selectedGameArray[0])
                 }
             }
         }
@@ -166,14 +183,23 @@ class MainActivity : AppCompatActivity() {
 
 
     @Suppress("DEPRECATION")
-    private fun openFilePicker() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-            type = "application/*"
-            addCategory(Intent.CATEGORY_OPENABLE)
+    private fun openFilePicker(requestCode: Int) {
+        var intent: Intent? = null
+
+        if (requestCode == SELECT_EXE) {
+            intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "application/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+            }
+        } else if (requestCode == SELECT_ICON) {
+            intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "image/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+            }
         }
+
         startActivityForResult(
-            Intent.createChooser(intent, getString(R.string.selectExecutableFile)),
-            1
+            Intent.createChooser(intent, getString(R.string.selectExecutableFile)),  requestCode
         )
     }
 
@@ -237,6 +263,8 @@ class MainActivity : AppCompatActivity() {
 
         const val ACTION_UPDATE_HOME = "com.micewine.emu.ACTION_UPDATE_HOME"
         const val RAM_COUNTER_KEY = "ramCounter"
+        const val SELECT_EXE = 1
+        const val SELECT_ICON = 2
 
         private fun booleanToString(boolean: Boolean): String {
             return if (boolean) {
@@ -311,13 +339,13 @@ class MainActivity : AppCompatActivity() {
             return context.applicationContext.applicationInfo.nativeLibraryDir
         }
 
-        private fun saveToGameList(context: Context, path: String, prettyName: String) {
+        private fun saveToGameList(context: Context, path: String, prettyName: String, icon: String) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
             val editor = preferences.edit()
 
             val currentList = loadGameList(context)
 
-            val game = arrayOf(prettyName, path)
+            val game = arrayOf(prettyName, path, icon)
 
             if (!checkIfExists(context, game)) {
                 currentList.add(game)
@@ -384,6 +412,26 @@ class MainActivity : AppCompatActivity() {
             context.sendBroadcast(intent)
         }
 
+        fun setIconToGame(context: Context, icon: String, gameName: String) {
+            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+            val editor = preferences.edit()
+
+            val currentList = loadGameList(context)
+
+            val index = currentList.indexOfFirst { it[0] == gameName }
+
+            currentList[index][2] = icon
+
+            val gson = Gson()
+            val json = gson.toJson(currentList)
+
+            editor.putString("gameList", json)
+            editor.apply()
+
+            val intent = Intent(ACTION_UPDATE_HOME)
+            context.sendBroadcast(intent)
+        }
+
         private fun checkIfExists(context: Context, array: Array<String>): Boolean {
             val currentList = loadGameList(context)
 
@@ -410,6 +458,37 @@ class MainActivity : AppCompatActivity() {
             val usedMemory = totalMemory - availableMemory
 
             return "RAM: $usedMemory/$totalMemory"
+        }
+
+        fun addGameToHome(context: Context, selectedGameArray: Array<String>) {
+            val shortcutManager = context.getSystemService(ShortcutManager::class.java)
+
+            if (shortcutManager!!.isRequestPinShortcutSupported) {
+                val intent = Intent(context, EmulationActivity::class.java).apply {
+                    action = Intent.ACTION_VIEW
+                    putExtra("exePath", selectedGameArray[1])
+                }
+
+                val pinShortcutInfo = ShortcutInfo.Builder(context, "my-pme")
+                    .setShortLabel(selectedGameArray[0])
+                    .setIcon(
+                        if (selectedGameArray[2] == "" || !File(selectedGameArray[2]).exists()) {
+                            Icon.createWithResource(context, R.drawable.default_icon)
+                        } else {
+                            Icon.createWithBitmap(BitmapFactory.decodeFile(selectedGameArray[2]))
+                        })
+
+                    .setIntent(intent)
+                    .build()
+
+                val pinnedShortcutCallbackIntent = shortcutManager.createShortcutResultIntent(pinShortcutInfo)
+
+                val successCallback = PendingIntent.getBroadcast(context, 0,
+                    pinnedShortcutCallbackIntent, PendingIntent.FLAG_IMMUTABLE)
+
+                shortcutManager.requestPinShortcut(pinShortcutInfo,
+                    successCallback.intentSender)
+            }
         }
     }
 }
