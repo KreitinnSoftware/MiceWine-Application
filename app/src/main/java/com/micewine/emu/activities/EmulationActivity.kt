@@ -32,6 +32,7 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.GravityCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
@@ -42,6 +43,7 @@ import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
 import com.micewine.emu.ICmdEntryInterface
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.classPath
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
@@ -49,6 +51,7 @@ import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.core.Init
+import com.micewine.emu.core.ShellExecutorCmd
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
@@ -101,6 +104,14 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     private val overlayThread: Thread? = null
     private var init: Init? = null
     private var drawerLayout: DrawerLayout? = null
+    private val xServerThread: Thread = Thread {
+        ShellExecutorCmd.executeShell(
+            "export CLASSPATH=$classPath;" +
+                    "/system/bin/app_process / com.micewine.emu.CmdEntryPoint :0", "XServer"
+        )
+    }.apply {
+        start()
+    }
 
     init {
         instance = this
@@ -115,6 +126,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         preferences.registerOnSharedPreferenceChangeListener { _: SharedPreferences?, key: String? ->
             onPreferencesChanged(key)
         }
+
         prepareButtonsAxisValues(this)
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         init = Init()
@@ -125,6 +137,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         val exePath = intent.getStringExtra("exePath")
 
         drawerLayout = findViewById(R.id.DrawerLayout)
+        //drawerLayout?.background = AppCompatResources.getDrawable(this, R.drawable.default_icon)
         drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
 
         val lorieView = findViewById<LorieView>(R.id.lorieView)
@@ -149,7 +162,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             when (item.itemId) {
                 R.id.exitFromEmulation -> {
                     init!!.stopAll()
-                    finish()
+                    drawerLayout?.closeDrawers()
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    startActivityIfNeeded(intent, 0)
                 }
 
                 R.id.openCloseKeyboard -> {

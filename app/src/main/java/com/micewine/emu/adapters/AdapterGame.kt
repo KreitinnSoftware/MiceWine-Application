@@ -1,5 +1,6 @@
 package com.micewine.emu.adapters
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -15,7 +16,7 @@ import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
 import java.io.File
 
-class AdapterGame(private val gameList: List<GameList>, private val context: Context) :
+class AdapterGame(private val gameList: List<GameList>, private val activity: Activity) :
     RecyclerView.Adapter<AdapterGame.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView =
@@ -49,16 +50,18 @@ class AdapterGame(private val gameList: List<GameList>, private val context: Con
 
         override fun onClick(v: View) {
             val gameModel = gameList[getAdapterPosition()]
-            val intent = Intent(context, EmulationActivity::class.java)
+            val intent = Intent(activity, EmulationActivity::class.java)
 
-            if (gameModel.exeFile.path == context.getString(R.string.desktop_mode_init)) {
+            if (gameModel.exeFile.path == activity.getString(R.string.desktop_mode_init)) {
                 intent.putExtra("exePath", "**wine-desktop**")
             } else {
                 intent.putExtra("exePath", gameModel.exeFile.toString())
             }
 
             enableRamCounter = true
-            context.startActivity(intent)
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            activity.startActivityIfNeeded(intent, 0)
         }
 
         override fun onLongClick(v: View): Boolean {

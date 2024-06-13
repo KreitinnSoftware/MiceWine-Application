@@ -1,25 +1,16 @@
 package com.micewine.emu
 
 import android.annotation.SuppressLint
-import android.app.ActivityManager
 import android.app.ActivityThread
-import android.app.IActivityManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.IIntentReceiver
-import android.content.IIntentSender
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.IBinder
 import android.os.Looper
 import android.os.ParcelFileDescriptor
-import android.os.RemoteException
-import android.system.Os
 import android.util.Log
 import android.view.Surface
-import androidx.annotation.Keep
 import java.io.DataInputStream
 import java.net.ConnectException
 import java.net.InetAddress
@@ -28,89 +19,30 @@ import java.net.Socket
 import kotlin.system.exitProcess
 
 @Suppress("DEPRECATION")
-@Keep
-@SuppressLint("StaticFieldLeak", "UnsafeDynamicallyLoadedCode")
-class CmdEntryPoint internal constructor(args: Array<String>?) : ICmdEntryInterface.Stub() {
+class CmdEntryPoint internal constructor(args: Array<String>?, context: Context) : ICmdEntryInterface.Stub() {
     init {
         if (!start(args)) exitProcess(1)
-        spawnListeningThread()
-        sendBroadcastDelayed()
+        spawnListeningThread(context)
+        sendBroadcastDelayed(context)
     }
 
-    @SuppressLint("WrongConstant", "PrivateApi")
-    fun sendBroadcast() {
-        val targetPackage = "com.micewine.emu"
-        // We should not care about multiple instances, it should be called only by `Termux:X11` app
-        // which is single instance...
+    private fun sendBroadcast(context: Context) {
         val bundle = Bundle()
         bundle.putBinder("", this)
         val intent = Intent(ACTION_START)
         intent.putExtra("", bundle)
-        intent.setPackage(targetPackage)
-        if (Os.getuid() == 0 || Os.getuid() == 2000) intent.setFlags(0x00400000 /* FLAG_RECEIVER_FROM_SHELL */)
-        try {
-            ctx.sendBroadcast(intent)
-        } catch (e: IllegalArgumentException) {
-            val packageName: String = try {
-                ActivityThread.getPackageManager().getPackagesForUid(Os.getuid())[0]
-            } catch (ex: RemoteException) {
-                throw RuntimeException(ex)
-            }
-            val am: IActivityManager = try {
-                ActivityManager::class.java
-                    .getMethod("getService")
-                    .invoke(null) as IActivityManager
-            } catch (e2: Exception) {
-                try {
-                    Class.forName("android.app.ActivityManagerNative")
-                        .getMethod("getDefault")
-                        .invoke(null) as IActivityManager
-                } catch (e3: Exception) {
-                    throw RuntimeException(e3)
-                }
-            }
-            val sender = am.getIntentSender(
-                1, packageName, null, null, 0, arrayOf(intent),
-                null, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_ONE_SHOT, null, 0
-            )
-            try {
-                IIntentSender::class.java
-                    .getMethod(
-                        "send",
-                        Int::class.javaPrimitiveType,
-                        Intent::class.java,
-                        String::class.java,
-                        IBinder::class.java,
-                        IIntentReceiver::class.java,
-                        String::class.java,
-                        Bundle::class.java
-                    )
-                    .invoke(sender, 0, intent, null, null, object : IIntentReceiver.Stub() {
-                        override fun performReceive(
-                            i: Intent,
-                            r: Int,
-                            d: String,
-                            e: Bundle,
-                            o: Boolean,
-                            s: Boolean,
-                            a: Int
-                        ) {
-                        }
-                    }, null, null)
-            } catch (ex: Exception) {
-                throw RuntimeException(ex)
-            }
-        }
+
+        context.sendBroadcast(intent)
     }
 
     // In some cases Android Activity part can not connect opened port.
     // In this case opened port works like a lock file.
-    private fun sendBroadcastDelayed() {
-        if (!connected()) sendBroadcast()
-        handler!!.postDelayed({ sendBroadcastDelayed() }, 1000)
+    private fun sendBroadcastDelayed(context: Context) {
+        if (!connected()) sendBroadcast(context)
+        handler!!.postDelayed({ sendBroadcastDelayed(context) }, 1000)
     }
 
-    private fun spawnListeningThread() {
+    private fun spawnListeningThread(context: Context) {
         Thread {
             // New thread is needed to avoid android.os.NetworkOnMainThreadException
             /*
@@ -132,7 +64,7 @@ class CmdEntryPoint internal constructor(args: Array<String>?) : ICmdEntryInterf
                                 reader.readFully(b)
                                 if (MAGIC.contentEquals(b)) {
                                     Log.e("CmdEntryPoint", "New client connection!")
-                                    sendBroadcast()
+                                    sendBroadcast(context)
                                 }
                             }
                         } catch (e: Exception) {
@@ -150,12 +82,12 @@ class CmdEntryPoint internal constructor(args: Array<String>?) : ICmdEntryInterf
     external override fun getXConnection(): ParcelFileDescriptor
     external override fun getLogcatOutput(): ParcelFileDescriptor
 
+    @SuppressLint("UnsafeDynamicallyLoadedCode")
     companion object {
         const val ACTION_START = "com.micewine.emu.CmdEntryPoint.ACTION_START"
         const val PORT = 7892
         val MAGIC = "0xDEADBEEF".toByteArray()
         private var handler: Handler? = null
-        var ctx = createContext()
 
         init {
             val path = "lib/" + Build.SUPPORTED_ABIS[0] + "/libXlorie.so"
@@ -177,7 +109,7 @@ class CmdEntryPoint internal constructor(args: Array<String>?) : ICmdEntryInterf
                 Looper.prepareMainLooper()
             }
 
-            handler = Handler()
+            handler = Handler(Looper.getMainLooper())
         }
 
         /**
@@ -188,7 +120,7 @@ class CmdEntryPoint internal constructor(args: Array<String>?) : ICmdEntryInterf
         @JvmStatic
         fun main(args: Array<String>) {
             Log.i("CmdEntryPoint", "commit " + BuildConfig.COMMIT)
-            handler!!.post { CmdEntryPoint(args) }
+            handler!!.post { CmdEntryPoint(args, createContext()) }
             Looper.loop()
         }
 
@@ -216,9 +148,6 @@ class CmdEntryPoint internal constructor(args: Array<String>?) : ICmdEntryInterf
             }.start()
         }
 
-        /**
-         * @noinspection DataFlowIssue
-         */
         @SuppressLint("DiscouragedPrivateApi")
         fun createContext(): Context {
             return try {

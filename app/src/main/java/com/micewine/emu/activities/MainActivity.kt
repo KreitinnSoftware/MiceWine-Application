@@ -260,6 +260,7 @@ class MainActivity : AppCompatActivity() {
         var selectedVirGLProfile: String? = null
         var selectedDXVKHud: String? = null
         var selectedGameArray: Array<String> = arrayOf()
+        var classPath: String? = null
 
         const val ACTION_UPDATE_HOME = "com.micewine.emu.ACTION_UPDATE_HOME"
         const val RAM_COUNTER_KEY = "ramCounter"
@@ -295,6 +296,7 @@ class MainActivity : AppCompatActivity() {
             selectedVirGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
             selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "FPS/GPU Load")
             enableRamCounter = preferences.getBoolean(RAM_COUNTER_KEY, false)
+            classPath = getClassPath(context)
         }
 
         fun copyAssets(activity: Activity, filename: String, outputPath: String, textView: TextView) {
@@ -469,7 +471,7 @@ class MainActivity : AppCompatActivity() {
                     putExtra("exePath", selectedGameArray[1])
                 }
 
-                val pinShortcutInfo = ShortcutInfo.Builder(context, "my-pme")
+                val pinShortcutInfo = ShortcutInfo.Builder(context, selectedGameArray[0])
                     .setShortLabel(selectedGameArray[0])
                     .setIcon(
                         if (selectedGameArray[2] == "" || !File(selectedGameArray[2]).exists()) {

@@ -21,13 +21,6 @@ class MainService : Service() {
 
         serviceScope.launch {
             ShellExecutorCmd.executeShell(
-                "export CLASSPATH=" + getClassPath(this@MainService) + ";" +
-                        "/system/bin/app_process / com.micewine.emu.CmdEntryPoint :0", "XServer"
-            )
-        }
-
-        serviceScope.launch {
-            ShellExecutorCmd.executeShell(
                 "$usrDir/bin/virgl_test_server", "VirGLServer"
             )
         }
