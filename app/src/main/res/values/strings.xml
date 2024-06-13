@@ -81,4 +81,6 @@
     <string name="removeLastPresetError">The Last Preset Cannot be Removed</string>
     <string name="editGameIcon">Edit Icon</string>
     <string name="addGameToHome">Create Shortcut on Launcher</string>
+    <string name="cancelText">Cancel</string>
+    <string name="removeGameItemWarning">Are you sure you want to remove it?</string>
 </resources>

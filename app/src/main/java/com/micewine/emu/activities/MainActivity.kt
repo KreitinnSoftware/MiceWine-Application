@@ -44,6 +44,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_THEME_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VIRGL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
 import com.micewine.emu.databinding.ActivityMainBinding
+import com.micewine.emu.fragments.DeleteGameItemFragment
 import com.micewine.emu.fragments.HomeFragment
 import com.micewine.emu.fragments.RenameGameItemFragment
 import com.micewine.emu.fragments.SettingsFragment
@@ -156,7 +157,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             getString(R.string.removeGameItem) -> {
-                removeGameFromList(this, selectedGameArray)
+                DeleteGameItemFragment().show(supportFragmentManager, "")
             }
 
             getString(R.string.renameGameItem) -> {
@@ -389,7 +390,7 @@ class MainActivity : AppCompatActivity() {
             return gson.fromJson(json, listType) ?: mutableListOf()
         }
 
-        private fun removeGameFromList(context: Context, array: Array<String>) {
+        fun removeGameFromList(context: Context, array: Array<String>) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
             val editor = preferences.edit()
 

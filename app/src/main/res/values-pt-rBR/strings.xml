@@ -74,4 +74,6 @@
     <string name="removeLastPresetError">O Último Preset não pode ser removido</string>
     <string name="editGameIcon">Editar Icone</string>
     <string name="addGameToHome">Criar Atalho no Launcher</string>
+    <string name="cancelText">Cancelar</string>
+    <string name="removeGameItemWarning">Você tem certeza que quer remover?</string>
 </resources>
