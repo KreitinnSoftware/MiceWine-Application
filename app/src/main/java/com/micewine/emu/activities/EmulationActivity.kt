@@ -137,7 +137,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         val exePath = intent.getStringExtra("exePath")
 
         drawerLayout = findViewById(R.id.DrawerLayout)
-        //drawerLayout?.background = AppCompatResources.getDrawable(this, R.drawable.default_icon)
         drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
 
         val lorieView = findViewById<LorieView>(R.id.lorieView)

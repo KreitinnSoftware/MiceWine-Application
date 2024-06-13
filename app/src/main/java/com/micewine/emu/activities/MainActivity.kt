@@ -74,6 +74,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
+        setSharedVars(this)
+
         fab = findViewById(R.id.addItemFAB)
         bottomNavigation = findViewById(R.id.bottom_navigation)
 
@@ -111,7 +113,18 @@ class MainActivity : AppCompatActivity() {
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
 
-        setSharedVars(this)
+        val exePath = intent.getStringExtra("exePath")
+
+        if (exePath != null) {
+            val intent = Intent(this, EmulationActivity::class.java)
+
+            intent.putExtra("exePath", exePath)
+
+            enableRamCounter = true
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+            startActivityIfNeeded(intent, 0)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -466,7 +479,7 @@ class MainActivity : AppCompatActivity() {
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
 
             if (shortcutManager!!.isRequestPinShortcutSupported) {
-                val intent = Intent(context, EmulationActivity::class.java).apply {
+                val intent = Intent(context, MainActivity::class.java).apply {
                     action = Intent.ACTION_VIEW
                     putExtra("exePath", selectedGameArray[1])
                 }
