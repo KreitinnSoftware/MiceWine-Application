@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.EmulationActivity
+import com.micewine.emu.activities.MainActivity.Companion.ACTION_RUN_WINE
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
 import java.io.File
@@ -50,17 +51,21 @@ class AdapterGame(private val gameList: List<GameList>, private val activity: Ac
 
         override fun onClick(v: View) {
             val gameModel = gameList[getAdapterPosition()]
-            val intent = Intent(activity, EmulationActivity::class.java)
 
-            if (gameModel.exeFile.path == activity.getString(R.string.desktop_mode_init)) {
-                intent.putExtra("exePath", "**wine-desktop**")
-            } else {
-                intent.putExtra("exePath", gameModel.exeFile.toString())
+            val intent = Intent(activity, EmulationActivity::class.java).apply {
+                setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             }
 
-            enableRamCounter = true
+            val runWineIntent = Intent(ACTION_RUN_WINE).apply {
+                if (gameModel.exeFile.path == activity.getString(R.string.desktop_mode_init)) {
+                    putExtra("exePath", "**wine-desktop**")
+                } else {
+                    putExtra("exePath", gameModel.exeFile.toString())
+                }
+            }
 
-            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            activity.sendBroadcast(runWineIntent)
+
             activity.startActivityIfNeeded(intent, 0)
         }
 

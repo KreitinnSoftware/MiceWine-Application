@@ -1,6 +1,7 @@
 package com.micewine.emu.adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,7 +44,7 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
             holder.settingsSwitch.setOnClickListener {
                 val editor = preferences.edit()
 
-                editor.putBoolean(sList.key, !preferences.getBoolean(sList.key, false))
+                editor.putBoolean(sList.key, !preferences.getBoolean(sList.key, sList.defaultValue.toBoolean()))
 
                 editor.apply()
             }

@@ -32,10 +32,10 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.GravityCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
 import com.micewine.emu.CmdEntryPoint
@@ -43,15 +43,13 @@ import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
 import com.micewine.emu.ICmdEntryInterface
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
-import com.micewine.emu.activities.MainActivity.Companion.classPath
+import com.micewine.emu.activities.MainActivity.Companion.killWine
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
-import com.micewine.emu.core.Init
-import com.micewine.emu.core.ShellExecutorCmd
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
@@ -60,6 +58,7 @@ import com.micewine.emu.utils.FullscreenWorkaround
 import com.micewine.emu.utils.KeyInterceptor
 import com.micewine.emu.views.OverlayView
 import com.micewine.emu.views.OverlayView.CustomButtonData
+import kotlinx.coroutines.launch
 
 @Suppress("deprecation", "unused")
 class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
@@ -102,16 +101,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     }
     private var mLorieKeyListener: View.OnKeyListener? = null
     private val overlayThread: Thread? = null
-    private var init: Init? = null
     private var drawerLayout: DrawerLayout? = null
-    private val xServerThread: Thread = Thread {
-        ShellExecutorCmd.executeShell(
-            "export CLASSPATH=$classPath;" +
-                    "/system/bin/app_process / com.micewine.emu.CmdEntryPoint :0", "XServer"
-        )
-    }.apply {
-        start()
-    }
 
     init {
         instance = this
@@ -129,12 +119,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         prepareButtonsAxisValues(this)
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        init = Init()
         window.setFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, 0)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_emulation)
-
-        val exePath = intent.getStringExtra("exePath")
 
         drawerLayout = findViewById(R.id.DrawerLayout)
         drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
@@ -152,18 +139,21 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         overlayView.visibility = View.INVISIBLE
 
-        Thread {
+        lifecycleScope.launch {
             controllerMouseEmulation(lorieView)
-        }.start()
+        }
 
         val nav = findViewById<NavigationView>(R.id.NavigationView)
         nav.setNavigationItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
                 R.id.exitFromEmulation -> {
-                    init!!.stopAll()
                     drawerLayout?.closeDrawers()
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    killWine()
+
+                    val intent = Intent(this, MainActivity::class.java).apply {
+                        setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    }
+
                     startActivityIfNeeded(intent, 0)
                 }
 
@@ -314,8 +304,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         onPreferencesChanged("")
         checkXEvents()
 
-        init!!.run(this, exePath)
-
         setSharedVars(this)
 
         if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU && checkSelfPermission(permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED && !shouldShowRequestPermissionRationale(
@@ -334,7 +322,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
     override fun onDestroy() {
         unregisterReceiver(receiver)
-        init!!.stopAll()
         super.onDestroy()
     }
 

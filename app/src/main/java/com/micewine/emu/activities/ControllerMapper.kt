@@ -288,10 +288,6 @@ class ControllerMapper : AppCompatActivity() {
 
             currentList[index][mappingMap[DEAD_ZONE_KEY]!!] = "$value"
 
-            currentList.forEach {
-                Log.v("AAAAAAAA", it.toString())
-            }
-
             val gson = Gson()
             val json = gson.toJson(currentList)
 
@@ -314,10 +310,6 @@ class ControllerMapper : AppCompatActivity() {
             }
 
             currentList[index][mappingMap[MOUSE_SENSIBILITY_KEY]!!] = "$value"
-
-            currentList.forEach {
-                Log.v("AAAAAAAA", it.toString())
-            }
 
             val gson = Gson()
             val json = gson.toJson(currentList)
@@ -352,10 +344,6 @@ class ControllerMapper : AppCompatActivity() {
 
         fun getMapping(context: Context, name: String, key: String): List<String> {
             val currentList = loadControllerPresets(context)
-
-            currentList.forEach {
-                Log.v("AAAAAAAA", it.toString())
-            }
 
             val index = currentList.indexOfFirst { it[0] == name }
 
@@ -433,10 +421,6 @@ class ControllerMapper : AppCompatActivity() {
             }
 
             currentList[index][mappingMap[key]!!] = "$selectedItem:$mappingType"
-
-            currentList.forEach {
-                Log.v("AAAAAAAA", it.toString())
-            }
 
             val gson = Gson()
             val json = gson.toJson(currentList)

@@ -22,6 +22,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -43,11 +44,16 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_IB_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_THEME_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VIRGL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
+import com.micewine.emu.core.EnvVars
+import com.micewine.emu.core.ShellExecutorCmd
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.DeleteGameItemFragment
 import com.micewine.emu.fragments.HomeFragment
 import com.micewine.emu.fragments.RenameGameItemFragment
 import com.micewine.emu.fragments.SettingsFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -61,6 +67,13 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context, intent: Intent) {
             if (ACTION_UPDATE_HOME == intent.action) {
                 fragmentLoader(HomeFragment(), false)
+            } else if (ACTION_RUN_WINE == intent.action) {
+                val exePath = intent.getStringExtra("exePath")
+
+                lifecycleScope.launch {
+                    runVirGLRenderer()
+                    runWine(exePath!!)
+                }
             }
         }
     }
@@ -74,6 +87,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
+
+        lifecycleScope.launch {
+            runXServer(":0")
+        }
 
         setSharedVars(this)
 
@@ -108,7 +125,11 @@ class MainActivity : AppCompatActivity() {
         selectedFragment = "HomeFragment"
         fragmentLoader(HomeFragment(), true)
 
-        registerReceiver(receiver, object : IntentFilter(ACTION_UPDATE_HOME) {})
+        registerReceiver(receiver, object : IntentFilter(ACTION_UPDATE_HOME) {
+            init {
+                addAction(ACTION_RUN_WINE)
+            }
+        })
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -202,7 +223,7 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == SELECT_EXE) {
             intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                type = "application/*"
+                type = "application/x-msdos-program"
                 addCategory(Intent.CATEGORY_OPENABLE)
             }
         } else if (requestCode == SELECT_ICON) {
@@ -247,6 +268,41 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private suspend fun runWine(exePath: String) {
+        withContext(Dispatchers.Default) {
+            EnvVars.setVariables()
+
+            if (exePath.contains("**wine-desktop**")) {
+                ShellExecutorCmd.executeShell(
+                    EnvVars.exportVariables() + ";" +
+                            "$usrDir/bin/start-wine.sh", "WineService"
+                )
+            } else {
+                ShellExecutorCmd.executeShell(
+                    EnvVars.exportVariables() + ";" +
+                            "$usrDir/bin/start-wine.sh \"$exePath\"", "WineService"
+                )
+            }
+        }
+    }
+
+    private suspend fun runVirGLRenderer() {
+        withContext(Dispatchers.IO) {
+            ShellExecutorCmd.executeShell(
+                "$usrDir/bin/virgl_test_server", "VirGLServer"
+            )
+        }
+    }
+
+    private suspend fun runXServer(display: String) {
+        withContext(Dispatchers.IO) {
+            ShellExecutorCmd.executeShell(
+                "export CLASSPATH=${getClassPath(this@MainActivity)};" +
+                        "/system/bin/app_process / com.micewine.emu.CmdEntryPoint $display", "XServer"
+            )
+        }
+    }
+
     companion object {
         const val PERMISSION_REQUEST_CODE = 123
 
@@ -274,9 +330,9 @@ class MainActivity : AppCompatActivity() {
         var selectedVirGLProfile: String? = null
         var selectedDXVKHud: String? = null
         var selectedGameArray: Array<String> = arrayOf()
-        var classPath: String? = null
 
         const val ACTION_UPDATE_HOME = "com.micewine.emu.ACTION_UPDATE_HOME"
+        const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
         const val RAM_COUNTER_KEY = "ramCounter"
         const val SELECT_EXE = 1
         const val SELECT_ICON = 2
@@ -310,7 +366,6 @@ class MainActivity : AppCompatActivity() {
             selectedVirGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
             selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "FPS/GPU Load")
             enableRamCounter = preferences.getBoolean(RAM_COUNTER_KEY, false)
-            classPath = getClassPath(context)
         }
 
         fun copyAssets(activity: Activity, filename: String, outputPath: String, textView: TextView) {
@@ -347,7 +402,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fun getClassPath(context: Context): String {
+        private fun getClassPath(context: Context): String {
             return File(getLibsPath(context)).parentFile?.parentFile?.absolutePath + "/base.apk"
         }
 
@@ -499,12 +554,17 @@ class MainActivity : AppCompatActivity() {
 
                 val pinnedShortcutCallbackIntent = shortcutManager.createShortcutResultIntent(pinShortcutInfo)
 
-                val successCallback = PendingIntent.getBroadcast(context, 0,
-                    pinnedShortcutCallbackIntent, PendingIntent.FLAG_IMMUTABLE)
+                val successCallback = PendingIntent.getBroadcast(context, 0, pinnedShortcutCallbackIntent, PendingIntent.FLAG_IMMUTABLE)
 
-                shortcutManager.requestPinShortcut(pinShortcutInfo,
-                    successCallback.intentSender)
+                shortcutManager.requestPinShortcut(pinShortcutInfo, successCallback.intentSender)
             }
+        }
+
+        fun killWine() {
+            EnvVars.setVariables()
+
+            ShellExecutorCmd.executeShell(EnvVars.exportVariables() + ";" +
+                    "box64 wineserver -k", "WineKiller")
         }
     }
 }

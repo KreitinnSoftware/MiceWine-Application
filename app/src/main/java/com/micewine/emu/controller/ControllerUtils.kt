@@ -54,6 +54,8 @@ import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
 import com.micewine.emu.input.InputStub.BUTTON_UNDEFINED
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.math.absoluteValue
 
 object ControllerUtils {
@@ -264,36 +266,93 @@ object ControllerUtils {
         }
     }
 
-    fun controllerMouseEmulation(lorieView: LorieView) {
-        while (true) {
-            when (moveVMouse) {
-                LEFT -> {
-                    lorieView.sendMouseEvent(-10F * (axisXVelocity * mouseSensibility), 0F, BUTTON_UNDEFINED, false, true)
-                }
-                RIGHT -> {
-                    lorieView.sendMouseEvent(10F * (axisXVelocity * mouseSensibility), 0F, BUTTON_UNDEFINED, false, true)
-                }
-                UP -> {
-                    lorieView.sendMouseEvent(0F, -10F * (axisYVelocity * mouseSensibility), BUTTON_UNDEFINED, false, true)
-                }
-                DOWN -> {
-                    lorieView.sendMouseEvent(0F, 10F * (axisYVelocity * mouseSensibility), BUTTON_UNDEFINED, false, true)
-                }
-                LEFT_UP -> {
-                    lorieView.sendMouseEvent(-10F * (axisXVelocity * mouseSensibility), -10F * (axisYVelocity * mouseSensibility), BUTTON_UNDEFINED, false, true)
-                }
-                LEFT_DOWN -> {
-                    lorieView.sendMouseEvent(-10F * (axisXVelocity * mouseSensibility), 10F * (axisYVelocity * mouseSensibility), BUTTON_UNDEFINED, false, true)
-                }
-                RIGHT_UP -> {
-                    lorieView.sendMouseEvent(10F * (axisXVelocity * mouseSensibility), -10F * (axisYVelocity * mouseSensibility), BUTTON_UNDEFINED, false, true)
-                }
-                RIGHT_DOWN -> {
-                    lorieView.sendMouseEvent(10F * (axisXVelocity * mouseSensibility), 10F * (axisYVelocity * mouseSensibility), BUTTON_UNDEFINED, false, true)
-                }
-            }
+    suspend fun controllerMouseEmulation(lorieView: LorieView) {
+        withContext(Dispatchers.IO) {
+            while (true) {
+                when (moveVMouse) {
+                    LEFT -> {
+                        lorieView.sendMouseEvent(
+                            -10F * (axisXVelocity * mouseSensibility),
+                            0F,
+                            BUTTON_UNDEFINED,
+                            false,
+                            true
+                        )
+                    }
 
-            Thread.sleep(16)
+                    RIGHT -> {
+                        lorieView.sendMouseEvent(
+                            10F * (axisXVelocity * mouseSensibility),
+                            0F,
+                            BUTTON_UNDEFINED,
+                            false,
+                            true
+                        )
+                    }
+
+                    UP -> {
+                        lorieView.sendMouseEvent(
+                            0F,
+                            -10F * (axisYVelocity * mouseSensibility),
+                            BUTTON_UNDEFINED,
+                            false,
+                            true
+                        )
+                    }
+
+                    DOWN -> {
+                        lorieView.sendMouseEvent(
+                            0F,
+                            10F * (axisYVelocity * mouseSensibility),
+                            BUTTON_UNDEFINED,
+                            false,
+                            true
+                        )
+                    }
+
+                    LEFT_UP -> {
+                        lorieView.sendMouseEvent(
+                            -10F * (axisXVelocity * mouseSensibility),
+                            -10F * (axisYVelocity * mouseSensibility),
+                            BUTTON_UNDEFINED,
+                            false,
+                            true
+                        )
+                    }
+
+                    LEFT_DOWN -> {
+                        lorieView.sendMouseEvent(
+                            -10F * (axisXVelocity * mouseSensibility),
+                            10F * (axisYVelocity * mouseSensibility),
+                            BUTTON_UNDEFINED,
+                            false,
+                            true
+                        )
+                    }
+
+                    RIGHT_UP -> {
+                        lorieView.sendMouseEvent(
+                            10F * (axisXVelocity * mouseSensibility),
+                            -10F * (axisYVelocity * mouseSensibility),
+                            BUTTON_UNDEFINED,
+                            false,
+                            true
+                        )
+                    }
+
+                    RIGHT_DOWN -> {
+                        lorieView.sendMouseEvent(
+                            10F * (axisXVelocity * mouseSensibility),
+                            10F * (axisYVelocity * mouseSensibility),
+                            BUTTON_UNDEFINED,
+                            false,
+                            true
+                        )
+                    }
+                }
+
+                Thread.sleep(16)
+            }
         }
     }
 

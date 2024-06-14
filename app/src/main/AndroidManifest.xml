@@ -71,12 +71,6 @@
             android:exported="true"
             android:theme="@style/Theme.MiceWine">
         </activity>
-
-        <service
-            android:name=".core.MainService"
-            android:enabled="true"
-            android:exported="false">
-        </service>
     </application>
 
 </manifest>
