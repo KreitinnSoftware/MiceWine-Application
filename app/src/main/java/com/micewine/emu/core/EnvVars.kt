@@ -84,6 +84,7 @@ object EnvVars {
 
         putVar("MICEWINE_THEME", "MICEWINE_THEME=$selectedTheme")
         putVar("D3DX_RENDERER", "D3DX_RENDERER=$d3dxRenderer")
+        putVar("D3D8_WRAPPER", "D3D8_WRAPPER=D8VK")
         putVar("WINED3D_VERSION", "WINED3D_VERSION=$selectedWineD3D")
         putVar("DXVK_VERSION", "DXVK_VERSION=$selectedDXVK")
         putVar("DXVK_ASYNC", "DXVK_ASYNC=1")
