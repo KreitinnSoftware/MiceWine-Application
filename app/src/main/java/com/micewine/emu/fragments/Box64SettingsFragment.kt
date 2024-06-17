@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN_KEY
@@ -57,6 +58,8 @@ class Box64SettingsFragment : Fragment() {
         addToAdapter(R.string.box64_safeflags_title, R.string.box64_safeflags_description, arrayOf("0", "1", "2"), SPINNER, "1", BOX64_DYNAREC_SAFEFLAGS_KEY)
 
         addToAdapter(R.string.box64_callret_title, R.string.box64_callret_description, arrayOf(""), SWITCH, "true", BOX64_DYNAREC_CALLRET_KEY)
+
+        addToAdapter(R.string.box64_aligned_atomics_title, R.string.box64_aligned_atomics_description, arrayOf(""), SWITCH, "false", BOX64_DYNAREC_ALIGNED_ATOMICS_KEY)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>, type: Int, defaultValue: String, keyId: String) {

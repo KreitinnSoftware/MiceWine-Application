@@ -122,6 +122,7 @@ class GeneralSettings : AppCompatActivity() {
         const val BOX64_DYNAREC_FASTROUND_KEY = "BOX64_DYNAREC_FASTROUND"
         const val BOX64_DYNAREC_SAFEFLAGS_KEY = "BOX64_DYNAREC_SAFEFLAGS"
         const val BOX64_DYNAREC_CALLRET_KEY = "BOX64_DYNAREC_CALLRET"
+        const val BOX64_DYNAREC_ALIGNED_ATOMICS_KEY = "BOX64_DYNAREC_ALIGNED_ATOMICS"
         const val SELECTED_DRIVER_KEY = "selectedDriver"
         const val SELECTED_THEME_KEY = "selectedTheme"
         const val SELECTED_D3DX_RENDERER_KEY = "d3dxRenderer"

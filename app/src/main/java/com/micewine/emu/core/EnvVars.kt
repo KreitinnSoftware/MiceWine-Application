@@ -2,6 +2,7 @@ package com.micewine.emu.core
 
 import com.micewine.emu.activities.MainActivity.Companion.appLang
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecAlignedAtomics
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBigblock
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecCallret
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastnan
@@ -9,15 +10,12 @@ import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastround
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecSafeflags
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecStrongmem
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecX87double
-import com.micewine.emu.activities.MainActivity.Companion.d3dxRenderer
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
-import com.micewine.emu.activities.MainActivity.Companion.selectedDXVK
 import com.micewine.emu.activities.MainActivity.Companion.selectedDXVKHud
 import com.micewine.emu.activities.MainActivity.Companion.selectedDriver
 import com.micewine.emu.activities.MainActivity.Companion.selectedIbVersion
 import com.micewine.emu.activities.MainActivity.Companion.selectedTheme
 import com.micewine.emu.activities.MainActivity.Companion.selectedVirGLProfile
-import com.micewine.emu.activities.MainActivity.Companion.selectedWineD3D
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 
@@ -108,6 +106,7 @@ object EnvVars {
         putVar("BOX64_DYNAREC_FASTROUND", "BOX64_DYNAREC_FASTROUND=$box64DynarecFastround")
         putVar("BOX64_DYNAREC_SAFEFLAGS", "BOX64_DYNAREC_SAFEFLAGS=$box64DynarecSafeflags")
         putVar("BOX64_DYNAREC_CALLRET", "BOX64_DYNAREC_CALLRET=$box64DynarecCallret")
+        putVar("BOX64_DYNAREC_ALIGNED_ATOMICS", "BOX64_DYNAREC_ALIGNED_ATOMICS=$box64DynarecAlignedAtomics")
         putVar("VKD3D_FEATURE_LEVEL", "VKD3D_FEATURE_LEVEL=12_0")
         putVar("WINEDEBUG", "WINEDEBUG=-virtual")
     }

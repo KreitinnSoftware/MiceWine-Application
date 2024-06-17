@@ -29,6 +29,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN_KEY
@@ -380,6 +381,7 @@ class MainActivity : AppCompatActivity() {
         var box64DynarecFastround: String? = null
         var box64DynarecSafeflags: String? = null
         var box64DynarecCallret: String? = null
+        var box64DynarecAlignedAtomics: String? = null
         var selectedDriver: String? = null
         var selectedTheme: String? = null
         var d3dxRenderer: String? = null
@@ -419,6 +421,7 @@ class MainActivity : AppCompatActivity() {
             box64DynarecFastround = booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTROUND_KEY, true))
             box64DynarecSafeflags = preferences.getString(BOX64_DYNAREC_SAFEFLAGS_KEY, "1")
             box64DynarecCallret = booleanToString(preferences.getBoolean(BOX64_DYNAREC_CALLRET_KEY, true))
+            box64DynarecAlignedAtomics = booleanToString(preferences.getBoolean(BOX64_DYNAREC_ALIGNED_ATOMICS_KEY, false))
             selectedDriver = preferences.getString(SELECTED_DRIVER_KEY, "Turnip/Zink")
             selectedTheme = preferences.getString(SELECTED_THEME_KEY, "DarkBlue")
             d3dxRenderer = preferences.getString(SELECTED_D3DX_RENDERER_KEY, "DXVK")

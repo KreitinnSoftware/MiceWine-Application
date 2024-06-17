@@ -76,7 +76,7 @@
     <string name="enableRamCounterDescription">Enable or Disable RAM Counter on Screen</string>
     <string name="selectedControllerPreset">Selected Controller Preset</string>
     <string name="mouse">Mouse</string>
-    <string name="keyboard">Keyboard</string>
+    <string name="keyboard" translatable="false">Keyboard</string>
     <string name="controllerPresetCreateText">Type a Name</string>
     <string name="removeLastPresetError">The Last Preset Cannot be Removed</string>
     <string name="editGameIcon">Edit Icon</string>
@@ -85,4 +85,6 @@
     <string name="removeGameItemWarning">Are you sure you want to remove it?</string>
     <string name="enableCPUCounter">Enable/Disable CPU Usage Counter</string>
     <string name="enableCPUCounterDescription">Enable or Disable CPU Usage on Screen</string>
+    <string name="box64_aligned_atomics_title" translatable="false">BOX64_DYNAREC_ALIGNED_ATOMICS</string>
+    <string name="box64_aligned_atomics_description">Codigo gerado para atomics alinhados apenas</string>
 </resources>
