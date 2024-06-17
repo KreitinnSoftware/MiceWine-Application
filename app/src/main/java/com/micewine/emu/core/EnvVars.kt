@@ -93,8 +93,14 @@ object EnvVars {
             "FPS" -> {
                 putVar("DXVK_HUD", "DXVK_HUD=fps")
             }
+            "GPU Load" -> {
+                putVar("DXVK_HUD", "DXVK_HUD=gpuload")
+            }
             "FPS/GPU Load" -> {
                 putVar("DXVK_HUD", "DXVK_HUD=fps,gpuload")
+            }
+            "FPS/GPU Load/Dev Info" -> {
+                putVar("DXVK_HUD", "DXVK_HUD=fps,gpuload,devinfo")
             }
         }
 

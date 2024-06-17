@@ -59,7 +59,7 @@ class DriversSettingsFragment : Fragment() {
             SPINNER, "DXVK-1.10.3-async", SELECTED_DXVK_KEY)
 
         addToAdapter(R.string.select_dxvk_hud_preset_title, R.string.null_description, arrayOf(
-            "Off", "FPS", "FPS/GPU Load"),
+            "Off", "FPS", "GPU Load", "FPS/GPU Load", "FPS/GPU Load/Dev Info"),
             SPINNER, "FPS/GPU Load", SELECTED_DXVK_HUD_PRESET_KEY)
 
         addToAdapter(R.string.select_wined3d_title, R.string.null_description, arrayOf(
