@@ -15,7 +15,7 @@ object WineWrapper {
 
         executeShell(
             exportVariables() + ";" +
-                "$LINKER_PATH $(which box64) $(which wineserver) \"$args\"", "WineServer"
+                "$LINKER_PATH $(which box64) $(which wineserver) $args", "WineServer"
         )
     }
 
@@ -25,7 +25,7 @@ object WineWrapper {
 
             executeShell(
                 exportVariables() + ";" +
-                        "$LINKER_PATH $(which box64) $(which wineserver) \"$args\"", "WineServer"
+                        "$LINKER_PATH $(which box64) $(which wineserver) $args", "WineServer"
             )
         }
     }
@@ -35,7 +35,7 @@ object WineWrapper {
 
         executeShell(
             exportVariables() + " WINEPREFIX=$winePrefix;" +
-                    "$LINKER_PATH $(which box64) $(which wine) \"$args\"", "WineProcess"
+                    "$LINKER_PATH $(which box64) $(which wine) $args", "WineProcess"
         )
     }
 
@@ -44,8 +44,8 @@ object WineWrapper {
 
         executeShell(
             exportVariables() + " WINEPREFIX=$winePrefix;" +
-                    "cd \"$cwd\";" +
-                    "$LINKER_PATH $(which box64) $(which wine) \"$args\"", "WineProcess"
+                    "cd $cwd;" +
+                    "$LINKER_PATH $(which box64) $(which wine) $args", "WineProcess"
         )
     }
 

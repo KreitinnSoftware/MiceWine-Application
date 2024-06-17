@@ -336,7 +336,7 @@ class MainActivity : AppCompatActivity() {
             if (exePath == "") {
                 WineWrapper.wine("explorer /desktop=shell,1280x720 explorer", winePrefix)
             } else {
-                WineWrapper.wine(exePath, winePrefix, File(exePath).parent!!)
+                WineWrapper.wine("\"$exePath\"", winePrefix, "\"${File(exePath).parent!!}\"")
             }
         }
     }
