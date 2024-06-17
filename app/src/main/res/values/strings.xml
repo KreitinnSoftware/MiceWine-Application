@@ -83,4 +83,6 @@
     <string name="addGameToHome">Create Shortcut on Launcher</string>
     <string name="cancelText">Cancel</string>
     <string name="removeGameItemWarning">Are you sure you want to remove it?</string>
+    <string name="enableCPUCounter">Enable/Disable CPU Usage Counter</string>
+    <string name="enableCPUCounterDescription">Enable or Disable CPU Usage on Screen</string>
 </resources>

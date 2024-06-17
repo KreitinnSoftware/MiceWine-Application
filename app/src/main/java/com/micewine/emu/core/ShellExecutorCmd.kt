@@ -75,4 +75,65 @@ object ShellExecutorCmd {
             Thread.currentThread().interrupt()
         }
     }
+
+    fun executeShellWithOutput(cmd: String): String {
+        try {
+            val shell = Runtime.getRuntime().exec("/system/bin/sh")
+            val os = DataOutputStream(shell.outputStream)
+
+            os.writeBytes("$cmd\nexit\n")
+            os.flush()
+
+            val stdout = BufferedReader(InputStreamReader(shell.inputStream))
+            val stderr = BufferedReader(InputStreamReader(shell.errorStream))
+
+            var output = ""
+
+            val stdoutThread = Thread {
+                try {
+                    var stdOut: String?
+                    while (stdout.readLine().also { stdOut = it } != null) {
+                        output += stdOut + "\n"
+                    }
+                } catch (_: IOException) {
+                } finally {
+                    try {
+                        stdout.close()
+                    } catch (_: IOException) {
+                    }
+                }
+            }
+
+            val stderrThread = Thread {
+                try {
+                    var stdErr: String?
+                    while (stderr.readLine().also { stdErr = it } != null) {
+                        output += stdErr + "\n"
+                    }
+                } catch (_: IOException) {
+                } finally {
+                    try {
+                        stderr.close()
+                    } catch (_: IOException) {
+                    }
+                }
+            }
+
+            stdoutThread.start()
+            stderrThread.start()
+
+            stdoutThread.join()
+            stderrThread.join()
+
+            os.close()
+
+            shell.waitFor()
+            shell.destroy()
+
+            return output
+        } catch (_: IOException) {
+        }
+
+        return "0"
+    }
 }

@@ -76,4 +76,6 @@
     <string name="addGameToHome">Criar Atalho no Launcher</string>
     <string name="cancelText">Cancelar</string>
     <string name="removeGameItemWarning">Você tem certeza que quer remover?</string>
+    <string name="enableCPUCounter">Ativar/Desativar Contador de uso de CPU</string>
+    <string name="enableCPUCounterDescription">Ativa ou Desativa Contador de uso de CPU na Tela</string>
 </resources>

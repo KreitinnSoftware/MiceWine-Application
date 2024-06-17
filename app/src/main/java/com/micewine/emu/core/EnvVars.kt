@@ -43,7 +43,7 @@ object EnvVars {
         putVar("LANG", "LANG=$appLang")
         putVar("TMPDIR", "TMPDIR=$tmpDir")
         putVar("HOME", "HOME=$homeDir")
-        putVar("DISPLAY_SESSION", "DISPLAY=:0")
+        putVar("DISPLAY", "DISPLAY=:0")
         putVar("BOX64_LOG", "BOX64_LOG=1")
         putVar("LD_LIBRARY_PATH", "LD_LIBRARY_PATH=$usrDir/lib")
         putVar("PATH", "PATH+=:$usrDir/bin:$appRootDir/wine/x86_64/bin")
@@ -83,10 +83,6 @@ object EnvVars {
         }
 
         putVar("MICEWINE_THEME", "MICEWINE_THEME=$selectedTheme")
-        putVar("D3DX_RENDERER", "D3DX_RENDERER=$d3dxRenderer")
-        putVar("D3D8_WRAPPER", "D3D8_WRAPPER=D8VK")
-        putVar("WINED3D_VERSION", "WINED3D_VERSION=$selectedWineD3D")
-        putVar("DXVK_VERSION", "DXVK_VERSION=$selectedDXVK")
         putVar("DXVK_ASYNC", "DXVK_ASYNC=1")
         putVar("DXVK_STATE_CACHE_PATH", "DXVK_STATE_CACHE_PATH=$homeDir/.cache/dxvk-shader-cache")
 
@@ -114,6 +110,5 @@ object EnvVars {
         putVar("BOX64_DYNAREC_CALLRET", "BOX64_DYNAREC_CALLRET=$box64DynarecCallret")
         putVar("VKD3D_FEATURE_LEVEL", "VKD3D_FEATURE_LEVEL=12_0")
         putVar("WINEDEBUG", "WINEDEBUG=-virtual")
-        putVar("WINEPREFIX", "WINEPREFIX=$homeDir/.wine")
     }
 }

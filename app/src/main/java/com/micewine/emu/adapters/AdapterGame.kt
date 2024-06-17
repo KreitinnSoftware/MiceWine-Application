@@ -58,7 +58,7 @@ class AdapterGame(private val gameList: List<GameList>, private val activity: Ac
 
             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                 if (gameModel.exeFile.path == activity.getString(R.string.desktop_mode_init)) {
-                    putExtra("exePath", "**wine-desktop**")
+                    putExtra("exePath", "")
                 } else {
                     putExtra("exePath", gameModel.exeFile.toString())
                 }

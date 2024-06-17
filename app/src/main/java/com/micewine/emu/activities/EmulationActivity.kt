@@ -43,13 +43,17 @@ import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
 import com.micewine.emu.ICmdEntryInterface
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
-import com.micewine.emu.activities.MainActivity.Companion.killWine
+import com.micewine.emu.activities.MainActivity.Companion.enableCpuCounter
+import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
+import com.micewine.emu.activities.MainActivity.Companion.getCpuInfo
+import com.micewine.emu.activities.MainActivity.Companion.getMemoryInfo
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
+import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
@@ -117,8 +121,20 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             onPreferencesChanged(key)
         }
 
+        if (enableCpuCounter) {
+            lifecycleScope.launch {
+                getCpuInfo()
+            }
+        }
+
+        if (enableRamCounter) {
+            lifecycleScope.launch {
+                getMemoryInfo(this@EmulationActivity)
+            }
+        }
+
         prepareButtonsAxisValues(this)
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         window.setFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, 0)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_emulation)
@@ -148,7 +164,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             when (item.itemId) {
                 R.id.exitFromEmulation -> {
                     drawerLayout?.closeDrawers()
-                    killWine()
+
+                    WineWrapper.wineServer("--kill")
 
                     val intent = Intent(this, MainActivity::class.java).apply {
                         setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)

@@ -44,14 +44,16 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_IB_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_THEME_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VIRGL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
-import com.micewine.emu.core.EnvVars
-import com.micewine.emu.core.ShellExecutorCmd
+import com.micewine.emu.core.ShellExecutorCmd.executeShell
+import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
+import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.DeleteGameItemFragment
 import com.micewine.emu.fragments.HomeFragment
 import com.micewine.emu.fragments.RenameGameItemFragment
 import com.micewine.emu.fragments.SettingsFragment
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -71,8 +73,15 @@ class MainActivity : AppCompatActivity() {
                 val exePath = intent.getStringExtra("exePath")
 
                 lifecycleScope.launch {
+                    runXServer(":0")
+                }
+
+                lifecycleScope.launch {
                     runVirGLRenderer()
-                    runWine(exePath!!)
+                }
+
+                lifecycleScope.launch {
+                    runWine(exePath.toString(), File("$homeDir/.wine"))
                 }
             }
         }
@@ -81,16 +90,14 @@ class MainActivity : AppCompatActivity() {
     private var selectedFragment = "HomeFragment"
     private var fab: FloatingActionButton? = null
     private var bottomNavigation: BottomNavigationView? = null
+    private var runningXServer = false
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
-
-        lifecycleScope.launch {
-            runXServer(":0")
-        }
 
         setSharedVars(this)
 
@@ -117,7 +124,7 @@ class MainActivity : AppCompatActivity() {
 
         if (!usrDir.exists()) {
             val intent = Intent(this, WelcomeActivity::class.java)
-            this.startActivity(intent)
+            startActivity(intent)
         } else {
             extractedAssets = true
         }
@@ -130,21 +137,22 @@ class MainActivity : AppCompatActivity() {
                 addAction(ACTION_RUN_WINE)
             }
         })
-    }
-
-    override fun onPostCreate(savedInstanceState: Bundle?) {
-        super.onPostCreate(savedInstanceState)
 
         val exePath = intent.getStringExtra("exePath")
 
         if (exePath != null) {
-            val intent = Intent(this, EmulationActivity::class.java)
+            val intent = Intent(this, EmulationActivity::class.java).apply {
+                setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+            }
 
-            intent.putExtra("exePath", exePath)
+            WineWrapper.wineServer("--kill")
 
-            enableRamCounter = true
+            sendBroadcast(
+                Intent(ACTION_RUN_WINE).apply {
+                    putExtra("exePath", exePath)
+                }
+            )
 
-            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             startActivityIfNeeded(intent, 0)
         }
     }
@@ -268,35 +276,87 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun runWine(exePath: String) {
-        withContext(Dispatchers.Default) {
-            EnvVars.setVariables()
+    private fun installDXWrapper(winePrefix: File) {
+        val driveC = File("$winePrefix/drive_c")
+        val wineUtils = File("$appRootDir/wine-utils")
+        val system32 = File("$driveC/windows/system32")
+        val syswow64 = File("$driveC/windows/syswow64")
 
-            if (exePath.contains("**wine-desktop**")) {
-                ShellExecutorCmd.executeShell(
-                    EnvVars.exportVariables() + ";" +
-                            "$usrDir/bin/start-wine.sh", "WineService"
-                )
+        when (d3dxRenderer) {
+            "DXVK" -> {
+                File("$wineUtils/DXVK/$selectedDXVK/x64").copyRecursively(system32, true)
+                File("$wineUtils/DXVK/$selectedDXVK/x32").copyRecursively(syswow64, true)
+            }
+
+            "WineD3D" -> {
+                File("$wineUtils/WineD3D/$selectedWineD3D/x64").copyRecursively(system32, true)
+                File("$wineUtils/WineD3D/$selectedWineD3D/x32").copyRecursively(syswow64, true)
+            }
+        }
+    }
+
+    private fun setupWinePrefix(winePrefix: File) {
+        if (!winePrefix.exists()) {
+            val driveC = File("$winePrefix/drive_c")
+            val wineUtils = File("$appRootDir/wine-utils")
+            val startMenu = File("$driveC/ProgramData/Microsoft/Windows/Start Menu")
+            val userSharedFolder = File("/storage/emulated/0/MiceWine")
+            val localAppData = File("$driveC/users/\$(whoami)/AppData")
+
+            WineWrapper.wine("wineboot --init", winePrefix)
+
+            localAppData.deleteRecursively()
+
+            File("$userSharedFolder/AppData").mkdirs()
+
+            executeShell("ln -sf $userSharedFolder/AppData $localAppData", "Symlink")
+
+            startMenu.deleteRecursively()
+
+            File("$wineUtils/Start Menu").copyRecursively(File("$startMenu"), true)
+            File("$wineUtils/Addons").copyRecursively(File("$driveC/Addons"), true)
+
+            WineWrapper.wine("regedit $wineUtils/Addons/DefaultDLLsOverrides.reg", winePrefix)
+        }
+    }
+
+    private suspend fun runWine(exePath: String, winePrefix: File) {
+        withContext(Dispatchers.Default) {
+            WineWrapper.waitXServer()
+
+            lifecycleScope.launch {
+                WineWrapper.wineServerSuspend("--foreground --persistent")
+            }
+
+            setupWinePrefix(winePrefix)
+
+            installDXWrapper(winePrefix)
+
+            if (exePath == "") {
+                WineWrapper.wine("explorer /desktop=shell,1280x720 explorer", winePrefix)
             } else {
-                ShellExecutorCmd.executeShell(
-                    EnvVars.exportVariables() + ";" +
-                            "$usrDir/bin/start-wine.sh \"$exePath\"", "WineService"
-                )
+                WineWrapper.wine(exePath, winePrefix, File(exePath).parent!!)
             }
         }
     }
 
     private suspend fun runVirGLRenderer() {
         withContext(Dispatchers.IO) {
-            ShellExecutorCmd.executeShell(
-                "$usrDir/bin/virgl_test_server", "VirGLServer"
+            executeShell(
+                "/system/bin/linker64 $usrDir/bin/virgl_test_server", "VirGLServer"
             )
         }
     }
 
     private suspend fun runXServer(display: String) {
         withContext(Dispatchers.IO) {
-            ShellExecutorCmd.executeShell(
+            if (runningXServer) {
+                return@withContext
+            }
+
+            runningXServer = true
+
+            executeShell(
                 "export CLASSPATH=${getClassPath(this@MainActivity)};" +
                         "/system/bin/app_process / com.micewine.emu.CmdEntryPoint $display", "XServer"
             )
@@ -304,8 +364,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val PERMISSION_REQUEST_CODE = 123
-
         @SuppressLint("SdCardPath")
         var appRootDir = File("/data/data/com.micewine.emu/files")
         var usrDir = File("$appRootDir/usr")
@@ -313,6 +371,7 @@ class MainActivity : AppCompatActivity() {
         var homeDir = File("$appRootDir/home")
         var extractedAssets: Boolean = false
         var enableRamCounter: Boolean = false
+        var enableCpuCounter: Boolean = true
         var appLang: String? = null
         var box64DynarecBigblock: String? = null
         var box64DynarecStrongmem: String? = null
@@ -330,10 +389,13 @@ class MainActivity : AppCompatActivity() {
         var selectedVirGLProfile: String? = null
         var selectedDXVKHud: String? = null
         var selectedGameArray: Array<String> = arrayOf()
+        var memoryStats = "0/0"
+        var totalCpuUsage = "0%"
 
         const val ACTION_UPDATE_HOME = "com.micewine.emu.ACTION_UPDATE_HOME"
         const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
         const val RAM_COUNTER_KEY = "ramCounter"
+        const val CPU_COUNTER_KEY = "cpuCounter"
         const val SELECT_EXE = 1
         const val SELECT_ICON = 2
 
@@ -519,16 +581,41 @@ class MainActivity : AppCompatActivity() {
             return path
         }
 
-        fun getMemoryInfo(context: Context): String {
-            val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            val memoryInfo = ActivityManager.MemoryInfo()
-            activityManager.getMemoryInfo(memoryInfo)
+        suspend fun getMemoryInfo(context: Context) {
+            withContext(Dispatchers.IO) {
+                val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                val memoryInfo = ActivityManager.MemoryInfo()
+                var totalMemory: Long
+                var availableMemory: Long
+                var usedMemory: Long
 
-            val totalMemory = memoryInfo.totalMem / (1024 * 1024)
-            val availableMemory = memoryInfo.availMem / (1024 * 1024)
-            val usedMemory = totalMemory - availableMemory
+                while (enableRamCounter) {
+                    activityManager.getMemoryInfo(memoryInfo)
 
-            return "RAM: $usedMemory/$totalMemory"
+                    totalMemory = memoryInfo.totalMem / (1024 * 1024)
+                    availableMemory = memoryInfo.availMem / (1024 * 1024)
+                    usedMemory = totalMemory - availableMemory
+
+                    memoryStats = "$usedMemory/$totalMemory"
+                }
+            }
+        }
+
+        suspend fun getCpuInfo() {
+            withContext(Dispatchers.IO) {
+                var usageInfo: String
+                var usageProcessed: String
+
+                while (enableCpuCounter) {
+                    usageInfo = executeShellWithOutput("top -n 1 | grep user | head -n 1 | cut -d \"%\" -f 2 | sed \"s/cpu//g\"")
+
+                    usageProcessed = usageInfo.replace(" ", "").replace("\n", "")
+
+                    totalCpuUsage = "${(usageProcessed.toInt() / Runtime.getRuntime().availableProcessors())}%"
+
+                    delay(750)
+                }
+            }
         }
 
         fun addGameToHome(context: Context, selectedGameArray: Array<String>) {
@@ -558,13 +645,6 @@ class MainActivity : AppCompatActivity() {
 
                 shortcutManager.requestPinShortcut(pinShortcutInfo, successCallback.intentSender)
             }
-        }
-
-        fun killWine() {
-            EnvVars.setVariables()
-
-            ShellExecutorCmd.executeShell(EnvVars.exportVariables() + ";" +
-                    "box64 wineserver -k", "WineKiller")
         }
     }
 }
