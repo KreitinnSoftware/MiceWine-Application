@@ -78,5 +78,7 @@
     <string name="removeGameItemWarning">Você tem certeza que quer remover?</string>
     <string name="enableCPUCounter">Ativar/Desativar Contador de uso de CPU</string>
     <string name="enableCPUCounterDescription">Ativa ou Desativa Contador de uso de CPU na Tela</string>
-    <string name="box64_aligned_atomics_description">Generated code for aligned atomics only</string>
+    <string name="box64_aligned_atomics_description">Codigo gerado para atomics alinhados apenas</string>
+    <string name="box64_bleeding_edge_description">Detectar MonoBleedingEdge e aplicar configurações conservativas</string>
+    <string name="box64_dynarec_wait_description">Comportamento com FillBlock quando não está disponível (FillBlock cria blocos de Dynarec e não é multithreaded)</string>
 </resources>

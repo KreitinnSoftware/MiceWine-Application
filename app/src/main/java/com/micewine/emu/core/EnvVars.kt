@@ -4,11 +4,13 @@ import com.micewine.emu.activities.MainActivity.Companion.appLang
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecAlignedAtomics
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBigblock
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBleedingEdge
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecCallret
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastnan
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastround
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecSafeflags
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecStrongmem
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecWait
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecX87double
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedDXVKHud
@@ -107,6 +109,8 @@ object EnvVars {
         putVar("BOX64_DYNAREC_SAFEFLAGS", "BOX64_DYNAREC_SAFEFLAGS=$box64DynarecSafeflags")
         putVar("BOX64_DYNAREC_CALLRET", "BOX64_DYNAREC_CALLRET=$box64DynarecCallret")
         putVar("BOX64_DYNAREC_ALIGNED_ATOMICS", "BOX64_DYNAREC_ALIGNED_ATOMICS=$box64DynarecAlignedAtomics")
+        putVar("BOX64_DYNAREC_BLEEDING_EDGE", "BOX64_DYNAREC_BLEEDING_EDGE=$box64DynarecBleedingEdge")
+        putVar("BOX64_DYNAREC_WAIT", "BOX64_DYNAREC_WAIT=$box64DynarecWait")
         putVar("VKD3D_FEATURE_LEVEL", "VKD3D_FEATURE_LEVEL=12_0")
         putVar("WINEDEBUG", "WINEDEBUG=-virtual")
     }

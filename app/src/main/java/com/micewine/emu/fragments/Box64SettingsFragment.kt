@@ -10,11 +10,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BLEEDING_EDGE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTROUND_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_SAFEFLAGS_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_STRONGMEM_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_WAIT_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
@@ -60,6 +62,10 @@ class Box64SettingsFragment : Fragment() {
         addToAdapter(R.string.box64_callret_title, R.string.box64_callret_description, arrayOf(""), SWITCH, "true", BOX64_DYNAREC_CALLRET_KEY)
 
         addToAdapter(R.string.box64_aligned_atomics_title, R.string.box64_aligned_atomics_description, arrayOf(""), SWITCH, "false", BOX64_DYNAREC_ALIGNED_ATOMICS_KEY)
+
+        addToAdapter(R.string.box64_bleeding_edge_title, R.string.box64_bleeding_edge_description, arrayOf(""), SWITCH, "true", BOX64_DYNAREC_BLEEDING_EDGE_KEY)
+
+        addToAdapter(R.string.box64_dynarec_wait_title, R.string.box64_dynarec_wait_description, arrayOf(""), SWITCH, "true", BOX64_DYNAREC_WAIT_KEY)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>, type: Int, defaultValue: String, keyId: String) {

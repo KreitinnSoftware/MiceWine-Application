@@ -86,5 +86,9 @@
     <string name="enableCPUCounter">Enable/Disable CPU Usage Counter</string>
     <string name="enableCPUCounterDescription">Enable or Disable CPU Usage on Screen</string>
     <string name="box64_aligned_atomics_title" translatable="false">BOX64_DYNAREC_ALIGNED_ATOMICS</string>
-    <string name="box64_aligned_atomics_description">Codigo gerado para atomics alinhados apenas</string>
+    <string name="box64_aligned_atomics_description">Generated code for aligned atomics only</string>
+    <string name="box64_bleeding_edge_title" translatable="false">BOX64_DYNAREC_BLEEDING_EDGE</string>
+    <string name="box64_bleeding_edge_description">Detect MonoBleedingEdge and apply conservative settings</string>
+    <string name="box64_dynarec_wait_title" translatable="false">BOX64_DYNAREC_WAIT</string>
+    <string name="box64_dynarec_wait_description">Behavior with FillBlock is not available (FillBlock build Dynarec blocks and is not multithreaded)</string>
 </resources>
