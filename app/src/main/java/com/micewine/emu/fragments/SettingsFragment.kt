@@ -37,6 +37,8 @@ class SettingsFragment : Fragment() {
 
         addToAdapter(R.string.controllerMapperTitle, R.string.controllerMapperDescription, R.drawable.ic_info_outline)
 
+        addToAdapter(R.string.virtualControllerMapperTitle, R.string.controllerMapperDescription, R.drawable.ic_info_outline)
+
         addToAdapter(R.string.aboutTitle, R.string.aboutDescription, R.drawable.ic_info_outline)
     }
 

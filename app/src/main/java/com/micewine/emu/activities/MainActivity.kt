@@ -374,7 +374,7 @@ class MainActivity : AppCompatActivity() {
         var homeDir = File("$appRootDir/home")
         var extractedAssets: Boolean = false
         var enableRamCounter: Boolean = false
-        var enableCpuCounter: Boolean = true
+        var enableCpuCounter: Boolean = false
         var appLang: String? = null
         var box64DynarecBigblock: String? = null
         var box64DynarecStrongmem: String? = null
@@ -437,6 +437,7 @@ class MainActivity : AppCompatActivity() {
             selectedVirGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
             selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "FPS/GPU Load")
             enableRamCounter = preferences.getBoolean(RAM_COUNTER_KEY, false)
+            enableCpuCounter = preferences.getBoolean(CPU_COUNTER_KEY, false)
         }
 
         fun copyAssets(activity: Activity, filename: String, outputPath: String, textView: TextView) {

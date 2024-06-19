@@ -64,7 +64,6 @@ import com.micewine.emu.views.OverlayView
 import com.micewine.emu.views.OverlayView.CustomButtonData
 import kotlinx.coroutines.launch
 
-@Suppress("deprecation", "unused")
 class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
     private var frm: FrameLayout? = null
     var orientation = 0
@@ -104,7 +103,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
     }
     private var mLorieKeyListener: View.OnKeyListener? = null
-    private val overlayThread: Thread? = null
     private var drawerLayout: DrawerLayout? = null
 
     init {
@@ -135,7 +133,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         prepareButtonsAxisValues(this)
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
-        window.setFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, 0)
+        window.setFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, 0)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_emulation)
 
@@ -176,6 +174,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
                 R.id.openCloseKeyboard -> {
                     val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    @Suppress("DEPRECATION")
                     imm.showSoftInput(lorieView, InputMethodManager.SHOW_FORCED)
                     drawerLayout?.closeDrawers()
                 }
@@ -365,7 +364,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     }
 
     private fun tryConnect() {
-        if (mClientConnected) return
+        if (mClientConnected) {
+            return
+        }
         try {
             Log.v("LorieBroadcastReceiver", "Extracting X connection socket.")
             val fd = if (service == null) null else service!!.getXConnection()
@@ -444,40 +445,37 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         orientation = newConfig.orientation
     }
 
-    @SuppressLint("WrongConstant")
+    @Suppress("DEPRECATION")
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         PreferenceManager.getDefaultSharedPreferences(this)
         val window = window
-        val decorView = window.decorView
-        val requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        if (getRequestedOrientation() != requestedOrientation) setRequestedOrientation(
-            requestedOrientation
-        )
+
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+
         if (hasFocus) {
-            getWindow().attributes.layoutInDisplayCutoutMode =
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            getWindow().attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
             window.statusBarColor = Color.BLACK
             window.navigationBarColor = Color.BLACK
         }
         window.setFlags(
-            WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-            0
-        )
+            WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, 0)
         if (hasFocus) {
             window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                     or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     or View.SYSTEM_UI_FLAG_FULLSCREEN
                     or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
         }
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN or WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
-        (findViewById<View>(android.R.id.content) as FrameLayout).getChildAt(0).fitsSystemWindows =
-            false
-        if (hasFocus) lorieView.regenerate()
+        (findViewById<View>(android.R.id.content) as FrameLayout).getChildAt(0).fitsSystemWindows = false
+        if (hasFocus) {
+            lorieView.regenerate()
+        }
         lorieView.requestFocus()
     }
 
@@ -494,10 +492,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
     }
 
-    /**
-     * @noinspection NullableProblems
-     */
-    @SuppressLint("WrongConstant")
     override fun onApplyWindowInsets(v: View, insets: WindowInsets): WindowInsets {
         handler.postDelayed({ lorieView.triggerCallback() }, 100)
         return insets
@@ -528,7 +522,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
     companion object {
         const val ACTION_STOP = "com.micewine.emu.ACTION_STOP"
-        const val REQUEST_LAUNCH_EXTERNAL_DISPLAY = "request_launch_external_display"
         private const val KEY_BACK = 158
         var handler = Handler(Looper.getMainLooper())
 

@@ -51,9 +51,8 @@ class OverlayView @JvmOverloads constructor (context: Context, attrs: AttributeS
         when (event.actionMasked) {
             MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_DOWN -> {
                 buttonList.forEach {
-                    if (event.getX(event.actionIndex) >= it.x && event.getX(event.actionIndex) <= (it.x + it.width / 2)
-                            && event.getY(event.actionIndex) >= it.y && event.getY(event.actionIndex) <= (it.y + it.width / 2)
-                            ) {
+                    if ((event.getX(event.actionIndex) >= it.x - it.width / 2 && event.getX(event.actionIndex) <= (it.x + (it.width / 2))) &&
+                        (event.getY(event.actionIndex) >= it.y - it.width / 2 && event.getY(event.actionIndex) <= (it.y + (it.width / 2)))) {
                         handleButton(it, true)
                     }
                 }
@@ -61,9 +60,8 @@ class OverlayView @JvmOverloads constructor (context: Context, attrs: AttributeS
 
             MotionEvent.ACTION_POINTER_UP -> {
                 buttonList.forEach {
-                    if (event.getX(event.actionIndex) >= it.x && event.getX(event.actionIndex) <= (it.x + it.width / 2)
-                            && event.getY(event.actionIndex) >= it.y && event.getY(event.actionIndex) <= (it.y + it.width / 2)
-                            ) {
+                    if ((event.getX(event.actionIndex) >= it.x - it.width / 2 && event.getX(event.actionIndex) <= (it.x + (it.width / 2))) &&
+                        (event.getY(event.actionIndex) >= it.y - it.width / 2 && event.getY(event.actionIndex) <= (it.y + (it.width / 2)))) {
                         handleButton(it, false)
                     }
                 }

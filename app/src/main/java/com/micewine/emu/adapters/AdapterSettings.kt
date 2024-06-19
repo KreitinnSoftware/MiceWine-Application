@@ -13,6 +13,7 @@ import com.micewine.emu.activities.ControllerMapper
 import com.micewine.emu.activities.GeneralSettings
 import com.micewine.emu.activities.GeneralSettings.Companion.ACTION_PREFERENCE_SELECT
 import com.micewine.emu.activities.LogAppOutput
+import com.micewine.emu.activities.VirtualControllerOverlayMapper
 
 class AdapterSettings(private val settingsList: List<SettingsList>, private val context: Context) :
     RecyclerView.Adapter<AdapterSettings.ViewHolder>() {
@@ -45,19 +46,32 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
         override fun onClick(v: View) {
             val settingsModel = settingsList[getAdapterPosition()]
 
-            if (R.string.settingsTitle == settingsModel.titleSettings) {
-                val intent = Intent(context, GeneralSettings::class.java)
-                context.startActivity(intent)
-            } else if (R.string.logTitle == settingsModel.titleSettings) {
-                val intent = Intent(context, LogAppOutput::class.java)
-                context.startActivity(intent)
-            } else if (R.string.controllerMapperTitle == settingsModel.titleSettings) {
-                val intent = Intent(context, ControllerMapper::class.java)
-                context.startActivity(intent)
-            } else {
-                val intent = Intent(ACTION_PREFERENCE_SELECT)
-                intent.putExtra("preference", context.resources.getString(settingsModel.titleSettings))
-                context.sendBroadcast(intent)
+            when (settingsModel.titleSettings) {
+                R.string.settingsTitle -> {
+                    val intent = Intent(context, GeneralSettings::class.java)
+                    context.startActivity(intent)
+                }
+
+                R.string.logTitle -> {
+                    val intent = Intent(context, LogAppOutput::class.java)
+                    context.startActivity(intent)
+                }
+
+                R.string.controllerMapperTitle -> {
+                    val intent = Intent(context, ControllerMapper::class.java)
+                    context.startActivity(intent)
+                }
+
+                R.string.virtualControllerMapperTitle -> {
+                    val intent = Intent(context, VirtualControllerOverlayMapper::class.java)
+                    context.startActivity(intent)
+                }
+
+                else -> {
+                    val intent = Intent(ACTION_PREFERENCE_SELECT)
+                    intent.putExtra("preference", context.resources.getString(settingsModel.titleSettings))
+                    context.sendBroadcast(intent)
+                }
             }
         }
     }

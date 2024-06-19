@@ -14,14 +14,14 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
-import com.micewine.emu.databinding.GeneralSettingsBinding
+import com.micewine.emu.databinding.ActivityGeneralSettingsBinding
 import com.micewine.emu.fragments.Box64SettingsFragment
 import com.micewine.emu.fragments.DisplaySettingsFragment
 import com.micewine.emu.fragments.DriversSettingsFragment
 import com.micewine.emu.fragments.GeneralSettingsFragment
 
 class GeneralSettings : AppCompatActivity() {
-    private var binding: GeneralSettingsBinding? = null
+    private var binding: ActivityGeneralSettingsBinding? = null
     private var backButton: ImageButton? = null
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
@@ -45,7 +45,7 @@ class GeneralSettings : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = GeneralSettingsBinding.inflate(layoutInflater)
+        binding = ActivityGeneralSettingsBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
         fragmentLoader(GeneralSettingsFragment(), true)

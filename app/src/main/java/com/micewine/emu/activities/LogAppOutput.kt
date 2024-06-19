@@ -10,14 +10,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.micewine.emu.R
 import com.micewine.emu.core.ShellExecutorCmd.stdErrOut
-import com.micewine.emu.databinding.LogViewerBinding
+import com.micewine.emu.databinding.ActivityLogViewerBinding
 
 class LogAppOutput : AppCompatActivity() {
-    private var binding: LogViewerBinding? = null
+    private var binding: ActivityLogViewerBinding? = null
     private var sharedLogs: ViewModelAppLogs? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = LogViewerBinding.inflate(layoutInflater)
+        binding = ActivityLogViewerBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
 
         val toolBar = findViewById<Toolbar>(R.id.logViewerToolbar)
