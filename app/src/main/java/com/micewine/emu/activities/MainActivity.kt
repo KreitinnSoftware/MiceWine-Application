@@ -44,7 +44,9 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_IB_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_THEME_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VIRGL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
 import com.micewine.emu.core.ShellExecutorCmd.executeShell
@@ -318,8 +320,10 @@ class MainActivity : AppCompatActivity() {
 
             File("$wineUtils/Start Menu").copyRecursively(File("$startMenu"), true)
             File("$wineUtils/Addons").copyRecursively(File("$driveC/Addons"), true)
+            File("$wineUtils/Addons/Windows").copyRecursively(File("$driveC/windows"), true)
 
-            WineWrapper.wine("regedit $wineUtils/Addons/DefaultDLLsOverrides.reg", winePrefix)
+            WineWrapper.wine("regedit $driveC/Addons/DefaultDLLsOverrides.reg", winePrefix)
+            WineWrapper.wine("regedit $driveC/Addons/Themes/DarkBlue/DarkBlue.reg", winePrefix)
         }
     }
 
@@ -336,9 +340,9 @@ class MainActivity : AppCompatActivity() {
             installDXWrapper(winePrefix)
 
             if (exePath == "") {
-                WineWrapper.wine("explorer /desktop=shell,1280x720 explorer", winePrefix)
+                WineWrapper.wine("explorer /desktop=shell,1280x720 TFM", winePrefix)
             } else {
-                WineWrapper.wine("\"$exePath\"", winePrefix, "\"${File(exePath).parent!!}\"")
+                WineWrapper.wine("'$exePath'", winePrefix, "'${File(exePath).parent!!}'")
             }
         }
     }
@@ -394,6 +398,8 @@ class MainActivity : AppCompatActivity() {
         var selectedIbVersion: String? = null
         var selectedVirGLProfile: String? = null
         var selectedDXVKHud: String? = null
+        var selectedMesaVkWsiPresentMode: String? = null
+        var selectedTuDebugPreset: String? = null
         var selectedGameArray: Array<String> = arrayOf()
         var memoryStats = "0/0"
         var totalCpuUsage = "0%"
@@ -436,6 +442,8 @@ class MainActivity : AppCompatActivity() {
             selectedIbVersion = preferences.getString(SELECTED_IB_KEY, "0.1.8")
             selectedVirGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
             selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "FPS/GPU Load")
+            selectedMesaVkWsiPresentMode = preferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY, "mailbox")
+            selectedTuDebugPreset = preferences.getString(SELECTED_TU_DEBUG_PRESET_KEY, "noconform")
             enableRamCounter = preferences.getBoolean(RAM_COUNTER_KEY, false)
             enableCpuCounter = preferences.getBoolean(CPU_COUNTER_KEY, false)
         }

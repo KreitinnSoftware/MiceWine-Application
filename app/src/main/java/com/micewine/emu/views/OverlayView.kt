@@ -2,6 +2,7 @@ package com.micewine.emu.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -12,6 +13,9 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.preference.PreferenceManager
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.micewine.emu.LorieView
 
 class OverlayView @JvmOverloads constructor (context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0): View(context, attrs, defStyleAttr) {
@@ -28,9 +32,23 @@ class OverlayView @JvmOverloads constructor (context: Context, attrs: AttributeS
 
     private var lorieView: LorieView = LorieView(context)
 
-    fun addButton(buttonData: CustomButtonData) {
+    private fun addButton(buttonData: CustomButtonData) {
         buttonList.add(buttonData)
         invalidate()
+    }
+
+    fun loadFromPreferences(preferences: SharedPreferences) {
+        val gson = Gson()
+
+        val json = preferences.getString("overlaySettings", "")
+
+        val listType = object : TypeToken<MutableList<CustomButtonData>>() {}.type
+
+        val processed: MutableList<CustomButtonData> = gson.fromJson(json, listType) ?: mutableListOf()
+
+        processed.forEach {
+            addButton(it)
+        }
     }
 
     override fun onDraw(canvas: Canvas) {

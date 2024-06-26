@@ -17,18 +17,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.extractedAssets
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
-import com.micewine.emu.core.ObbExtractor
+import com.micewine.emu.core.ObbExtractor.extractZip
 import com.micewine.emu.core.ShellExecutorCmd
 import com.micewine.emu.databinding.ActivityWelcomeBinding
 import com.micewine.emu.fragments.Welcome2Fragment
 import com.micewine.emu.fragments.Welcome3Fragment
 import com.micewine.emu.fragments.WelcomeFragment
+import kotlinx.coroutines.launch
 import java.io.File
 
 class WelcomeActivity : AppCompatActivity() {
@@ -59,7 +61,7 @@ class WelcomeActivity : AppCompatActivity() {
             if (!usrDir.exists()) {
                 MainActivity.copyAssets(this, "rootfs.zip", appRootDir.toString(), progressTextBar!!)
 
-                ObbExtractor().extractZip("$appRootDir/rootfs.zip", "$appRootDir", progressExtractBar, progressTextBar, this)
+                extractZip("$appRootDir/rootfs.zip", "$appRootDir", progressExtractBar, progressTextBar, this@WelcomeActivity)
 
                 File("$appRootDir/rootfs.zip").delete()
 

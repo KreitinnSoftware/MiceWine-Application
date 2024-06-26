@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.preference.PreferenceManager
 import com.micewine.emu.R
 import com.micewine.emu.databinding.ActivityVirtualControllerMapperBinding
 import com.micewine.emu.views.OverlayViewCreator
@@ -23,6 +24,8 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
         setContentView(binding!!.root)
 
         overlayView = findViewById(R.id.overlayView)
+
+        overlayView?.loadFromPreferences()
     }
 
     @Suppress("DEPRECATION")

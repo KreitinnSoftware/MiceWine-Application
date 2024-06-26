@@ -92,4 +92,6 @@
     <string name="box64_dynarec_wait_title" translatable="false">BOX64_DYNAREC_WAIT</string>
     <string name="box64_dynarec_wait_description">Behavior with FillBlock is not available (FillBlock build Dynarec blocks and is not multithreaded)</string>
     <string name="virtualControllerMapperTitle">Virtual Controller Mapper</string>
+    <string name="mesa_vk_wsi_present_mode_title">MESA_VK_WSI_PRESENT_MODE</string>
+    <string name="tu_debug_title">TU_DEBUG</string>
 </resources>

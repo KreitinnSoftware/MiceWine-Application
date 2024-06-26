@@ -62,6 +62,7 @@ import com.micewine.emu.utils.FullscreenWorkaround
 import com.micewine.emu.utils.KeyInterceptor
 import com.micewine.emu.views.OverlayView
 import com.micewine.emu.views.OverlayView.CustomButtonData
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
@@ -145,11 +146,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         val overlayView: OverlayView = findViewById(R.id.overlayView)
 
-        overlayView.addButton(CustomButtonData(1, "Enter", 50F, 50F, 150F, getXKeyScanCodes("Enter")))
-        overlayView.addButton(CustomButtonData(2, "Right", 50F, 500F, 150F, getXKeyScanCodes("Right")))
-        overlayView.addButton(CustomButtonData(3, "Left", 200F, 500F, 150F, getXKeyScanCodes("Left")))
-        overlayView.addButton(CustomButtonData(4, "Up", 450F, 500F, 150F, getXKeyScanCodes("Up")))
-        overlayView.addButton(CustomButtonData(5, "Down", 600F, 500F, 150F, getXKeyScanCodes("Down")))
+        overlayView.loadFromPreferences(preferences)
 
         overlayView.visibility = View.INVISIBLE
 
@@ -417,6 +414,20 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         super.onResume()
         lorieView.requestFocus()
         prepareButtonsAxisValues(this)
+
+        lifecycleScope.cancel()
+
+        if (enableCpuCounter) {
+            lifecycleScope.launch {
+                getCpuInfo()
+            }
+        }
+
+        if (enableRamCounter) {
+            lifecycleScope.launch {
+                getMemoryInfo(this@EmulationActivity)
+            }
+        }
     }
 
     public override fun onPause() {

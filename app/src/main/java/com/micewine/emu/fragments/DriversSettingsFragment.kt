@@ -12,9 +12,11 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDE
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VIRGL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_KEY
 import com.micewine.emu.adapters.AdapterSettingsPreferences
 import com.micewine.emu.adapters.AdapterSettingsPreferences.SettingsListSpinner
 
@@ -61,6 +63,14 @@ class DriversSettingsFragment : Fragment() {
         addToAdapter(R.string.select_dxvk_hud_preset_title, R.string.null_description, arrayOf(
             "Off", "FPS", "GPU Load", "FPS/GPU Load", "FPS/GPU Load/Dev Info"),
             SPINNER, "FPS/GPU Load", SELECTED_DXVK_HUD_PRESET_KEY)
+
+        addToAdapter(R.string.mesa_vk_wsi_present_mode_title, R.string.null_description, arrayOf(
+            "fifo", "relaxed", "mailbox", "immediate"),
+            SPINNER, "mailbox", SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY)
+
+        addToAdapter(R.string.tu_debug_title, R.string.null_description, arrayOf(
+            "noconform", "noconform,flushall", "noconform,flushall,syncdraw", "noconform,syncdraw"),
+            SPINNER, "mailbox", SELECTED_TU_DEBUG_PRESET_KEY)
 
         addToAdapter(R.string.select_wined3d_title, R.string.null_description, arrayOf(
             "WineD3D-3.17", "WineD3D-7.18",

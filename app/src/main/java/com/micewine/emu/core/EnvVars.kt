@@ -16,7 +16,9 @@ import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedDXVKHud
 import com.micewine.emu.activities.MainActivity.Companion.selectedDriver
 import com.micewine.emu.activities.MainActivity.Companion.selectedIbVersion
+import com.micewine.emu.activities.MainActivity.Companion.selectedMesaVkWsiPresentMode
 import com.micewine.emu.activities.MainActivity.Companion.selectedTheme
+import com.micewine.emu.activities.MainActivity.Companion.selectedTuDebugPreset
 import com.micewine.emu.activities.MainActivity.Companion.selectedVirGLProfile
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
@@ -50,12 +52,12 @@ object EnvVars {
         putVar("PREFIX", "PREFIX=$usrDir")
         putVar("IB_VERSION", "IB_VERSION=$selectedIbVersion")
         putVar("MESA_SHADER_CACHE_DIR", "MESA_SHADER_CACHE_DIR=$homeDir/.cache")
+        putVar("MESA_VK_WSI_PRESENT_MODE", "MESA_VK_WSI_PRESENT_MODE=$selectedMesaVkWsiPresentMode")
 
         when (selectedDriver) {
             "Turnip/Zink" -> {
                 putVar("GALLIUM_DRIVER", "GALLIUM_DRIVER=zink")
-                putVar("MESA_VK_WSI_PRESENT_MODE", "MESA_VK_WSI_PRESENT_MODE=mailbox")
-                putVar("TU_DEBUG", "TU_DEBUG=noconform")
+                putVar("TU_DEBUG", "TU_DEBUG=$selectedTuDebugPreset")
                 putVar("VK_ICD_FILENAMES", "VK_ICD_FILENAMES=$usrDir/share/vulkan/icd.d/freedreno_icd.aarch64.json")
                 putVar("MESA_GL_VERSION_OVERRIDE", "MESA_GL_VERSION_OVERRIDE=4.6")
                 putVar("MESA_GLSL_VERSION_OVERRIDE", "MESA_GLSL_VERSION_OVERRIDE=460")

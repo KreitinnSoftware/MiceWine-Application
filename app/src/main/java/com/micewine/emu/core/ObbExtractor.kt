@@ -8,9 +8,15 @@ import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.progress.ProgressMonitor
 import java.io.IOException
 
-class ObbExtractor {
+object ObbExtractor {
     @SuppressLint("SetTextI18n")
-    fun extractZip(zipFilePath: String?, destinationPath: String, progressExtractBar: ProgressBar?, progressText: TextView?, activity: Activity) {
+    fun extractZip(
+        zipFilePath: String?,
+        destinationPath: String,
+        progressExtractBar: ProgressBar?,
+        progressText: TextView?,
+        activity: Activity
+    ) {
         try {
             if (progressExtractBar != null) {
                 activity.runOnUiThread {
