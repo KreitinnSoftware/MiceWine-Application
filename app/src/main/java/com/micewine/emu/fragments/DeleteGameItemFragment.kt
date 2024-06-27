@@ -2,15 +2,11 @@ package com.micewine.emu.fragments
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import android.widget.EditText
 import androidx.fragment.app.DialogFragment
 import com.micewine.emu.R
-import com.micewine.emu.activities.MainActivity
 import com.micewine.emu.activities.MainActivity.Companion.removeGameFromList
-import com.micewine.emu.activities.MainActivity.Companion.renameGameFromList
 import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
 
 class DeleteGameItemFragment : DialogFragment() {

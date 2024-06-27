@@ -2,7 +2,6 @@ package com.micewine.emu.activities
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.WindowManager
@@ -17,8 +16,8 @@ import com.micewine.emu.R
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.databinding.ActivityVirtualControllerMapperBinding
 import com.micewine.emu.views.OverlayViewCreator
-import com.micewine.emu.views.OverlayViewCreator.VirtualButton
 import com.micewine.emu.views.OverlayViewCreator.VirtualAnalog
+import com.micewine.emu.views.OverlayViewCreator.VirtualButton
 
 class VirtualControllerOverlayMapper : AppCompatActivity() {
     private var binding: ActivityVirtualControllerMapperBinding? = null

@@ -8,7 +8,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PointF;
 import android.os.Handler;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.InputDevice;
 import android.view.KeyEvent;
@@ -463,16 +462,12 @@ public class TouchInputHandler {
          * Maps the number of fingers in a tap or long-press gesture to a mouse-button.
          */
         private int mouseButtonFromPointerCount(int pointerCount) {
-            switch (pointerCount) {
-                case 1:
-                    return InputStub.BUTTON_LEFT;
-                case 2:
-                    return InputStub.BUTTON_RIGHT;
-                case 3:
-                    return InputStub.BUTTON_MIDDLE;
-                default:
-                    return InputStub.BUTTON_UNDEFINED;
-            }
+            return switch (pointerCount) {
+                case 1 -> InputStub.BUTTON_LEFT;
+                case 2 -> InputStub.BUTTON_RIGHT;
+                case 3 -> InputStub.BUTTON_MIDDLE;
+                default -> InputStub.BUTTON_UNDEFINED;
+            };
         }
 
         /**
@@ -622,9 +617,12 @@ public class TouchInputHandler {
                     checkButtons(e);
                     return true;
                 case MotionEvent.ACTION_HOVER_MOVE:
-                    float scaledX = e.getX() * mRenderData.scale.x, scaledY = e.getY() * mRenderData.scale.y;
-                    if (mRenderData.setCursorPosition(scaledX, scaledY))
+                    float scaledX = e.getX() * mRenderData.scale.x;
+                    float scaledY = e.getY() * mRenderData.scale.y;
+
+                    if (mRenderData.setCursorPosition(scaledX, scaledY)) {
                         mInjector.sendCursorMove(scaledX, scaledY, false);
+                    }
                     return true;
                 case MotionEvent.ACTION_DOWN:
                     checkButtons(e);

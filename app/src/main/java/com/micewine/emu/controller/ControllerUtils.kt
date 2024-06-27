@@ -1,7 +1,6 @@
 package com.micewine.emu.controller
 
 import android.content.Context
-import android.util.Log
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_BUTTON_A

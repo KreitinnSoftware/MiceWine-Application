@@ -9,7 +9,6 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.media.AudioManager
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -29,7 +28,6 @@ import android.view.Window
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
-import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.core.view.WindowCompat
@@ -59,15 +57,12 @@ import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.input.TouchInputHandler.RenderStub.NullStub
-import com.micewine.emu.utils.FullscreenWorkaround
 import com.micewine.emu.utils.KeyInterceptor
 import com.micewine.emu.views.OverlayView
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
-    private var frm: FrameLayout? = null
-    var orientation = 0
     private var mInputHandler: TouchInputHandler? = null
     private var service: ICmdEntryInterface? = null
     private var mClientConnected = false
@@ -84,7 +79,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                             service = null
                             requestConnection()
                             Log.v("Lorie", "Disconnected")
-                            runOnUiThread { clientConnectedStateChanged(false) } //recreate()); //onPreferencesChanged(""));
+                            runOnUiThread { clientConnectedStateChanged(false) }
                         }, 0
                     )
                     onReceiveConnection()
@@ -95,8 +90,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                         e
                     )
                 }
-            } else if (ACTION_STOP == intent.action) {
-                finishAffinity()
             } else if (GeneralSettings.ACTION_PREFERENCES_CHANGED == intent.action) {
                 Log.d("MainActivity", "preference: " + intent.getStringExtra("key"))
                 if ("additionalKbdVisible" != intent.getStringExtra("key")) onPreferencesChanged("")
@@ -256,25 +249,13 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             )
         }
         lorieParent.setOnGenericMotionListener { _: View?, e: MotionEvent? ->
-            mInputHandler!!.handleTouchEvent(
-                lorieParent,
-                lorieView,
-                e
-            )
+            mInputHandler!!.handleTouchEvent(lorieParent, lorieView, e)
         }
         lorieView.setOnCapturedPointerListener { _: View?, e: MotionEvent? ->
-            mInputHandler!!.handleTouchEvent(
-                lorieView,
-                lorieView,
-                e
-            )
+            mInputHandler!!.handleTouchEvent(lorieView, lorieView, e)
         }
         lorieParent.setOnCapturedPointerListener { _: View?, e: MotionEvent? ->
-            mInputHandler!!.handleTouchEvent(
-                lorieView,
-                lorieView,
-                e
-            )
+            mInputHandler!!.handleTouchEvent(lorieView, lorieView, e)
         }
         lorieView.setOnKeyListener(mLorieKeyListener)
 
@@ -305,12 +286,11 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         registerReceiver(receiver, object : IntentFilter(CmdEntryPoint.ACTION_START) {
             init {
                 addAction(GeneralSettings.ACTION_PREFERENCES_CHANGED)
-                addAction(ACTION_STOP)
             }
         })
 
         // Taken from Stackoverflow answer https://stackoverflow.com/questions/7417123/android-how-to-adjust-layout-in-full-screen-mode-when-softkeyboard-is-visible/7509285#
-        FullscreenWorkaround.assistActivity(this)
+        // FullscreenWorkaround.assistActivity(this)
         requestConnection()
         onPreferencesChanged("")
         checkXEvents()
@@ -336,21 +316,16 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         super.onDestroy()
     }
 
-    fun setSize(v: View, width: Int, height: Int) {
-        val p = v.layoutParams
-        p.width = (width * getResources().displayMetrics.density).toInt()
-        p.height = (height * getResources().displayMetrics.density).toInt()
-        v.setLayoutParams(p)
-        v.setMinimumWidth((width * getResources().displayMetrics.density).toInt())
-        v.setMinimumHeight((height * getResources().displayMetrics.density).toInt())
-    }
-
     fun onReceiveConnection() {
         try {
             if (service != null && service!!.asBinder().isBinderAlive) {
                 Log.v("LorieBroadcastReceiver", "Extracting logcat fd.")
                 val logcatOutput = service!!.getLogcatOutput()
-                if (logcatOutput != null) LorieView.startLogcat(logcatOutput.detachFd())
+
+                if (logcatOutput != null) {
+                    LorieView.startLogcat(logcatOutput.detachFd())
+                }
+
                 tryConnect()
             }
         } catch (e: Exception) {
@@ -380,25 +355,30 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
     }
 
-    @SuppressLint("WrongConstant")
     fun onPreferencesChanged(key: String?) {
-        if ("additionalKbdVisible" == key) return
+        if ("additionalKbdVisible" == key) {
+            return
+        }
+
         val p = PreferenceManager.getDefaultSharedPreferences(this)
         val lorieView = lorieView
-        val mode = 1
-        mInputHandler!!.setInputMode(mode)
+
+        mInputHandler!!.setInputMode(TouchInputHandler.InputMode.TRACKPAD)
         mInputHandler!!.setTapToMove(false)
         mInputHandler!!.setPreferScancodes(true)
         mInputHandler!!.setPointerCaptureEnabled(false)
-        if (!p.getBoolean(
-                "pointerCapture",
-                false
-            ) && lorieView.hasPointerCapture()
-        ) lorieView.releasePointerCapture()
+
+        if (!p.getBoolean("pointerCapture", false) && lorieView.hasPointerCapture()) {
+            lorieView.releasePointerCapture()
+        }
+
         onWindowFocusChanged(true)
         LorieView.setClipboardSyncEnabled(false)
         lorieView.triggerCallback()
-        if (checkSelfPermission(permission.WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED) KeyInterceptor.shutdown()
+
+        if (checkSelfPermission(permission.WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED) {
+            KeyInterceptor.shutdown()
+        }
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
 
@@ -438,20 +418,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         return true
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        if (newConfig.orientation != orientation) {
-            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            var view = currentFocus
-            if (view == null) {
-                view = lorieView
-                view.requestFocus()
-            }
-            imm.hideSoftInputFromWindow(view.windowToken, 0)
-        }
-        orientation = newConfig.orientation
-    }
-
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
 
@@ -478,14 +444,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         PreferenceManager.getDefaultSharedPreferences(this)
     }
 
-    override fun onPictureInPictureModeChanged(
-        isInPictureInPictureMode: Boolean,
-        newConfig: Configuration
-    ) {
-        frm!!.setPadding(0, 0, 0, 0)
-        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
-    }
-
     override fun onApplyWindowInsets(v: View, insets: WindowInsets): WindowInsets {
         handler.postDelayed({ lorieView.triggerCallback() }, 100)
         return insets
@@ -499,12 +457,12 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             lorieView.regenerate()
 
             // We should recover connection in the case if file descriptor for some reason was broken...
-            if (!connected) tryConnect()
+            if (!connected) {
+                tryConnect()
+            }
+
             if (connected) lorieView.setPointerIcon(
-                PointerIcon.getSystemIcon(
-                    this,
-                    PointerIcon.TYPE_NULL
-                )
+                PointerIcon.getSystemIcon(this, PointerIcon.TYPE_NULL)
             )
         }
     }
@@ -515,7 +473,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     }
 
     companion object {
-        const val ACTION_STOP = "com.micewine.emu.ACTION_STOP"
         private const val KEY_BACK = 158
         var handler = Handler(Looper.getMainLooper())
 

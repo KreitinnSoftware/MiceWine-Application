@@ -169,6 +169,12 @@ class OverlayView @JvmOverloads constructor(
                             it.leftKeyCodes,
                             it.rightKeyCodes
                         )
+                    } else {
+                        if ((event.getX(event.actionIndex) >= it.x - it.width / 2 && event.getX(event.actionIndex) <= (it.x + (it.width / 2))) &&
+                            (event.getY(event.actionIndex) >= it.y - it.width / 2 && event.getY(event.actionIndex) <= (it.y + (it.width / 2)))
+                        ) {
+                            it.isPressed = true
+                        }
                     }
                 }
 
