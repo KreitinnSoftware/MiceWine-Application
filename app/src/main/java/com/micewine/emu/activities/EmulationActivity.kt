@@ -52,7 +52,6 @@ import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
-import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
@@ -61,7 +60,6 @@ import com.micewine.emu.input.TouchInputHandler.RenderStub.NullStub
 import com.micewine.emu.utils.FullscreenWorkaround
 import com.micewine.emu.utils.KeyInterceptor
 import com.micewine.emu.views.OverlayView
-import com.micewine.emu.views.OverlayView.CustomButtonData
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 

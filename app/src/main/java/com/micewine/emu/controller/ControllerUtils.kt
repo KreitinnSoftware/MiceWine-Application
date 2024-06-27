@@ -363,7 +363,7 @@ object ControllerUtils {
         axisYVelocity = axisY.absoluteValue
     }
 
-    private fun handleAxis(lorieView: LorieView, axisX: Float, axisY: Float, axisXNeutral: Boolean, axisYNeutral: Boolean, axisXPlusMapping: List<Int>, axisXMinusMapping: List<Int>, axisYPlusMapping: List<Int>, axisYMinusMapping: List<Int>): Boolean {
+    fun handleAxis(lorieView: LorieView, axisX: Float, axisY: Float, axisXNeutral: Boolean, axisYNeutral: Boolean, axisXPlusMapping: List<Int>, axisXMinusMapping: List<Int>, axisYPlusMapping: List<Int>, axisYMinusMapping: List<Int>, deadZone: Float): Boolean {
         return when {
             // Left
             axisX < -deadZone && axisYNeutral -> {
@@ -485,8 +485,6 @@ object ControllerUtils {
                 true
             }
             else -> {
-                Log.v("Rarara", "Some Analog was Released")
-
                 if (axisXPlusMapping[2] == KEYBOARD &&
                     axisXMinusMapping[2] == KEYBOARD &&
                     axisYPlusMapping[2] == KEYBOARD &&
@@ -521,10 +519,9 @@ object ControllerUtils {
         val axisHatXNeutral = axisHatX < deadZone && axisHatX > -deadZone
         val axisHatYNeutral = axisHatY < deadZone && axisHatY > -deadZone
 
-        handleAxis(lorieView, axisX, axisY, axisXNeutral, axisYNeutral, axisX_plus_mapping, axisX_minus_mapping, axisY_plus_mapping, axisY_minus_mapping)
+        handleAxis(lorieView, axisX, axisY, axisXNeutral, axisYNeutral, axisX_plus_mapping, axisX_minus_mapping, axisY_plus_mapping, axisY_minus_mapping, deadZone)
 
-        handleAxis(lorieView, axisZ, axisRZ, axisZNeutral, axisRZNeutral, axisZ_plus_mapping, axisZ_minus_mapping, axisRZ_plus_mapping, axisRZ_minus_mapping)
+        handleAxis(lorieView, axisZ, axisRZ, axisZNeutral, axisRZNeutral, axisZ_plus_mapping, axisZ_minus_mapping, axisRZ_plus_mapping, axisRZ_minus_mapping, deadZone)
 
-        handleAxis(lorieView, axisHatX, axisHatY, axisHatXNeutral, axisHatYNeutral, axisHatX_plus_mapping, axisHatX_minus_mapping, axisHatY_plus_mapping, axisHatY_minus_mapping)
-    }
+        handleAxis(lorieView, axisHatX, axisHatY, axisHatXNeutral, axisHatYNeutral, axisHatX_plus_mapping, axisHatX_minus_mapping, axisHatY_plus_mapping, axisHatY_minus_mapping, deadZone)    }
 }
