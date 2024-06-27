@@ -39,7 +39,8 @@
         </activity>
         <activity
             android:name=".activities.VirtualControllerOverlayMapper"
-            android:exported="false">
+            android:exported="false"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
         </activity>
         <activity
             android:name=".activities.MainActivity"

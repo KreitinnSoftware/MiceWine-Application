@@ -94,4 +94,6 @@
     <string name="virtualControllerMapperTitle">Virtual Controller Mapper</string>
     <string name="mesa_vk_wsi_present_mode_title">MESA_VK_WSI_PRESENT_MODE</string>
     <string name="tu_debug_title">TU_DEBUG</string>
+    <string name="addButton">Add Button</string>
+    <string name="addVAxis">Add Virtual Axis</string>
 </resources>

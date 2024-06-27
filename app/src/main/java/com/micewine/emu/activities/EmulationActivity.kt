@@ -10,7 +10,6 @@ import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.Color
 import android.media.AudioManager
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -33,6 +32,9 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
@@ -144,8 +146,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         val overlayView: OverlayView = findViewById(R.id.overlayView)
 
-        overlayView.loadFromPreferences(preferences)
-
         overlayView.visibility = View.INVISIBLE
 
         lifecycleScope.launch {
@@ -155,7 +155,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         val nav = findViewById<NavigationView>(R.id.NavigationView)
         nav.setNavigationItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
-                R.id.exitFromEmulation -> {
+                R.id.exit -> {
                     drawerLayout?.closeDrawers()
 
                     WineWrapper.wineServer("--kill")
@@ -399,10 +399,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         LorieView.setClipboardSyncEnabled(false)
         lorieView.triggerCallback()
         if (checkSelfPermission(permission.WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED) KeyInterceptor.shutdown()
-        val requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        if (getRequestedOrientation() != requestedOrientation) setRequestedOrientation(
-            requestedOrientation
-        )
+
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
 
         //Reset default input back to normal
         TouchInputHandler.STYLUS_INPUT_HELPER_MODE = 1
@@ -454,37 +452,24 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         orientation = newConfig.orientation
     }
 
-    @Suppress("DEPRECATION")
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        PreferenceManager.getDefaultSharedPreferences(this)
-        val window = window
 
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-
-        if (hasFocus) {
-            getWindow().attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-            window.statusBarColor = Color.BLACK
-            window.navigationBarColor = Color.BLACK
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, window.decorView).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
+
         window.setFlags(
-            WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, 0)
-        if (hasFocus) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
 
-            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
-        }
-
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN or WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
-        (findViewById<View>(android.R.id.content) as FrameLayout).getChildAt(0).fitsSystemWindows = false
         if (hasFocus) {
             lorieView.regenerate()
         }
+
         lorieView.requestFocus()
     }
 

@@ -2,18 +2,17 @@ package com.micewine.emu.views
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.LorieView
 import com.micewine.emu.controller.ControllerUtils.handleAxis
-import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 
 class OverlayView @JvmOverloads constructor(
     context: Context,
@@ -22,6 +21,7 @@ class OverlayView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
     private val buttonList = mutableListOf<VirtualButton>()
     private val analogList = mutableListOf<VirtualAnalog>()
+
     private val paint: Paint = Paint().apply {
         color = Color.WHITE
         textAlign = Paint.Align.CENTER
@@ -36,38 +36,32 @@ class OverlayView @JvmOverloads constructor(
 
     private var lorieView: LorieView = LorieView(context)
 
-    private fun addAnalog(analogData: VirtualAnalog) {
-        analogList.add(analogData)
-        invalidate()
-    }
+    private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+
+    private val gson = Gson()
 
     init {
-        addAnalog(
-            VirtualAnalog(0, 200F, 800F, 0F, 0F, 250F, getXKeyScanCodes("Up"), getXKeyScanCodes("Down"), getXKeyScanCodes("Left"), getXKeyScanCodes("Right"))
-        )
-
-        addButton(
-            VirtualButton(0, "Enter", 800F, 800F, 150F, getXKeyScanCodes("Enter"))
-        )
+        loadFromPreferences()
     }
 
-    private fun addButton(buttonData: VirtualButton) {
-        buttonList.add(buttonData)
-        invalidate()
-    }
+    private fun loadFromPreferences() {
+        val buttonJson = preferences.getString("overlayButtons", "")
+        val axisJson = preferences.getString("overlayAxis", "")
 
-    fun loadFromPreferences(preferences: SharedPreferences) {
-        val gson = Gson()
+        val virtualButtonListType = object : TypeToken<MutableList<VirtualButton>>() {}.type
+        val virtualAxisListType = object : TypeToken<MutableList<VirtualAnalog>>() {}.type
 
-        val json = preferences.getString("overlaySettings", "")
+        val currentButtons: MutableList<VirtualButton> =
+            gson.fromJson(buttonJson, virtualButtonListType) ?: mutableListOf()
+        val currentVAxis: MutableList<VirtualAnalog> =
+            gson.fromJson(axisJson, virtualAxisListType) ?: mutableListOf()
 
-        val listType = object : TypeToken<MutableList<VirtualButton>>() {}.type
+        currentButtons.forEach {
+            buttonList.add(it)
+        }
 
-        val processed: MutableList<VirtualButton> =
-            gson.fromJson(json, listType) ?: mutableListOf()
-
-        processed.forEach {
-            addButton(it)
+        currentVAxis.forEach {
+            analogList.add(it)
         }
     }
 
@@ -126,7 +120,16 @@ class OverlayView @JvmOverloads constructor(
                         val axisX = posX / maxVAxisPos
                         val axisY = posY / maxVAxisPos
 
-                        virtualAxis(axisX, axisY, it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes)
+                        it.isPressed = true
+
+                        virtualAxis(
+                            axisX,
+                            axisY,
+                            it.upKeyCodes,
+                            it.downKeyCodes,
+                            it.leftKeyCodes,
+                            it.rightKeyCodes
+                        )
                     }
                 }
 
@@ -135,29 +138,38 @@ class OverlayView @JvmOverloads constructor(
 
             MotionEvent.ACTION_MOVE -> {
                 analogList.forEach {
-                    var posX = event.getX(event.actionIndex) - it.x
-                    var posY = event.getY(event.actionIndex) - it.y
-                    val maxVAxisPos = it.width / 4
+                    if (it.isPressed) {
+                        var posX = event.getX(event.actionIndex) - it.x
+                        var posY = event.getY(event.actionIndex) - it.y
+                        val maxVAxisPos = it.width / 4
 
-                    if (posX > maxVAxisPos) {
-                        posX = maxVAxisPos
-                    } else if (posX < -maxVAxisPos) {
-                        posX = -maxVAxisPos
+                        if (posX > maxVAxisPos) {
+                            posX = maxVAxisPos
+                        } else if (posX < -maxVAxisPos) {
+                            posX = -maxVAxisPos
+                        }
+
+                        if (posY > maxVAxisPos) {
+                            posY = maxVAxisPos
+                        } else if (posY < -maxVAxisPos) {
+                            posY = -maxVAxisPos
+                        }
+
+                        it.fingerX = posX
+                        it.fingerY = posY
+
+                        val axisX = posX / maxVAxisPos
+                        val axisY = posY / maxVAxisPos
+
+                        virtualAxis(
+                            axisX,
+                            axisY,
+                            it.upKeyCodes,
+                            it.downKeyCodes,
+                            it.leftKeyCodes,
+                            it.rightKeyCodes
+                        )
                     }
-
-                    if (posY > maxVAxisPos) {
-                        posY = maxVAxisPos
-                    } else if (posY < -maxVAxisPos) {
-                        posY = -maxVAxisPos
-                    }
-
-                    it.fingerX = posX
-                    it.fingerY = posY
-
-                    val axisX = posX / maxVAxisPos
-                    val axisY = posY / maxVAxisPos
-
-                    virtualAxis(axisX, axisY, it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes)
                 }
 
                 invalidate()
@@ -179,7 +191,16 @@ class OverlayView @JvmOverloads constructor(
                         it.fingerX = 0F
                         it.fingerY = 0F
 
-                        virtualAxis(0F, 0F, it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes)
+                        it.isPressed = false
+
+                        virtualAxis(
+                            0F,
+                            0F,
+                            it.upKeyCodes,
+                            it.downKeyCodes,
+                            it.leftKeyCodes,
+                            it.rightKeyCodes
+                        )
                     }
                 }
 
@@ -195,7 +216,16 @@ class OverlayView @JvmOverloads constructor(
                     it.fingerX = 0F
                     it.fingerY = 0F
 
-                    virtualAxis(0F, 0F, it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes)
+                    it.isPressed = false
+
+                    virtualAxis(
+                        0F,
+                        0F,
+                        it.upKeyCodes,
+                        it.downKeyCodes,
+                        it.leftKeyCodes,
+                        it.rightKeyCodes
+                    )
                 }
 
                 invalidate()
@@ -205,11 +235,29 @@ class OverlayView @JvmOverloads constructor(
         return true
     }
 
-    private fun virtualAxis(axisX: Float, axisY: Float, upKeyCodes: List<Int>, downKeyCodes: List<Int>, leftKeyCodes: List<Int>, rightKeyCodes: List<Int>) {
+    private fun virtualAxis(
+        axisX: Float,
+        axisY: Float,
+        upKeyCodes: List<Int>,
+        downKeyCodes: List<Int>,
+        leftKeyCodes: List<Int>,
+        rightKeyCodes: List<Int>
+    ) {
         val axisXNeutral = axisX < 0.25F && axisX > -0.25F
         val axisYNeutral = axisY < 0.25F && axisY > -0.25F
 
-        handleAxis(lorieView, axisX, axisY, axisXNeutral, axisYNeutral, rightKeyCodes, leftKeyCodes, downKeyCodes, upKeyCodes, 0.25F)
+        handleAxis(
+            lorieView,
+            axisX,
+            axisY,
+            axisXNeutral,
+            axisYNeutral,
+            rightKeyCodes,
+            leftKeyCodes,
+            downKeyCodes,
+            upKeyCodes,
+            0.25F
+        )
     }
 
     private fun handleButton(button: VirtualButton, pressed: Boolean) {
@@ -235,6 +283,7 @@ class OverlayView @JvmOverloads constructor(
         val upKeyCodes: List<Int>,
         val downKeyCodes: List<Int>,
         val leftKeyCodes: List<Int>,
-        val rightKeyCodes: List<Int>
+        val rightKeyCodes: List<Int>,
+        var isPressed: Boolean
     )
 }

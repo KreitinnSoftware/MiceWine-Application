@@ -82,4 +82,6 @@
     <string name="box64_bleeding_edge_description">Detectar MonoBleedingEdge e aplicar configurações conservativas</string>
     <string name="box64_dynarec_wait_description">Comportamento com FillBlock quando não está disponível (FillBlock cria blocos de Dynarec e não é multithreaded)</string>
     <string name="virtualControllerMapperTitle">Mapeador de Controles Virtuais</string>
+    <string name="addButton">Add Button</string>
+    <string name="addVAxis">Add Virtual Axis</string>
 </resources>

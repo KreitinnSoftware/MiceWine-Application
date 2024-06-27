@@ -3,6 +3,8 @@
     <style name="Base.Theme.MiceWine" parent="Theme.Material3.DynamicColors.Light.NoActionBar">
         <item name="android:statusBarColor">@android:color/darker_gray</item>
         <item name="popupMenuBackground">@drawable/menu_bg</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
 
     <style name="Theme.MiceWine" parent="Base.Theme.MiceWine" />
