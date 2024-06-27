@@ -13,7 +13,7 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
 class RenameGameItemFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater
-        val view = inflater.inflate(R.layout.rename_game_item_fragment, null)
+        val view = inflater.inflate(R.layout.fragment_rename_game_item, null)
 
         val editTextNewName = view.findViewById<EditText>(R.id.editTextNewName)
         val buttonContinue = view.findViewById<Button>(R.id.buttonContinue)

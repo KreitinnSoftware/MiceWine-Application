@@ -12,7 +12,7 @@ import com.micewine.emu.activities.ControllerMapper.Companion.addControllerPrese
 class CreateControllerPresetFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater
-        val view = inflater.inflate(R.layout.create_controller_preset, null)
+        val view = inflater.inflate(R.layout.fragment_create_controller_preset, null)
 
         val editTextNewName = view.findViewById<EditText>(R.id.editTextNewName)
         val buttonContinue = view.findViewById<Button>(R.id.buttonContinue)

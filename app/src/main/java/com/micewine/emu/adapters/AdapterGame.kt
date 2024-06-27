@@ -19,7 +19,7 @@ class AdapterGame(private val gameList: List<GameList>, private val activity: Ac
     RecyclerView.Adapter<AdapterGame.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView =
-            LayoutInflater.from(parent.context).inflate(R.layout.game_item, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.adapter_game_item, parent, false)
         return ViewHolder(itemView)
     }
 

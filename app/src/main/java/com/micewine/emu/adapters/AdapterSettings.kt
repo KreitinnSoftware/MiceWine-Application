@@ -18,7 +18,7 @@ import com.micewine.emu.activities.VirtualControllerOverlayMapper
 class AdapterSettings(private val settingsList: List<SettingsList>, private val context: Context) :
     RecyclerView.Adapter<AdapterSettings.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.settings_item, parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_settings_item, parent, false)
         return ViewHolder(itemView)
     }
 

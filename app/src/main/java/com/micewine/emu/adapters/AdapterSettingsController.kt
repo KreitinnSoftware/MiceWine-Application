@@ -26,7 +26,7 @@ class AdapterSettingsController(private val settingsControllerList: List<Setting
     private val mouseEntries: Array<String> = arrayOf("Null", "Left", "Middle", "Right")
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.settings_controller_item, parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_settings_controller_item, parent, false)
         return ViewHolder(itemView)
     }
 

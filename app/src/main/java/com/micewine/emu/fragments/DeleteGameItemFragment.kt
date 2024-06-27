@@ -12,7 +12,7 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
 class DeleteGameItemFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater
-        val view = inflater.inflate(R.layout.delete_game_item_fragment, null)
+        val view = inflater.inflate(R.layout.fragment_delete_game_item, null)
 
         val buttonContinue = view.findViewById<Button>(R.id.buttonContinue)
         val buttonCancel = view.findViewById<Button>(R.id.buttonCancel)

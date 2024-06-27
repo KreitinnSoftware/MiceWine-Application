@@ -21,7 +21,7 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
     val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.settings_preferences_item, parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_settings_preferences_item, parent, false)
         return ViewHolder(itemView)
     }
 
