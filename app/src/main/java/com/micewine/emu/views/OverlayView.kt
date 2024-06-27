@@ -28,8 +28,10 @@ class OverlayView @JvmOverloads constructor(
         isFakeBoldText = true
     }
 
-    private val blackPaint: Paint = Paint().apply {
-        color = Color.BLACK
+    private val buttonPaint: Paint = Paint().apply {
+        strokeWidth = 10F
+        color = Color.WHITE
+        style = Paint.Style.STROKE
     }
 
     private var lorieView: LorieView = LorieView(context)
@@ -41,7 +43,11 @@ class OverlayView @JvmOverloads constructor(
 
     init {
         addAnalog(
-            VirtualAnalog(0, 200F, 200F, 0F, 0F, 250F, getXKeyScanCodes("Up"), getXKeyScanCodes("Down"), getXKeyScanCodes("Left"), getXKeyScanCodes("Right"))
+            VirtualAnalog(0, 200F, 800F, 0F, 0F, 250F, getXKeyScanCodes("Up"), getXKeyScanCodes("Down"), getXKeyScanCodes("Left"), getXKeyScanCodes("Right"))
+        )
+
+        addButton(
+            VirtualButton(0, "Enter", 800F, 800F, 150F, getXKeyScanCodes("Enter"))
         )
     }
 
@@ -69,18 +75,14 @@ class OverlayView @JvmOverloads constructor(
         super.onDraw(canvas)
 
         buttonList.forEach {
-            canvas.drawCircle(it.x, it.y, it.width / 2, paint)
-
-            canvas.drawCircle(it.x, it.y, it.width / 2 - 10, blackPaint)
+            canvas.drawCircle(it.x, it.y, it.width / 2, buttonPaint)
 
             paint.textSize = it.width / 4
             canvas.drawText(it.text, it.x, it.y + 10, paint)
         }
 
         analogList.forEach {
-            canvas.drawCircle(it.x, it.y, it.width / 2, paint)
-
-            canvas.drawCircle(it.x, it.y, it.width / 2 - 10, blackPaint)
+            canvas.drawCircle(it.x, it.y, it.width / 2, buttonPaint)
 
             canvas.drawCircle(it.x + it.fingerX, it.y + it.fingerY, it.width / 4 - 10, paint)
         }
@@ -121,9 +123,14 @@ class OverlayView @JvmOverloads constructor(
                         it.fingerX = posX
                         it.fingerY = posY
 
-                        invalidate()
+                        val axisX = posX / maxVAxisPos
+                        val axisY = posY / maxVAxisPos
+
+                        virtualAxis(axisX, axisY, it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes)
                     }
                 }
+
+                invalidate()
             }
 
             MotionEvent.ACTION_MOVE -> {
@@ -151,9 +158,9 @@ class OverlayView @JvmOverloads constructor(
                     val axisY = posY / maxVAxisPos
 
                     virtualAxis(axisX, axisY, it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes)
-
-                    invalidate()
                 }
+
+                invalidate()
             }
 
             MotionEvent.ACTION_POINTER_UP -> {
@@ -173,10 +180,10 @@ class OverlayView @JvmOverloads constructor(
                         it.fingerY = 0F
 
                         virtualAxis(0F, 0F, it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes)
-
-                        invalidate()
                     }
                 }
+
+                invalidate()
             }
 
             MotionEvent.ACTION_UP -> {
