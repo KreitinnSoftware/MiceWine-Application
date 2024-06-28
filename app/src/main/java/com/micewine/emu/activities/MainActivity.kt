@@ -54,6 +54,7 @@ import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.DeleteGameItemFragment
+import com.micewine.emu.fragments.FileManagerFragment
 import com.micewine.emu.fragments.HomeFragment
 import com.micewine.emu.fragments.RenameGameItemFragment
 import com.micewine.emu.fragments.SettingsFragment
@@ -88,6 +89,42 @@ class MainActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     runWine(exePath.toString(), File("$homeDir/.wine"))
                 }
+            } else if (ACTION_SELECT_FILE_MANAGER == intent.action) {
+                val fileName = intent.getStringExtra("selectedFile")
+
+                if (fileName == "..") {
+                    if (fileManagerCwd == "/storage/emulated/0") {
+                        return
+                    }
+
+                    fileManagerCwd = File(fileManagerCwd).parent!!
+
+                    fragmentLoader(FileManagerFragment(), false)
+
+                    return
+                }
+
+                val file = File(fileName!!)
+
+                if (file.isDirectory) {
+                    fileManagerCwd = file.path
+
+                    fragmentLoader(FileManagerFragment(), false)
+                } else if (file.isFile) {
+                    if (file.name.endsWith(".exe") || file.name.endsWith(".bat")) {
+                        val runWineIntent = Intent(ACTION_RUN_WINE).apply {
+                            putExtra("exePath", file.path)
+                        }
+
+                        sendBroadcast(runWineIntent)
+
+                        val emulationActivityIntent = Intent(this@MainActivity, EmulationActivity::class.java).apply {
+                            setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                        }
+
+                        startActivityIfNeeded(emulationActivityIntent, 0)
+                    }
+                }
             }
         }
     }
@@ -112,12 +149,19 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation?.setOnItemSelectedListener { item: MenuItem ->
             val id = item.itemId
 
-            if (id == R.id.nav_home) {
-                selectedFragment = "HomeFragment"
-                fragmentLoader(HomeFragment(), false)
-            } else if (id == R.id.nav_settings) {
-                selectedFragment = "SettingsFragment"
-                fragmentLoader(SettingsFragment(), false)
+            when (id) {
+                R.id.nav_home -> {
+                    selectedFragment = "HomeFragment"
+                    fragmentLoader(HomeFragment(), false)
+                }
+                R.id.nav_settings -> {
+                    selectedFragment = "SettingsFragment"
+                    fragmentLoader(SettingsFragment(), false)
+                }
+                R.id.nav_file_manager -> {
+                    selectedFragment = "FileManagerFragment"
+                    fragmentLoader(FileManagerFragment(), false)
+                }
             }
 
             true
@@ -140,6 +184,7 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(receiver, object : IntentFilter(ACTION_UPDATE_HOME) {
             init {
                 addAction(ACTION_RUN_WINE)
+                addAction(ACTION_SELECT_FILE_MANAGER)
             }
         })
 
@@ -209,7 +254,13 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == SELECT_EXE && resultCode == Activity.RESULT_OK) {
             data?.data?.also { uri ->
                 uriParser(uri).also {
-                    if (it.endsWith(".exe") || it.endsWith(".bat")) {
+                    if (it.endsWith(".exe")) {
+                        val output = "$usrDir/tmp/${File(it).nameWithoutExtension}-icon.ico"
+
+                        WineWrapper.extractIcon(File(it), output)
+
+                        saveToGameList(this, it, File(it).nameWithoutExtension, output)
+                    } else if (it.endsWith(".bat")) {
                         saveToGameList(this, it, File(it).nameWithoutExtension, "")
                     } else {
                         Toast.makeText(this, getString(R.string.incompatibleSelectedFile), Toast.LENGTH_SHORT).show()
@@ -403,9 +454,11 @@ class MainActivity : AppCompatActivity() {
         var selectedGameArray: Array<String> = arrayOf()
         var memoryStats = "0/0"
         var totalCpuUsage = "0%"
+        var fileManagerCwd: String = "/storage/emulated/0"
 
         const val ACTION_UPDATE_HOME = "com.micewine.emu.ACTION_UPDATE_HOME"
         const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
+        const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
         const val RAM_COUNTER_KEY = "ramCounter"
         const val CPU_COUNTER_KEY = "cpuCounter"
         const val SELECT_EXE = 1

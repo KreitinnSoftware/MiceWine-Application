@@ -96,4 +96,5 @@
     <string name="tu_debug_title">TU_DEBUG</string>
     <string name="addButton">Add Button</string>
     <string name="addVAxis">Add Virtual Axis</string>
+    <string name="fileManagerTitle">File Manager</string>
 </resources>

@@ -57,4 +57,15 @@ object WineWrapper {
                     "$LINKER_PATH $(which wait-xserver)", "WaitingXServer"
         )
     }
+
+    fun extractIcon(exeFile: File, output: String) {
+        if (exeFile.name.endsWith(".exe")) {
+            setVariables()
+
+            executeShell(
+                exportVariables() + ";" +
+                        "wrestool -x -t 14 '${exeFile.path}' > '$output'", "ExtractIcon"
+            )
+        }
+    }
 }

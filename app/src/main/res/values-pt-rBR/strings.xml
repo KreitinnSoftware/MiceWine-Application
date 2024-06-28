@@ -84,4 +84,5 @@
     <string name="virtualControllerMapperTitle">Mapeador de Controles Virtuais</string>
     <string name="addButton">Add Button</string>
     <string name="addVAxis">Add Virtual Axis</string>
+    <string name="fileManagerTitle">Gerenciador de Arquivos</string>
 </resources>

@@ -34,7 +34,8 @@ class HomeFragment : Fragment() {
 
     private fun setAdapter(recyclerView: RecyclerView) {
         val adapterGame = AdapterGame(gameList, requireActivity())
-        recyclerView.setAdapter(adapterGame)
+
+        recyclerView.adapter = adapterGame
 
         registerForContextMenu(recyclerView)
 
