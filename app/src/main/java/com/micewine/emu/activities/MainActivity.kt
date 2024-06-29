@@ -20,12 +20,10 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
@@ -54,6 +52,7 @@ import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.DeleteGameItemFragment
+import com.micewine.emu.fragments.ExtractingFilesFragment
 import com.micewine.emu.fragments.FileManagerFragment
 import com.micewine.emu.fragments.HomeFragment
 import com.micewine.emu.fragments.RenameGameItemFragment
@@ -73,64 +72,68 @@ class MainActivity : AppCompatActivity() {
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
-            if (ACTION_UPDATE_HOME == intent.action) {
-                fragmentLoader(HomeFragment(), false)
-            } else if (ACTION_RUN_WINE == intent.action) {
-                val exePath = intent.getStringExtra("exePath")
-
-                lifecycleScope.launch {
-                    runXServer(":0")
+            when (intent.action) {
+                ACTION_UPDATE_HOME -> {
+                    fragmentLoader(HomeFragment(), false)
                 }
 
-                lifecycleScope.launch {
-                    runVirGLRenderer()
+                ACTION_RUN_WINE -> {
+                    val exePath = intent.getStringExtra("exePath")
+
+                    lifecycleScope.launch {
+                        runXServer(":0")
+                    }
+
+                    lifecycleScope.launch {
+                        runVirGLRenderer()
+                    }
+
+                    lifecycleScope.launch {
+                        runWine(exePath.toString(), File("$homeDir/.wine"))
+                    }
                 }
 
-                lifecycleScope.launch {
-                    runWine(exePath.toString(), File("$homeDir/.wine"))
-                }
-            } else if (ACTION_SELECT_FILE_MANAGER == intent.action) {
-                val fileName = intent.getStringExtra("selectedFile")
+                ACTION_SELECT_FILE_MANAGER -> {
+                    val fileName = intent.getStringExtra("selectedFile")
 
-                if (fileName == "..") {
-                    if (fileManagerCwd == "/storage/emulated/0") {
+                    if (fileName == "..") {
+                        fileManagerCwd = File(fileManagerCwd).parent!!
+
+                        fragmentLoader(FileManagerFragment(), false)
+
                         return
                     }
 
-                    fileManagerCwd = File(fileManagerCwd).parent!!
+                    val file = File(fileName!!)
 
-                    fragmentLoader(FileManagerFragment(), false)
+                    if (file.isFile) {
+                        if (file.name.endsWith(".exe") || file.name.endsWith(".bat")) {
+                            val runWineIntent = Intent(ACTION_RUN_WINE).apply {
+                                putExtra("exePath", file.path)
+                            }
 
-                    return
+                            sendBroadcast(runWineIntent)
+
+                            val emulationActivityIntent = Intent(this@MainActivity, EmulationActivity::class.java).apply {
+                                setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                            }
+
+                            startActivityIfNeeded(emulationActivityIntent, 0)
+                        }
+                    } else if (file.isDirectory) {
+                        fileManagerCwd = file.path
+
+                        fragmentLoader(FileManagerFragment(), false)
+                    }
                 }
 
-                val file = File(fileName!!)
-
-                if (file.isDirectory) {
-                    fileManagerCwd = file.path
-
+                ACTION_UPDATE_FILE_MANAGER -> {
                     fragmentLoader(FileManagerFragment(), false)
-                } else if (file.isFile) {
-                    if (file.name.endsWith(".exe") || file.name.endsWith(".bat")) {
-                        val runWineIntent = Intent(ACTION_RUN_WINE).apply {
-                            putExtra("exePath", file.path)
-                        }
-
-                        sendBroadcast(runWineIntent)
-
-                        val emulationActivityIntent = Intent(this@MainActivity, EmulationActivity::class.java).apply {
-                            setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                        }
-
-                        startActivityIfNeeded(emulationActivityIntent, 0)
-                    }
                 }
             }
         }
     }
 
-    private var selectedFragment = "HomeFragment"
-    private var fab: FloatingActionButton? = null
     private var bottomNavigation: BottomNavigationView? = null
     private var runningXServer = false
 
@@ -143,21 +146,20 @@ class MainActivity : AppCompatActivity() {
 
         setSharedVars(this)
 
-        fab = findViewById(R.id.addItemFAB)
         bottomNavigation = findViewById(R.id.bottom_navigation)
 
         bottomNavigation?.setOnItemSelectedListener { item: MenuItem ->
-            val id = item.itemId
-
-            when (id) {
+            when (item.itemId) {
                 R.id.nav_home -> {
                     selectedFragment = "HomeFragment"
                     fragmentLoader(HomeFragment(), false)
                 }
+
                 R.id.nav_settings -> {
                     selectedFragment = "SettingsFragment"
                     fragmentLoader(SettingsFragment(), false)
                 }
+
                 R.id.nav_file_manager -> {
                     selectedFragment = "FileManagerFragment"
                     fragmentLoader(FileManagerFragment(), false)
@@ -167,17 +169,6 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        fab?.setOnClickListener {
-            openFilePicker(SELECT_EXE)
-        }
-
-        if (!usrDir.exists()) {
-            val intent = Intent(this, WelcomeActivity::class.java)
-            startActivity(intent)
-        } else {
-            extractedAssets = true
-        }
-
         selectedFragment = "HomeFragment"
         fragmentLoader(HomeFragment(), true)
 
@@ -185,6 +176,7 @@ class MainActivity : AppCompatActivity() {
             init {
                 addAction(ACTION_RUN_WINE)
                 addAction(ACTION_SELECT_FILE_MANAGER)
+                addAction(ACTION_UPDATE_FILE_MANAGER)
             }
         })
 
@@ -207,13 +199,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-            finish()
-            return true
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+
+        if (!usrDir.exists()) {
+            val intent = Intent(this, WelcomeActivity::class.java)
+
+            startActivity(intent)
+        } else {
+            setupDone = true
         }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onCreateContextMenu(
@@ -221,26 +216,63 @@ class MainActivity : AppCompatActivity() {
         v: View?,
         menuInfo: ContextMenu.ContextMenuInfo?
     ) {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.game_list_context_menu, menu)
+        if (selectedFragment == "HomeFragment") {
+            menuInflater.inflate(R.menu.game_list_context_menu, menu)
+        } else if (selectedFragment == "FileManagerFragment") {
+            menuInflater.inflate(R.menu.file_list_context_menu, menu)
+        }
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
-        when (item.title) {
-            getString(R.string.addGameToHome) -> {
-                addGameToHome(this, selectedGameArray)
+        when (item.itemId) {
+            R.id.addToLauncher -> {
+                addGameToLauncher(this, selectedGameArray)
             }
 
-            getString(R.string.editGameIcon) -> {
-                openFilePicker(SELECT_ICON)
+            R.id.editGameIcon -> {
+                openFilePicker()
             }
 
-            getString(R.string.removeGameItem) -> {
+            R.id.removeGameItem -> {
                 DeleteGameItemFragment().show(supportFragmentManager, "")
             }
 
-            getString(R.string.renameGameItem) -> {
+            R.id.renameGameItem -> {
                 RenameGameItemFragment().show(supportFragmentManager, "")
+            }
+
+            R.id.addToHome -> {
+                if (selectedFile.endsWith(".exe")) {
+                    val output = "$usrDir/icons/${File(selectedFile).nameWithoutExtension}-icon.ico"
+
+                    WineWrapper.extractIcon(File(selectedFile), output)
+
+                    saveToGameList(this, selectedFile, File(selectedFile).nameWithoutExtension, output)
+                } else if (selectedFile.endsWith(".bat")) {
+                    saveToGameList(this, selectedFile, File(selectedFile).nameWithoutExtension, "")
+                } else {
+                    Toast.makeText(this, getString(R.string.incompatibleSelectedFile), Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            R.id.executeExe -> {
+                if (selectedFile.endsWith(".exe") || selectedFile.endsWith(".bat")) {
+                    val runWineIntent = Intent(ACTION_RUN_WINE).apply {
+                        putExtra("exePath", selectedFile)
+                    }
+
+                    sendBroadcast(runWineIntent)
+
+                    val emulationActivityIntent = Intent(this@MainActivity, EmulationActivity::class.java).apply {
+                        setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    }
+
+                    startActivityIfNeeded(emulationActivityIntent, 0)
+                }
+            }
+
+            R.id.deleteFile -> {
+                DeleteGameItemFragment().show(supportFragmentManager, "")
             }
         }
 
@@ -251,27 +283,9 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(
         requestCode: Int, resultCode: Int, data: Intent?
     ) {
-        if (requestCode == SELECT_EXE && resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             data?.data?.also { uri ->
-                uriParser(uri).also {
-                    if (it.endsWith(".exe")) {
-                        val output = "$usrDir/tmp/${File(it).nameWithoutExtension}-icon.ico"
-
-                        WineWrapper.extractIcon(File(it), output)
-
-                        saveToGameList(this, it, File(it).nameWithoutExtension, output)
-                    } else if (it.endsWith(".bat")) {
-                        saveToGameList(this, it, File(it).nameWithoutExtension, "")
-                    } else {
-                        Toast.makeText(this, getString(R.string.incompatibleSelectedFile), Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        } else if (requestCode == SELECT_ICON && resultCode == Activity.RESULT_OK) {
-            data?.data?.also { uri ->
-                uriParser(uri).also {
-                    setIconToGame(this, it, selectedGameArray[0])
-                }
+                setIconToGame(this, uri, selectedGameArray[0])
             }
         }
 
@@ -282,23 +296,14 @@ class MainActivity : AppCompatActivity() {
 
 
     @Suppress("DEPRECATION")
-    private fun openFilePicker(requestCode: Int) {
-        var intent: Intent? = null
-
-        if (requestCode == SELECT_EXE) {
-            intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                type = "application/x-msdos-program"
-                addCategory(Intent.CATEGORY_OPENABLE)
-            }
-        } else if (requestCode == SELECT_ICON) {
-            intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                type = "image/*"
-                addCategory(Intent.CATEGORY_OPENABLE)
-            }
+    private fun openFilePicker() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "image/*"
+            addCategory(Intent.CATEGORY_OPENABLE)
         }
 
         startActivityForResult(
-            Intent.createChooser(intent, getString(R.string.selectExecutableFile)),  requestCode
+            Intent.createChooser(intent, getString(R.string.selectExecutableFile)), 0
         )
     }
 
@@ -311,8 +316,6 @@ class MainActivity : AppCompatActivity() {
             fragmentTransaction.replace(R.id.content, fragment)
         }
 
-        fab?.isVisible = selectedFragment == "HomeFragment"
-
         fragmentTransaction.commit()
     }
 
@@ -324,6 +327,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        if (!setupDone) {
+            ExtractingFilesFragment().show(supportFragmentManager , "")
+        }
 
         if (selectedFragment == "HomeFragment") {
             fragmentLoader(HomeFragment(), false)
@@ -351,42 +358,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupWinePrefix(winePrefix: File) {
-        if (!winePrefix.exists()) {
-            val driveC = File("$winePrefix/drive_c")
-            val wineUtils = File("$appRootDir/wine-utils")
-            val startMenu = File("$driveC/ProgramData/Microsoft/Windows/Start Menu")
-            val userSharedFolder = File("/storage/emulated/0/MiceWine")
-            val localAppData = File("$driveC/users/\$(whoami)/AppData")
-
-            WineWrapper.wine("wineboot --init", winePrefix)
-
-            localAppData.deleteRecursively()
-
-            File("$userSharedFolder/AppData").mkdirs()
-
-            executeShell("ln -sf $userSharedFolder/AppData $localAppData", "Symlink")
-
-            startMenu.deleteRecursively()
-
-            File("$wineUtils/Start Menu").copyRecursively(File("$startMenu"), true)
-            File("$wineUtils/Addons").copyRecursively(File("$driveC/Addons"), true)
-            File("$wineUtils/Addons/Windows").copyRecursively(File("$driveC/windows"), true)
-
-            WineWrapper.wine("regedit $driveC/Addons/DefaultDLLsOverrides.reg", winePrefix)
-            WineWrapper.wine("regedit $driveC/Addons/Themes/DarkBlue/DarkBlue.reg", winePrefix)
-        }
-    }
-
     private suspend fun runWine(exePath: String, winePrefix: File) {
         withContext(Dispatchers.Default) {
-            WineWrapper.waitXServer()
-
             lifecycleScope.launch {
                 WineWrapper.wineServerSuspend("--foreground --persistent")
             }
-
-            setupWinePrefix(winePrefix)
 
             installDXWrapper(winePrefix)
 
@@ -427,7 +403,7 @@ class MainActivity : AppCompatActivity() {
         var usrDir = File("$appRootDir/usr")
         var tmpDir = File("$usrDir/tmp")
         var homeDir = File("$appRootDir/home")
-        var extractedAssets: Boolean = false
+        var setupDone: Boolean = false
         var enableRamCounter: Boolean = false
         var enableCpuCounter: Boolean = false
         var appLang: String? = null
@@ -454,15 +430,45 @@ class MainActivity : AppCompatActivity() {
         var selectedGameArray: Array<String> = arrayOf()
         var memoryStats = "0/0"
         var totalCpuUsage = "0%"
-        var fileManagerCwd: String = "/storage/emulated/0"
+        var fileManagerDefaultDir: String = "$homeDir/.wine/dosdevices"
+        var fileManagerCwd: String = fileManagerDefaultDir
+        var selectedFile: String = ""
+
+        var selectedFragment = "HomeFragment"
 
         const val ACTION_UPDATE_HOME = "com.micewine.emu.ACTION_UPDATE_HOME"
         const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
         const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
+        const val ACTION_UPDATE_FILE_MANAGER = "com.micewine.emu.ACTION_UPDATE_FILE_MANAGER"
         const val RAM_COUNTER_KEY = "ramCounter"
         const val CPU_COUNTER_KEY = "cpuCounter"
-        const val SELECT_EXE = 1
-        const val SELECT_ICON = 2
+
+        fun setupWinePrefix(winePrefix: File) {
+            if (!winePrefix.exists()) {
+                val driveC = File("$winePrefix/drive_c")
+                val wineUtils = File("$appRootDir/wine-utils")
+                val startMenu = File("$driveC/ProgramData/Microsoft/Windows/Start Menu")
+                val userSharedFolder = File("/storage/emulated/0/MiceWine")
+                val localAppData = File("$driveC/users/\$(whoami)/AppData")
+
+                WineWrapper.wine("wineboot --init", winePrefix)
+
+                localAppData.deleteRecursively()
+
+                File("$userSharedFolder/AppData").mkdirs()
+
+                executeShell("ln -sf $userSharedFolder/AppData $localAppData", "Symlink")
+
+                startMenu.deleteRecursively()
+
+                File("$wineUtils/Start Menu").copyRecursively(File("$startMenu"), true)
+                File("$wineUtils/Addons").copyRecursively(File("$driveC/Addons"), true)
+                File("$wineUtils/Addons/Windows").copyRecursively(File("$driveC/windows"), true)
+
+                WineWrapper.wine("regedit $driveC/Addons/DefaultDLLsOverrides.reg", winePrefix)
+                WineWrapper.wine("regedit $driveC/Addons/Themes/DarkBlue/DarkBlue.reg", winePrefix)
+            }
+        }
 
         private fun booleanToString(boolean: Boolean): String {
             return if (boolean) {
@@ -563,8 +569,10 @@ class MainActivity : AppCompatActivity() {
             editor.putString("gameList", json)
             editor.apply()
 
-            val intent = Intent(ACTION_UPDATE_HOME)
-            context.sendBroadcast(intent)
+            if (selectedFragment == "HomeFragment") {
+                val intent = Intent(ACTION_UPDATE_HOME)
+                context.sendBroadcast(intent)
+            }
         }
 
         fun loadGameList(context: Context): MutableList<Array<String>> {
@@ -616,7 +624,7 @@ class MainActivity : AppCompatActivity() {
             context.sendBroadcast(intent)
         }
 
-        fun setIconToGame(context: Context, icon: String, gameName: String) {
+        fun setIconToGame(context: Context, uri: Uri, gameName: String) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
             val editor = preferences.edit()
 
@@ -624,7 +632,13 @@ class MainActivity : AppCompatActivity() {
 
             val index = currentList.indexOfFirst { it[0] == gameName }
 
-            currentList[index][2] = icon
+            val imageInputStream = context.contentResolver.openInputStream(uri)
+
+            copyFile(imageInputStream!!, File("$usrDir/icons/$gameName-icon.ico").outputStream())
+
+            imageInputStream.close()
+
+            currentList[index][2] = "$usrDir/icons/$gameName-icon.ico"
 
             val gson = Gson()
             val json = gson.toJson(currentList)
@@ -640,16 +654,6 @@ class MainActivity : AppCompatActivity() {
             val currentList = loadGameList(context)
 
             return currentList.any { it[0] == array[0] && it[1] == array[1] }
-        }
-
-        private fun uriParser(uri: Uri): String {
-            var path = uri.path.toString()
-
-            if (path.contains("primary")) {
-                path = "/storage/emulated/0/" + path.split(":")[1]
-            }
-
-            return path
         }
 
         suspend fun getMemoryInfo(context: Context) {
@@ -689,7 +693,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fun addGameToHome(context: Context, selectedGameArray: Array<String>) {
+        fun addGameToLauncher(context: Context, selectedGameArray: Array<String>) {
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
 
             if (shortcutManager!!.isRequestPinShortcutSupported) {

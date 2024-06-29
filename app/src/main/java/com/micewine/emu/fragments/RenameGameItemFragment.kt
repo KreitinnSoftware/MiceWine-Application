@@ -18,7 +18,7 @@ class RenameGameItemFragment : DialogFragment() {
         val editTextNewName = view.findViewById<EditText>(R.id.editTextNewName)
         val buttonContinue = view.findViewById<Button>(R.id.buttonContinue)
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
             .setView(view)
             .create()
 

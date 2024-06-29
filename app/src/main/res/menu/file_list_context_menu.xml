@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/addToLauncher"
+        android:id="@+id/executeExe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="@string/addGameToHome">
+        android:title="@string/executeExe">
     </item>
     <item
-        android:id="@+id/editGameIcon"
+        android:id="@+id/addToHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="@string/editGameIcon">
+        android:title="@string/createShortcutOnHome">
     </item>
     <item
-        android:id="@+id/renameGameItem"
+        android:id="@+id/renameFile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:title="@string/renameGameItem">
     </item>
     <item
-        android:id="@+id/removeGameItem"
+        android:id="@+id/deleteFile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:title="@string/removeGameItem">

@@ -26,20 +26,20 @@
         android:gravity="start">
 
         <Button
-            android:id="@+id/buttonContinue"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="@string/continueText"
-            tools:ignore="ButtonStyle">
-        </Button>
-
-        <Button
             android:id="@+id/buttonCancel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:text="@string/cancelText"
+            tools:ignore="ButtonStyle">
+        </Button>
+
+        <Button
+            android:id="@+id/buttonContinue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/continueText"
             tools:ignore="ButtonStyle">
         </Button>
 

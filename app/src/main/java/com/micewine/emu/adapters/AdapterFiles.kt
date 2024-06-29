@@ -11,6 +11,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_FILE_MANAGER
+import com.micewine.emu.activities.MainActivity.Companion.fileManagerCwd
+import com.micewine.emu.activities.MainActivity.Companion.fileManagerDefaultDir
+import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.core.WineWrapper.extractIcon
 import java.io.File
@@ -46,12 +49,13 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
         return fileList.size
     }
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
         val fileName: TextView = itemView.findViewById(R.id.title_preferences_model)
         val icon: ImageView = itemView.findViewById(R.id.set_img)
 
         init {
             itemView.setOnClickListener(this)
+            itemView.setOnLongClickListener(this)
         }
 
         override fun onClick(v: View) {
@@ -62,6 +66,14 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
             }
 
             context.sendBroadcast(intent)
+        }
+
+        override fun onLongClick(v: View): Boolean {
+            val settingsModel = fileList[getAdapterPosition()]
+
+            selectedFile = settingsModel.file.path
+
+            return (fileManagerCwd == fileManagerDefaultDir) || selectedFile == ".."
         }
     }
 

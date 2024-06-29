@@ -33,16 +33,6 @@
         android:layout_gravity="center">
     </FrameLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addItemFAB"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:layout_gravity="end"
-        android:src="@android:drawable/ic_menu_add"
-        android:importantForAccessibility="no">
-    </com.google.android.material.floatingactionbutton.FloatingActionButton>
-
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         style="@style/RoundTopCorners"

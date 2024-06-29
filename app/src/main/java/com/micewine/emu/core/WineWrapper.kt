@@ -3,6 +3,7 @@ package com.micewine.emu.core
 import com.micewine.emu.core.EnvVars.exportVariables
 import com.micewine.emu.core.EnvVars.setVariables
 import com.micewine.emu.core.ShellExecutorCmd.executeShell
+import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -49,22 +50,13 @@ object WineWrapper {
         )
     }
 
-    fun waitXServer() {
-        setVariables()
-
-        executeShell(
-            exportVariables() + ";" +
-                    "$LINKER_PATH $(which wait-xserver)", "WaitingXServer"
-        )
-    }
-
     fun extractIcon(exeFile: File, output: String) {
         if (exeFile.name.endsWith(".exe")) {
             setVariables()
 
-            executeShell(
+            executeShellWithOutput(
                 exportVariables() + ";" +
-                        "wrestool -x -t 14 '${exeFile.path}' > '$output'", "ExtractIcon"
+                        "wrestool -x -t 14 '${exeFile.path}' > '$output'"
             )
         }
     }

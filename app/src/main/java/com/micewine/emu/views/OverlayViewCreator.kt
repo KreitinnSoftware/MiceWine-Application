@@ -14,7 +14,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0): View(context, attrs, defStyleAttr) {
-    private val box: Box = Box(20F, 20F, 450F, 140F)
+    private val box: Box = Box(20F, 20F, 450F, 0F)
 
     val buttonList = mutableListOf<VirtualButton>()
 
@@ -88,8 +88,6 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        canvas.drawRoundRect(box.x, box.y, box.x + box.width, box.height, 50F, 50F, paint)
-
         buttonList.forEach {
             canvas.drawCircle(it.x, it.y, it.width / 2, buttonPaint)
 
@@ -102,6 +100,10 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
             canvas.drawCircle(it.x, it.y, it.width / 4 - 10, whitePaint)
         }
+
+        box.height = height - 20F
+
+        canvas.drawRoundRect(box.x, box.y, box.x + box.width, box.height, 50F, 50F, paint)
     }
 
     fun addButton(buttonData: VirtualButton) {
