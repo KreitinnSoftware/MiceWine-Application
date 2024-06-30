@@ -171,9 +171,8 @@ class MainActivity : AppCompatActivity() {
         selectedFragment = "HomeFragment"
         fragmentLoader(homeFragment, true)
 
-        registerReceiver(receiver, object : IntentFilter(ACTION_UPDATE_HOME) {
+        registerReceiver(receiver, object : IntentFilter(ACTION_RUN_WINE) {
             init {
-                addAction(ACTION_RUN_WINE)
                 addAction(ACTION_SELECT_FILE_MANAGER)
             }
         })
@@ -428,7 +427,6 @@ class MainActivity : AppCompatActivity() {
 
         var selectedFragment = "HomeFragment"
 
-        const val ACTION_UPDATE_HOME = "com.micewine.emu.ACTION_UPDATE_HOME"
         const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
         const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
         const val RAM_COUNTER_KEY = "ramCounter"
