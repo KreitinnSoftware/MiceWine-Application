@@ -15,6 +15,7 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
 import android.os.Bundle
 import android.view.ContextMenu
+import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
@@ -206,6 +207,20 @@ class MainActivity : AppCompatActivity() {
         } else {
             setupDone = true
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK && selectedFragment == "FileManagerFragment") {
+            if (fileManagerCwd != fileManagerDefaultDir) {
+                fileManagerCwd = File(fileManagerCwd).parent!!
+
+                refreshFiles()
+
+                return true
+            }
+        }
+
+        return super.onKeyDown(keyCode, event)
     }
 
     override fun onCreateContextMenu(
