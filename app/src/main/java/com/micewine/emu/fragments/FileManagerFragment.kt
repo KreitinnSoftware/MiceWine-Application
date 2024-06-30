@@ -67,9 +67,11 @@ class FileManagerFragment: Fragment() {
         fun deleteFile(filePath: String) {
             val index = fileList.indexOfFirst { it.file.path == filePath }
 
-            fileList.removeAt(index)
+            if (File(filePath).delete()) {
+                fileList.removeAt(index)
 
-            recyclerView?.adapter?.notifyItemRemoved(index)
+                recyclerView?.adapter?.notifyItemRemoved(index)
+            }
         }
 
         private fun addToAdapter(file: File) {

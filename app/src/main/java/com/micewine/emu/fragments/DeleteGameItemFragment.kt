@@ -2,7 +2,6 @@ package com.micewine.emu.fragments
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
@@ -14,7 +13,6 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedFragment
 import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
 import com.micewine.emu.fragments.FileManagerFragment.Companion.deleteFile
 import com.micewine.emu.fragments.HomeFragment.Companion.removeGameFromList
-import java.io.File
 
 class DeleteGameItemFragment : DialogFragment() {
     private var preferences: SharedPreferences? = null
