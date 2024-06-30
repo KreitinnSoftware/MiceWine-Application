@@ -6,8 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.view.KeyEvent
 import android.widget.ImageButton
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -22,23 +22,39 @@ import com.micewine.emu.fragments.GeneralSettingsFragment
 class GeneralSettings : AppCompatActivity() {
     private var binding: ActivityGeneralSettingsBinding? = null
     private var backButton: ImageButton? = null
+    private val box64SettingsFragment = Box64SettingsFragment()
+    private val displaySettingsFragment = DisplaySettingsFragment()
+    private val driversSettingsFragment = DriversSettingsFragment()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
-            if (ACTION_PREFERENCE_SELECT == intent.action) {
-                if (intent.getStringExtra("preference") == context.resources.getString(R.string.box64_settings_title)) {
-                    fragmentLoader(Box64SettingsFragment(), false)
-                    findViewById<Toolbar>(R.id.generalSettingsToolbar).title = context.resources.getString(R.string.box64_settings_title)
-                } else if (intent.getStringExtra("preference") == context.resources.getString(R.string.display_settings_title)) {
-                    fragmentLoader(DisplaySettingsFragment(), false)
-                    findViewById<Toolbar>(R.id.generalSettingsToolbar).title = context.resources.getString(R.string.display_settings_title)
-                } else if (intent.getStringExtra("preference") == context.resources.getString(R.string.driver_settings_title)) {
-                    fragmentLoader(DriversSettingsFragment(), false)
-                    findViewById<Toolbar>(R.id.generalSettingsToolbar).title = context.resources.getString(R.string.driver_settings_title)
+            val preference = intent.getStringExtra("preference")
+
+            if (intent.action == ACTION_PREFERENCE_SELECT) {
+                when (preference) {
+                    context.resources.getString(R.string.box64_settings_title) -> {
+                        generalSettingsToolbar?.title = context.resources.getString(R.string.box64_settings_title)
+
+                        fragmentLoader(box64SettingsFragment, false)
+                    }
+
+                    context.resources.getString(R.string.display_settings_title) -> {
+                        generalSettingsToolbar?.title = context.resources.getString(R.string.display_settings_title)
+
+                        fragmentLoader(displaySettingsFragment, false)
+                    }
+
+                    context.resources.getString(R.string.driver_settings_title) -> {
+                        generalSettingsToolbar?.title = context.resources.getString(R.string.driver_settings_title)
+
+                        fragmentLoader(driversSettingsFragment, false)
+                    }
                 }
             }
         }
     }
+
+    private var generalSettingsToolbar: Toolbar? = null
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,34 +65,30 @@ class GeneralSettings : AppCompatActivity() {
 
         fragmentLoader(GeneralSettingsFragment(), true)
 
-        findViewById<Toolbar>(R.id.generalSettingsToolbar).title = this.resources.getString(R.string.general_settings)
+        generalSettingsToolbar = findViewById(R.id.generalSettingsToolbar)
+
+        generalSettingsToolbar?.title = this.resources.getString(R.string.general_settings)
 
         backButton = findViewById(R.id.backButton)
 
         backButton?.setOnClickListener {
-            if (supportFragmentManager.backStackEntryCount > 0) {
-                supportFragmentManager.popBackStack()
-                findViewById<Toolbar>(R.id.generalSettingsToolbar).title = this.resources.getString(R.string.general_settings)
-            } else {
-                finish()
-            }
+            onKeyDown(KeyEvent.KEYCODE_BACK, null)
         }
-
-        val callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                val fragmentManager = supportFragmentManager
-                if (fragmentManager.backStackEntryCount > 0) {
-                    findViewById<Toolbar>(R.id.generalSettingsToolbar).title = resources.getString(R.string.general_settings)
-                    fragmentManager.popBackStack()
-                } else {
-                    finish()
-                }
-            }
-        }
-
-        onBackPressedDispatcher.addCallback(this, callback)
 
         registerReceiver(receiver, object : IntentFilter(ACTION_PREFERENCE_SELECT) {})
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+            generalSettingsToolbar?.title = resources.getString(R.string.general_settings)
+
+            return true
+        } else {
+            finish()
+        }
+
+        return super.onKeyDown(keyCode, event)
     }
 
     override fun onDestroy() {

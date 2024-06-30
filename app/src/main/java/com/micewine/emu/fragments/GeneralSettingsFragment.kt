@@ -29,8 +29,7 @@ class GeneralSettingsFragment : Fragment() {
     }
 
     private fun setAdapter() {
-        val adapterSettings = AdapterSettings(settingsList, requireContext())
-        recyclerView?.setAdapter(adapterSettings)
+        recyclerView?.setAdapter(AdapterSettings(settingsList, requireContext()))
 
         settingsList.clear()
 
