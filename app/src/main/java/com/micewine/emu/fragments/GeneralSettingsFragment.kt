@@ -12,22 +12,25 @@ import com.micewine.emu.adapters.AdapterSettings.SettingsList
 
 class GeneralSettingsFragment : Fragment() {
     private val settingsList: MutableList<SettingsList> = ArrayList()
+    private var rootView: View? = null
+    private var recyclerView: RecyclerView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_general_settings, container, false)
-        val recyclerView = rootView.findViewById<RecyclerView>(R.id.recyclerViewGeneralSettings)
-        setAdapter(recyclerView)
+        rootView = inflater.inflate(R.layout.fragment_general_settings, container, false)
+        recyclerView = rootView?.findViewById(R.id.recyclerViewGeneralSettings)
+
+        setAdapter()
 
         return rootView
     }
 
-    private fun setAdapter(recyclerView: RecyclerView) {
+    private fun setAdapter() {
         val adapterSettings = AdapterSettings(settingsList, requireContext())
-        recyclerView.setAdapter(adapterSettings)
+        recyclerView?.setAdapter(adapterSettings)
 
         settingsList.clear()
 

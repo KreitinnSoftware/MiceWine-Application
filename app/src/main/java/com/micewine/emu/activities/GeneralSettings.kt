@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.view.MenuItem
 import android.widget.ImageButton
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -78,17 +77,6 @@ class GeneralSettings : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this, callback)
 
         registerReceiver(receiver, object : IntentFilter(ACTION_PREFERENCE_SELECT) {})
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-
-        if (id == android.R.id.home) {
-            finish()
-            return true
-        }
-
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroy() {

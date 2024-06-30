@@ -8,11 +8,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
-import android.net.Uri
 import android.os.Bundle
 import android.view.ContextMenu
 import android.view.MenuItem
@@ -24,8 +24,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
@@ -52,9 +50,12 @@ import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.DeleteGameItemFragment
-import com.micewine.emu.fragments.ExtractingFilesFragment
+import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.FileManagerFragment
+import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.fragments.HomeFragment
+import com.micewine.emu.fragments.HomeFragment.Companion.saveToGameList
+import com.micewine.emu.fragments.HomeFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.RenameGameItemFragment
 import com.micewine.emu.fragments.SettingsFragment
 import kotlinx.coroutines.Dispatchers
@@ -73,10 +74,6 @@ class MainActivity : AppCompatActivity() {
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
-                ACTION_UPDATE_HOME -> {
-                    fragmentLoader(HomeFragment(), false)
-                }
-
                 ACTION_RUN_WINE -> {
                     val exePath = intent.getStringExtra("exePath")
 
@@ -99,7 +96,7 @@ class MainActivity : AppCompatActivity() {
                     if (fileName == "..") {
                         fileManagerCwd = File(fileManagerCwd).parent!!
 
-                        fragmentLoader(FileManagerFragment(), false)
+                        refreshFiles()
 
                         return
                     }
@@ -123,12 +120,8 @@ class MainActivity : AppCompatActivity() {
                     } else if (file.isDirectory) {
                         fileManagerCwd = file.path
 
-                        fragmentLoader(FileManagerFragment(), false)
+                        refreshFiles()
                     }
-                }
-
-                ACTION_UPDATE_FILE_MANAGER -> {
-                    fragmentLoader(FileManagerFragment(), false)
                 }
             }
         }
@@ -136,6 +129,10 @@ class MainActivity : AppCompatActivity() {
 
     private var bottomNavigation: BottomNavigationView? = null
     private var runningXServer = false
+    private val homeFragment: HomeFragment = HomeFragment()
+    private val settingsFragment: SettingsFragment = SettingsFragment()
+    private val fileManagerFragment: FileManagerFragment = FileManagerFragment()
+    private var preferences: SharedPreferences? = null
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -146,23 +143,25 @@ class MainActivity : AppCompatActivity() {
 
         setSharedVars(this)
 
+        preferences = PreferenceManager.getDefaultSharedPreferences(this)
+
         bottomNavigation = findViewById(R.id.bottom_navigation)
 
         bottomNavigation?.setOnItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
                 R.id.nav_home -> {
                     selectedFragment = "HomeFragment"
-                    fragmentLoader(HomeFragment(), false)
+                    fragmentLoader(homeFragment, false)
                 }
 
                 R.id.nav_settings -> {
                     selectedFragment = "SettingsFragment"
-                    fragmentLoader(SettingsFragment(), false)
+                    fragmentLoader(settingsFragment, false)
                 }
 
                 R.id.nav_file_manager -> {
                     selectedFragment = "FileManagerFragment"
-                    fragmentLoader(FileManagerFragment(), false)
+                    fragmentLoader(fileManagerFragment, false)
                 }
             }
 
@@ -170,13 +169,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         selectedFragment = "HomeFragment"
-        fragmentLoader(HomeFragment(), true)
+        fragmentLoader(homeFragment, true)
 
         registerReceiver(receiver, object : IntentFilter(ACTION_UPDATE_HOME) {
             init {
                 addAction(ACTION_RUN_WINE)
                 addAction(ACTION_SELECT_FILE_MANAGER)
-                addAction(ACTION_UPDATE_FILE_MANAGER)
             }
         })
 
@@ -243,13 +241,13 @@ class MainActivity : AppCompatActivity() {
 
             R.id.addToHome -> {
                 if (selectedFile.endsWith(".exe")) {
-                    val output = "$usrDir/icons/${File(selectedFile).nameWithoutExtension}-icon.ico"
+                    val output = "$usrDir/icons/${File(selectedFile).nameWithoutExtension}-icon"
 
                     WineWrapper.extractIcon(File(selectedFile), output)
 
-                    saveToGameList(this, selectedFile, File(selectedFile).nameWithoutExtension, output)
+                    saveToGameList(preferences!!, selectedFile, File(selectedFile).nameWithoutExtension, output)
                 } else if (selectedFile.endsWith(".bat")) {
-                    saveToGameList(this, selectedFile, File(selectedFile).nameWithoutExtension, "")
+                    saveToGameList(preferences!!, selectedFile, File(selectedFile).nameWithoutExtension, "")
                 } else {
                     Toast.makeText(this, getString(R.string.incompatibleSelectedFile), Toast.LENGTH_SHORT).show()
                 }
@@ -285,7 +283,7 @@ class MainActivity : AppCompatActivity() {
     ) {
         if (resultCode == Activity.RESULT_OK) {
             data?.data?.also { uri ->
-                setIconToGame(this, uri, selectedGameArray[0])
+                setIconToGame(this, preferences!!, uri, selectedGameArray)
             }
         }
 
@@ -329,13 +327,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         if (!setupDone) {
-            ExtractingFilesFragment().show(supportFragmentManager , "")
-        }
-
-        if (selectedFragment == "HomeFragment") {
-            fragmentLoader(HomeFragment(), false)
-        } else if (selectedFragment == "SettingsFragment") {
-            fragmentLoader(SettingsFragment(), false)
+            SetupFragment().show(supportFragmentManager , "")
         }
     }
 
@@ -439,7 +431,6 @@ class MainActivity : AppCompatActivity() {
         const val ACTION_UPDATE_HOME = "com.micewine.emu.ACTION_UPDATE_HOME"
         const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
         const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
-        const val ACTION_UPDATE_FILE_MANAGER = "com.micewine.emu.ACTION_UPDATE_FILE_MANAGER"
         const val RAM_COUNTER_KEY = "ramCounter"
         const val CPU_COUNTER_KEY = "cpuCounter"
 
@@ -466,6 +457,8 @@ class MainActivity : AppCompatActivity() {
                 File("$wineUtils/Addons/Windows").copyRecursively(File("$driveC/windows"), true)
 
                 WineWrapper.wine("regedit $driveC/Addons/DefaultDLLsOverrides.reg", winePrefix)
+                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Decorated /d N", winePrefix)
+                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Managed /d N", winePrefix)
                 WineWrapper.wine("regedit $driveC/Addons/Themes/DarkBlue/DarkBlue.reg", winePrefix)
             }
         }
@@ -533,7 +526,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         @Throws(IOException::class)
-        private fun copyFile(input: InputStream, out: OutputStream?) {
+        fun copyFile(input: InputStream, out: OutputStream?) {
             val buffer = ByteArray(1024)
             var read: Int
             while (input.read(buffer).also { read = it } != -1) {
@@ -547,113 +540,6 @@ class MainActivity : AppCompatActivity() {
 
         private fun getLibsPath(context: Context): String {
             return context.applicationContext.applicationInfo.nativeLibraryDir
-        }
-
-        private fun saveToGameList(context: Context, path: String, prettyName: String, icon: String) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val editor = preferences.edit()
-
-            val currentList = loadGameList(context)
-
-            val game = arrayOf(prettyName, path, icon)
-
-            if (!checkIfExists(context, game)) {
-                currentList.add(game)
-            } else {
-                Toast.makeText(context, context.getString(R.string.executableAlreadyAdded), Toast.LENGTH_SHORT).show()
-            }
-
-            val gson = Gson()
-            val json = gson.toJson(currentList)
-
-            editor.putString("gameList", json)
-            editor.apply()
-
-            if (selectedFragment == "HomeFragment") {
-                val intent = Intent(ACTION_UPDATE_HOME)
-                context.sendBroadcast(intent)
-            }
-        }
-
-        fun loadGameList(context: Context): MutableList<Array<String>> {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val gson = Gson()
-
-            val json = preferences.getString("gameList", "")
-
-            val listType = object : TypeToken<MutableList<Array<String>>>() {}.type
-
-            return gson.fromJson(json, listType) ?: mutableListOf()
-        }
-
-        fun removeGameFromList(context: Context, array: Array<String>) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val editor = preferences.edit()
-
-            val currentList = loadGameList(context)
-
-            currentList.removeIf { it[0] == array[0] && it[1] == array[1] }
-
-            val gson = Gson()
-            val json = gson.toJson(currentList)
-
-            editor.putString("gameList", json)
-            editor.apply()
-
-            val intent = Intent(ACTION_UPDATE_HOME)
-            context.sendBroadcast(intent)
-        }
-
-        fun renameGameFromList(context: Context, array: Array<String>, newName: String) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val editor = preferences.edit()
-
-            val currentList = loadGameList(context)
-
-            val index = currentList.indexOfFirst { it[0] == array[0] }
-
-            currentList[index][0] = newName
-
-            val gson = Gson()
-            val json = gson.toJson(currentList)
-
-            editor.putString("gameList", json)
-            editor.apply()
-
-            val intent = Intent(ACTION_UPDATE_HOME)
-            context.sendBroadcast(intent)
-        }
-
-        fun setIconToGame(context: Context, uri: Uri, gameName: String) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val editor = preferences.edit()
-
-            val currentList = loadGameList(context)
-
-            val index = currentList.indexOfFirst { it[0] == gameName }
-
-            val imageInputStream = context.contentResolver.openInputStream(uri)
-
-            copyFile(imageInputStream!!, File("$usrDir/icons/$gameName-icon.ico").outputStream())
-
-            imageInputStream.close()
-
-            currentList[index][2] = "$usrDir/icons/$gameName-icon.ico"
-
-            val gson = Gson()
-            val json = gson.toJson(currentList)
-
-            editor.putString("gameList", json)
-            editor.apply()
-
-            val intent = Intent(ACTION_UPDATE_HOME)
-            context.sendBroadcast(intent)
-        }
-
-        private fun checkIfExists(context: Context, array: Array<String>): Boolean {
-            val currentList = loadGameList(context)
-
-            return currentList.any { it[0] == array[0] && it[1] == array[1] }
         }
 
         suspend fun getMemoryInfo(context: Context) {

@@ -16,7 +16,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.micewine.emu.R
 import com.micewine.emu.databinding.ActivityWelcomeBinding
-import com.micewine.emu.fragments.ExtractingFilesFragment
 import com.micewine.emu.fragments.Welcome2Fragment
 import com.micewine.emu.fragments.WelcomeFragment
 

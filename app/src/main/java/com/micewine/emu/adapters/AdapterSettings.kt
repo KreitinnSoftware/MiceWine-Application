@@ -14,7 +14,6 @@ import com.micewine.emu.activities.GeneralSettings
 import com.micewine.emu.activities.GeneralSettings.Companion.ACTION_PREFERENCE_SELECT
 import com.micewine.emu.activities.LogAppOutput
 import com.micewine.emu.activities.VirtualControllerOverlayMapper
-import com.micewine.emu.fragments.FileManagerFragment
 
 class AdapterSettings(private val settingsList: List<SettingsList>, private val context: Context) :
     RecyclerView.Adapter<AdapterSettings.ViewHolder>() {

@@ -48,10 +48,10 @@ class AdapterGame(private val gameList: List<GameList>, private val activity: Ac
         }
 
         override fun onClick(v: View) {
-            val gameModel = gameList[getAdapterPosition()]
+            val gameModel = gameList[adapterPosition]
 
             val intent = Intent(activity, EmulationActivity::class.java).apply {
-                setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             }
 
             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
@@ -68,11 +68,11 @@ class AdapterGame(private val gameList: List<GameList>, private val activity: Ac
         }
 
         override fun onLongClick(v: View): Boolean {
-            if (getAdapterPosition() == 0) {
+            if (adapterPosition == 0) {
                 return true
             }
 
-            val gameModel = gameList[getAdapterPosition()]
+            val gameModel = gameList[adapterPosition]
 
             selectedGameArray = arrayOf(gameModel.name, gameModel.exeFile.path, gameModel.imageGame)
 

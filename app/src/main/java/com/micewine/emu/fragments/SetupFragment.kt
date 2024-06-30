@@ -15,14 +15,13 @@ import com.micewine.emu.activities.MainActivity.Companion.setupWinePrefix
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.core.ObbExtractor.extractZip
-import com.micewine.emu.core.ShellExecutorCmd.executeShell
 import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
 import java.io.File
 
-class ExtractingFilesFragment : DialogFragment() {
+class SetupFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater
-        val view = inflater.inflate(R.layout.fragment_extracting_files, null)
+        val view = inflater.inflate(R.layout.fragment_setup, null)
 
         val titleText = view.findViewById<TextView>(R.id.titleText)
         val progressTextBar = view.findViewById<TextView>(R.id.updateProgress)
@@ -35,30 +34,24 @@ class ExtractingFilesFragment : DialogFragment() {
         isCancelable = false
 
         Thread {
-            if (!appRootDir.exists()) {
-                appRootDir.mkdirs()
-            }
+            appRootDir.mkdirs()
 
             progressExtractBar.isIndeterminate = true
 
-            if (!usrDir.exists()) {
-                copyAssets(requireActivity(), "rootfs.zip", appRootDir.toString(), progressTextBar!!)
+            copyAssets(requireActivity(), "rootfs.zip", appRootDir.toString(), progressTextBar!!)
 
-                extractZip("$appRootDir/rootfs.zip", "$appRootDir", progressExtractBar, progressTextBar, requireActivity())
+            extractZip("$appRootDir/rootfs.zip", "$appRootDir", progressExtractBar, progressTextBar, requireActivity())
 
-                File("$appRootDir/rootfs.zip").delete()
+            File("$appRootDir/rootfs.zip").delete()
 
-                executeShellWithOutput("chmod 700 -R $appRootDir")
-                executeShellWithOutput("$usrDir/generateSymlinks.sh")
+            executeShellWithOutput("chmod 700 -R $appRootDir")
+            executeShellWithOutput("$usrDir/generateSymlinks.sh")
 
-                File("$usrDir/icons").mkdirs()
-            }
+            File("$usrDir/icons").mkdirs()
 
-            if (!tmpDir.exists())
-                tmpDir.mkdirs()
+            tmpDir.mkdirs()
 
-            if (!homeDir.exists())
-                homeDir.mkdirs()
+            homeDir.mkdirs()
 
             requireActivity().runOnUiThread {
                 titleText.text = getString(R.string.creatingWinePrefix)

@@ -34,7 +34,7 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
             holder.icon.setImageResource(R.drawable.ic_folder)
         } else if (sList.file.isFile) {
             if (sList.file.name.endsWith(".exe")) {
-                val output = "$usrDir/tmp/${sList.file.nameWithoutExtension}-icon.ico"
+                val output = "$usrDir/icons/${sList.file.nameWithoutExtension}-icon.ico"
 
                 extractIcon(sList.file, output)
 
@@ -59,7 +59,11 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
         }
 
         override fun onClick(v: View) {
-            val settingsModel = fileList[getAdapterPosition()]
+            if (adapterPosition < 0) {
+                return
+            }
+
+            val settingsModel = fileList[adapterPosition]
 
             val intent = Intent(ACTION_SELECT_FILE_MANAGER).apply {
                 putExtra("selectedFile", settingsModel.file.path)
@@ -69,7 +73,7 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
         }
 
         override fun onLongClick(v: View): Boolean {
-            val settingsModel = fileList[getAdapterPosition()]
+            val settingsModel = fileList[adapterPosition]
 
             selectedFile = settingsModel.file.path
 

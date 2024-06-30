@@ -35,25 +35,28 @@ import com.micewine.emu.adapters.AdapterSettingsController.SettingsController
 
 class ControllerMapperFragment : Fragment() {
     private val settingsList: MutableList<SettingsController> = ArrayList()
+    private var rootView: View? = null
+    private var recyclerView: RecyclerView? = null
+    private var layoutManager: GridLayoutManager? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_settings_model, container, false)
-        val recyclerView = rootView.findViewById<RecyclerView>(R.id.recyclerViewSettingsModel)
-        setAdapter(recyclerView)
+        rootView = inflater.inflate(R.layout.fragment_settings_model, container, false)
+        recyclerView = rootView?.findViewById(R.id.recyclerViewSettingsModel)
 
-        val layoutManager = recyclerView.layoutManager as GridLayoutManager
-        layoutManager.spanCount = 2
+        setAdapter()
+
+        layoutManager = recyclerView?.layoutManager as GridLayoutManager?
+        layoutManager?.spanCount = 2
 
         return rootView
     }
 
-    private fun setAdapter(recyclerView: RecyclerView) {
-        val adapterSettingsController = AdapterSettingsController(settingsList, requireContext())
-        recyclerView.setAdapter(adapterSettingsController)
+    private fun setAdapter() {
+        recyclerView?.setAdapter(AdapterSettingsController(settingsList, requireContext()))
 
         settingsList.clear()
 

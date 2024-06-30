@@ -12,12 +12,10 @@ import com.micewine.emu.activities.MainActivity.Companion.fileManagerDefaultDir
 import com.micewine.emu.adapters.AdapterFiles
 import com.micewine.emu.databinding.FragmentFileManagerBinding
 import java.io.File
-import java.nio.file.Files
 
 class FileManagerFragment: Fragment() {
     private var binding: FragmentFileManagerBinding? = null
     private var rootView: View? = null
-    private val fileList: MutableList<AdapterFiles.FileList> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,37 +25,55 @@ class FileManagerFragment: Fragment() {
         binding = FragmentFileManagerBinding.inflate(inflater, container, false)
         rootView = binding!!.root
 
-        val recyclerView = rootView?.findViewById<RecyclerView>(R.id.recyclerViewFiles)
-        setAdapter(recyclerView!!)
+        recyclerView = rootView?.findViewById(R.id.recyclerViewFiles)
+
+        recyclerView?.adapter = AdapterFiles(fileList, requireContext())
+
+        refreshFiles()
+
+        registerForContextMenu(recyclerView!!)
 
         return rootView
     }
 
-    private fun setAdapter(recyclerView: RecyclerView) {
-        val adapterFile = AdapterFiles(fileList, requireActivity())
+    companion object {
+        private var recyclerView: RecyclerView? = null
+        private val fileList: MutableList<AdapterFiles.FileList> = ArrayList()
 
-        recyclerView.adapter = adapterFile
+        fun refreshFiles() {
+            recyclerView?.adapter?.notifyItemRangeRemoved(0, fileList.count())
 
-        registerForContextMenu(recyclerView)
+            fileList.clear()
 
-        if (fileManagerCwd != fileManagerDefaultDir) {
-            addToAdapter(File(".."))
-        }
-
-        File(fileManagerCwd).listFiles()?.sorted()?.forEach {
-            if (it.isDirectory) {
-                addToAdapter(it)
+            if (fileManagerCwd != fileManagerDefaultDir) {
+                addToAdapter(File(".."))
             }
-        }
 
-        File(fileManagerCwd).listFiles()?.sorted()?.forEach {
-            if (it.isFile) {
-                addToAdapter(it)
+            File(fileManagerCwd).listFiles()?.sorted()?.forEach {
+                if (it.isDirectory) {
+                    addToAdapter(it)
+                }
             }
-        }
-    }
 
-    private fun addToAdapter(file: File) {
-        fileList.add(AdapterFiles.FileList(file))
+            File(fileManagerCwd).listFiles()?.sorted()?.forEach {
+                if (it.isFile) {
+                    addToAdapter(it)
+                }
+            }
+
+            recyclerView?.adapter?.notifyItemRangeInserted(0, fileList.count())
+        }
+
+        fun deleteFile(filePath: String) {
+            val index = fileList.indexOfFirst { it.file.path == filePath }
+
+            fileList.removeAt(index)
+
+            recyclerView?.adapter?.notifyItemRemoved(index)
+        }
+
+        private fun addToAdapter(file: File) {
+            fileList.add(AdapterFiles.FileList(file))
+        }
     }
 }
