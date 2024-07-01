@@ -454,6 +454,8 @@ class MainActivity : AppCompatActivity() {
                 val startMenu = File("$driveC/ProgramData/Microsoft/Windows/Start Menu")
                 val userSharedFolder = File("/storage/emulated/0/MiceWine")
                 val localAppData = File("$driveC/users/\$(whoami)/AppData")
+                val system32 = File("$driveC/windows/system32")
+                val syswow64 = File("$driveC/windows/syswow64")
 
                 WineWrapper.wine("wineboot --init", winePrefix)
 
@@ -468,6 +470,8 @@ class MainActivity : AppCompatActivity() {
                 File("$wineUtils/Start Menu").copyRecursively(File("$startMenu"), true)
                 File("$wineUtils/Addons").copyRecursively(File("$driveC/Addons"), true)
                 File("$wineUtils/Addons/Windows").copyRecursively(File("$driveC/windows"), true)
+                File("$wineUtils/DirectX/x64").copyRecursively(system32, true)
+                File("$wineUtils/DirectX/x32").copyRecursively(syswow64, true)
 
                 WineWrapper.wine("regedit $driveC/Addons/DefaultDLLsOverrides.reg", winePrefix)
                 WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Decorated /d N", winePrefix)
