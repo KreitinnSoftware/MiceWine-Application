@@ -1,5 +1,6 @@
 package com.micewine.emu.fragments
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
@@ -7,18 +8,10 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.micewine.emu.R
-import com.micewine.emu.activities.MainActivity.Companion.appRootDir
-import com.micewine.emu.activities.MainActivity.Companion.copyAssets
-import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.setupDone
-import com.micewine.emu.activities.MainActivity.Companion.setupWinePrefix
-import com.micewine.emu.activities.MainActivity.Companion.tmpDir
-import com.micewine.emu.activities.MainActivity.Companion.usrDir
-import com.micewine.emu.core.ObbExtractor.extractZip
-import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
-import java.io.File
 
 class SetupFragment : DialogFragment() {
+    @SuppressLint("SetTextI18n")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.fragment_setup, null)
@@ -27,47 +20,34 @@ class SetupFragment : DialogFragment() {
         val progressTextBar = view.findViewById<TextView>(R.id.updateProgress)
         val progressExtractBar = view.findViewById<ProgressBar>(R.id.progressBar)
 
-        val dialog = AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog)
-            .setView(view)
-            .create()
-
         isCancelable = false
 
         Thread {
-            appRootDir.mkdirs()
+            while (!setupDone) {
+                requireActivity().runOnUiThread {
+                    if (progressBarValue > 0) {
+                        progressTextBar.text = "$progressBarValue%"
+                    } else {
+                        progressTextBar.text = ""
+                    }
 
-            progressExtractBar.isIndeterminate = true
+                    progressExtractBar.progress = progressBarValue
+                    progressExtractBar.isIndeterminate = progressBarIsIndeterminate
+                    titleText.text = dialogTitleText
+                }
 
-            copyAssets(requireActivity(), "rootfs.zip", appRootDir.toString(), progressTextBar!!)
-
-            extractZip("$appRootDir/rootfs.zip", "$appRootDir", progressExtractBar, progressTextBar, requireActivity())
-
-            File("$appRootDir/rootfs.zip").delete()
-
-            executeShellWithOutput("chmod 700 -R $appRootDir")
-            executeShellWithOutput("$usrDir/generateSymlinks.sh")
-
-            File("$usrDir/icons").mkdirs()
-
-            tmpDir.mkdirs()
-
-            homeDir.mkdirs()
-
-            requireActivity().runOnUiThread {
-                titleText.text = getString(R.string.creatingWinePrefix)
+                Thread.sleep(16)
             }
-
-            progressTextBar.text = ""
-
-            progressExtractBar.isIndeterminate = true
-
-            setupWinePrefix(File("$homeDir/.wine"))
-
-            setupDone = true
 
             dismiss()
         }.start()
 
-        return dialog
+        return AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog).setView(view).create()
+    }
+
+    companion object {
+        var progressBarValue: Int = 0
+        var progressBarIsIndeterminate: Boolean = false
+        var dialogTitleText: String = ""
     }
 }

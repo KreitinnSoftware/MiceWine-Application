@@ -18,7 +18,6 @@ import android.view.ContextMenu
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -46,12 +45,12 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_THEME_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VIRGL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
+import com.micewine.emu.core.ObbExtractor.extractZip
 import com.micewine.emu.core.ShellExecutorCmd.executeShell
 import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.DeleteGameItemFragment
-import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.FileManagerFragment
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.fragments.HomeFragment
@@ -59,6 +58,9 @@ import com.micewine.emu.fragments.HomeFragment.Companion.saveToGameList
 import com.micewine.emu.fragments.HomeFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.RenameGameItemFragment
 import com.micewine.emu.fragments.SettingsFragment
+import com.micewine.emu.fragments.SetupFragment
+import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
+import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -124,6 +126,12 @@ class MainActivity : AppCompatActivity() {
                         refreshFiles()
                     }
                 }
+
+                ACTION_SETUP -> {
+                    lifecycleScope.launch {
+                        setupMiceWine()
+                    }
+                }
             }
         }
     }
@@ -174,6 +182,7 @@ class MainActivity : AppCompatActivity() {
 
         registerReceiver(receiver, object : IntentFilter(ACTION_RUN_WINE) {
             init {
+                addAction(ACTION_SETUP)
                 addAction(ACTION_SELECT_FILE_MANAGER)
             }
         })
@@ -403,6 +412,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private suspend fun setupMiceWine() {
+        withContext(Dispatchers.IO) {
+            appRootDir.mkdirs()
+
+            progressBarIsIndeterminate = true
+
+            copyAssets(this@MainActivity, "rootfs.zip", appRootDir.toString())
+
+            dialogTitleText = getString(R.string.extracting_resources_text)
+
+            extractZip("$appRootDir/rootfs.zip", "$appRootDir")
+
+            File("$appRootDir/rootfs.zip").delete()
+
+            executeShellWithOutput("chmod 700 -R $appRootDir")
+            executeShellWithOutput("$usrDir/generateSymlinks.sh")
+
+            File("$usrDir/icons").mkdirs()
+
+            tmpDir.mkdirs()
+
+            homeDir.mkdirs()
+
+            dialogTitleText = getString(R.string.creatingWinePrefix)
+
+            progressBarIsIndeterminate = true
+
+            setupWinePrefix(File("$homeDir/.wine"))
+
+            setupDone = true
+        }
+    }
+
     companion object {
         @SuppressLint("SdCardPath")
         var appRootDir = File("/data/data/com.micewine.emu/files")
@@ -443,6 +485,7 @@ class MainActivity : AppCompatActivity() {
         var selectedFragment = "HomeFragment"
 
         const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
+        const val ACTION_SETUP = "com.micewine.emu.ACTION_SETUP"
         const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
         const val RAM_COUNTER_KEY = "ramCounter"
         const val CPU_COUNTER_KEY = "cpuCounter"
@@ -476,6 +519,7 @@ class MainActivity : AppCompatActivity() {
                 WineWrapper.wine("regedit $driveC/Addons/DefaultDLLsOverrides.reg", winePrefix)
                 WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Decorated /d N", winePrefix)
                 WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Managed /d N", winePrefix)
+                WineWrapper.wine("reg delete HKCU\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\ThemeManager -v DllName /f", winePrefix)
                 WineWrapper.wine("regedit $driveC/Addons/Themes/DarkBlue/DarkBlue.reg", winePrefix)
             }
         }
@@ -517,10 +561,8 @@ class MainActivity : AppCompatActivity() {
             enableCpuCounter = preferences.getBoolean(CPU_COUNTER_KEY, false)
         }
 
-        fun copyAssets(activity: Activity, filename: String, outputPath: String, textView: TextView) {
-            activity.runOnUiThread {
-                textView.text = activity.getString(R.string.extracting_from_assets)
-            }
+        fun copyAssets(activity: Activity, filename: String, outputPath: String) {
+            dialogTitleText = activity.getString(R.string.extracting_from_assets)
 
             val assetManager = activity.assets
             var input: InputStream? = null

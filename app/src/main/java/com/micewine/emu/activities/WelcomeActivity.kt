@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.ACTION_SETUP
 import com.micewine.emu.databinding.ActivityWelcomeBinding
 import com.micewine.emu.fragments.Welcome2Fragment
 import com.micewine.emu.fragments.WelcomeFragment
@@ -54,6 +55,10 @@ class WelcomeActivity : AppCompatActivity() {
                 }
 
                 2 -> {
+                    sendBroadcast(
+                        Intent(ACTION_SETUP)
+                    )
+
                     finish()
                 }
             }

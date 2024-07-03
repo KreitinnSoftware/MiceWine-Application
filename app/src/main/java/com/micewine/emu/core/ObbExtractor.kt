@@ -1,28 +1,17 @@
 package com.micewine.emu.core
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.widget.ProgressBar
-import android.widget.TextView
+import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
+import com.micewine.emu.fragments.SetupFragment.Companion.progressBarValue
 import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.progress.ProgressMonitor
 import java.io.IOException
 
 object ObbExtractor {
     @SuppressLint("SetTextI18n")
-    fun extractZip(
-        zipFilePath: String?,
-        destinationPath: String,
-        progressExtractBar: ProgressBar?,
-        progressText: TextView?,
-        activity: Activity
-    ) {
+    fun extractZip(zipFilePath: String?, destinationPath: String) {
         try {
-            if (progressExtractBar != null) {
-                activity.runOnUiThread {
-                    progressExtractBar.isIndeterminate = false
-                }
-            }
+            progressBarIsIndeterminate = false
 
             val zipFile = ZipFile(zipFilePath)
 
@@ -31,17 +20,13 @@ object ObbExtractor {
             val progressMonitor = zipFile.progressMonitor
             zipFile.extractAll(destinationPath)
 
-            if (progressExtractBar != null) {
-                while (!progressMonitor.state.equals(ProgressMonitor.State.READY)) {
-                    activity.runOnUiThread {
-                        progressText?.text = progressMonitor.percentDone.toString() + "%"
-                        progressExtractBar.progress = progressMonitor.percentDone
-                    }
+            while (!progressMonitor.state.equals(ProgressMonitor.State.READY)) {
+                progressBarValue = progressMonitor.percentDone
 
-                    Thread.sleep(100)
-                }
+                Thread.sleep(100)
             }
 
+            progressBarValue = 0
         } catch (e: IOException) {
             e.printStackTrace()
         }
