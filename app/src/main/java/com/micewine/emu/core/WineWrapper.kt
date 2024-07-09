@@ -1,7 +1,8 @@
 package com.micewine.emu.core
 
-import com.micewine.emu.core.EnvVars.exportVariables
-import com.micewine.emu.core.EnvVars.setVariables
+import com.micewine.emu.activities.MainActivity.Companion.appRootDir
+import com.micewine.emu.activities.MainActivity.Companion.usrDir
+import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.ShellExecutorCmd.executeShell
 import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
 import kotlinx.coroutines.Dispatchers
@@ -12,51 +13,36 @@ object WineWrapper {
     private const val LINKER_PATH = "/system/bin/linker64"
 
     fun wineServer(args: String) {
-        setVariables()
-
         executeShell(
-            exportVariables() + ";" +
-                "$LINKER_PATH $(which box64) $(which wineserver) $args", "WineServer"
+            getEnv() + "$LINKER_PATH $usrDir/bin/box64 $appRootDir/wine/x86_64/bin/wineserver $args", "WineServer"
         )
     }
 
     suspend fun wineServerSuspend(args: String) {
         withContext(Dispatchers.Default) {
-            setVariables()
-
             executeShell(
-                exportVariables() + ";" +
-                        "$LINKER_PATH $(which box64) $(which wineserver) $args", "WineServer"
+                getEnv() + "$LINKER_PATH $usrDir/bin/box64 $appRootDir/wine/x86_64/bin/wineserver $args", "WineServer"
             )
         }
     }
 
     fun wine(args: String, winePrefix: File) {
-        setVariables()
-
         executeShell(
-            exportVariables() + " WINEPREFIX=$winePrefix;" +
-                    "$LINKER_PATH $(which box64) $(which wine) $args", "WineProcess"
+            getEnv() + "WINEPREFIX=$winePrefix $LINKER_PATH $usrDir/bin/box64 $appRootDir/wine/x86_64/bin/wine $args", "WineProcess"
         )
     }
 
     fun wine(args: String, winePrefix: File, cwd: String) {
-        setVariables()
-
         executeShell(
-            exportVariables() + " WINEPREFIX=$winePrefix;" +
-                    "cd $cwd;" +
-                    "$LINKER_PATH $(which box64) $(which wine) $args", "WineProcess"
+            "cd $cwd;" +
+                    getEnv() + "WINEPREFIX=$winePrefix $LINKER_PATH $usrDir/bin/box64 $appRootDir/wine/x86_64/bin/wine $args", "WineProcess"
         )
     }
 
     fun extractIcon(exeFile: File, output: String) {
         if (exeFile.name.endsWith(".exe")) {
-            setVariables()
-
             executeShellWithOutput(
-                exportVariables() + ";" +
-                        "wrestool -x -t 14 '${exeFile.path}' > '$output'"
+                getEnv() + "$LINKER_PATH $usrDir/bin/wrestool -x -t 14 '${exeFile.path}' > '$output'"
             )
         }
     }

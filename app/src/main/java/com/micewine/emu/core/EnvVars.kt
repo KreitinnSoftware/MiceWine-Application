@@ -33,15 +33,19 @@ object EnvVars {
         return vars[key]
     }
 
-    fun exportVariables(): String {
-        var variables = ""
+    fun getEnv(): String {
+        setEnv()
+
+        var variables = " "
+
         for (key in vars.keys) {
-            variables += " " + getVar(key)
+            variables += "${getVar(key)} "
         }
-        return "export$variables"
+
+        return "env$variables"
     }
 
-    fun setVariables() {
+    private fun setEnv() {
         putVar("LANG", "LANG=$appLang")
         putVar("TMPDIR", "TMPDIR=$tmpDir")
         putVar("HOME", "HOME=$homeDir")
