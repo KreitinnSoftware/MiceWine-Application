@@ -426,6 +426,8 @@ class MainActivity : AppCompatActivity() {
 
             File("$appRootDir/rootfs.zip").delete()
 
+            File("$appRootDir/wine-utils/CoreFonts").copyRecursively(File("$appRootDir/wine/share/wine/fonts"), true)
+
             executeShellWithOutput("chmod 700 -R $appRootDir")
             executeShellWithOutput("$usrDir/generateSymlinks.sh")
 
