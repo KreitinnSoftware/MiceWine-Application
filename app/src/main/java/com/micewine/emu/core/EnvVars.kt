@@ -27,20 +27,10 @@ object EnvVars {
         vars[name] = "$name=$value"
     }
 
-    private fun getVar(key: String): String? {
-        return vars[key]
-    }
-
     fun getEnv(): String {
         setEnv()
 
-        var variables = " "
-
-        for (key in vars.keys) {
-            variables += "${getVar(key)} "
-        }
-
-        return "env$variables"
+        return "env ${vars.values.joinToString(" ")} "
     }
 
     private fun setEnv() {
