@@ -15,9 +15,7 @@ import com.micewine.emu.activities.MainActivity.Companion.box64DynarecX87double
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedDXVKHud
 import com.micewine.emu.activities.MainActivity.Companion.selectedDriver
-import com.micewine.emu.activities.MainActivity.Companion.selectedIbVersion
 import com.micewine.emu.activities.MainActivity.Companion.selectedMesaVkWsiPresentMode
-import com.micewine.emu.activities.MainActivity.Companion.selectedTheme
 import com.micewine.emu.activities.MainActivity.Companion.selectedTuDebugPreset
 import com.micewine.emu.activities.MainActivity.Companion.selectedVirGLProfile
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
@@ -25,8 +23,8 @@ import com.micewine.emu.activities.MainActivity.Companion.usrDir
 
 object EnvVars {
     private val vars = LinkedHashMap<String, String>()
-    private fun putVar(name: String, value: Any) {
-        vars[name] = value.toString()
+    private fun putVar(name: String, value: String?) {
+        vars[name] = "$name=$value"
     }
 
     private fun getVar(key: String): String? {
@@ -46,84 +44,85 @@ object EnvVars {
     }
 
     private fun setEnv() {
-        putVar("LANG", "LANG=$appLang")
-        putVar("TMPDIR", "TMPDIR=$tmpDir")
-        putVar("HOME", "HOME=$homeDir")
-        putVar("DISPLAY", "DISPLAY=:0")
-        putVar("BOX64_LOG", "BOX64_LOG=1")
-        putVar("LD_LIBRARY_PATH", "LD_LIBRARY_PATH=$usrDir/lib")
-        putVar("PATH", "PATH+=:$usrDir/bin:$appRootDir/wine/x86_64/bin")
-        putVar("PREFIX", "PREFIX=$usrDir")
-        putVar("IB_VERSION", "IB_VERSION=$selectedIbVersion")
-        putVar("MESA_SHADER_CACHE_DIR", "MESA_SHADER_CACHE_DIR=$homeDir/.cache")
-        putVar("MESA_VK_WSI_PRESENT_MODE", "MESA_VK_WSI_PRESENT_MODE=$selectedMesaVkWsiPresentMode")
+        putVar("LANG", appLang)
+        putVar("TMPDIR", tmpDir.path)
+        putVar("HOME", homeDir.path)
+        putVar("DISPLAY", ":0")
+        putVar("BOX64_LOG", "1")
+        putVar("LD_LIBRARY_PATH", "$usrDir/lib")
+        putVar("PATH", "\$PATH:$usrDir/bin:$appRootDir/wine/x86_64/bin")
+        putVar("PREFIX", usrDir.path)
+        putVar("MESA_SHADER_CACHE_DIR", "$homeDir/.cache")
+        putVar("MESA_VK_WSI_PRESENT_MODE", selectedMesaVkWsiPresentMode)
+        putVar("mesa_glthread", "true")
 
         when (selectedDriver) {
             "Turnip/Zink" -> {
-                putVar("GALLIUM_DRIVER", "GALLIUM_DRIVER=zink")
-                putVar("TU_DEBUG", "TU_DEBUG=$selectedTuDebugPreset")
-                putVar("VK_ICD_FILENAMES", "VK_ICD_FILENAMES=$usrDir/share/vulkan/icd.d/freedreno_icd.aarch64.json")
-                putVar("MESA_GL_VERSION_OVERRIDE", "MESA_GL_VERSION_OVERRIDE=4.6")
-                putVar("MESA_GLSL_VERSION_OVERRIDE", "MESA_GLSL_VERSION_OVERRIDE=460")
+                putVar("GALLIUM_DRIVER", "zink")
+                putVar("MESA_LOADER_DRIVER_OVERRIDE", "zink")
+                putVar("TU_DEBUG", "$selectedTuDebugPreset")
+                putVar("VK_ICD_FILENAMES", "$usrDir/share/vulkan/icd.d/freedreno_icd.aarch64.json")
+                putVar("MESA_GL_VERSION_OVERRIDE", "4.6")
+                putVar("MESA_GLSL_VERSION_OVERRIDE", "460")
             }
             "Android/Zink" -> {
-                putVar("GALLIUM_DRIVER", "GALLIUM_DRIVER=zink")
-                putVar("LD_LIBRARY_PATH", "LD_LIBRARY_PATH=$usrDir/native-zink/lib:$usrDir/lib")
-                putVar("MESA_GL_VERSION_OVERRIDE", "MESA_GL_VERSION_OVERRIDE=4.6")
-                putVar("MESA_GLSL_VERSION_OVERRIDE", "MESA_GLSL_VERSION_OVERRIDE=460")
+                putVar("GALLIUM_DRIVER", "zink")
+                putVar("MESA_LOADER_DRIVER_OVERRIDE", "zink")
+                putVar("LD_LIBRARY_PATH", "$usrDir/native-zink/lib:$usrDir/lib")
+                putVar("MESA_GL_VERSION_OVERRIDE", "4.6")
+                putVar("MESA_GLSL_VERSION_OVERRIDE", "460")
             }
             "VirGL" -> {
-                putVar("GALLIUM_DRIVER", "GALLIUM_DRIVER=virpipe")
-                putVar("LIBGL_ALWAYS_SOFTWARE", "LIBGL_ALWAYS_SOFTWARE=1")
+                putVar("GALLIUM_DRIVER", "virpipe")
+                putVar("MESA_LOADER_DRIVER_OVERRIDE", "virpipe")
+                putVar("LIBGL_ALWAYS_SOFTWARE", "1")
 
                 if (selectedVirGLProfile == "GL 2.1") {
-                    putVar("MESA_GL_VERSION_OVERRIDE", "MESA_GL_VERSION_OVERRIDE=2.1")
-                    putVar("MESA_GLSL_VERSION_OVERRIDE", "MESA_GLSL_VERSION_OVERRIDE=120")
+                    putVar("MESA_GL_VERSION_OVERRIDE", "2.1")
+                    putVar("MESA_GLSL_VERSION_OVERRIDE", "120")
                 } else if (selectedVirGLProfile == "GL 3.3") {
-                    putVar("MESA_GL_VERSION_OVERRIDE", "MESA_GL_VERSION_OVERRIDE=3.3COMPAT")
-                    putVar("MESA_GLSL_VERSION_OVERRIDE", "MESA_GLSL_VERSION_OVERRIDE=330")
+                    putVar("MESA_GL_VERSION_OVERRIDE", "3.3COMPAT")
+                    putVar("MESA_GLSL_VERSION_OVERRIDE", "330")
                 }
 
-                putVar("MESA_EXTENSION_OVERRIDE", "MESA_EXTENSION_OVERRIDE='-GL_EXT_texture_sRGB_decode GL_EXT_polygon_offset_clamp'")
+                putVar("MESA_EXTENSION_OVERRIDE", "'-GL_EXT_texture_sRGB_decode GL_EXT_polygon_offset_clamp'")
             }
         }
 
-        putVar("MICEWINE_THEME", "MICEWINE_THEME=$selectedTheme")
-        putVar("DXVK_ASYNC", "DXVK_ASYNC=1")
-        putVar("DXVK_STATE_CACHE_PATH", "DXVK_STATE_CACHE_PATH=$homeDir/.cache/dxvk-shader-cache")
+        putVar("DXVK_ASYNC", "1")
+        putVar("DXVK_STATE_CACHE_PATH", "$homeDir/.cache/dxvk-shader-cache")
 
         when (selectedDXVKHud) {
             "Off" -> {
-                putVar("DXVK_HUD", "DXVK_HUD=0")
+                putVar("DXVK_HUD", "0")
             }
             "FPS" -> {
-                putVar("DXVK_HUD", "DXVK_HUD=fps")
+                putVar("DXVK_HUD", "fps")
             }
             "GPU Load" -> {
-                putVar("DXVK_HUD", "DXVK_HUD=gpuload")
+                putVar("DXVK_HUD", "gpuload")
             }
             "FPS/GPU Load" -> {
-                putVar("DXVK_HUD", "DXVK_HUD=fps,gpuload")
+                putVar("DXVK_HUD", "fps,gpuload")
             }
             "FPS/GPU Load/Dev Info" -> {
-                putVar("DXVK_HUD", "DXVK_HUD=fps,gpuload,devinfo")
+                putVar("DXVK_HUD", "fps,gpuload,devinfo")
             }
         }
 
-        putVar("BOX64_LOG", "BOX64_LOG=1")
-        putVar("BOX64_MMAP32", "BOX64_MMAP32=1")
-        putVar("BOX64_AVX", "BOX64_AVX=2")
-        putVar("BOX64_DYNAREC_BIGBLOCK", "BOX64_DYNAREC_BIGBLOCK=$box64DynarecBigblock")
-        putVar("BOX64_DYNAREC_STRONGMEM", "BOX64_DYNAREC_STRONGMEM=$box64DynarecStrongmem")
-        putVar("BOX64_DYNAREC_X87DOUBLE", "BOX64_DYNAREC_X87DOUBLE=$box64DynarecX87double")
-        putVar("BOX64_DYNAREC_FASTNAN", "BOX64_DYNAREC_FASTNAN=$box64DynarecFastnan")
-        putVar("BOX64_DYNAREC_FASTROUND", "BOX64_DYNAREC_FASTROUND=$box64DynarecFastround")
-        putVar("BOX64_DYNAREC_SAFEFLAGS", "BOX64_DYNAREC_SAFEFLAGS=$box64DynarecSafeflags")
-        putVar("BOX64_DYNAREC_CALLRET", "BOX64_DYNAREC_CALLRET=$box64DynarecCallret")
-        putVar("BOX64_DYNAREC_ALIGNED_ATOMICS", "BOX64_DYNAREC_ALIGNED_ATOMICS=$box64DynarecAlignedAtomics")
-        putVar("BOX64_DYNAREC_BLEEDING_EDGE", "BOX64_DYNAREC_BLEEDING_EDGE=$box64DynarecBleedingEdge")
-        putVar("BOX64_DYNAREC_WAIT", "BOX64_DYNAREC_WAIT=$box64DynarecWait")
-        putVar("VKD3D_FEATURE_LEVEL", "VKD3D_FEATURE_LEVEL=12_0")
-        putVar("WINEDEBUG", "WINEDEBUG=-virtual")
+        putVar("BOX64_LOG", "1")
+        putVar("BOX64_MMAP32", "1")
+        putVar("BOX64_AVX", "2")
+        putVar("BOX64_DYNAREC_BIGBLOCK", box64DynarecBigblock)
+        putVar("BOX64_DYNAREC_STRONGMEM", box64DynarecStrongmem)
+        putVar("BOX64_DYNAREC_X87DOUBLE", box64DynarecX87double)
+        putVar("BOX64_DYNAREC_FASTNAN", box64DynarecFastnan)
+        putVar("BOX64_DYNAREC_FASTROUND", box64DynarecFastround)
+        putVar("BOX64_DYNAREC_SAFEFLAGS", box64DynarecSafeflags)
+        putVar("BOX64_DYNAREC_CALLRET", box64DynarecCallret)
+        putVar("BOX64_DYNAREC_ALIGNED_ATOMICS", box64DynarecAlignedAtomics)
+        putVar("BOX64_DYNAREC_BLEEDING_EDGE", box64DynarecBleedingEdge)
+        putVar("BOX64_DYNAREC_WAIT", box64DynarecWait)
+        putVar("VKD3D_FEATURE_LEVEL", "12_0")
     }
 }
