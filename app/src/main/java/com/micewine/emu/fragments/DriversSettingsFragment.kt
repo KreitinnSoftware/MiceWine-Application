@@ -17,14 +17,20 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_P
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VIRGL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
+import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.adapters.AdapterSettingsPreferences
 import com.micewine.emu.adapters.AdapterSettingsPreferences.SettingsListSpinner
+import java.io.File
 
 class DriversSettingsFragment : Fragment() {
     private val settingsList: MutableList<SettingsListSpinner> = ArrayList()
     private var rootView: View? = null
     private var recyclerView: RecyclerView? = null
     private var layoutManager: GridLayoutManager? = null
+    private val dxvkFolder: File = File("$appRootDir/wine-utils/DXVK")
+    private val dxvkVersions: MutableList<String> = mutableListOf()
+    private val wined3dFolder: File = File("$appRootDir/wine-utils/WineD3D")
+    private val wined3dVersions: MutableList<String> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,6 +52,16 @@ class DriversSettingsFragment : Fragment() {
         recyclerView?.setAdapter(AdapterSettingsPreferences(settingsList, requireContext()))
 
         settingsList.clear()
+        dxvkVersions.clear()
+        wined3dVersions.clear()
+
+        dxvkFolder.listFiles()?.sorted()?.forEach {
+            dxvkVersions.add(it.name)
+        }
+
+        wined3dFolder.listFiles()?.sorted()?.forEach {
+            wined3dVersions.add(it.name)
+        }
 
         addToAdapter(R.string.select_driver_title, R.string.null_description, arrayOf(
             "Turnip/Zink", "Android/Zink",
@@ -56,11 +72,7 @@ class DriversSettingsFragment : Fragment() {
             "DXVK", "WineD3D"),
             SPINNER, "DXVK", SELECTED_D3DX_RENDERER_KEY)
 
-        addToAdapter(R.string.select_dxvk_title, R.string.null_description, arrayOf(
-            "DXVK-1.10.3-async", "DXVK-2.0-async",
-            "DXVK-2.1", "DXVK-2.2", "DXVK-2.3",
-            "DXVK-2.3.1", "DXVK-DEV-571948c",
-            "DXVK-DEV-eb80695", "DXVK-GPLASYNC-2.3.1"),
+        addToAdapter(R.string.select_dxvk_title, R.string.null_description, dxvkVersions.toTypedArray(),
             SPINNER, "DXVK-1.10.3-async", SELECTED_DXVK_KEY)
 
         addToAdapter(R.string.select_dxvk_hud_preset_title, R.string.null_description, arrayOf(
@@ -75,10 +87,8 @@ class DriversSettingsFragment : Fragment() {
             "noconform", "noconform,flushall", "noconform,flushall,syncdraw", "noconform,syncdraw"),
             SPINNER, "mailbox", SELECTED_TU_DEBUG_PRESET_KEY)
 
-        addToAdapter(R.string.select_wined3d_title, R.string.null_description, arrayOf(
-            "WineD3D-3.17", "WineD3D-7.18",
-            "WineD3D-8.2", "WineD3D-9.0"),
-            SPINNER, "WineD3D-9.0", SELECTED_WINED3D_KEY)
+        addToAdapter(R.string.select_wined3d_title, R.string.null_description, wined3dVersions.toTypedArray(),
+            SPINNER, "WineD3D-9.12", SELECTED_WINED3D_KEY)
 
         addToAdapter(R.string.select_virgl_profile_title, R.string.null_description, arrayOf(
             "GL 2.1", "GL 3.3"),

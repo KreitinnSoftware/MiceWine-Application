@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 object WineWrapper {
-    private const val LINKER_PATH = "/system/bin/linker64"
+    const val LINKER_PATH = "/system/bin/linker64"
 
     fun wineServer(args: String) {
         executeShell(

@@ -39,9 +39,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDE
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_IB_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_THEME_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VIRGL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
@@ -49,6 +47,7 @@ import com.micewine.emu.core.ObbExtractor.extractZip
 import com.micewine.emu.core.ShellExecutorCmd.executeShell
 import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
 import com.micewine.emu.core.WineWrapper
+import com.micewine.emu.core.WineWrapper.LINKER_PATH
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.DeleteGameItemFragment
 import com.micewine.emu.fragments.FileManagerFragment
@@ -392,7 +391,7 @@ class MainActivity : AppCompatActivity() {
     private suspend fun runVirGLRenderer() {
         withContext(Dispatchers.IO) {
             executeShell(
-                "/system/bin/linker64 $usrDir/bin/virgl_test_server", "VirGLServer"
+                "$LINKER_PATH $usrDir/bin/virgl_test_server", "VirGLServer"
             )
         }
     }
@@ -468,11 +467,9 @@ class MainActivity : AppCompatActivity() {
         var box64DynarecBleedingEdge: String? = null
         var box64DynarecWait: String? = null
         var selectedDriver: String? = null
-        var selectedTheme: String? = null
         var d3dxRenderer: String? = null
         var selectedWineD3D: String? = null
         var selectedDXVK: String? = null
-        var selectedIbVersion: String? = null
         var selectedVirGLProfile: String? = null
         var selectedDXVKHud: String? = null
         var selectedMesaVkWsiPresentMode: String? = null
@@ -550,11 +547,9 @@ class MainActivity : AppCompatActivity() {
             box64DynarecBleedingEdge = booleanToString(preferences.getBoolean(BOX64_DYNAREC_BLEEDING_EDGE_KEY, true))
             box64DynarecWait = booleanToString(preferences.getBoolean(BOX64_DYNAREC_WAIT_KEY, true))
             selectedDriver = preferences.getString(SELECTED_DRIVER_KEY, "Turnip/Zink")
-            selectedTheme = preferences.getString(SELECTED_THEME_KEY, "DarkBlue")
             d3dxRenderer = preferences.getString(SELECTED_D3DX_RENDERER_KEY, "DXVK")
             selectedWineD3D = preferences.getString(SELECTED_WINED3D_KEY, "WineD3D-9.0")
             selectedDXVK = preferences.getString(SELECTED_DXVK_KEY, "DXVK-1.10.3-async")
-            selectedIbVersion = preferences.getString(SELECTED_IB_KEY, "0.1.8")
             selectedVirGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
             selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "FPS/GPU Load")
             selectedMesaVkWsiPresentMode = preferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY, "mailbox")
