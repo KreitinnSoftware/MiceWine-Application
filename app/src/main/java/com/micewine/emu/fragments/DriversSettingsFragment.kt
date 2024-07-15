@@ -64,8 +64,7 @@ class DriversSettingsFragment : Fragment() {
         }
 
         addToAdapter(R.string.select_driver_title, R.string.null_description, arrayOf(
-            "Turnip/Zink", "Android/Zink",
-            "VirGL"),
+            "Turnip/Zink", "Android/Zink", "VirGL"),
             SPINNER, "Turnip/Zink", SELECTED_DRIVER_KEY)
 
         addToAdapter(R.string.select_d3dx_title, R.string.null_description, arrayOf(
