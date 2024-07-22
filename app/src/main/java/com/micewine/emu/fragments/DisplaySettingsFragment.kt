@@ -39,7 +39,7 @@ class DisplaySettingsFragment : Fragment() {
     }
 
     private fun setAdapter() {
-        recyclerView?.setAdapter(AdapterSettingsPreferences(settingsList, requireContext()))
+        recyclerView?.setAdapter(AdapterSettingsPreferences(settingsList, requireActivity()))
 
         settingsList.clear()
 

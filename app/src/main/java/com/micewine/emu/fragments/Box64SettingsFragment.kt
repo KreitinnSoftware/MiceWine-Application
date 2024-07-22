@@ -46,7 +46,7 @@ class Box64SettingsFragment : Fragment() {
     }
 
     private fun setAdapter() {
-        val adapterSettingsPreferences = AdapterSettingsPreferences(settingsList, requireContext())
+        val adapterSettingsPreferences = AdapterSettingsPreferences(settingsList, requireActivity())
         recyclerView?.setAdapter(adapterSettingsPreferences)
 
         settingsList.clear()

@@ -1,5 +1,6 @@
 package com.micewine.emu.core
 
+import android.os.Build
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.core.EnvVars.getEnv
@@ -12,30 +13,32 @@ import java.io.File
 object WineWrapper {
     const val LINKER_PATH = "/system/bin/linker64"
 
+    private var IS_BOX64 = if (Build.SUPPORTED_ABIS[0] == "x86_64") "" else "$usrDir/bin/box64"
+
     fun wineServer(args: String) {
         executeShell(
-            getEnv() + "$LINKER_PATH $usrDir/bin/box64 $appRootDir/wine/x86_64/bin/wineserver $args", "WineServer"
+            getEnv() + "$LINKER_PATH $IS_BOX64 $appRootDir/wine/x86_64/bin/wineserver $args", "WineServer"
         )
     }
 
     suspend fun wineServerSuspend(args: String) {
         withContext(Dispatchers.Default) {
             executeShell(
-                getEnv() + "$LINKER_PATH $usrDir/bin/box64 $appRootDir/wine/x86_64/bin/wineserver $args", "WineServer"
+                getEnv() + "$LINKER_PATH $IS_BOX64 $appRootDir/wine/x86_64/bin/wineserver $args", "WineServer"
             )
         }
     }
 
     fun wine(args: String, winePrefix: File) {
         executeShell(
-            getEnv() + "WINEPREFIX=$winePrefix $LINKER_PATH $usrDir/bin/box64 $appRootDir/wine/x86_64/bin/wine $args", "WineProcess"
+            getEnv() + "WINEPREFIX=$winePrefix $LINKER_PATH $IS_BOX64 $appRootDir/wine/x86_64/bin/wine $args", "WineProcess"
         )
     }
 
     fun wine(args: String, winePrefix: File, cwd: String) {
         executeShell(
             "cd $cwd;" +
-                    getEnv() + "WINEPREFIX=$winePrefix $LINKER_PATH $usrDir/bin/box64 $appRootDir/wine/x86_64/bin/wine $args", "WineProcess"
+                    getEnv() + "WINEPREFIX=$winePrefix $LINKER_PATH $IS_BOX64 $appRootDir/wine/x86_64/bin/wine $args", "WineProcess"
         )
     }
 

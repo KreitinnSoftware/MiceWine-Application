@@ -1,6 +1,5 @@
 package com.micewine.emu.adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,16 +8,18 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
+import com.micewine.emu.fragments.InfoDialogFragment
 
-class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpinner>, private val context: Context) :
+class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpinner>, private val activity: FragmentActivity) :
     RecyclerView.Adapter<AdapterSettingsPreferences.ViewHolder>() {
 
-    val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
+    val preferences = PreferenceManager.getDefaultSharedPreferences(activity)!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_settings_preferences_item, parent, false)
@@ -30,7 +31,7 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
         holder.settingsName.setText(sList.titleSettings)
         holder.settingsDescription.setText(sList.descriptionSettings)
 
-        if (context.getString(sList.descriptionSettings)  == " ") {
+        if (activity.getString(sList.descriptionSettings)  == " ") {
             holder.settingsDescription.visibility = View.GONE
             holder.settingsName.gravity = com.google.android.material.R.id.center
         }
@@ -50,7 +51,7 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
         } else if (sList.type == SPINNER) {
             holder.settingsSwitch.visibility = View.GONE
 
-            holder.spinnerOptions.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, sList.spinnerOptions)
+            holder.spinnerOptions.adapter = ArrayAdapter(activity, android.R.layout.simple_spinner_dropdown_item, sList.spinnerOptions)
 
             holder.spinnerOptions.setSelection(sList.spinnerOptions.indexOf(preferences.getString(sList.key, sList.defaultValue)))
 
@@ -93,9 +94,12 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
         }
 
         override fun onClick(v: View) {
-            // val settingsModel = settingsList[getAdapterPosition()]
+            val settingsModel = settingsList[getAdapterPosition()]
 
-            // TODO Small Dialog that shows description of preference
+            InfoDialogFragment.titleText = settingsModel.key
+            InfoDialogFragment.descriptionText = activity.getString(settingsModel.descriptionSettings)
+
+            InfoDialogFragment().show(activity.supportFragmentManager, "")
         }
     }
 

@@ -31,12 +31,12 @@
         android:layout_marginTop="16dp"
         android:gravity="start">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonContinue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/continueText">
-        </Button>
+        </com.google.android.material.button.MaterialButton>
 
     </LinearLayout>
 
