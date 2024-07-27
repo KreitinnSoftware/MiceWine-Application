@@ -53,7 +53,7 @@ class CmdEntryPoint internal constructor(args: Array<String>?, context: Context)
              */Log.e("CmdEntryPoint", "Listening port $PORT")
             try {
                 ServerSocket(PORT, 0, InetAddress.getByName("127.0.0.1")).use { listeningSocket ->
-                    listeningSocket.setReuseAddress(true)
+                    listeningSocket.reuseAddress = true
                     while (true) {
                         try {
                             listeningSocket.accept().use { client ->
@@ -91,7 +91,7 @@ class CmdEntryPoint internal constructor(args: Array<String>?, context: Context)
 
         init {
             val path = "lib/" + Build.SUPPORTED_ABIS[0] + "/libXlorie.so"
-            val loader = CmdEntryPoint::class.java.getClassLoader()
+            val loader = CmdEntryPoint::class.java.classLoader
             val res = loader?.getResource(path)
             val libPath = res?.file?.replace("file:", "")?.replace("-v8a", "")?.replace("/base.apk!", "")
 
@@ -119,7 +119,7 @@ class CmdEntryPoint internal constructor(args: Array<String>?, context: Context)
          */
         @JvmStatic
         fun main(args: Array<String>) {
-            Log.i("CmdEntryPoint", "commit " + BuildConfig.COMMIT)
+            Log.i("CmdEntryPoint", "Starting CmdEntryPoint...")
             handler!!.post { CmdEntryPoint(args, createContext()) }
             Looper.loop()
         }
