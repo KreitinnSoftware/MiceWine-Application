@@ -34,13 +34,13 @@ object EnvVars {
     }
 
     private fun setEnv() {
-        putVar("LANG", appLang)
+        putVar("LANG", "$appLang.UTF-8")
         putVar("TMPDIR", tmpDir.path)
         putVar("HOME", homeDir.path)
         putVar("DISPLAY", ":0")
         putVar("BOX64_LOG", "1")
         putVar("LD_LIBRARY_PATH", "$usrDir/lib")
-        putVar("PATH", "\$PATH:$usrDir/bin:$appRootDir/wine/x86_64/bin")
+        putVar("PATH", "\$PATH:$usrDir/bin:$appRootDir/wine/bin")
         putVar("PREFIX", usrDir.path)
         putVar("MESA_SHADER_CACHE_DIR", "$homeDir/.cache")
         putVar("MESA_VK_WSI_PRESENT_MODE", selectedMesaVkWsiPresentMode)
@@ -103,6 +103,7 @@ object EnvVars {
         putVar("BOX64_LOG", "1")
         putVar("BOX64_MMAP32", "1")
         putVar("BOX64_AVX", "2")
+        putVar("BOX64_RCFILE", "$usrDir/etc/box64.box64rc")
         putVar("BOX64_DYNAREC_BIGBLOCK", box64DynarecBigblock)
         putVar("BOX64_DYNAREC_STRONGMEM", box64DynarecStrongmem)
         putVar("BOX64_DYNAREC_X87DOUBLE", box64DynarecX87double)

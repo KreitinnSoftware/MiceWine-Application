@@ -13,9 +13,7 @@ import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.ContextMenu
 import android.view.KeyEvent
 import android.view.MenuItem
@@ -37,6 +35,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_SAFEF
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_STRONGMEM_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_WAIT_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_KEY
@@ -45,11 +44,11 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WS
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VIRGL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
+import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.ObbExtractor.extractZip
 import com.micewine.emu.core.ShellExecutorCmd.executeShell
 import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
 import com.micewine.emu.core.WineWrapper
-import com.micewine.emu.core.WineWrapper.LINKER_PATH
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.DeleteGameItemFragment
 import com.micewine.emu.fragments.FileManagerFragment
@@ -79,19 +78,14 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 ACTION_RUN_WINE -> {
-                    val exePath = intent.getStringExtra("exePath")
+                    val exePath = intent.getStringExtra("exePath")!!
 
-                    lifecycleScope.launch {
-                        runXServer(":0")
-                    }
+                    tmpDir.deleteRecursively()
+                    tmpDir.mkdirs()
 
-                    lifecycleScope.launch {
-                        runVirGLRenderer()
-                    }
-
-                    lifecycleScope.launch {
-                        runWine(exePath.toString(), File("$homeDir/.wine"))
-                    }
+                    lifecycleScope.launch { runXServer(":0") }
+                    lifecycleScope.launch { runVirGLRenderer() }
+                    lifecycleScope.launch { runWine(exePath, File("$homeDir/.wine")) }
                 }
 
                 ACTION_SELECT_FILE_MANAGER -> {
@@ -108,7 +102,7 @@ class MainActivity : AppCompatActivity() {
                     val file = File(fileName!!)
 
                     if (file.isFile) {
-                        if (file.name.endsWith(".exe") || file.name.endsWith(".bat")) {
+                        if (file.name.endsWith(".exe") || file.name.endsWith(".bat") || file.name.endsWith(".msi")) {
                             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                                 putExtra("exePath", file.path)
                             }
@@ -116,7 +110,7 @@ class MainActivity : AppCompatActivity() {
                             sendBroadcast(runWineIntent)
 
                             val emulationActivityIntent = Intent(this@MainActivity, EmulationActivity::class.java).apply {
-                                setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
                             }
 
                             startActivityIfNeeded(emulationActivityIntent, 0)
@@ -192,7 +186,7 @@ class MainActivity : AppCompatActivity() {
 
         if (exePath != null) {
             val intent = Intent(this, EmulationActivity::class.java).apply {
-                setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
             }
 
             WineWrapper.wineServer("--kill")
@@ -270,7 +264,7 @@ class MainActivity : AppCompatActivity() {
                     WineWrapper.extractIcon(File(selectedFile), output)
 
                     saveToGameList(preferences!!, selectedFile, File(selectedFile).nameWithoutExtension, output)
-                } else if (selectedFile.endsWith(".bat")) {
+                } else if (selectedFile.endsWith(".bat") || selectedFile.endsWith(".msi")) {
                     saveToGameList(preferences!!, selectedFile, File(selectedFile).nameWithoutExtension, "")
                 } else {
                     Toast.makeText(this, getString(R.string.incompatibleSelectedFile), Toast.LENGTH_SHORT).show()
@@ -278,7 +272,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.executeExe -> {
-                if (selectedFile.endsWith(".exe") || selectedFile.endsWith(".bat")) {
+                if (selectedFile.endsWith(".exe") || selectedFile.endsWith(".bat") || selectedFile.endsWith(".msi")) {
                     val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                         putExtra("exePath", selectedFile)
                     }
@@ -286,7 +280,7 @@ class MainActivity : AppCompatActivity() {
                     sendBroadcast(runWineIntent)
 
                     val emulationActivityIntent = Intent(this@MainActivity, EmulationActivity::class.java).apply {
-                        setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                        flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
                     }
 
                     startActivityIfNeeded(emulationActivityIntent, 0)
@@ -383,7 +377,7 @@ class MainActivity : AppCompatActivity() {
             installDXWrapper(winePrefix)
 
             if (exePath == "") {
-                WineWrapper.wine("explorer /desktop=shell,1280x720 TFM", winePrefix)
+                WineWrapper.wine("TFM", winePrefix)
             } else {
                 WineWrapper.wine("'$exePath'", winePrefix, "'${File(exePath).parent!!}'")
             }
@@ -393,7 +387,7 @@ class MainActivity : AppCompatActivity() {
     private suspend fun runVirGLRenderer() {
         withContext(Dispatchers.IO) {
             executeShell(
-                "$LINKER_PATH $usrDir/bin/virgl_test_server", "VirGLServer"
+                getEnv() + "$usrDir/bin/virgl_test_server", "VirGLServer"
             )
         }
     }
@@ -482,6 +476,7 @@ class MainActivity : AppCompatActivity() {
         var fileManagerDefaultDir: String = "$homeDir/.wine/dosdevices"
         var fileManagerCwd: String = fileManagerDefaultDir
         var selectedFile: String = ""
+        private var selectedResolution: String? = ""
 
         var selectedFragment = "HomeFragment"
 
@@ -516,12 +511,16 @@ class MainActivity : AppCompatActivity() {
                 File("$wineUtils/Addons/Windows").copyRecursively(File("$driveC/windows"), true)
                 File("$wineUtils/DirectX/x64").copyRecursively(system32, true)
                 File("$wineUtils/DirectX/x32").copyRecursively(syswow64, true)
+                File("$wineUtils/OpenAL/x64").copyRecursively(system32, true)
+                File("$wineUtils/OpenAL/x32").copyRecursively(syswow64, true)
 
                 WineWrapper.wine("regedit $driveC/Addons/DefaultDLLsOverrides.reg", winePrefix)
-                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Decorated /d N", winePrefix)
-                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Managed /d N", winePrefix)
-                WineWrapper.wine("reg delete HKCU\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\ThemeManager -v DllName /f", winePrefix)
                 WineWrapper.wine("regedit $driveC/Addons/Themes/DarkBlue/DarkBlue.reg", winePrefix)
+                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Decorated /d N /f", winePrefix)
+                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Managed /d N /f", winePrefix)
+                WineWrapper.wine("reg delete HKCU\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\ThemeManager -v DllName /f", winePrefix)
+                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\Explorer\\\\Desktops /t REG_SZ /v Default /d $selectedResolution /f", winePrefix)
+                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\Explorer /t REG_SZ /v Desktop /d Default /f", winePrefix)
             }
         }
 
@@ -556,6 +555,7 @@ class MainActivity : AppCompatActivity() {
             selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "FPS/GPU Load")
             selectedMesaVkWsiPresentMode = preferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY, "mailbox")
             selectedTuDebugPreset = preferences.getString(SELECTED_TU_DEBUG_PRESET_KEY, "noconform")
+            selectedResolution = preferences.getString(DISPLAY_RESOLUTION_KEY, "1280x720")
             enableRamCounter = preferences.getBoolean(RAM_COUNTER_KEY, false)
             enableCpuCounter = preferences.getBoolean(CPU_COUNTER_KEY, false)
         }

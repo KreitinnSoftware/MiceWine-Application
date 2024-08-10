@@ -11,41 +11,39 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 object WineWrapper {
-    const val LINKER_PATH = "/system/bin/linker64"
-
     private var IS_BOX64 = if (Build.SUPPORTED_ABIS[0] == "x86_64") "" else "$usrDir/bin/box64"
 
     fun wineServer(args: String) {
         executeShell(
-            getEnv() + "$LINKER_PATH $IS_BOX64 $appRootDir/wine/x86_64/bin/wineserver $args", "WineServer"
+            getEnv() + "$IS_BOX64 $appRootDir/wine/bin/wineserver $args", "WineServer"
         )
     }
 
     suspend fun wineServerSuspend(args: String) {
         withContext(Dispatchers.Default) {
             executeShell(
-                getEnv() + "$LINKER_PATH $IS_BOX64 $appRootDir/wine/x86_64/bin/wineserver $args", "WineServer"
+                getEnv() + "$IS_BOX64 $appRootDir/wine/bin/wineserver $args", "WineServer"
             )
         }
     }
 
     fun wine(args: String, winePrefix: File) {
         executeShell(
-            getEnv() + "WINEPREFIX=$winePrefix $LINKER_PATH $IS_BOX64 $appRootDir/wine/x86_64/bin/wine $args", "WineProcess"
+            getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 $appRootDir/wine/bin/wine $args", "WineProcess"
         )
     }
 
     fun wine(args: String, winePrefix: File, cwd: String) {
         executeShell(
             "cd $cwd;" +
-                    getEnv() + "WINEPREFIX=$winePrefix $LINKER_PATH $IS_BOX64 $appRootDir/wine/x86_64/bin/wine $args", "WineProcess"
+                    getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 $appRootDir/wine/bin/wine $args", "WineProcess"
         )
     }
 
     fun extractIcon(exeFile: File, output: String) {
         if (exeFile.name.endsWith(".exe")) {
             executeShellWithOutput(
-                getEnv() + "$LINKER_PATH $usrDir/bin/wrestool -x -t 14 '${exeFile.path}' > '$output'"
+                getEnv() + "$usrDir/bin/wrestool -x -t 14 '${exeFile.path}' > '$output'"
             )
         }
     }
