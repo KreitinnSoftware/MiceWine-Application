@@ -8,6 +8,7 @@ object XKeyCodes {
         "Right" to (106 to 22),
         "ESC" to (1 to 111),
         "Enter" to (28 to 66),
+        "Space" to (57 to 62),
         "A" to (30 to 29),
         "B" to (48 to 30),
         "C" to (46 to 31),
@@ -40,7 +41,6 @@ object XKeyCodes {
         "LShift" to (42 to 59),
         "RShift" to (54 to 60),
         "Tab" to (15 to 61),
-        "Space" to (57 to 62),
         "AltLeft" to (56 to 57),
         "F1" to (59 to 131),
         "F2" to (60 to 132),
@@ -60,8 +60,17 @@ object XKeyCodes {
         "Delete" to (111 to 112),
         "End" to (107 to 123),
         "PageDown" to (109 to 93),
+        "BackSpace" to (14 to 67),
         "0" to (82 to 144),
-        "1" to (79 to 145)
+        "1" to (79 to 145),
+        "2" to (80 to 146),
+        "3" to (81 to 147),
+        "4" to (75 to 148),
+        "5" to (76 to 149),
+        "6" to (77 to 150),
+        "7" to (71 to 151),
+        "8" to (72 to 152),
+        "9" to (73 to 153),
     )
 
     fun getKeyNames(): MutableList<String> {
