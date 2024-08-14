@@ -377,7 +377,7 @@ class MainActivity : AppCompatActivity() {
             installDXWrapper(winePrefix)
 
             if (exePath == "") {
-                WineWrapper.wine("TFM", winePrefix)
+                WineWrapper.wine("explorer /desktop=shell,1280x720 TFM", winePrefix)
             } else {
                 WineWrapper.wine("'$exePath'", winePrefix, "'${File(exePath).parent!!}'")
             }
@@ -519,8 +519,6 @@ class MainActivity : AppCompatActivity() {
                 WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Decorated /d N /f", winePrefix)
                 WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Managed /d N /f", winePrefix)
                 WineWrapper.wine("reg delete HKCU\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\ThemeManager -v DllName /f", winePrefix)
-                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\Explorer\\\\Desktops /t REG_SZ /v Default /d $selectedResolution /f", winePrefix)
-                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\Explorer /t REG_SZ /v Desktop /d Default /f", winePrefix)
             }
         }
 
