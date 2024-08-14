@@ -13,8 +13,8 @@ android {
         minSdk = 28
         //noinspection ExpiredTargetSdkVersion
         targetSdk = 28
-        versionCode = 13
-        versionName = "13"
+        versionCode = 1
+        versionName = "beta-$versionCode"
     }
 
     ndkVersion = "26.1.10909125"
