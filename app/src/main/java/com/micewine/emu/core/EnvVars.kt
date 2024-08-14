@@ -17,7 +17,7 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedDXVKHud
 import com.micewine.emu.activities.MainActivity.Companion.selectedDriver
 import com.micewine.emu.activities.MainActivity.Companion.selectedMesaVkWsiPresentMode
 import com.micewine.emu.activities.MainActivity.Companion.selectedTuDebugPreset
-import com.micewine.emu.activities.MainActivity.Companion.selectedVirGLProfile
+import com.micewine.emu.activities.MainActivity.Companion.selectedGLProfile
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 
@@ -44,7 +44,21 @@ object EnvVars {
         putVar("PREFIX", usrDir.path)
         putVar("MESA_SHADER_CACHE_DIR", "$homeDir/.cache")
         putVar("MESA_VK_WSI_PRESENT_MODE", selectedMesaVkWsiPresentMode)
-        putVar("mesa_glthread", "true")
+
+        val glVersionStr = selectedGLProfile!!.split(" ")[1]
+        val glVersionInt = glVersionStr.replace(".", "").toInt()
+        val glslVersion =
+            when (glVersionInt) {
+                in 33..46 -> "$glVersionInt" + "0"
+                32 -> "150"
+                31 -> "140"
+                30 -> "130"
+                21 -> "120"
+                else -> null
+            }
+
+        putVar("MESA_GL_VERSION_OVERRIDE", glVersionStr)
+        putVar("MESA_GLSL_VERSION_OVERRIDE", glslVersion)
 
         when (selectedDriver) {
             "Turnip/Zink" -> {
@@ -52,29 +66,18 @@ object EnvVars {
                 putVar("MESA_LOADER_DRIVER_OVERRIDE", "zink")
                 putVar("TU_DEBUG", "$selectedTuDebugPreset")
                 putVar("VK_ICD_FILENAMES", "$usrDir/share/vulkan/icd.d/freedreno_icd.aarch64.json")
-                putVar("MESA_GL_VERSION_OVERRIDE", "4.6")
-                putVar("MESA_GLSL_VERSION_OVERRIDE", "460")
+                putVar("ZINK_DEBUG", "compact")
             }
             "Android/Zink" -> {
                 putVar("GALLIUM_DRIVER", "zink")
                 putVar("MESA_LOADER_DRIVER_OVERRIDE", "zink")
-                putVar("LD_LIBRARY_PATH", "$usrDir/native-zink/lib:$usrDir/lib")
-                putVar("MESA_GL_VERSION_OVERRIDE", "4.6")
-                putVar("MESA_GLSL_VERSION_OVERRIDE", "460")
+                putVar("LD_LIBRARY_PATH", "$usrDir/zink-xlib/lib:$usrDir/lib")
+                putVar("ZINK_DEBUG", "compact")
             }
             "VirGL" -> {
                 putVar("GALLIUM_DRIVER", "virpipe")
                 putVar("MESA_LOADER_DRIVER_OVERRIDE", "virpipe")
                 putVar("LIBGL_ALWAYS_SOFTWARE", "1")
-
-                if (selectedVirGLProfile == "GL 2.1") {
-                    putVar("MESA_GL_VERSION_OVERRIDE", "2.1")
-                    putVar("MESA_GLSL_VERSION_OVERRIDE", "120")
-                } else if (selectedVirGLProfile == "GL 3.3") {
-                    putVar("MESA_GL_VERSION_OVERRIDE", "3.3COMPAT")
-                    putVar("MESA_GLSL_VERSION_OVERRIDE", "330")
-                }
-
                 putVar("MESA_EXTENSION_OVERRIDE", "'-GL_EXT_texture_sRGB_decode GL_EXT_polygon_offset_clamp'")
             }
         }
@@ -100,6 +103,7 @@ object EnvVars {
             }
         }
 
+        putVar("GALLIUM_HUD", "simple,fps")
         putVar("BOX64_LOG", "1")
         putVar("BOX64_MMAP32", "1")
         putVar("BOX64_AVX", "2")

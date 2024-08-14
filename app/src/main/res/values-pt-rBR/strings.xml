@@ -39,8 +39,8 @@
     <string name="select_dxvk_title">Selecionar versão do DXVK</string>
     <string name="select_wined3d_title">"Selecionar versão do WineD3D "</string>
     <string name="select_d3dx_title">Selecionar Renderizador de DirectX 9/10/11</string>
-    <string name="select_virgl_profile_title">Selecionar Perfil VirGL</string>
-    <string name="select_virgl_profile_description">Selecionar um Perfil OpenGL para VirGL</string>
+    <string name="select_gl_profile_title">Selecionar Perfil OpenGL</string>
+    <string name="select_gl_profile_description">Selecionar um Perfil OpenGL para VirGL</string>
     <string name="select_wined3d_description">Selecionar Versão do WineD3D</string>
     <string name="select_dxvk_hud_preset_title">Selecionar Preset do DXVK HUD</string>
     <string name="select_dxvk_hud_preset_description">Selecionar Preset do DXVK HUD para mais ou menos informação</string>
@@ -87,5 +87,5 @@
     <string name="fileManagerTitle">Gerenciador de Arquivos</string>
     <string name="createShortcutOnHome">Criar Atalho no Início</string>
     <string name="executeExe">Executar</string>
-    <string name="creatingWinePrefix">Creating Wine Prefix...</string>
+    <string name="creatingWinePrefix">Creating Wine Prefix…</string>
 </resources>

@@ -89,9 +89,14 @@ class DriversSettingsFragment : Fragment() {
         addToAdapter(R.string.select_wined3d_title, R.string.null_description, wined3dVersions.toTypedArray(),
             SPINNER, "WineD3D-9.12", SELECTED_WINED3D_KEY)
 
-        addToAdapter(R.string.select_virgl_profile_title, R.string.null_description, arrayOf(
-            "GL 2.1", "GL 3.3"),
-            SPINNER, "GL 3.3", SELECTED_VIRGL_PROFILE_KEY)
+        addToAdapter(R.string.select_gl_profile_title, R.string.null_description, arrayOf(
+            "GL 2.1", "GL 3.0",
+            "GL 3.1", "GL 3.2",
+            "GL 3.3", "GL 4.0",
+            "GL 4.1", "GL 4.2",
+            "GL 4.3", "GL 4.4",
+            "GL 4.5", "GL 4.6"),
+            SPINNER, "GL 4.6", SELECTED_VIRGL_PROFILE_KEY)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>, type: Int, defaultValue: String, keyId: String) {

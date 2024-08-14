@@ -466,7 +466,7 @@ class MainActivity : AppCompatActivity() {
         var d3dxRenderer: String? = null
         var selectedWineD3D: String? = null
         var selectedDXVK: String? = null
-        var selectedVirGLProfile: String? = null
+        var selectedGLProfile: String? = null
         var selectedDXVKHud: String? = null
         var selectedMesaVkWsiPresentMode: String? = null
         var selectedTuDebugPreset: String? = null
@@ -549,7 +549,7 @@ class MainActivity : AppCompatActivity() {
             d3dxRenderer = preferences.getString(SELECTED_D3DX_RENDERER_KEY, "DXVK")
             selectedWineD3D = preferences.getString(SELECTED_WINED3D_KEY, "WineD3D-9.0")
             selectedDXVK = preferences.getString(SELECTED_DXVK_KEY, "DXVK-1.10.3-async")
-            selectedVirGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
+            selectedGLProfile = preferences.getString(SELECTED_VIRGL_PROFILE_KEY, "GL 3.3")
             selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "FPS/GPU Load")
             selectedMesaVkWsiPresentMode = preferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY, "mailbox")
             selectedTuDebugPreset = preferences.getString(SELECTED_TU_DEBUG_PRESET_KEY, "noconform")
