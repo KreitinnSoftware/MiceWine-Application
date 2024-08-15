@@ -14,7 +14,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_P
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VIRGL_PROFILE_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_GL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
@@ -96,7 +96,7 @@ class DriversSettingsFragment : Fragment() {
             "GL 4.1", "GL 4.2",
             "GL 4.3", "GL 4.4",
             "GL 4.5", "GL 4.6"),
-            SPINNER, "GL 4.6", SELECTED_VIRGL_PROFILE_KEY)
+            SPINNER, "GL 4.6", SELECTED_GL_PROFILE_KEY)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>, type: Int, defaultValue: String, keyId: String) {
