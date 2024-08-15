@@ -28,3 +28,14 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew assembleDebug
+
+    - name: "Get Short SHA"
+      run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          
+    - name: "Create Release"
+      uses: softprops/action-gh-release@v2
+      with:
+        name: "MiceWine Application ${{ github.sha }}"
+        tag_name: ${{ env.SHORT_SHA }}
+        files: ./app/build/outputs/apk/debug/app-debug.apk
+    
