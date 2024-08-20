@@ -78,6 +78,8 @@ object EnvVars {
                 putVar("GALLIUM_DRIVER", "virpipe")
                 putVar("MESA_LOADER_DRIVER_OVERRIDE", "virpipe")
                 putVar("LIBGL_ALWAYS_SOFTWARE", "1")
+                putVar("LIBGL_DRIVERS_PATH", "$usrDir/mesa-virgl/lib/dri")
+                putVar("LD_LIBRARY_PATH", "$usrDir/mesa-virgl/lib:$usrDir/lib")
                 putVar("MESA_EXTENSION_OVERRIDE", "'-GL_EXT_texture_sRGB_decode GL_EXT_polygon_offset_clamp'")
             }
         }

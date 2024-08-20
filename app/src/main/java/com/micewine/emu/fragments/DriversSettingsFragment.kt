@@ -87,7 +87,7 @@ class DriversSettingsFragment : Fragment() {
             SPINNER, "mailbox", SELECTED_TU_DEBUG_PRESET_KEY)
 
         addToAdapter(R.string.select_wined3d_title, R.string.null_description, wined3dVersions.toTypedArray(),
-            SPINNER, "WineD3D-9.12", SELECTED_WINED3D_KEY)
+            SPINNER, "WineD3D-(9.3)", SELECTED_WINED3D_KEY)
 
         addToAdapter(R.string.select_gl_profile_title, R.string.null_description, arrayOf(
             "GL 2.1", "GL 3.0",

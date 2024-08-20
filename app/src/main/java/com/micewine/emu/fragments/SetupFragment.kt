@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.setupDone

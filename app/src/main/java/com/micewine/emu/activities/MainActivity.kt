@@ -14,6 +14,7 @@ import android.content.pm.ShortcutManager
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
 import android.os.Bundle
+import android.util.Log
 import android.view.ContextMenu
 import android.view.KeyEvent
 import android.view.MenuItem
@@ -124,7 +125,11 @@ class MainActivity : AppCompatActivity() {
 
                 ACTION_SETUP -> {
                     lifecycleScope.launch {
-                        setupMiceWine()
+                        if (appBuiltinRootfs) {
+                            setupMiceWine("")
+                        } else {
+                            openFilePicker("rootfs")
+                        }
                     }
                 }
             }
@@ -246,7 +251,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.editGameIcon -> {
-                openFilePicker()
+                openFilePicker("image")
             }
 
             R.id.removeGameItem -> {
@@ -299,28 +304,53 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(
         requestCode: Int, resultCode: Int, data: Intent?
     ) {
-        if (resultCode == Activity.RESULT_OK) {
-            data?.data?.also { uri ->
-                setIconToGame(this, preferences!!, uri, selectedGameArray)
+        if (filePickerOperation == "image") {
+            if (resultCode == Activity.RESULT_OK) {
+                data?.data?.also { uri ->
+                    setIconToGame(this, preferences!!, uri, selectedGameArray)
+                }
+            }
+
+            setSharedVars(this)
+        } else if (filePickerOperation == "rootfs") {
+            if (resultCode == Activity.RESULT_OK) {
+                data?.data?.also { uri ->
+                    customRootFSPath = uri.path?.replace("/document/primary:", "/storage/emulated/0/").toString()
+                }
+
+                lifecycleScope.launch {
+                    setupMiceWine("$customRootFSPath")
+                }
             }
         }
-
-        setSharedVars(this)
 
         super.onActivityResult(requestCode, resultCode, data)
     }
 
 
     @Suppress("DEPRECATION")
-    private fun openFilePicker() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-            type = "image/*"
-            addCategory(Intent.CATEGORY_OPENABLE)
-        }
+    private fun openFilePicker(typeInfo: String) {
+        filePickerOperation = typeInfo
 
-        startActivityForResult(
-            Intent.createChooser(intent, getString(R.string.selectExecutableFile)), 0
-        )
+        if (typeInfo == "image") {
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "image/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+            }
+
+            startActivityForResult(
+                Intent.createChooser(intent, getString(R.string.selectExecutableFile)), 0
+            )
+        } else if (typeInfo == "rootfs") {
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "*/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+            }
+
+            startActivityForResult(
+                Intent.createChooser(intent, getString(R.string.selectExecutableFile)), 0
+            )
+        }
     }
 
     private fun fragmentLoader(fragment: Fragment, appInit: Boolean) {
@@ -354,16 +384,22 @@ class MainActivity : AppCompatActivity() {
         val wineUtils = File("$appRootDir/wine-utils")
         val system32 = File("$driveC/windows/system32")
         val syswow64 = File("$driveC/windows/syswow64")
+        val selectedDXVK = File("$wineUtils/DXVK/$selectedDXVK")
+        val selectedWineD3D = File("$wineUtils/WineD3D/$selectedWineD3D")
 
         when (d3dxRenderer) {
             "DXVK" -> {
-                File("$wineUtils/DXVK/$selectedDXVK/x64").copyRecursively(system32, true)
-                File("$wineUtils/DXVK/$selectedDXVK/x32").copyRecursively(syswow64, true)
+                if (selectedDXVK.exists()) {
+                    File("$selectedDXVK/x64").copyRecursively(system32, true)
+                    File("$selectedDXVK/x32").copyRecursively(syswow64, true)
+                }
             }
 
             "WineD3D" -> {
-                File("$wineUtils/WineD3D/$selectedWineD3D/x64").copyRecursively(system32, true)
-                File("$wineUtils/WineD3D/$selectedWineD3D/x32").copyRecursively(syswow64, true)
+                if (selectedWineD3D.exists()) {
+                    File("$selectedWineD3D/x64").copyRecursively(system32, true)
+                    File("$selectedWineD3D/x32").copyRecursively(syswow64, true)
+                }
             }
         }
     }
@@ -407,19 +443,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun setupMiceWine() {
+    private suspend fun setupMiceWine(rootfs: String) {
         withContext(Dispatchers.IO) {
             appRootDir.mkdirs()
 
             progressBarIsIndeterminate = true
 
-            copyAssets(this@MainActivity, "rootfs.zip", appRootDir.toString())
-
             dialogTitleText = getString(R.string.extracting_resources_text)
 
-            extractZip("$appRootDir/rootfs.zip", "$appRootDir")
+            if (appBuiltinRootfs && rootfs == "") {
+                copyAssets(this@MainActivity, "rootfs.zip", appRootDir.toString())
 
-            File("$appRootDir/rootfs.zip").delete()
+                extractZip("$appRootDir/rootfs.zip", "$appRootDir")
+
+                File("$appRootDir/rootfs.zip").delete()
+            } else {
+                extractZip(rootfs, "$appRootDir")
+            }
 
             File("$appRootDir/wine-utils/CoreFonts").copyRecursively(File("$appRootDir/wine/share/wine/fonts"), true)
 
@@ -445,6 +485,9 @@ class MainActivity : AppCompatActivity() {
     companion object {
         @SuppressLint("SdCardPath")
         var appRootDir = File("/data/data/com.micewine.emu/files")
+        var appBuiltinRootfs: Boolean = false
+        var filePickerOperation: String? = null
+        var customRootFSPath: String? = null
         var usrDir = File("$appRootDir/usr")
         var tmpDir = File("$usrDir/tmp")
         var homeDir = File("$appRootDir/home")
@@ -530,10 +573,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fun setSharedVars(context: Context) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+        fun setSharedVars(activity: Activity) {
+            val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
 
-            appLang = context.resources.getString(R.string.app_lang)
+            appLang = activity.resources.getString(R.string.app_lang)
+            appBuiltinRootfs = activity.assets.list("")?.contains("rootfs.zip")!!
 
             box64DynarecBigblock = preferences.getString(BOX64_DYNAREC_BIGBLOCK_KEY, "1")
             box64DynarecStrongmem = preferences.getString(BOX64_DYNAREC_STRONGMEM_KEY, "0")
@@ -562,21 +606,24 @@ class MainActivity : AppCompatActivity() {
             dialogTitleText = activity.getString(R.string.extracting_from_assets)
 
             val assetManager = activity.assets
-            var input: InputStream? = null
-            var out: OutputStream? = null
-            try {
-                input = assetManager.open(filename)
-                val outFile = File(outputPath, filename)
-                out = Files.newOutputStream(outFile.toPath())
-                copyFile(input, out)
-            } catch (e: IOException) {
-                e.printStackTrace()
-            } finally {
+
+            if (appBuiltinRootfs) {
+                var input: InputStream? = null
+                var out: OutputStream? = null
                 try {
-                    input?.close()
-                    out?.close()
+                    input = assetManager.open(filename)
+                    val outFile = File(outputPath, filename)
+                    out = Files.newOutputStream(outFile.toPath())
+                    copyFile(input, out)
                 } catch (e: IOException) {
                     e.printStackTrace()
+                } finally {
+                    try {
+                        input?.close()
+                        out?.close()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
                 }
             }
         }

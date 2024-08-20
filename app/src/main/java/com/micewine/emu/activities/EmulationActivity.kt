@@ -154,7 +154,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     WineWrapper.wineServer("--kill")
 
                     val intent = Intent(this, MainActivity::class.java).apply {
-                        setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                        flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
                     }
 
                     startActivityIfNeeded(intent, 0)
@@ -453,7 +453,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         runOnUiThread {
             PreferenceManager.getDefaultSharedPreferences(this)
             mClientConnected = connected
-            lorieView.setVisibility(if (connected) View.VISIBLE else View.INVISIBLE)
+            lorieView.visibility = if (connected) View.VISIBLE else View.INVISIBLE
             lorieView.regenerate()
 
             // We should recover connection in the case if file descriptor for some reason was broken...
@@ -461,9 +461,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 tryConnect()
             }
 
-            if (connected) lorieView.setPointerIcon(
-                PointerIcon.getSystemIcon(this, PointerIcon.TYPE_NULL)
-            )
+            if (connected) lorieView.pointerIcon = PointerIcon.getSystemIcon(this, PointerIcon.TYPE_NULL)
         }
     }
 

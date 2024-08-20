@@ -14,8 +14,8 @@ object WineWrapper {
     private var IS_BOX64 = if (Build.SUPPORTED_ABIS[0] == "x86_64") "" else "$usrDir/bin/box64"
 
     fun wineServer(args: String) {
-        executeShell(
-            getEnv() + "$IS_BOX64 $appRootDir/wine/bin/wineserver $args", "WineServer"
+        executeShellWithOutput(
+            getEnv() + "$IS_BOX64 $appRootDir/wine/bin/wineserver $args"
         )
     }
 

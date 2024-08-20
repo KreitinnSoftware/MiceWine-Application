@@ -62,6 +62,7 @@
     <string name="welcome_text_1">Welcome to MiceWine!</string>
     <string name="continueText">Continue</string>
     <string name="get_file_permission_text">Allow File Management Permission</string>
+    <string name="rootfs_not_builtin_text">"This APK is compiled without built-in RootFS"</string>
     <string name="extracting_resources_text">"Extracting Files…\nIt may take a while"</string>
     <string name="extracted_resources_text">Extraction Done!</string>
     <string name="extracting_from_assets">Extracting From Assets…</string>
