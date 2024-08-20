@@ -24,7 +24,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             ndk {
-                abiFilters += listOf("arm64-v8a", "x86_64")
+                abiFilters += "arm64-v8a"
             }
         }
     }
