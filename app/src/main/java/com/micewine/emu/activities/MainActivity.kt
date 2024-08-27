@@ -14,7 +14,6 @@ import android.content.pm.ShortcutManager
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
 import android.os.Bundle
-import android.util.Log
 import android.view.ContextMenu
 import android.view.KeyEvent
 import android.view.MenuItem
@@ -45,7 +44,6 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WS
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_GL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
-import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.ObbExtractor.extractZip
 import com.micewine.emu.core.ShellExecutorCmd.executeShell
 import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
@@ -54,6 +52,7 @@ import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.DeleteGameItemFragment
 import com.micewine.emu.fragments.FileManagerFragment
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
+import com.micewine.emu.fragments.FloatingFileManagerFragment
 import com.micewine.emu.fragments.HomeFragment
 import com.micewine.emu.fragments.HomeFragment.Companion.saveToGameList
 import com.micewine.emu.fragments.HomeFragment.Companion.setIconToGame
@@ -85,7 +84,6 @@ class MainActivity : AppCompatActivity() {
                     tmpDir.mkdirs()
 
                     lifecycleScope.launch { runXServer(":0") }
-                    lifecycleScope.launch { runVirGLRenderer() }
                     lifecycleScope.launch { runWine(exePath, File("$homeDir/.wine")) }
                 }
 
@@ -128,7 +126,9 @@ class MainActivity : AppCompatActivity() {
                         if (appBuiltinRootfs) {
                             setupMiceWine("")
                         } else {
-                            openFilePicker("rootfs")
+                            SetupFragment().show(supportFragmentManager, "")
+
+                            setupMiceWine("$customRootFSPath")
                         }
                     }
                 }
@@ -251,7 +251,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.editGameIcon -> {
-                openFilePicker("image")
+                openFilePicker()
             }
 
             R.id.removeGameItem -> {
@@ -312,16 +312,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             setSharedVars(this)
-        } else if (filePickerOperation == "rootfs") {
-            if (resultCode == Activity.RESULT_OK) {
-                data?.data?.also { uri ->
-                    customRootFSPath = uri.path?.replace("/document/primary:", "/storage/emulated/0/").toString()
-                }
-
-                lifecycleScope.launch {
-                    setupMiceWine("$customRootFSPath")
-                }
-            }
         }
 
         super.onActivityResult(requestCode, resultCode, data)
@@ -329,28 +319,15 @@ class MainActivity : AppCompatActivity() {
 
 
     @Suppress("DEPRECATION")
-    private fun openFilePicker(typeInfo: String) {
-        filePickerOperation = typeInfo
-
-        if (typeInfo == "image") {
-            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                type = "image/*"
-                addCategory(Intent.CATEGORY_OPENABLE)
-            }
-
-            startActivityForResult(
-                Intent.createChooser(intent, getString(R.string.selectExecutableFile)), 0
-            )
-        } else if (typeInfo == "rootfs") {
-            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                type = "*/*"
-                addCategory(Intent.CATEGORY_OPENABLE)
-            }
-
-            startActivityForResult(
-                Intent.createChooser(intent, getString(R.string.selectExecutableFile)), 0
-            )
+    private fun openFilePicker() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "image/*"
+            addCategory(Intent.CATEGORY_OPENABLE)
         }
+
+        startActivityForResult(
+            Intent.createChooser(intent, getString(R.string.selectExecutableFile)), 0
+        )
     }
 
     private fun fragmentLoader(fragment: Fragment, appInit: Boolean) {
@@ -375,7 +352,11 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         if (!setupDone) {
-            SetupFragment().show(supportFragmentManager , "")
+            if (appBuiltinRootfs) {
+                SetupFragment().show(supportFragmentManager , "")
+            } else {
+                FloatingFileManagerFragment().show(supportFragmentManager, "")
+            }
         }
     }
 
@@ -417,14 +398,6 @@ class MainActivity : AppCompatActivity() {
             } else {
                 WineWrapper.wine("'$exePath'", winePrefix, "'${File(exePath).parent!!}'")
             }
-        }
-    }
-
-    private suspend fun runVirGLRenderer() {
-        withContext(Dispatchers.IO) {
-            executeShell(
-                getEnv() + "$usrDir/bin/virgl_test_server", "VirGLServer"
-            )
         }
     }
 
@@ -475,6 +448,8 @@ class MainActivity : AppCompatActivity() {
             dialogTitleText = getString(R.string.creatingWinePrefix)
 
             progressBarIsIndeterminate = true
+
+            lifecycleScope.launch { runXServer(":0") }
 
             setupWinePrefix(File("$homeDir/.wine"))
 

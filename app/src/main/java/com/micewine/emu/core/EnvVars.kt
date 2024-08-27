@@ -46,9 +46,8 @@ object EnvVars {
         putVar("MESA_VK_WSI_PRESENT_MODE", selectedMesaVkWsiPresentMode)
 
         val glVersionStr = selectedGLProfile!!.split(" ")[1]
-        val glVersionInt = glVersionStr.replace(".", "").toInt()
         val glslVersion =
-            when (glVersionInt) {
+            when (val glVersionInt = glVersionStr.replace(".", "").toInt()) {
                 in 33..46 -> "$glVersionInt" + "0"
                 32 -> "150"
                 31 -> "140"
@@ -71,16 +70,9 @@ object EnvVars {
             "Android/Zink" -> {
                 putVar("GALLIUM_DRIVER", "zink")
                 putVar("MESA_LOADER_DRIVER_OVERRIDE", "zink")
-                putVar("LD_LIBRARY_PATH", "$usrDir/zink-xlib/lib:$usrDir/lib")
+                putVar("LD_LIBRARY_PATH", "/system/lib64:$usrDir/lib")
+                putVar("VK_ICD_FILENAMES", "$usrDir/share/vulkan/icd.d/sysvk_icd.json")
                 putVar("ZINK_DEBUG", "compact")
-            }
-            "VirGL" -> {
-                putVar("GALLIUM_DRIVER", "virpipe")
-                putVar("MESA_LOADER_DRIVER_OVERRIDE", "virpipe")
-                putVar("LIBGL_ALWAYS_SOFTWARE", "1")
-                putVar("LIBGL_DRIVERS_PATH", "$usrDir/mesa-virgl/lib/dri")
-                putVar("LD_LIBRARY_PATH", "$usrDir/mesa-virgl/lib:$usrDir/lib")
-                putVar("MESA_EXTENSION_OVERRIDE", "'-GL_EXT_texture_sRGB_decode GL_EXT_polygon_offset_clamp'")
             }
         }
 

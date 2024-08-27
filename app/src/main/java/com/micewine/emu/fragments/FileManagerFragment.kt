@@ -27,7 +27,7 @@ class FileManagerFragment: Fragment() {
 
         recyclerView = rootView?.findViewById(R.id.recyclerViewFiles)
 
-        recyclerView?.adapter = AdapterFiles(fileList, requireContext())
+        recyclerView?.adapter = AdapterFiles(fileList, requireContext(), false)
 
         refreshFiles()
 

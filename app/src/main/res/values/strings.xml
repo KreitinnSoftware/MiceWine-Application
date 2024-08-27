@@ -101,4 +101,5 @@
     <string name="createShortcutOnHome">Create Shortcut on Home</string>
     <string name="executeExe">Execute</string>
     <string name="creatingWinePrefix">Creating Wine Prefix…</string>
+    <string name="select_rootfs_file">Select RootFS File</string>
 </resources>

@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+import android.util.Log
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_BACK
 import android.widget.Button
@@ -16,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SETUP
+import com.micewine.emu.activities.MainActivity.Companion.appBuiltinRootfs
 import com.micewine.emu.databinding.ActivityWelcomeBinding
 import com.micewine.emu.fragments.Welcome2Fragment
 import com.micewine.emu.fragments.WelcomeFragment
@@ -55,9 +57,11 @@ class WelcomeActivity : AppCompatActivity() {
                 }
 
                 2 -> {
-                    sendBroadcast(
-                        Intent(ACTION_SETUP)
-                    )
+                    if (appBuiltinRootfs) {
+                        sendBroadcast(
+                            Intent(ACTION_SETUP)
+                        )
+                    }
 
                     finish()
                 }

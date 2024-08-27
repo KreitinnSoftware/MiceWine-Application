@@ -3,23 +3,26 @@ package com.micewine.emu.adapters
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_FILE_MANAGER
+import com.micewine.emu.activities.MainActivity.Companion.customRootFSPath
 import com.micewine.emu.activities.MainActivity.Companion.fileManagerCwd
 import com.micewine.emu.activities.MainActivity.Companion.fileManagerDefaultDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.core.WineWrapper.extractIcon
+import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.refreshFiles
 import java.io.File
 
-class AdapterFiles(private val fileList: List<FileList>, private val context: Context) :
-    RecyclerView.Adapter<AdapterFiles.ViewHolder>() {
+class AdapterFiles(private val fileList: List<FileList>, private val context: Context, private val isFloatFilesDialog: Boolean) : RecyclerView.Adapter<AdapterFiles.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_files_item, parent, false)
         return ViewHolder(itemView)
@@ -38,7 +41,11 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
 
                 extractIcon(sList.file, output)
 
-                holder.icon.setImageBitmap(BitmapFactory.decodeFile(output))
+                if (File(output).exists()) {
+                    holder.icon.setImageBitmap(BitmapFactory.decodeFile(output))
+                } else {
+                    holder.icon.setImageResource(R.drawable.ic_log)
+                }
             } else {
                 holder.icon.setImageResource(R.drawable.ic_log)
             }
@@ -65,11 +72,27 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
 
             val settingsModel = fileList[adapterPosition]
 
-            val intent = Intent(ACTION_SELECT_FILE_MANAGER).apply {
-                putExtra("selectedFile", settingsModel.file.path)
-            }
+            if (isFloatFilesDialog) {
+                if (settingsModel.file.name == "..") {
+                    fileManagerCwd = File(fileManagerCwd).parent!!
 
-            context.sendBroadcast(intent)
+                    refreshFiles()
+                } else if (settingsModel.file.isFile) {
+                    if (settingsModel.file.name.contains(".zip")) {
+                        customRootFSPath = settingsModel.file.path
+                    }
+                } else if (settingsModel.file.isDirectory) {
+                    fileManagerCwd = settingsModel.file.path
+
+                    refreshFiles()
+                }
+            } else {
+                val intent = Intent(ACTION_SELECT_FILE_MANAGER).apply {
+                    putExtra("selectedFile", settingsModel.file.path)
+                }
+
+                context.sendBroadcast(intent)
+            }
         }
 
         override fun onLongClick(v: View): Boolean {

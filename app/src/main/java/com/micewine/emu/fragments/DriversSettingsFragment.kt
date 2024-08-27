@@ -64,7 +64,7 @@ class DriversSettingsFragment : Fragment() {
         }
 
         addToAdapter(R.string.select_driver_title, R.string.null_description, arrayOf(
-            "Turnip/Zink", "Android/Zink", "VirGL"),
+            "Turnip/Zink", "Android/Zink"),
             SPINNER, "Turnip/Zink", SELECTED_DRIVER_KEY)
 
         addToAdapter(R.string.select_d3dx_title, R.string.null_description, arrayOf(
@@ -72,7 +72,7 @@ class DriversSettingsFragment : Fragment() {
             SPINNER, "DXVK", SELECTED_D3DX_RENDERER_KEY)
 
         addToAdapter(R.string.select_dxvk_title, R.string.null_description, dxvkVersions.toTypedArray(),
-            SPINNER, "DXVK-1.10.3-async", SELECTED_DXVK_KEY)
+            SPINNER, "DXVK-2.4", SELECTED_DXVK_KEY)
 
         addToAdapter(R.string.select_dxvk_hud_preset_title, R.string.null_description, arrayOf(
             "Off", "FPS", "GPU Load", "FPS/GPU Load", "FPS/GPU Load/Dev Info"),
