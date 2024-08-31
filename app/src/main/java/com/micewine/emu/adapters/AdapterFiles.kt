@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_FILE_MANAGER
@@ -31,7 +30,11 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val sList = fileList[position]
 
-        holder.fileName.text = sList.file.name
+        if (fileManagerCwd == fileManagerDefaultDir) {
+            holder.fileName.text = sList.file.name.uppercase()
+        } else {
+            holder.fileName.text = sList.file.name
+        }
 
         if (sList.file.isDirectory) {
             holder.icon.setImageResource(R.drawable.ic_folder)

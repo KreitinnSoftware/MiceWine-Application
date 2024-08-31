@@ -21,13 +21,13 @@
             android:visibility="visible">
         </com.micewine.emu.LorieView>
 
-        <com.micewine.emu.views.HWInfoView
+        <com.micewine.emu.views.OnScreenInfoView
             android:id="@+id/hwView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:visibility="visible">
-        </com.micewine.emu.views.HWInfoView>
+        </com.micewine.emu.views.OnScreenInfoView>
 
         <com.micewine.emu.views.OverlayView
             android:id="@+id/overlayView"

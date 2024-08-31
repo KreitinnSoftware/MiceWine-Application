@@ -12,6 +12,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION_
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
 import com.micewine.emu.activities.MainActivity.Companion.CPU_COUNTER_KEY
+import com.micewine.emu.activities.MainActivity.Companion.ENABLE_DEBUG_INFO_KEY
 import com.micewine.emu.activities.MainActivity.Companion.RAM_COUNTER_KEY
 import com.micewine.emu.adapters.AdapterSettingsPreferences
 import com.micewine.emu.adapters.AdapterSettingsPreferences.SettingsListSpinner
@@ -53,10 +54,13 @@ class DisplaySettingsFragment : Fragment() {
             SPINNER, "1280x720", DISPLAY_RESOLUTION_KEY)
 
         addToAdapter(R.string.enableRamCounter, R.string.enableRamCounterDescription, arrayOf(""),
-            SWITCH, "false", RAM_COUNTER_KEY)
+            SWITCH, "true", RAM_COUNTER_KEY)
 
         addToAdapter(R.string.enableCPUCounter, R.string.enableCPUCounterDescription, arrayOf(""),
             SWITCH, "false", CPU_COUNTER_KEY)
+
+        addToAdapter(R.string.enableDebugInfo, R.string.enableDebugInfoDescription, arrayOf(""),
+            SWITCH, "true", ENABLE_DEBUG_INFO_KEY)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>, type: Int, defaultValue: String, keyId: String) {

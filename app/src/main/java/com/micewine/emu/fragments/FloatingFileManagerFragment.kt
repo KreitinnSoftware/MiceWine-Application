@@ -32,6 +32,8 @@ class FloatingFileManagerFragment: DialogFragment() {
             .setView(view)
             .create()
 
+        isCancelable = false
+
         Thread {
             while (customRootFSPath == null) {
                 Thread.sleep(16)

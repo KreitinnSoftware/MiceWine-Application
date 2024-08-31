@@ -26,6 +26,8 @@ object ObbExtractor {
                 Thread.sleep(100)
             }
 
+            zipFile.close()
+
             progressBarValue = 0
         } catch (e: IOException) {
             e.printStackTrace()

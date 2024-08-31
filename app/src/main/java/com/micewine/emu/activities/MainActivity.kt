@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
@@ -453,6 +454,8 @@ class MainActivity : AppCompatActivity() {
 
             setupWinePrefix(File("$homeDir/.wine"))
 
+            fileManagerCwd = fileManagerDefaultDir
+
             setupDone = true
         }
     }
@@ -469,6 +472,7 @@ class MainActivity : AppCompatActivity() {
         var setupDone: Boolean = false
         var enableRamCounter: Boolean = false
         var enableCpuCounter: Boolean = false
+        var enableDebugInfo: Boolean = false
         var appLang: String? = null
         var box64DynarecBigblock: String? = null
         var box64DynarecStrongmem: String? = null
@@ -494,6 +498,7 @@ class MainActivity : AppCompatActivity() {
         var fileManagerDefaultDir: String = "$homeDir/.wine/dosdevices"
         var fileManagerCwd: String = fileManagerDefaultDir
         var selectedFile: String = ""
+        var miceWineVersion: String = "MiceWine (git-${BuildConfig.GIT_SHORT_SHA})"
         private var selectedResolution: String? = ""
 
         var selectedFragment = "HomeFragment"
@@ -503,6 +508,7 @@ class MainActivity : AppCompatActivity() {
         const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
         const val RAM_COUNTER_KEY = "ramCounter"
         const val CPU_COUNTER_KEY = "cpuCounter"
+        const val ENABLE_DEBUG_INFO_KEY = "debugInfo"
 
         fun setupWinePrefix(winePrefix: File) {
             if (!winePrefix.exists()) {
@@ -573,8 +579,9 @@ class MainActivity : AppCompatActivity() {
             selectedMesaVkWsiPresentMode = preferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY, "mailbox")
             selectedTuDebugPreset = preferences.getString(SELECTED_TU_DEBUG_PRESET_KEY, "noconform")
             selectedResolution = preferences.getString(DISPLAY_RESOLUTION_KEY, "1280x720")
-            enableRamCounter = preferences.getBoolean(RAM_COUNTER_KEY, false)
+            enableRamCounter = preferences.getBoolean(RAM_COUNTER_KEY, true)
             enableCpuCounter = preferences.getBoolean(CPU_COUNTER_KEY, false)
+            enableDebugInfo = preferences.getBoolean(ENABLE_DEBUG_INFO_KEY, true)
         }
 
         fun copyAssets(activity: Activity, filename: String, outputPath: String) {

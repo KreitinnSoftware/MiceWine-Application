@@ -90,4 +90,6 @@
     <string name="executeExe">Executar</string>
     <string name="creatingWinePrefix">Criando Prefixo Wine…</string>
     <string name="select_rootfs_file">Selecione arquivo da RootFS</string>
+    <string name="enableDebugInfo">Ativa/Desativa Info de Debug</string>
+    <string name="enableDebugInfoDescription">Ativa ou Desativa Info de Debug na Tela</string>
 </resources>
