@@ -1,6 +1,8 @@
+import java.io.ByteArrayOutputStream
+
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    id("kotlin-android")
     kotlin("plugin.serialization")
 }
 
@@ -22,8 +24,11 @@ android {
     buildTypes {
         debug {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                file("proguard-rules.pro"))
             ndk {
+                //noinspection ChromeOsAbiSupport
                 abiFilters += "arm64-v8a"
             }
         }
@@ -43,6 +48,7 @@ android {
     buildTypes {
         getByName("debug") {
             isMinifyEnabled = false
+            buildConfigField("String", "GIT_SHORT_SHA", "\"${getGitShortSHA()}\"")
         }
     }
 
@@ -54,6 +60,7 @@ android {
     
     buildFeatures {
         aidl = true
+        buildConfig = true
         viewBinding = true
     }
 
@@ -85,4 +92,13 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.9.1")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation(project(":app:stub"))
+}
+
+fun getGitShortSHA(): String {
+    val stdout = ByteArrayOutputStream()
+    exec {
+        commandLine = listOf("git", "rev-parse", "--short", "HEAD")
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
 }

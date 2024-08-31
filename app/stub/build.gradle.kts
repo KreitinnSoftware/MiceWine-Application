@@ -11,10 +11,6 @@ android {
         minSdk = 28
     }
 
-    buildFeatures {
-        buildConfig = false
-    }
-
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
