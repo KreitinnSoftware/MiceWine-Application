@@ -92,4 +92,6 @@
     <string name="select_rootfs_file">Selecione arquivo da RootFS</string>
     <string name="enableDebugInfo">Ativa/Desativa Info de Debug</string>
     <string name="enableDebugInfoDescription">Ativa ou Desativa Info de Debug na Tela</string>
+    <string name="open_log_viewer">Abrir Visualizador de Logs</string>
+    <string name="controllerVirtualMapperDescription">Configure Controles na Tela</string>
 </resources>

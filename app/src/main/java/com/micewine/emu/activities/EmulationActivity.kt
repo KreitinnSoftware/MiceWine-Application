@@ -52,7 +52,9 @@ import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
+import com.micewine.emu.core.ShellExecutorCmd
 import com.micewine.emu.core.WineWrapper
+import com.micewine.emu.fragments.FloatingLogViewerFragment
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
@@ -173,6 +175,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     editPrefs.apply()
 
                     lorieView.requestLayout()
+                }
+
+                R.id.openLogViewer -> {
+                    FloatingLogViewerFragment().show(supportFragmentManager, "")
                 }
 
                 R.id.openCloseOverlay -> {
@@ -477,5 +483,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         @JvmStatic
         @SuppressLint("StaticFieldLeak")
         lateinit var instance: EmulationActivity private set
+
+        var sharedLogs = ShellExecutorCmd.ViewModelAppLogs()
     }
 }

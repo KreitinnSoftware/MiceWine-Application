@@ -23,6 +23,13 @@
         android:title="@string/stretch_display">
     </item>
     <item
+        android:id="@+id/openLogViewer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/ic_log"
+        android:title="@string/open_log_viewer">
+    </item>
+    <item
         android:id="@+id/openCloseOverlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

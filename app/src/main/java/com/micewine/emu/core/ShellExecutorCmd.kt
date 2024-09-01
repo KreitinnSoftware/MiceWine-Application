@@ -1,14 +1,16 @@
 package com.micewine.emu.core
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.micewine.emu.activities.EmulationActivity.Companion.handler
+import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
 
 object ShellExecutorCmd {
-    var stdErrOut = ""
-
     fun executeShell(cmd: String, msg: String?) {
         try {
             Log.e(msg, "Trying to exec: $cmd")
@@ -25,7 +27,7 @@ object ShellExecutorCmd {
                 try {
                     var stdOut: String?
                     while (stdout.readLine().also { stdOut = it } != null) {
-                        stdErrOut += stdOut + "\n"
+                        sharedLogs.appendText("$stdOut")
                         Log.v(msg, "$stdOut")
                     }
                 } catch (e: IOException) {
@@ -43,7 +45,7 @@ object ShellExecutorCmd {
                 try {
                     var stdErr: String?
                     while (stderr.readLine().also { stdErr = it } != null) {
-                        stdErrOut += stdErr + "\n"
+                        sharedLogs.appendText("$stdErr")
                         Log.v(msg, "$stdErr")
                     }
                 } catch (e: IOException) {
@@ -135,5 +137,17 @@ object ShellExecutorCmd {
         }
 
         return "0"
+    }
+
+    class ViewModelAppLogs : ViewModel() {
+        val logsText = MutableLiveData<String>()
+        val logsTextHead = MutableLiveData<String>()
+
+        fun appendText(text: String) {
+            handler.post {
+                logsTextHead.value = "$text\n"
+                logsText.value += "$text\n"
+            }
+        }
     }
 }

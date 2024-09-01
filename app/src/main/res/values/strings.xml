@@ -104,4 +104,6 @@
     <string name="select_rootfs_file">Select RootFS File</string>
     <string name="enableDebugInfo">Enable/Disable Debug Info</string>
     <string name="enableDebugInfoDescription">Enable or Disable Debug Info on Screen</string>
+    <string name="open_log_viewer">Open Log Viewer</string>
+    <string name="controllerVirtualMapperDescription">Configure On-Screen Controllers</string>
 </resources>

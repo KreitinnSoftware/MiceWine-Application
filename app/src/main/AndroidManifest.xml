@@ -67,11 +67,6 @@
             android:theme="@style/Theme.MiceWine.FullScreen"
             android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity
-            android:name=".activities.LogAppOutput"
-            android:exported="true"
-            android:theme="@style/Theme.MiceWine">
-        </activity>
     </application>
 
 </manifest>

@@ -12,7 +12,6 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.ControllerMapper
 import com.micewine.emu.activities.GeneralSettings
 import com.micewine.emu.activities.GeneralSettings.Companion.ACTION_PREFERENCE_SELECT
-import com.micewine.emu.activities.LogAppOutput
 import com.micewine.emu.activities.VirtualControllerOverlayMapper
 
 class AdapterSettings(private val settingsList: List<SettingsList>, private val context: Context) :
@@ -49,11 +48,6 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
             when (settingsModel.titleSettings) {
                 R.string.settingsTitle -> {
                     val intent = Intent(context, GeneralSettings::class.java)
-                    context.startActivity(intent)
-                }
-
-                R.string.logTitle -> {
-                    val intent = Intent(context, LogAppOutput::class.java)
                     context.startActivity(intent)
                 }
 
