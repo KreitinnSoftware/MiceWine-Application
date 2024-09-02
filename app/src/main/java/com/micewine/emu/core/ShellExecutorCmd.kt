@@ -11,73 +11,6 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 object ShellExecutorCmd {
-    fun executeShell(cmd: String, msg: String?) {
-        try {
-            Log.e(msg, "Trying to exec: $cmd")
-            val shell = Runtime.getRuntime().exec("/system/bin/sh")
-            val os = DataOutputStream(shell.outputStream)
-
-            os.writeBytes("$cmd\nexit\n")
-            os.flush()
-
-            val stdout = BufferedReader(InputStreamReader(shell.inputStream))
-            val stderr = BufferedReader(InputStreamReader(shell.errorStream))
-
-            val stdoutThread = Thread {
-                try {
-                    var stdOut: String?
-                    while (stdout.readLine().also { stdOut = it } != null) {
-                        sharedLogs.appendText("$stdOut")
-                        Log.v(msg, "$stdOut")
-                    }
-                } catch (e: IOException) {
-                    Log.e(msg, "Error reading stdout", e)
-                } finally {
-                    try {
-                        stdout.close()
-                    } catch (e: IOException) {
-                        Log.e(msg, "Error closing stdout", e)
-                    }
-                }
-            }
-
-            val stderrThread = Thread {
-                try {
-                    var stdErr: String?
-                    while (stderr.readLine().also { stdErr = it } != null) {
-                        sharedLogs.appendText("$stdErr")
-                        Log.v(msg, "$stdErr")
-                    }
-                } catch (e: IOException) {
-                    Log.e(msg, "Error reading stderr", e)
-                } finally {
-                    try {
-                        stderr.close()
-                    } catch (e: IOException) {
-                        Log.e(msg, "Error closing stderr", e)
-                    }
-                }
-            }
-
-            stdoutThread.start()
-            stderrThread.start()
-
-            stdoutThread.join()
-            stderrThread.join()
-
-            os.close()
-
-            shell.waitFor()
-            shell.destroy()
-        } catch (e: IOException) {
-            Log.e(msg, "IOException occurred", e)
-            throw RuntimeException(e)
-        } catch (e: InterruptedException) {
-            Log.e(msg, "InterruptedException occurred", e)
-            Thread.currentThread().interrupt()
-        }
-    }
-
     fun executeShellWithOutput(cmd: String): String {
         try {
             val shell = Runtime.getRuntime().exec("/system/bin/sh")
@@ -87,7 +20,7 @@ object ShellExecutorCmd {
             os.flush()
 
             val stdout = BufferedReader(InputStreamReader(shell.inputStream))
-            val stderr = BufferedReader(InputStreamReader(shell.errorStream))
+            BufferedReader(InputStreamReader(shell.errorStream))
 
             var output = ""
 
@@ -106,26 +39,9 @@ object ShellExecutorCmd {
                 }
             }
 
-            val stderrThread = Thread {
-                try {
-                    var stdErr: String?
-                    while (stderr.readLine().also { stdErr = it } != null) {
-                        output += stdErr + "\n"
-                    }
-                } catch (_: IOException) {
-                } finally {
-                    try {
-                        stderr.close()
-                    } catch (_: IOException) {
-                    }
-                }
-            }
-
             stdoutThread.start()
-            stderrThread.start()
 
             stdoutThread.join()
-            stderrThread.join()
 
             os.close()
 
@@ -136,7 +52,59 @@ object ShellExecutorCmd {
         } catch (_: IOException) {
         }
 
-        return "0"
+        return ""
+    }
+
+    class ShellLoader {
+        var shell: Process? = Runtime.getRuntime().exec("/system/bin/sh")
+        var os: DataOutputStream? = DataOutputStream(shell?.outputStream)
+        var stdout: BufferedReader? = BufferedReader(InputStreamReader(shell?.inputStream))
+        var stderr: BufferedReader? = BufferedReader(InputStreamReader(shell?.errorStream))
+
+        init {
+            Thread {
+                try {
+                    var stdOut: String?
+                    while ( stdout?.readLine().also { stdOut = it } != null) {
+                        sharedLogs.appendText("$stdOut")
+                        Log.v("ShellLoader", "$stdOut")
+                    }
+                } catch (e: IOException) {
+                    Log.e("ShellLoader", "Error reading stdout", e)
+                } finally {
+                    try {
+                        stdout?.close()
+                    } catch (e: IOException) {
+                        Log.e("ShellLoader", "Error closing stdout", e)
+                    }
+                }
+            }.start()
+
+            Thread {
+                try {
+                    var stdErr: String?
+                    while (stderr?.readLine().also { stdErr = it } != null) {
+                        sharedLogs.appendText("$stdErr")
+                        Log.v("ShellLoader", "$stdErr")
+                    }
+                } catch (e: IOException) {
+                    Log.e("ShellLoader", "Error reading stderr", e)
+                } finally {
+                    try {
+                        stderr?.close()
+                    } catch (e: IOException) {
+                        Log.e("ShellLoader", "Error closing stderr", e)
+                    }
+                }
+            }.start()
+        }
+
+        fun runCommand(cmd: String): Int {
+            os?.writeBytes("$cmd &\n")
+            os?.flush()
+
+            return -1
+        }
     }
 
     class ViewModelAppLogs : ViewModel() {

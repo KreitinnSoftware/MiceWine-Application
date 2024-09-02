@@ -41,14 +41,15 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDE
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_GL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_GL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
 import com.micewine.emu.core.ObbExtractor.extractZip
-import com.micewine.emu.core.ShellExecutorCmd.executeShell
+import com.micewine.emu.core.ShellExecutorCmd.ShellLoader
 import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
 import com.micewine.emu.core.WineWrapper
+import com.micewine.emu.core.WineWrapper.wineShell
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.DeleteGameItemFragment
 import com.micewine.emu.fragments.FileManagerFragment
@@ -63,7 +64,6 @@ import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -139,6 +139,7 @@ class MainActivity : AppCompatActivity() {
 
     private var bottomNavigation: BottomNavigationView? = null
     private var runningXServer = false
+    private val xServerShell = ShellLoader()
     private val homeFragment: HomeFragment = HomeFragment()
     private val settingsFragment: SettingsFragment = SettingsFragment()
     private val fileManagerFragment: FileManagerFragment = FileManagerFragment()
@@ -388,9 +389,7 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun runWine(exePath: String, winePrefix: File) {
         withContext(Dispatchers.Default) {
-            lifecycleScope.launch {
-                WineWrapper.wineServerSuspend("--foreground --persistent")
-            }
+            WineWrapper.wineServer("--foreground --persistent")
 
             installDXWrapper(winePrefix)
 
@@ -410,9 +409,8 @@ class MainActivity : AppCompatActivity() {
 
             runningXServer = true
 
-            executeShell(
-                "export CLASSPATH=${getClassPath(this@MainActivity)};" +
-                        "/system/bin/app_process / com.micewine.emu.CmdEntryPoint $display", "XServer"
+            xServerShell.runCommand(
+                "env CLASSPATH=${getClassPath(this@MainActivity)} /system/bin/app_process / com.micewine.emu.CmdEntryPoint $display"
             )
         }
     }
@@ -437,8 +435,8 @@ class MainActivity : AppCompatActivity() {
 
             File("$appRootDir/wine-utils/CoreFonts").copyRecursively(File("$appRootDir/wine/share/wine/fonts"), true)
 
-            executeShellWithOutput("chmod 700 -R $appRootDir")
-            executeShellWithOutput("$usrDir/generateSymlinks.sh")
+            wineShell.runCommand("chmod 700 -R $appRootDir")
+            wineShell.runCommand("$usrDir/generateSymlinks.sh")
 
             File("$usrDir/icons").mkdirs()
 
@@ -526,7 +524,7 @@ class MainActivity : AppCompatActivity() {
 
                 File("$userSharedFolder/AppData").mkdirs()
 
-                executeShell("ln -sf $userSharedFolder/AppData $localAppData", "Symlink")
+                ShellLoader().runCommand("ln -sf $userSharedFolder/AppData $localAppData")
 
                 startMenu.deleteRecursively()
 
@@ -649,17 +647,14 @@ class MainActivity : AppCompatActivity() {
 
         suspend fun getCpuInfo() {
             withContext(Dispatchers.IO) {
-                var usageInfo: String
-                var usageProcessed: String
+                var usageInfo: Float
 
                 while (enableCpuCounter) {
-                    usageInfo = executeShellWithOutput("top -n 1 | grep user | head -n 1 | cut -d \"%\" -f 2 | sed \"s/cpu//g\"")
+                    usageInfo = executeShellWithOutput("top -bn 1 -u \$(whoami) -o %CPU -q | head -n 1").toFloat() / Runtime.getRuntime().availableProcessors()
 
-                    usageProcessed = usageInfo.replace(" ", "").replace("\n", "")
-
-                    totalCpuUsage = "${(usageProcessed.toInt() / Runtime.getRuntime().availableProcessors())}%"
-
-                    delay(750)
+                    totalCpuUsage = "$usageInfo%"
+                    
+                    Thread.sleep(650)
                 }
             }
         }

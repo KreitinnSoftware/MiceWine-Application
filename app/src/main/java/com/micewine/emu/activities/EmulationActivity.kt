@@ -53,7 +53,7 @@ import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.ShellExecutorCmd
-import com.micewine.emu.core.WineWrapper
+import com.micewine.emu.core.WineWrapper.wineShell
 import com.micewine.emu.fragments.FloatingLogViewerFragment
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
@@ -153,7 +153,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 R.id.exit -> {
                     drawerLayout?.closeDrawers()
 
-                    WineWrapper.wineServer("--kill")
+                    wineShell.runCommand("pkill -9 wineserver")
+                    wineShell.runCommand("pkill -9 .exe")
+                    wineShell.runCommand("pkill -9 pulseaudio")
 
                     val intent = Intent(this, MainActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
