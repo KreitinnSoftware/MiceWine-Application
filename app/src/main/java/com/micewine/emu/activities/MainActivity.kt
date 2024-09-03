@@ -26,6 +26,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
+import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BLEEDING_EDGE_KEY
@@ -389,6 +390,8 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun runWine(exePath: String, winePrefix: File) {
         withContext(Dispatchers.Default) {
+            sharedLogs.clear()
+
             WineWrapper.wineServer("--foreground --persistent")
 
             installDXWrapper(winePrefix)
@@ -653,7 +656,7 @@ class MainActivity : AppCompatActivity() {
                     usageInfo = executeShellWithOutput("top -bn 1 -u \$(whoami) -o %CPU -q | head -n 1").toFloat() / Runtime.getRuntime().availableProcessors()
 
                     totalCpuUsage = "$usageInfo%"
-                    
+
                     Thread.sleep(650)
                 }
             }

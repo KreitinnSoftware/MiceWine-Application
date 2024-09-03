@@ -1,7 +1,5 @@
 package com.micewine.emu.fragments
 
-import android.R.attr.label
-import android.R.attr.text
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.ClipData

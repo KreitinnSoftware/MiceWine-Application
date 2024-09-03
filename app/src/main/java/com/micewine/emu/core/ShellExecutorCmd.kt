@@ -100,6 +100,7 @@ object ShellExecutorCmd {
         }
 
         fun runCommand(cmd: String): Int {
+            Log.v("ShellLoader", "Trying to exec: '$cmd'")
             os?.writeBytes("$cmd &\n")
             os?.flush()
 
@@ -115,6 +116,13 @@ object ShellExecutorCmd {
             handler.post {
                 logsTextHead.value = "$text\n"
                 logsText.value += "$text\n"
+            }
+        }
+
+        fun clear() {
+            handler.post {
+                logsTextHead.value = ""
+                logsText.value = ""
             }
         }
     }
