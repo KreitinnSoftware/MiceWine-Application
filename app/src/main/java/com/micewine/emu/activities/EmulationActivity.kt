@@ -52,8 +52,8 @@ import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
-import com.micewine.emu.core.ShellExecutorCmd
-import com.micewine.emu.core.WineWrapper.wineShell
+import com.micewine.emu.core.ShellLoader
+import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.fragments.FloatingLogViewerFragment
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
@@ -153,9 +153,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 R.id.exit -> {
                     drawerLayout?.closeDrawers()
 
-                    wineShell.runCommand("pkill -9 wineserver")
-                    wineShell.runCommand("pkill -9 .exe")
-                    wineShell.runCommand("pkill -9 pulseaudio")
+                    runCommand("pkill -9 wineserver")
+                    runCommand("pkill -9 .exe")
+                    runCommand("pkill -9 pulseaudio")
 
                     val intent = Intent(this, MainActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
@@ -486,6 +486,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         @SuppressLint("StaticFieldLeak")
         lateinit var instance: EmulationActivity private set
 
-        var sharedLogs = ShellExecutorCmd.ViewModelAppLogs()
+        var sharedLogs = ShellLoader.ViewModelAppLogs()
     }
 }

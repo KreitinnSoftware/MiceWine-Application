@@ -10,8 +10,8 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
 
-object ShellExecutorCmd {
-    fun executeShellWithOutput(cmd: String): String {
+object ShellLoader {
+    fun runCommandWithOutput(cmd: String): String {
         try {
             val shell = Runtime.getRuntime().exec("/system/bin/sh")
             val os = DataOutputStream(shell.outputStream)
@@ -55,7 +55,11 @@ object ShellExecutorCmd {
         return ""
     }
 
-    class ShellLoader {
+    fun runCommand(cmd: String) {
+        ShellLoader().runCommand("$cmd\nwait\nexit\n")
+    }
+
+    private class ShellLoader {
         var shell: Process? = Runtime.getRuntime().exec("/system/bin/sh")
         var os: DataOutputStream? = DataOutputStream(shell?.outputStream)
         var stdout: BufferedReader? = BufferedReader(InputStreamReader(shell?.inputStream))
@@ -69,13 +73,11 @@ object ShellExecutorCmd {
                         sharedLogs.appendText("$stdOut")
                         Log.v("ShellLoader", "$stdOut")
                     }
-                } catch (e: IOException) {
-                    Log.e("ShellLoader", "Error reading stdout", e)
+                } catch (_: IOException) {
                 } finally {
                     try {
                         stdout?.close()
-                    } catch (e: IOException) {
-                        Log.e("ShellLoader", "Error closing stdout", e)
+                    } catch (_: IOException) {
                     }
                 }
             }.start()
@@ -87,24 +89,23 @@ object ShellExecutorCmd {
                         sharedLogs.appendText("$stdErr")
                         Log.v("ShellLoader", "$stdErr")
                     }
-                } catch (e: IOException) {
-                    Log.e("ShellLoader", "Error reading stderr", e)
+                } catch (_: IOException) {
                 } finally {
                     try {
                         stderr?.close()
-                    } catch (e: IOException) {
-                        Log.e("ShellLoader", "Error closing stderr", e)
+                    } catch (_: IOException) {
                     }
                 }
             }.start()
         }
 
-        fun runCommand(cmd: String): Int {
+        fun runCommand(cmd: String) {
             Log.v("ShellLoader", "Trying to exec: '$cmd'")
-            os?.writeBytes("$cmd &\n")
+            os?.writeBytes("$cmd\nexit\n")
             os?.flush()
 
-            return -1
+            shell?.waitFor()
+            shell?.destroy()
         }
     }
 

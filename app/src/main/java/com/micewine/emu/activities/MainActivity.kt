@@ -47,10 +47,9 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WS
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
 import com.micewine.emu.core.ObbExtractor.extractZip
-import com.micewine.emu.core.ShellExecutorCmd.ShellLoader
-import com.micewine.emu.core.ShellExecutorCmd.executeShellWithOutput
+import com.micewine.emu.core.ShellLoader.runCommand
+import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
-import com.micewine.emu.core.WineWrapper.wineShell
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.DeleteGameItemFragment
 import com.micewine.emu.fragments.FileManagerFragment
@@ -140,7 +139,6 @@ class MainActivity : AppCompatActivity() {
 
     private var bottomNavigation: BottomNavigationView? = null
     private var runningXServer = false
-    private val xServerShell = ShellLoader()
     private val homeFragment: HomeFragment = HomeFragment()
     private val settingsFragment: SettingsFragment = SettingsFragment()
     private val fileManagerFragment: FileManagerFragment = FileManagerFragment()
@@ -392,8 +390,6 @@ class MainActivity : AppCompatActivity() {
         withContext(Dispatchers.Default) {
             sharedLogs.clear()
 
-            WineWrapper.wineServer("--foreground --persistent")
-
             installDXWrapper(winePrefix)
 
             if (exePath == "") {
@@ -412,7 +408,7 @@ class MainActivity : AppCompatActivity() {
 
             runningXServer = true
 
-            xServerShell.runCommand(
+            runCommand(
                 "env CLASSPATH=${getClassPath(this@MainActivity)} /system/bin/app_process / com.micewine.emu.CmdEntryPoint $display"
             )
         }
@@ -438,8 +434,8 @@ class MainActivity : AppCompatActivity() {
 
             File("$appRootDir/wine-utils/CoreFonts").copyRecursively(File("$appRootDir/wine/share/wine/fonts"), true)
 
-            wineShell.runCommand("chmod 700 -R $appRootDir")
-            wineShell.runCommand("$usrDir/generateSymlinks.sh")
+            runCommand("chmod 700 -R $appRootDir")
+            runCommand("$usrDir/generateSymlinks.sh")
 
             File("$usrDir/icons").mkdirs()
 
@@ -521,13 +517,13 @@ class MainActivity : AppCompatActivity() {
                 val system32 = File("$driveC/windows/system32")
                 val syswow64 = File("$driveC/windows/syswow64")
 
-                WineWrapper.wine("wineboot --init", winePrefix)
+                WineWrapper.wine("wineboot -i", winePrefix)
 
                 localAppData.deleteRecursively()
 
                 File("$userSharedFolder/AppData").mkdirs()
 
-                ShellLoader().runCommand("ln -sf $userSharedFolder/AppData $localAppData")
+                runCommand("ln -sf $userSharedFolder/AppData $localAppData")
 
                 startMenu.deleteRecursively()
 
@@ -574,8 +570,8 @@ class MainActivity : AppCompatActivity() {
             selectedDriver = preferences.getString(SELECTED_DRIVER_KEY, "Turnip/Zink")
             d3dxRenderer = preferences.getString(SELECTED_D3DX_RENDERER_KEY, "DXVK")
             selectedWineD3D = preferences.getString(SELECTED_WINED3D_KEY, "WineD3D-9.0")
-            selectedDXVK = preferences.getString(SELECTED_DXVK_KEY, "DXVK-1.10.3-async")
-            selectedGLProfile = preferences.getString(SELECTED_GL_PROFILE_KEY, "GL 3.3")
+            selectedDXVK = preferences.getString(SELECTED_DXVK_KEY, "DXVK-2.4")
+            selectedGLProfile = preferences.getString(SELECTED_GL_PROFILE_KEY, "GL 4.6")
             selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "FPS/GPU Load")
             selectedMesaVkWsiPresentMode = preferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY, "mailbox")
             selectedTuDebugPreset = preferences.getString(SELECTED_TU_DEBUG_PRESET_KEY, "noconform")
@@ -653,7 +649,7 @@ class MainActivity : AppCompatActivity() {
                 var usageInfo: Float
 
                 while (enableCpuCounter) {
-                    usageInfo = executeShellWithOutput("top -bn 1 -u \$(whoami) -o %CPU -q | head -n 1").toFloat() / Runtime.getRuntime().availableProcessors()
+                    usageInfo = runCommandWithOutput("top -bn 1 -u \$(whoami) -o %CPU -q | head -n 1").toFloat() / Runtime.getRuntime().availableProcessors()
 
                     totalCpuUsage = "$usageInfo%"
 
