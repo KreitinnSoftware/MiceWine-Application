@@ -393,7 +393,7 @@ class MainActivity : AppCompatActivity() {
             installDXWrapper(winePrefix)
 
             if (exePath == "") {
-                WineWrapper.wine("explorer /desktop=shell,1280x720 TFM", winePrefix)
+                WineWrapper.wine("explorer /desktop=shell,$selectedResolution TFM", winePrefix)
             } else {
                 WineWrapper.wine("'$exePath'", winePrefix, "'${File(exePath).parent!!}'")
             }
