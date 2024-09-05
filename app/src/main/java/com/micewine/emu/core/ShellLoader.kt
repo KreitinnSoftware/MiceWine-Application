@@ -14,21 +14,19 @@ object ShellLoader {
     fun runCommandWithOutput(cmd: String): String {
         try {
             val shell = Runtime.getRuntime().exec("/system/bin/sh")
-            val os = DataOutputStream(shell.outputStream)
-
-            os.writeBytes("$cmd\nexit\n")
-            os.flush()
+            val os = DataOutputStream(shell.outputStream).apply {
+                writeBytes("$cmd\nexit\n")
+                flush()
+            }
 
             val stdout = BufferedReader(InputStreamReader(shell.inputStream))
-            BufferedReader(InputStreamReader(shell.errorStream))
-
-            var output = ""
+            val output = StringBuilder()
 
             val stdoutThread = Thread {
                 try {
                     var stdOut: String?
                     while (stdout.readLine().also { stdOut = it } != null) {
-                        output += stdOut + "\n"
+                        output.append("$stdOut\n")
                     }
                 } catch (_: IOException) {
                 } finally {
@@ -48,7 +46,7 @@ object ShellLoader {
             shell.waitFor()
             shell.destroy()
 
-            return output
+            return output.toString()
         } catch (_: IOException) {
         }
 
@@ -56,7 +54,7 @@ object ShellLoader {
     }
 
     fun runCommand(cmd: String) {
-        ShellLoader().runCommand("$cmd\nwait\nexit\n")
+        ShellLoader().runCommand(cmd)
     }
 
     private class ShellLoader {
@@ -106,6 +104,8 @@ object ShellLoader {
 
             shell?.waitFor()
             shell?.destroy()
+
+            os?.close()
         }
     }
 
