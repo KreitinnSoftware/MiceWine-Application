@@ -10,22 +10,15 @@ It's use a XServer based on Termux-X11
 
 ### Compatible Android Versions
 
-| Android    | Support     |
-|------------|-------------|
-| Android 9  | Unsupported |
-| Android 10 | Supported   |
-| Android 11 | Supported   |
-| Android 12 | Supported   |
-| Android 13 | Supported   | 
-| Android 14 | Supported   |
+Support Android 10+
 
 ### Compatible GPUs
 
 | GPU        | Support             | Driver            |
 |------------|---------------------|-------------------|
-| Adreno 7xx | Supported           | Turnip/VirGL/Zink |
-| Adreno 6xx | Supported           | Turnip/VirGL/Zink |
-| Others     | Parcially Supported | VirGL/Zink        |
+| Adreno 7xx | Supported           | Turnip/Zink       |
+| Adreno 6xx | Supported           | Turnip/Zink       |
+| Others     | Parcially Supported | Zink (WIP)        |
 
 ## Third Party Open Source Applications:
 
