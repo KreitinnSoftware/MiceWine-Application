@@ -82,13 +82,11 @@ class GeneralSettings : AppCompatActivity() {
         if (supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStack()
             generalSettingsToolbar?.title = resources.getString(R.string.general_settings)
-
-            return true
         } else {
             finish()
         }
 
-        return super.onKeyDown(keyCode, event)
+        return true
     }
 
     override fun onDestroy() {
