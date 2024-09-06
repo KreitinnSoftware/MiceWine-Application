@@ -392,6 +392,10 @@ class MainActivity : AppCompatActivity() {
 
             installDXWrapper(winePrefix)
 
+            runCommand("pkill -9 wineserver")
+            runCommand("pkill -9 .exe")
+            runCommand("pkill -9 pulseaudio")
+
             if (exePath == "") {
                 WineWrapper.wine("explorer /desktop=shell,$selectedResolution TFM", winePrefix)
             } else {
