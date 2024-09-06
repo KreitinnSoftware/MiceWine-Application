@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
+import com.micewine.emu.activities.GeneralSettings.Companion.CHECKBOX
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_KEY
@@ -75,16 +76,16 @@ class DriversSettingsFragment : Fragment() {
             SPINNER, "DXVK-2.4", SELECTED_DXVK_KEY)
 
         addToAdapter(R.string.select_dxvk_hud_preset_title, R.string.null_description, arrayOf(
-            "Off", "FPS", "GPU Load", "FPS/GPU Load", "FPS/GPU Load/Dev Info"),
-            SPINNER, "FPS/GPU Load", SELECTED_DXVK_HUD_PRESET_KEY)
+            "fps", "gpuload", "devinfo"),
+            CHECKBOX, "fps", SELECTED_DXVK_HUD_PRESET_KEY)
 
         addToAdapter(R.string.mesa_vk_wsi_present_mode_title, R.string.null_description, arrayOf(
             "fifo", "relaxed", "mailbox", "immediate"),
             SPINNER, "mailbox", SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY)
 
         addToAdapter(R.string.tu_debug_title, R.string.null_description, arrayOf(
-            "noconform", "noconform,flushall", "noconform,flushall,syncdraw", "noconform,syncdraw"),
-            SPINNER, "mailbox", SELECTED_TU_DEBUG_PRESET_KEY)
+            "noconform", "flushall", "syncdraw"),
+            CHECKBOX, "noconform", SELECTED_TU_DEBUG_PRESET_KEY)
 
         addToAdapter(R.string.select_wined3d_title, R.string.null_description, wined3dVersions.toTypedArray(),
             SPINNER, "WineD3D-(9.3)", SELECTED_WINED3D_KEY)

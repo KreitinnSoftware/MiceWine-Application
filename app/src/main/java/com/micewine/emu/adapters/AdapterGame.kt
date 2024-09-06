@@ -51,7 +51,7 @@ class AdapterGame(private val gameList: List<GameList>, private val activity: Ac
             val gameModel = gameList[adapterPosition]
 
             val intent = Intent(activity, EmulationActivity::class.java).apply {
-                setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
             }
 
             val runWineIntent = Intent(ACTION_RUN_WINE).apply {

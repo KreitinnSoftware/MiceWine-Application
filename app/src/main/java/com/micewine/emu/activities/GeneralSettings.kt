@@ -114,6 +114,7 @@ class GeneralSettings : AppCompatActivity() {
         const val ACTION_PREFERENCES_CHANGED = "com.micewine.emu.ACTION_PREFERENCES_CHANGED"
         const val SWITCH = 1
         const val SPINNER = 2
+        const val CHECKBOX = 3
 
         const val BOX64_DYNAREC_BIGBLOCK_KEY = "BOX64_DYNAREC_BIGBLOCK"
         const val BOX64_DYNAREC_STRONGMEM_KEY = "BOX64_DYNAREC_STRONGMEM"

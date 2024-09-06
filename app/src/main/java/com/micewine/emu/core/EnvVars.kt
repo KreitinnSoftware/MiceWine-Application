@@ -78,24 +78,7 @@ object EnvVars {
 
         putVar("DXVK_ASYNC", "1")
         putVar("DXVK_STATE_CACHE_PATH", "$homeDir/.cache/dxvk-shader-cache")
-
-        when (selectedDXVKHud) {
-            "Off" -> {
-                putVar("DXVK_HUD", "0")
-            }
-            "FPS" -> {
-                putVar("DXVK_HUD", "fps")
-            }
-            "GPU Load" -> {
-                putVar("DXVK_HUD", "gpuload")
-            }
-            "FPS/GPU Load" -> {
-                putVar("DXVK_HUD", "fps,gpuload")
-            }
-            "FPS/GPU Load/Dev Info" -> {
-                putVar("DXVK_HUD", "fps,gpuload,devinfo")
-            }
-        }
+        putVar("DXVK_HUD", selectedDXVKHud)
 
         putVar("GALLIUM_HUD", "simple,fps")
         putVar("BOX64_LOG", "1")
