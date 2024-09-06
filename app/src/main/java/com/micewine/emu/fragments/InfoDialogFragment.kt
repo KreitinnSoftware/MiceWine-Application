@@ -15,7 +15,13 @@ class InfoDialogFragment : DialogFragment() {
 
         view.findViewById<TextView>(R.id.titleText).text = titleText
         view.findViewById<TextView>(R.id.descriptionText).text = descriptionText
-        view.findViewById<MaterialButton>(R.id.okButton).text = "Ok"
+        view.findViewById<MaterialButton>(R.id.okButton).apply {
+            text = getString(android.R.string.ok)
+
+            setOnClickListener {
+                dismiss()
+            }
+        }
 
         return AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog).setView(view).create()
     }

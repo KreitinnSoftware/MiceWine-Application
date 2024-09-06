@@ -131,7 +131,7 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
         override fun onClick(v: View) {
             val settingsModel = settingsList[getAdapterPosition()]
 
-            InfoDialogFragment.titleText = settingsModel.key
+            InfoDialogFragment.titleText = settingsName.text.toString()
             InfoDialogFragment.descriptionText = activity.getString(settingsModel.descriptionSettings)
 
             InfoDialogFragment().show(activity.supportFragmentManager, "")
@@ -148,8 +148,6 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
         private val spinner: Spinner
     ) : SpinnerAdapter {
         val checked = BooleanArray(count)
-        private var titleText: TextView? = null
-        private var baseView: View? = null
 
         override fun registerDataSetObserver(p0: DataSetObserver?) {
         }
@@ -175,11 +173,13 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
 
         override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View? {
             val inflater = activity.layoutInflater
-            baseView = p1 ?: inflater.inflate(android.R.layout.simple_spinner_item, p2, false)
-            titleText = baseView?.findViewById(android.R.id.text1)
-            titleText?.text = preferences.getString(sList.key, sList.defaultValue)
+            val view = p1 ?: inflater.inflate(android.R.layout.simple_spinner_item, p2, false)
 
-            return baseView
+            view.findViewById<TextView>(android.R.id.text1).apply {
+                text = preferences.getString(sList.key, sList.defaultValue)
+            }
+
+            return view
         }
 
         override fun getItemViewType(p0: Int): Int {
