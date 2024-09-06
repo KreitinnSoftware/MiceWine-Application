@@ -297,8 +297,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
         })
 
-        // Taken from Stackoverflow answer https://stackoverflow.com/questions/7417123/android-how-to-adjust-layout-in-full-screen-mode-when-softkeyboard-is-visible/7509285#
-        // FullscreenWorkaround.assistActivity(this)
         requestConnection()
         onPreferencesChanged("")
         checkXEvents()
