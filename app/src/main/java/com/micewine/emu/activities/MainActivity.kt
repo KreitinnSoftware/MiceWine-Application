@@ -45,6 +45,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_GL_PROFILE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VKD3D_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
 import com.micewine.emu.core.ObbExtractor.extractZip
 import com.micewine.emu.core.ShellLoader.runCommand
@@ -367,6 +368,7 @@ class MainActivity : AppCompatActivity() {
         val system32 = File("$driveC/windows/system32")
         val syswow64 = File("$driveC/windows/syswow64")
         val selectedDXVK = File("$wineUtils/DXVK/$selectedDXVK")
+        val selectedVKD3D = File("$wineUtils/VKD3D/$selectedVKD3D")
         val selectedWineD3D = File("$wineUtils/WineD3D/$selectedWineD3D")
 
         when (d3dxRenderer) {
@@ -383,6 +385,11 @@ class MainActivity : AppCompatActivity() {
                     File("$selectedWineD3D/x32").copyRecursively(syswow64, true)
                 }
             }
+        }
+
+        if (selectedVKD3D.exists()) {
+            File("$selectedVKD3D/x64").copyRecursively(system32, true)
+            File("$selectedVKD3D/x32").copyRecursively(syswow64, true)
         }
     }
 
@@ -489,6 +496,7 @@ class MainActivity : AppCompatActivity() {
         var d3dxRenderer: String? = null
         var selectedWineD3D: String? = null
         var selectedDXVK: String? = null
+        var selectedVKD3D: String? = null
         var selectedGLProfile: String? = null
         var selectedDXVKHud: String? = null
         var selectedMesaVkWsiPresentMode: String? = null
@@ -575,6 +583,7 @@ class MainActivity : AppCompatActivity() {
             d3dxRenderer = preferences.getString(SELECTED_D3DX_RENDERER_KEY, "DXVK")
             selectedWineD3D = preferences.getString(SELECTED_WINED3D_KEY, "WineD3D-9.0")
             selectedDXVK = preferences.getString(SELECTED_DXVK_KEY, "DXVK-2.4")
+            selectedVKD3D = preferences.getString(SELECTED_VKD3D_KEY, "VKD3D-2.13")
             selectedGLProfile = preferences.getString(SELECTED_GL_PROFILE_KEY, "GL 4.6")
             selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "FPS/GPU Load")
             selectedMesaVkWsiPresentMode = preferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY, "mailbox")

@@ -16,6 +16,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_GL_PROFILE_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VKD3D_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
@@ -30,6 +31,8 @@ class DriversSettingsFragment : Fragment() {
     private var layoutManager: GridLayoutManager? = null
     private val dxvkFolder: File = File("$appRootDir/wine-utils/DXVK")
     private val dxvkVersions: MutableList<String> = mutableListOf()
+    private val vkd3dFolder: File = File("$appRootDir/wine-utils/VKD3D")
+    private val vkd3dVersions: MutableList<String> = mutableListOf()
     private val wined3dFolder: File = File("$appRootDir/wine-utils/WineD3D")
     private val wined3dVersions: MutableList<String> = mutableListOf()
 
@@ -54,10 +57,15 @@ class DriversSettingsFragment : Fragment() {
 
         settingsList.clear()
         dxvkVersions.clear()
+        vkd3dVersions.clear()
         wined3dVersions.clear()
 
         dxvkFolder.listFiles()?.sorted()?.forEach {
             dxvkVersions.add(it.name)
+        }
+
+        vkd3dFolder.listFiles()?.sorted()?.forEach {
+            vkd3dVersions.add(it.name)
         }
 
         wined3dFolder.listFiles()?.sorted()?.forEach {
@@ -74,6 +82,9 @@ class DriversSettingsFragment : Fragment() {
 
         addToAdapter(R.string.select_dxvk_title, R.string.null_description, dxvkVersions.toTypedArray(),
             SPINNER, "DXVK-2.4", SELECTED_DXVK_KEY)
+
+        addToAdapter(R.string.select_vkd3d_title, R.string.null_description, vkd3dVersions.toTypedArray(),
+            SPINNER, "VKD3D-2.13", SELECTED_VKD3D_KEY)
 
         addToAdapter(R.string.select_dxvk_hud_preset_title, R.string.null_description, arrayOf(
             "fps", "gpuload", "devinfo"),

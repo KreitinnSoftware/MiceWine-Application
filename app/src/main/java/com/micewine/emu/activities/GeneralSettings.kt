@@ -129,6 +129,7 @@ class GeneralSettings : AppCompatActivity() {
         const val SELECTED_D3DX_RENDERER_KEY = "d3dxRenderer"
         const val SELECTED_WINED3D_KEY = "selectedWineD3D"
         const val SELECTED_DXVK_KEY = "selectedDXVK"
+        const val SELECTED_VKD3D_KEY = "selectedVKD3D"
         const val SELECTED_GL_PROFILE_KEY = "selectedGLProfile"
         const val SELECTED_DXVK_HUD_PRESET_KEY = "selectedDXVKHudPreset"
         const val SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY = "MESA_VK_WSI_PRESENT_MODE"

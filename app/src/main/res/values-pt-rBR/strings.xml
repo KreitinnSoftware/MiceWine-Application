@@ -94,4 +94,5 @@
     <string name="enableDebugInfoDescription">Ativa ou Desativa Info de Debug na Tela</string>
     <string name="open_log_viewer">Abrir Visualizador de Logs</string>
     <string name="controllerVirtualMapperDescription">Configure Controles na Tela</string>
+    <string name="select_vkd3d_title">Selecionar Versão do VKD3D</string>
 </resources>
