@@ -15,7 +15,7 @@ android {
         minSdk = 28
         //noinspection ExpiredTargetSdkVersion
         targetSdk = 28
-        versionCode = 1
+        versionCode = 2
         versionName = "beta-$versionCode"
     }
 
