@@ -585,7 +585,7 @@ class MainActivity : AppCompatActivity() {
             selectedDXVK = preferences.getString(SELECTED_DXVK_KEY, "DXVK-2.4")
             selectedVKD3D = preferences.getString(SELECTED_VKD3D_KEY, "VKD3D-2.13")
             selectedGLProfile = preferences.getString(SELECTED_GL_PROFILE_KEY, "GL 4.6")
-            selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "FPS/GPU Load")
+            selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "fps")
             selectedMesaVkWsiPresentMode = preferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY, "mailbox")
             selectedTuDebugPreset = preferences.getString(SELECTED_TU_DEBUG_PRESET_KEY, "noconform")
             selectedResolution = preferences.getString(DISPLAY_RESOLUTION_KEY, "1280x720")
