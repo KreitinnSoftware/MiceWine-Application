@@ -95,4 +95,8 @@
     <string name="open_log_viewer">Abrir Visualizador de Logs</string>
     <string name="controllerVirtualMapperDescription">Configure Controles na Tela</string>
     <string name="select_vkd3d_title">Selecionar Versão do VKD3D</string>
+    <string name="wine_esync_title">Ativa ou Desativa Wine ESync (experimental)</string>
+    <string name="wine_log_level_title">Level de Logs do Wine</string>
+    <string name="box64_avx_description">Ativa ou Desativa a Emulação de AVX ou AVX2 do Box64</string>
+    <string name="box64_log_description">Nível de Logs do Box64</string>
 </resources>

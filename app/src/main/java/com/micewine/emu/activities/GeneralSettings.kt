@@ -18,11 +18,13 @@ import com.micewine.emu.fragments.Box64SettingsFragment
 import com.micewine.emu.fragments.DisplaySettingsFragment
 import com.micewine.emu.fragments.DriversSettingsFragment
 import com.micewine.emu.fragments.GeneralSettingsFragment
+import com.micewine.emu.fragments.WineSettingsFragment
 
 class GeneralSettings : AppCompatActivity() {
     private var binding: ActivityGeneralSettingsBinding? = null
     private var backButton: ImageButton? = null
     private val box64SettingsFragment = Box64SettingsFragment()
+    private val wineSettingsFragment = WineSettingsFragment()
     private val displaySettingsFragment = DisplaySettingsFragment()
     private val driversSettingsFragment = DriversSettingsFragment()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -32,13 +34,19 @@ class GeneralSettings : AppCompatActivity() {
 
             if (intent.action == ACTION_PREFERENCE_SELECT) {
                 when (preference) {
-                    context.resources.getString(R.string.box64_settings_title) -> {
+                    getString(R.string.box64_settings_title) -> {
                         generalSettingsToolbar?.title = context.resources.getString(R.string.box64_settings_title)
 
                         fragmentLoader(box64SettingsFragment, false)
                     }
 
-                    context.resources.getString(R.string.display_settings_title) -> {
+                    getString(R.string.wine_settings_title) -> {
+                        generalSettingsToolbar?.title = getString(R.string.wine_settings_title)
+
+                        fragmentLoader(wineSettingsFragment, false)
+                    }
+
+                    getString(R.string.display_settings_title) -> {
                         generalSettingsToolbar?.title = context.resources.getString(R.string.display_settings_title)
 
                         fragmentLoader(displaySettingsFragment, false)
@@ -114,6 +122,8 @@ class GeneralSettings : AppCompatActivity() {
         const val SPINNER = 2
         const val CHECKBOX = 3
 
+        const val BOX64_LOG_KEY = "BOX64_LOG"
+        const val BOX64_AVX_KEY = "BOX64_AVX"
         const val BOX64_DYNAREC_BIGBLOCK_KEY = "BOX64_DYNAREC_BIGBLOCK"
         const val BOX64_DYNAREC_STRONGMEM_KEY = "BOX64_DYNAREC_STRONGMEM"
         const val BOX64_DYNAREC_X87DOUBLE_KEY = "BOX64_DYNAREC_X87DOUBLE"
@@ -130,6 +140,8 @@ class GeneralSettings : AppCompatActivity() {
         const val SELECTED_WINED3D_KEY = "selectedWineD3D"
         const val SELECTED_DXVK_KEY = "selectedDXVK"
         const val SELECTED_VKD3D_KEY = "selectedVKD3D"
+        const val WINE_ESYNC_KEY = "wineEsync"
+        const val WINE_LOG_LEVEL_KEY = "wineLogLevel"
         const val SELECTED_GL_PROFILE_KEY = "selectedGLProfile"
         const val SELECTED_DXVK_HUD_PRESET_KEY = "selectedDXVKHudPreset"
         const val SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY = "MESA_VK_WSI_PRESENT_MODE"

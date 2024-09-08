@@ -27,6 +27,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
 import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_AVX_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BLEEDING_EDGE_KEY
@@ -37,6 +38,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_SAFEF
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_STRONGMEM_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_WAIT_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_LOG_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
@@ -47,6 +49,8 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WS
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VKD3D_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.WINE_ESYNC_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.WINE_LOG_LEVEL_KEY
 import com.micewine.emu.core.ObbExtractor.extractZip
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
@@ -420,7 +424,7 @@ class MainActivity : AppCompatActivity() {
             runningXServer = true
 
             runCommand(
-                "env CLASSPATH=${getClassPath(this@MainActivity)} /system/bin/app_process / com.micewine.emu.CmdEntryPoint $display"
+                "env CLASSPATH=${getClassPath(this@MainActivity)} /system/bin/app_process / com.micewine.emu.CmdEntryPoint $display &> /dev/null"
             )
         }
     }
@@ -482,6 +486,8 @@ class MainActivity : AppCompatActivity() {
         var enableCpuCounter: Boolean = false
         var enableDebugInfo: Boolean = false
         var appLang: String? = null
+        var box64LogLevel: String? = null
+        var box64Avx: String? = null
         var box64DynarecBigblock: String? = null
         var box64DynarecStrongmem: String? = null
         var box64DynarecX87double: String? = null
@@ -492,6 +498,8 @@ class MainActivity : AppCompatActivity() {
         var box64DynarecAlignedAtomics: String? = null
         var box64DynarecBleedingEdge: String? = null
         var box64DynarecWait: String? = null
+        var wineESync: String? = null
+        var wineLogLevel: String? = null
         var selectedDriver: String? = null
         var d3dxRenderer: String? = null
         var selectedWineD3D: String? = null
@@ -502,8 +510,8 @@ class MainActivity : AppCompatActivity() {
         var selectedMesaVkWsiPresentMode: String? = null
         var selectedTuDebugPreset: String? = null
         var selectedGameArray: Array<String> = arrayOf()
-        var memoryStats = "0/0"
-        var totalCpuUsage = "0%"
+        var memoryStats = "??/??"
+        var totalCpuUsage = "???%"
         var fileManagerDefaultDir: String = "$homeDir/.wine/dosdevices"
         var fileManagerCwd: String = fileManagerDefaultDir
         var selectedFile: String = ""
@@ -569,6 +577,8 @@ class MainActivity : AppCompatActivity() {
             appLang = activity.resources.getString(R.string.app_lang)
             appBuiltinRootfs = activity.assets.list("")?.contains("rootfs.zip")!!
 
+            box64LogLevel = preferences.getString(BOX64_LOG_KEY, "1")
+            box64Avx = preferences.getString(BOX64_AVX_KEY, "2")
             box64DynarecBigblock = preferences.getString(BOX64_DYNAREC_BIGBLOCK_KEY, "1")
             box64DynarecStrongmem = preferences.getString(BOX64_DYNAREC_STRONGMEM_KEY, "0")
             box64DynarecX87double = booleanToString(preferences.getBoolean(BOX64_DYNAREC_X87DOUBLE_KEY, false))
@@ -579,6 +589,8 @@ class MainActivity : AppCompatActivity() {
             box64DynarecAlignedAtomics = booleanToString(preferences.getBoolean(BOX64_DYNAREC_ALIGNED_ATOMICS_KEY, false))
             box64DynarecBleedingEdge = booleanToString(preferences.getBoolean(BOX64_DYNAREC_BLEEDING_EDGE_KEY, true))
             box64DynarecWait = booleanToString(preferences.getBoolean(BOX64_DYNAREC_WAIT_KEY, true))
+            wineESync = booleanToString(preferences.getBoolean(WINE_ESYNC_KEY, false))
+            wineLogLevel = preferences.getString(WINE_LOG_LEVEL_KEY, "default")
             selectedDriver = preferences.getString(SELECTED_DRIVER_KEY, "Turnip/Zink")
             d3dxRenderer = preferences.getString(SELECTED_D3DX_RENDERER_KEY, "DXVK")
             selectedWineD3D = preferences.getString(SELECTED_WINED3D_KEY, "WineD3D-9.0")

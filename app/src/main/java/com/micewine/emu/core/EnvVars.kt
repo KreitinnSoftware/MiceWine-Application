@@ -1,7 +1,9 @@
 package com.micewine.emu.core
 
+import android.os.Build
 import com.micewine.emu.activities.MainActivity.Companion.appLang
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
+import com.micewine.emu.activities.MainActivity.Companion.box64Avx
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecAlignedAtomics
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBigblock
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBleedingEdge
@@ -12,6 +14,7 @@ import com.micewine.emu.activities.MainActivity.Companion.box64DynarecSafeflags
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecStrongmem
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecWait
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecX87double
+import com.micewine.emu.activities.MainActivity.Companion.box64LogLevel
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedDXVKHud
 import com.micewine.emu.activities.MainActivity.Companion.selectedDriver
@@ -20,11 +23,13 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedTuDebugPreset
 import com.micewine.emu.activities.MainActivity.Companion.selectedGLProfile
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
+import com.micewine.emu.activities.MainActivity.Companion.wineESync
+import com.micewine.emu.activities.MainActivity.Companion.wineLogLevel
 
 object EnvVars {
     private val vars = LinkedHashMap<String, String>()
     private fun putVar(name: String, value: String?) {
-        vars[name] = "$name=$value"
+        vars[name] = "$name=\"$value\""
     }
 
     fun getEnv(): String {
@@ -38,7 +43,6 @@ object EnvVars {
         putVar("TMPDIR", tmpDir.path)
         putVar("HOME", homeDir.path)
         putVar("DISPLAY", ":0")
-        putVar("BOX64_LOG", "1")
         putVar("LD_LIBRARY_PATH", "$usrDir/lib")
         putVar("PATH", "\$PATH:$usrDir/bin:$appRootDir/wine/bin")
         putVar("PREFIX", usrDir.path)
@@ -81,21 +85,31 @@ object EnvVars {
         putVar("DXVK_HUD", selectedDXVKHud)
 
         putVar("GALLIUM_HUD", "simple,fps")
-        putVar("BOX64_LOG", "1")
-        putVar("BOX64_MMAP32", "1")
-        putVar("BOX64_AVX", "2")
-        putVar("BOX64_RCFILE", "$usrDir/etc/box64.box64rc")
-        putVar("BOX64_DYNAREC_BIGBLOCK", box64DynarecBigblock)
-        putVar("BOX64_DYNAREC_STRONGMEM", box64DynarecStrongmem)
-        putVar("BOX64_DYNAREC_X87DOUBLE", box64DynarecX87double)
-        putVar("BOX64_DYNAREC_FASTNAN", box64DynarecFastnan)
-        putVar("BOX64_DYNAREC_FASTROUND", box64DynarecFastround)
-        putVar("BOX64_DYNAREC_SAFEFLAGS", box64DynarecSafeflags)
-        putVar("BOX64_DYNAREC_CALLRET", box64DynarecCallret)
-        putVar("BOX64_DYNAREC_ALIGNED_ATOMICS", box64DynarecAlignedAtomics)
-        putVar("BOX64_DYNAREC_BLEEDING_EDGE", box64DynarecBleedingEdge)
-        putVar("BOX64_DYNAREC_WAIT", box64DynarecWait)
+
+        if (Build.SUPPORTED_ABIS[0] != "x86_64") {
+            putVar("BOX64_LOG", box64LogLevel)
+            putVar("BOX64_CPUNAME", "ARM64 CPU")
+            putVar("BOX64_MMAP32", "1")
+            putVar("BOX64_AVX", box64Avx)
+            putVar("BOX64_RCFILE", "$usrDir/etc/box64.box64rc")
+            putVar("BOX64_DYNAREC_BIGBLOCK", box64DynarecBigblock)
+            putVar("BOX64_DYNAREC_STRONGMEM", box64DynarecStrongmem)
+            putVar("BOX64_DYNAREC_X87DOUBLE", box64DynarecX87double)
+            putVar("BOX64_DYNAREC_FASTNAN", box64DynarecFastnan)
+            putVar("BOX64_DYNAREC_FASTROUND", box64DynarecFastround)
+            putVar("BOX64_DYNAREC_SAFEFLAGS", box64DynarecSafeflags)
+            putVar("BOX64_DYNAREC_CALLRET", box64DynarecCallret)
+            putVar("BOX64_DYNAREC_ALIGNED_ATOMICS", box64DynarecAlignedAtomics)
+            putVar("BOX64_DYNAREC_BLEEDING_EDGE", box64DynarecBleedingEdge)
+            putVar("BOX64_DYNAREC_WAIT", box64DynarecWait)
+        }
+
         putVar("VKD3D_FEATURE_LEVEL", "12_0")
-        putVar("WINEESYNC", "1")
+
+        if (wineLogLevel == "off") {
+            putVar("WINEDEBUG", "-all")
+        }
+
+        putVar("WINEESYNC", wineESync)
     }
 }

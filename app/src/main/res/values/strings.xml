@@ -77,7 +77,7 @@
     <string name="enableRamCounterDescription">Enable or Disable RAM Counter on Screen</string>
     <string name="selectedControllerPreset">Selected Controller Preset</string>
     <string name="mouse">Mouse</string>
-    <string name="keyboard" translatable="false">Keyboard</string>
+    <string name="keyboard">Keyboard</string>
     <string name="controllerPresetCreateText">Type a Name</string>
     <string name="removeLastPresetError">The Last Preset Cannot be Removed</string>
     <string name="editGameIcon">Edit Icon</string>
@@ -107,4 +107,10 @@
     <string name="open_log_viewer">Open Log Viewer</string>
     <string name="controllerVirtualMapperDescription">Configure On-Screen Controllers</string>
     <string name="select_vkd3d_title">Select VKD3D Version</string>
+    <string name="wine_esync_title">Enable or Disable Wine ESync (experimental)</string>
+    <string name="wine_log_level_title">Wine Log Level</string>
+    <string name="box64_log_title" translatable="false">BOX64_LOG</string>
+    <string name="box64_avx_title" translatable="false">BOX64_AVX</string>
+    <string name="box64_avx_description">Enable or Disable Box64 AVX or AVX2 Emulation</string>
+    <string name="box64_log_description">Box64 Log Level</string>
 </resources>

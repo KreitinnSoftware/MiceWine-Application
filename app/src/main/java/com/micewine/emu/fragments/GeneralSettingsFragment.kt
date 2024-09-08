@@ -1,5 +1,6 @@
 package com.micewine.emu.fragments
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,7 +34,9 @@ class GeneralSettingsFragment : Fragment() {
 
         settingsList.clear()
 
-        addToAdapter(R.string.box64_settings_title, R.string.box64_settings_description, R.drawable.ic_box64)
+        if (Build.SUPPORTED_ABIS[0] != "x86_64") {
+            addToAdapter(R.string.box64_settings_title, R.string.box64_settings_description, R.drawable.ic_box64)
+        }
 
         addToAdapter(R.string.wine_settings_title, R.string.wine_settings_description, R.drawable.ic_wine)
 
