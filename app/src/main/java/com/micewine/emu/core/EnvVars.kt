@@ -96,5 +96,6 @@ object EnvVars {
         putVar("BOX64_DYNAREC_BLEEDING_EDGE", box64DynarecBleedingEdge)
         putVar("BOX64_DYNAREC_WAIT", box64DynarecWait)
         putVar("VKD3D_FEATURE_LEVEL", "12_0")
+        putVar("WINEESYNC", "1")
     }
 }
