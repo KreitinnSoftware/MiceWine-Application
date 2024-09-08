@@ -310,15 +310,13 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(
         requestCode: Int, resultCode: Int, data: Intent?
     ) {
-        if (filePickerOperation == "image") {
-            if (resultCode == Activity.RESULT_OK) {
-                data?.data?.also { uri ->
-                    setIconToGame(this, preferences!!, uri, selectedGameArray)
-                }
+        if (resultCode == Activity.RESULT_OK) {
+            data?.data?.also { uri ->
+                setIconToGame(this, preferences!!, uri, selectedGameArray)
             }
-
-            setSharedVars(this)
         }
+
+        setSharedVars(this)
 
         super.onActivityResult(requestCode, resultCode, data)
     }
@@ -332,7 +330,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         startActivityForResult(
-            Intent.createChooser(intent, getString(R.string.selectExecutableFile)), 0
+            Intent.createChooser(intent, ""), 0
         )
     }
 
@@ -476,7 +474,6 @@ class MainActivity : AppCompatActivity() {
         @SuppressLint("SdCardPath")
         var appRootDir = File("/data/data/com.micewine.emu/files")
         var appBuiltinRootfs: Boolean = false
-        var filePickerOperation: String? = null
         var customRootFSPath: String? = null
         var usrDir = File("$appRootDir/usr")
         var tmpDir = File("$usrDir/tmp")

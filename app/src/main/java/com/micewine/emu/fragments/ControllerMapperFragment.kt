@@ -61,47 +61,26 @@ class ControllerMapperFragment : Fragment() {
         settingsList.clear()
 
         addToAdapter(R.drawable.a_button, BUTTON_A_KEY)
-
         addToAdapter(R.drawable.x_button, BUTTON_X_KEY)
-
         addToAdapter(R.drawable.y_button, BUTTON_Y_KEY)
-
         addToAdapter(R.drawable.b_button, BUTTON_B_KEY)
-
         addToAdapter(R.drawable.rb_button, BUTTON_R1_KEY)
-
         addToAdapter(R.drawable.rt_button, BUTTON_R2_KEY)
-
         addToAdapter(R.drawable.lb_button, BUTTON_L1_KEY)
-
         addToAdapter(R.drawable.lt_button, BUTTON_L2_KEY)
-
         addToAdapter(R.drawable.start_button, BUTTON_START_KEY)
-
         addToAdapter(R.drawable.select_button, BUTTON_SELECT_KEY)
-
         addToAdapter(R.drawable.l_right, AXIS_X_PLUS_KEY)
-
         addToAdapter(R.drawable.l_left, AXIS_X_MINUS_KEY)
-
         addToAdapter(R.drawable.l_down, AXIS_Y_PLUS_KEY)
-
         addToAdapter(R.drawable.l_up, AXIS_Y_MINUS_KEY)
-
         addToAdapter(R.drawable.r_right, AXIS_Z_PLUS_KEY)
-
         addToAdapter(R.drawable.r_left, AXIS_Z_MINUS_KEY)
-
         addToAdapter(R.drawable.r_down, AXIS_RZ_PLUS_KEY)
-
         addToAdapter(R.drawable.r_up, AXIS_RZ_MINUS_KEY)
-
         addToAdapter(R.drawable.dpad_right, AXIS_HAT_X_PLUS_KEY)
-
         addToAdapter(R.drawable.dpad_left, AXIS_HAT_X_MINUS_KEY)
-
         addToAdapter(R.drawable.dpad_down, AXIS_HAT_Y_PLUS_KEY)
-
         addToAdapter(R.drawable.dpad_up, AXIS_HAT_Y_MINUS_KEY)
     }
 

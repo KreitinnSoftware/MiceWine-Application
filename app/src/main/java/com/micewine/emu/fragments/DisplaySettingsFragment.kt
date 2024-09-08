@@ -53,17 +53,17 @@ class DisplaySettingsFragment : Fragment() {
             ),
             SPINNER, "1280x720", DISPLAY_RESOLUTION_KEY)
 
-        addToAdapter(R.string.enableRamCounter, R.string.enableRamCounterDescription, arrayOf(""),
+        addToAdapter(R.string.enableRamCounter, R.string.enableRamCounterDescription, null,
             SWITCH, "true", RAM_COUNTER_KEY)
 
-        addToAdapter(R.string.enableCPUCounter, R.string.enableCPUCounterDescription, arrayOf(""),
+        addToAdapter(R.string.enableCPUCounter, R.string.enableCPUCounterDescription, null,
             SWITCH, "false", CPU_COUNTER_KEY)
 
-        addToAdapter(R.string.enableDebugInfo, R.string.enableDebugInfoDescription, arrayOf(""),
+        addToAdapter(R.string.enableDebugInfo, R.string.enableDebugInfoDescription, null,
             SWITCH, "true", ENABLE_DEBUG_INFO_KEY)
     }
 
-    private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>, type: Int, defaultValue: String, keyId: String) {
+    private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>?, type: Int, defaultValue: String, keyId: String) {
         settingsList.add(SettingsListSpinner(titleId, descriptionId, valuesArray, type, defaultValue, keyId))
     }
 }

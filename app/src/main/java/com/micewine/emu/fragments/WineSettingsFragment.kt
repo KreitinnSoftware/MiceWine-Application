@@ -42,12 +42,11 @@ class WineSettingsFragment : Fragment() {
 
         settingsList.clear()
 
-        addToAdapter(R.string.wine_esync_title, R.string.null_description, arrayOf(""), SWITCH, "false", WINE_ESYNC_KEY)
-
+        addToAdapter(R.string.wine_esync_title, R.string.null_description, null, SWITCH, "false", WINE_ESYNC_KEY)
         addToAdapter(R.string.wine_log_level_title, R.string.null_description, arrayOf("off", "default"), SPINNER, "default", WINE_LOG_LEVEL_KEY)
     }
 
-    private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>, type: Int, defaultValue: String, keyId: String) {
+    private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>?, type: Int, defaultValue: String, keyId: String) {
         settingsList.add(SettingsListSpinner(titleId, descriptionId, valuesArray, type, defaultValue, keyId))
     }
 }
