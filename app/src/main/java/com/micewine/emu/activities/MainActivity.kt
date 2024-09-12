@@ -26,6 +26,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
+import com.micewine.emu.activities.EmulationActivity.Companion.ACTION_BACK_MAIN
 import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_AVX_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_KEY
@@ -225,14 +226,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK && selectedFragment == "FileManagerFragment") {
-            if (fileManagerCwd != fileManagerDefaultDir) {
-                fileManagerCwd = File(fileManagerCwd).parent!!
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (selectedFragment == "FileManagerFragment") {
+                if (fileManagerCwd != fileManagerDefaultDir) {
+                    fileManagerCwd = File(fileManagerCwd).parent!!
 
-                refreshFiles()
+                    refreshFiles()
+
+                    return true
+                }
+            }
+
+            if (selectedFragment != "HomeFragment") {
+                bottomNavigation?.selectedItemId = R.id.nav_home
 
                 return true
             }
+
+            sendBroadcast(Intent(ACTION_STOP_ALL))
         }
 
         return super.onKeyDown(keyCode, event)
@@ -410,6 +421,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 WineWrapper.wine("'$exePath'", winePrefix, "'${File(exePath).parent!!}'")
             }
+
+            sendBroadcast(Intent(ACTION_BACK_MAIN))
         }
     }
 
@@ -519,6 +532,7 @@ class MainActivity : AppCompatActivity() {
 
         const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
         const val ACTION_SETUP = "com.micewine.emu.ACTION_SETUP"
+        const val ACTION_STOP_ALL = "com.micewine.emu.ACTION_STOP_ALL"
         const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
         const val RAM_COUNTER_KEY = "ramCounter"
         const val CPU_COUNTER_KEY = "cpuCounter"

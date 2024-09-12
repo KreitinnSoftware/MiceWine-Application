@@ -87,11 +87,13 @@ class GeneralSettings : AppCompatActivity() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (supportFragmentManager.backStackEntryCount > 0) {
-            supportFragmentManager.popBackStack()
-            generalSettingsToolbar?.title = resources.getString(R.string.general_settings)
-        } else {
-            finish()
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (supportFragmentManager.backStackEntryCount > 0) {
+                supportFragmentManager.popBackStack()
+                generalSettingsToolbar?.title = resources.getString(R.string.general_settings)
+            } else {
+                finish()
+            }
         }
 
         return true
