@@ -591,7 +591,7 @@ class MainActivity : AppCompatActivity() {
             selectedDriver = preferences.getString(SELECTED_DRIVER_KEY, "Turnip/Zink")
             d3dxRenderer = preferences.getString(SELECTED_D3DX_RENDERER_KEY, "DXVK")
             selectedWineD3D = preferences.getString(SELECTED_WINED3D_KEY, "WineD3D-9.0")
-            selectedDXVK = preferences.getString(SELECTED_DXVK_KEY, "DXVK-2.4")
+            selectedDXVK = preferences.getString(SELECTED_DXVK_KEY, "DXVK-1.10.3-async")
             selectedVKD3D = preferences.getString(SELECTED_VKD3D_KEY, "VKD3D-2.13")
             selectedGLProfile = preferences.getString(SELECTED_GL_PROFILE_KEY, "GL 4.6")
             selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET_KEY, "fps")

@@ -81,7 +81,7 @@ class DriversSettingsFragment : Fragment() {
             SPINNER, "DXVK", SELECTED_D3DX_RENDERER_KEY)
 
         addToAdapter(R.string.select_dxvk_title, R.string.null_description, dxvkVersions.toTypedArray(),
-            SPINNER, "DXVK-2.4", SELECTED_DXVK_KEY)
+            SPINNER, "DXVK-1.10.3-async", SELECTED_DXVK_KEY)
 
         addToAdapter(R.string.select_vkd3d_title, R.string.null_description, vkd3dVersions.toTypedArray(),
             SPINNER, "VKD3D-2.13", SELECTED_VKD3D_KEY)
