@@ -35,6 +35,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
@@ -114,6 +115,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         preferences.registerOnSharedPreferenceChangeListener { _: SharedPreferences?, key: String? ->
             onPreferencesChanged(key)
         }
+
+        initSharedLogs(supportFragmentManager)
 
         if (enableCpuCounter) {
             lifecycleScope.launch {
@@ -484,6 +487,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         @SuppressLint("StaticFieldLeak")
         lateinit var instance: EmulationActivity private set
 
-        var sharedLogs = ShellLoader.ViewModelAppLogs()
+        var sharedLogs: ShellLoader.ViewModelAppLogs? = null
+
+        fun initSharedLogs(supportFragmentManager: FragmentManager) {
+            sharedLogs = ShellLoader.ViewModelAppLogs(supportFragmentManager)
+        }
     }
 }

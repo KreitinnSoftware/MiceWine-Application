@@ -1,10 +1,14 @@
 package com.micewine.emu.core
 
 import android.util.Log
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.micewine.emu.activities.EmulationActivity.Companion.handler
 import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
+import com.micewine.emu.fragments.InfoDialogFragment
+import com.micewine.emu.fragments.InfoDialogFragment.Companion.descriptionText
+import com.micewine.emu.fragments.InfoDialogFragment.Companion.titleText
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.IOException
@@ -68,7 +72,7 @@ object ShellLoader {
                 try {
                     var stdOut: String?
                     while ( stdout?.readLine().also { stdOut = it } != null) {
-                        sharedLogs.appendText("$stdOut")
+                        sharedLogs?.appendText("$stdOut")
                         Log.v("ShellLoader", "$stdOut")
                     }
                 } catch (_: IOException) {
@@ -84,7 +88,7 @@ object ShellLoader {
                 try {
                     var stdErr: String?
                     while (stderr?.readLine().also { stdErr = it } != null) {
-                        sharedLogs.appendText("$stdErr")
+                        sharedLogs?.appendText("$stdErr")
                         Log.v("ShellLoader", "$stdErr")
                     }
                 } catch (_: IOException) {
@@ -109,7 +113,7 @@ object ShellLoader {
         }
     }
 
-    class ViewModelAppLogs : ViewModel() {
+    class ViewModelAppLogs(private val supportFragmentManager: FragmentManager) : ViewModel() {
         val logsText = MutableLiveData<String>()
         val logsTextHead = MutableLiveData<String>()
 
@@ -117,6 +121,21 @@ object ShellLoader {
             handler.post {
                 logsTextHead.value = "$text\n"
                 logsText.value += "$text\n"
+
+                // Check for errors
+                if (text.contains("err:module:import_dll")) {
+                    val missingDllName = "${text.split("Library ")[1].split(".dll")[0]}.dll"
+
+                    Log.v("DLL Import", "Error loading '$missingDllName'")
+                    titleText = "Missing DLL"
+                    descriptionText = "Error loading '$missingDllName'"
+                    InfoDialogFragment().show(supportFragmentManager, "")
+                } else if (text.contains("VK_ERROR_DEVICE_LOST")) {
+                    Log.v("VK Driver", "VK_ERROR_DEVICE_LOST")
+                    titleText = "VK_ERROR_DEVICE_LOST"
+                    descriptionText = "Error on Vulkan Graphics Driver 'VK_ERROR_DEVICE_LOST'"
+                    InfoDialogFragment().show(supportFragmentManager, "")
+                }
             }
         }
 

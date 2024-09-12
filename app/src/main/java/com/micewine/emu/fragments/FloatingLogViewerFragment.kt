@@ -38,9 +38,9 @@ class FloatingLogViewerFragment: DialogFragment() {
             }
         }
 
-        logText.text = sharedLogs.logsText.value
+        logText.text = sharedLogs?.logsText?.value
 
-        sharedLogs.logsTextHead.observe(this, observer!!)
+        sharedLogs?.logsTextHead?.observe(this, observer!!)
 
         scrollView.fullScroll(ScrollView.FOCUS_UP)
 
@@ -49,7 +49,7 @@ class FloatingLogViewerFragment: DialogFragment() {
         }
 
         copyButton.setOnClickListener {
-            val clip = ClipData.newPlainText("MiceWine Logs", sharedLogs.logsText.value)
+            val clip = ClipData.newPlainText("MiceWine Logs", sharedLogs?.logsText?.value)
             clipboard?.setPrimaryClip(clip)
         }
 
@@ -59,6 +59,6 @@ class FloatingLogViewerFragment: DialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
 
-        sharedLogs.logsText.removeObserver(observer!!)
+        sharedLogs?.logsText?.removeObserver(observer!!)
     }
 }

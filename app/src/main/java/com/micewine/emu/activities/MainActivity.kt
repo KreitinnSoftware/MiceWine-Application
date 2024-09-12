@@ -397,7 +397,7 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun runWine(exePath: String, winePrefix: File) {
         withContext(Dispatchers.Default) {
-            sharedLogs.clear()
+            sharedLogs?.clear()
 
             installDXWrapper(winePrefix)
 
@@ -643,7 +643,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         private fun getLibsPath(context: Context): String {
-            return context.applicationContext.applicationInfo.nativeLibraryDir
+            return context.applicationInfo.nativeLibraryDir
         }
 
         suspend fun getMemoryInfo(context: Context) {
@@ -668,14 +668,12 @@ class MainActivity : AppCompatActivity() {
 
         suspend fun getCpuInfo() {
             withContext(Dispatchers.IO) {
-                var usageInfo: Float
-
                 while (enableCpuCounter) {
-                    usageInfo = runCommandWithOutput("top -bn 1 -u \$(whoami) -o %CPU -q | head -n 1").toFloat() / Runtime.getRuntime().availableProcessors()
+                    val usageInfo = runCommandWithOutput("top -bn 1 -u \$(whoami) -o %CPU -q | head -n 1").toFloat() / Runtime.getRuntime().availableProcessors()
 
                     totalCpuUsage = "$usageInfo%"
 
-                    Thread.sleep(650)
+                    Thread.sleep(750)
                 }
             }
         }

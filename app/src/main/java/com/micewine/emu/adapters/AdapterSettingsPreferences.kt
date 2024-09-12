@@ -66,11 +66,11 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
                 holder.spinnerOptions.adapter = ArrayAdapter(
                     activity,
                     android.R.layout.simple_spinner_dropdown_item,
-                    sList.spinnerOptions
+                    sList.spinnerOptions!!
                 )
 
                 holder.spinnerOptions.setSelection(
-                    sList.spinnerOptions.indexOf(
+                    sList.spinnerOptions!!.indexOf(
                         preferences.getString(
                             sList.key,
                             sList.defaultValue
@@ -104,7 +104,7 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
 
                 holder.spinnerOptions.adapter = CheckableAdapter(
                     activity,
-                    sList.spinnerOptions,
+                    sList.spinnerOptions!!,
                     sList,
                     preferences,
                     holder.spinnerOptions
@@ -138,7 +138,7 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
         }
     }
 
-    class SettingsListSpinner(var titleSettings: Int, var descriptionSettings: Int, var spinnerOptions: Array<String>, var type: Int, var defaultValue: String, var key: String)
+    class SettingsListSpinner(var titleSettings: Int, var descriptionSettings: Int, var spinnerOptions: Array<String>?, var type: Int, var defaultValue: String, var key: String)
 
     class CheckableAdapter(
         val activity: Activity,
