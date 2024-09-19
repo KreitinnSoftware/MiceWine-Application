@@ -86,7 +86,7 @@ class LorieView : SurfaceView, InputStub {
 
     fun triggerCallback() {
         isFocusable = true
-        setFocusableInTouchMode(true)
+        isFocusableInTouchMode = true
         requestFocus()
         background = object : ColorDrawable(Color.TRANSPARENT) {
             override fun isStateful(): Boolean {

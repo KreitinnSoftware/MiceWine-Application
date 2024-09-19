@@ -51,7 +51,6 @@ class ControllerMapper : AppCompatActivity() {
                 val name = intent.getStringExtra("name")
 
                 selectedControllerPresetSpinner?.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, getControllerPresetsName(context))
-
                 selectedControllerPresetSpinner?.setSelection(getControllerPresetsName(context).indexOf(name))
 
                 fragmentLoader(ControllerMapperFragment(), true)
@@ -83,7 +82,6 @@ class ControllerMapper : AppCompatActivity() {
         }
 
         backButton = findViewById(R.id.backButton)
-
         backButton?.setOnClickListener {
             if (supportFragmentManager.backStackEntryCount > 0) {
                 supportFragmentManager.popBackStack()
@@ -94,15 +92,10 @@ class ControllerMapper : AppCompatActivity() {
         }
 
         deadZoneSeekbar = findViewById(R.id.deadZoneSeekBar)
-
         deadZoneSeekbar?.max = 75
-
         deadZoneSeekbar?.min = 25
-
         deadZoneSeekbar?.progress = getDeadZone(this, preferences!!.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!)
-
         seekBarDeadZoneValue = findViewById(R.id.seekBarDeadZoneValue)
-
         seekBarDeadZoneValue?.text = "${deadZoneSeekbar?.progress.toString()}%"
 
         deadZoneSeekbar?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
@@ -120,17 +113,11 @@ class ControllerMapper : AppCompatActivity() {
         })
 
         mouseSensibilitySeekBar = findViewById(R.id.mouseSensibilitySeekBar)
-
         mouseSensibilitySeekBar?.max = 350
-
         mouseSensibilitySeekBar?.min = 25
-
         mouseSensibilitySeekBar?.progress = getMouseSensibility(this, preferences!!.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!)
-
         mouseSensibilityValue = findViewById(R.id.mouseSensibilityValue)
-
         mouseSensibilityValue?.text = "${mouseSensibilitySeekBar?.progress.toString()}%"
-
         mouseSensibilitySeekBar?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             @SuppressLint("SetTextI18n")
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -146,12 +133,8 @@ class ControllerMapper : AppCompatActivity() {
         })
 
         selectedControllerPresetSpinner = findViewById(R.id.selectedControllerPresetSpinner)
-
         selectedControllerPresetSpinner?.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, getControllerPresetsName(this))
-
-        selectedControllerPresetSpinner?.setSelection(getControllerPresetsName(this).indexOf(
-            preferences!!.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")))
-
+        selectedControllerPresetSpinner?.setSelection(getControllerPresetsName(this).indexOf(preferences!!.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")))
         selectedControllerPresetSpinner?.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
@@ -160,12 +143,10 @@ class ControllerMapper : AppCompatActivity() {
                     position: Int,
                     id: Long
                 ) {
-                    val edit = preferences!!.edit()
-
-                    edit.putString(SELECTED_CONTROLLER_PRESET_KEY, parent?.selectedItem.toString())
-
-                    edit.apply()
-
+                    preferences!!.edit().apply {
+                        putString(SELECTED_CONTROLLER_PRESET_KEY, parent?.selectedItem.toString())
+                        apply()
+                    }
                     fragmentLoader(ControllerMapperFragment(), true)
                 }
 
@@ -174,13 +155,11 @@ class ControllerMapper : AppCompatActivity() {
             }
 
         addNewPresetButton = findViewById(R.id.addNewPreset)
-
         addNewPresetButton?.setOnClickListener {
             CreateControllerPresetFragment().show(supportFragmentManager, "")
         }
 
         deletePresetButton = findViewById(R.id.deletePreset)
-
         deletePresetButton?.setOnClickListener {
             deleteControllerPreset(this, preferences?.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!)
         }
@@ -189,9 +168,7 @@ class ControllerMapper : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-
-        if (id == android.R.id.home) {
+        if (item.itemId == android.R.id.home) {
             finish()
             return true
         }
@@ -241,7 +218,6 @@ class ControllerMapper : AppCompatActivity() {
         const val AXIS_HAT_Y_MINUS_KEY = "axisHatY-"
 
         const val SELECTED_CONTROLLER_PRESET_KEY = "selectedControllerPreset"
-
         const val ACTION_UPDATE_CONTROLLER_MAPPER = "com.micewine.emu.ACTION_UPDATE_CONTROLLER_MAPPER"
 
         private val mappingMap = mapOf(

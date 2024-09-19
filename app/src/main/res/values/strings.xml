@@ -113,4 +113,5 @@
     <string name="box64_avx_title" translatable="false">BOX64_AVX</string>
     <string name="box64_avx_description">Enable or Disable Box64 AVX or AVX2 Emulation</string>
     <string name="box64_log_description">Box64 Log Level</string>
+    <string name="save">Save</string>
 </resources>

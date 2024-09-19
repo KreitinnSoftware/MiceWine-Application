@@ -26,11 +26,9 @@ class FileManagerFragment: Fragment() {
         rootView = binding!!.root
 
         recyclerView = rootView?.findViewById(R.id.recyclerViewFiles)
-
         recyclerView?.adapter = AdapterFiles(fileList, requireContext(), false)
 
         refreshFiles()
-
         registerForContextMenu(recyclerView!!)
 
         return rootView

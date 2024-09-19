@@ -2,23 +2,28 @@ package com.micewine.emu.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Spinner
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.micewine.emu.activities.VirtualControllerOverlayMapper.Companion.ACTION_EDIT_VIRTUAL_BUTTON
+import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogDownKeyName
+import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogLeftKeyName
+import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogRightKeyName
+import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogUpKeyName
+import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonKeyName
+import com.micewine.emu.views.OverlayView.Companion.analogList
+import com.micewine.emu.views.OverlayView.Companion.buttonList
+import com.micewine.emu.views.OverlayView.Companion.detectClick
 
 class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0): View(context, attrs, defStyleAttr) {
-    private val box: Box = Box(20F, 20F, 450F, 0F)
-
-    val buttonList = mutableListOf<VirtualButton>()
-
-    val analogList = mutableListOf<VirtualAnalog>()
+    private val editButton: EditButton = EditButton(0F, 0F, 150F)
 
     private val paint = Paint().apply {
         color = Color.BLACK
@@ -38,28 +43,23 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     private val textPaint: Paint = Paint().apply {
         color = Color.WHITE
         textAlign = Paint.Align.CENTER
-        isFakeBoldText = true
+        textSize = 40F
     }
 
     private var selectedButton = 0
-
     private var selectedVAxis = 0
-
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-
     private val gson = Gson()
-
-    var spinner: Spinner? = null
 
     private fun loadFromPreferences() {
         val buttonJson = preferences.getString("overlayButtons", "")
         val axisJson = preferences.getString("overlayAxis", "")
 
-        val virtualButtonListType = object : TypeToken<MutableList<VirtualButton>>() {}.type
-        val virtualAxisListType = object : TypeToken<MutableList<VirtualAnalog>>() {}.type
+        val virtualButtonListType = object : TypeToken<MutableList<OverlayView.VirtualButton>>() {}.type
+        val virtualAxisListType = object : TypeToken<MutableList<OverlayView.VirtualAnalog>>() {}.type
 
-        val currentButtons: MutableList<VirtualButton> = gson.fromJson(buttonJson, virtualButtonListType) ?: mutableListOf()
-        val currentVAxis: MutableList<VirtualAnalog> = gson.fromJson(axisJson, virtualAxisListType) ?: mutableListOf()
+        val currentButtons: MutableList<OverlayView.VirtualButton> = gson.fromJson(buttonJson, virtualButtonListType) ?: mutableListOf()
+        val currentVAxis: MutableList<OverlayView.VirtualAnalog> = gson.fromJson(axisJson, virtualAxisListType) ?: mutableListOf()
 
         currentButtons.forEach {
             buttonList.add(it)
@@ -71,47 +71,73 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     }
 
     fun saveOnPreferences() {
-        val editor = preferences.edit()
-
         val buttonJson = gson.toJson(buttonList)
         val axisJson = gson.toJson(analogList)
 
-        editor.putString("overlayButtons", buttonJson)
-        editor.putString("overlayAxis", axisJson)
-        editor.apply()
+        preferences.edit().apply {
+            putString("overlayButtons", buttonJson)
+            putString("overlayAxis", axisJson)
+            apply()
+        }
     }
 
     init {
         loadFromPreferences()
     }
 
+    private fun drawText(text: String, x: Float, y: Float, c: Canvas) {
+        textPaint.style = Paint.Style.FILL
+        textPaint.color = Color.WHITE
+
+        c.drawText(text, x, y, textPaint)
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         buttonList.forEach {
-            canvas.drawCircle(it.x, it.y, it.width / 2, buttonPaint)
+            if (lastSelectedButton == it.id && lastSelectedType == BUTTON) {
+                buttonPaint.color = Color.GRAY
+                textPaint.color = Color.GRAY
+            } else {
+                buttonPaint.color = Color.WHITE
+                textPaint.color = Color.GRAY
+            }
 
-            paint.textSize = it.width / 4
-            canvas.drawText(it.text, it.x, it.y + 10, textPaint)
+            canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
+
+            paint.textSize = it.radius / 4
+
+            drawText(it.keyName, it.x, it.y + 10, canvas)
         }
 
         analogList.forEach {
-            canvas.drawCircle(it.x, it.y, it.width / 2, buttonPaint)
+            if (lastSelectedButton == it.id && lastSelectedType == ANALOG) {
+                buttonPaint.color = Color.GRAY
+                whitePaint.color = Color.GRAY
+            } else {
+                buttonPaint.color = Color.WHITE
+                whitePaint.color = Color.WHITE
+            }
 
-            canvas.drawCircle(it.x, it.y, it.width / 4 - 10, whitePaint)
+            canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
+            canvas.drawCircle(it.x, it.y, it.radius / 4 - 10, whitePaint)
         }
 
-        box.height = height - 20F
+        editButton.x = width - 20F - editButton.radius / 2
+        editButton.y = 20F + editButton.radius / 2
 
-        canvas.drawRoundRect(box.x, box.y, box.x + box.width, box.height, 50F, 50F, paint)
+        if (lastSelectedButton > 0) {
+            canvas.drawCircle(editButton.x, editButton.y, editButton.radius / 2, paint)
+        }
     }
 
-    fun addButton(buttonData: VirtualButton) {
+    fun addButton(buttonData: OverlayView.VirtualButton) {
         buttonList.add(buttonData)
         invalidate()
     }
 
-    fun addAnalog(buttonData: VirtualAnalog) {
+    fun addAnalog(buttonData: OverlayView.VirtualAnalog) {
         analogList.add(buttonData)
         invalidate()
     }
@@ -120,22 +146,26 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     override fun onTouchEvent(event: MotionEvent): Boolean {
          when (event.actionMasked) {
              MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
-                 buttonList.forEach {
-                     if ((event.getX(event.actionIndex) >= it.x - it.width / 2 && event.getX(event.actionIndex) <= (it.x + (it.width / 2))) &&
-                         (event.getY(event.actionIndex) >= it.y - it.width / 2 && event.getY(event.actionIndex) <= (it.y + (it.width / 2)))) {
+                 if (!detectClick(event, editButton.x, editButton.y, editButton.radius)) {
+                     lastSelectedButton = 0
+                 }
 
+                 buttonList.forEach {
+                     if (detectClick(event, it.x, it.y, it.radius)) {
                          if (selectedButton == 0) {
                              selectedButton = it.id
+                             lastSelectedType = BUTTON
+                             lastSelectedButton = it.id
                          }
                      }
                  }
 
                  analogList.forEach {
-                     if ((event.getX(event.actionIndex) >= it.x - it.width / 2 && event.getX(event.actionIndex) <= (it.x + (it.width / 2))) &&
-                         (event.getY(event.actionIndex) >= it.y - it.width / 2 && event.getY(event.actionIndex) <= (it.y + (it.width / 2)))) {
-
+                     if (detectClick(event, it.x, it.y, it.radius)) {
                          if (selectedVAxis == 0) {
                              selectedVAxis = it.id
+                             lastSelectedType = ANALOG
+                             lastSelectedButton = it.id
                          }
                      }
                  }
@@ -144,15 +174,8 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
              }
 
              MotionEvent.ACTION_MOVE -> {
-                 if ((event.getX(event.actionIndex) >= box.x && event.getX(event.actionIndex) <= box.x + box.width) &&
-                     (event.getY(event.actionIndex) >= box.y && event.getY(event.actionIndex) <= box.y + box.height)) {
-                     box.x = event.getX(event.actionIndex) - box.width / 2
-                 }
-
                  buttonList.forEach {
-                     if ((event.getX(event.actionIndex) >= it.x - it.width / 2 && event.getX(event.actionIndex) <= (it.x + (it.width / 2))) &&
-                         (event.getY(event.actionIndex) >= it.y - it.width / 2 && event.getY(event.actionIndex) <= (it.y + (it.width / 2)))) {
-
+                     if (detectClick(event, it.x, it.y, it.radius)) {
                          if (selectedButton > 0) {
                              buttonList[buttonList.indexOfFirst { i ->
                                  i.id == selectedButton
@@ -165,9 +188,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                  }
 
                  analogList.forEach {
-                     if ((event.getX(event.actionIndex) >= it.x - it.width / 2 && event.getX(event.actionIndex) <= (it.x + (it.width / 2))) &&
-                         (event.getY(event.actionIndex) >= it.y - it.width / 2 && event.getY(event.actionIndex) <= (it.y + (it.width / 2)))) {
-
+                     if (detectClick(event, it.x, it.y, it.radius)) {
                          if (selectedVAxis > 0) {
                              analogList[analogList.indexOfFirst { i ->
                                  i.id == selectedVAxis
@@ -184,9 +205,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
              MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_UP -> {
                  buttonList.forEach {
-                     if ((event.getX(event.actionIndex) >= it.x - it.width / 2 && event.getX(event.actionIndex) <= (it.x + (it.width / 2))) &&
-                         (event.getY(event.actionIndex) >= it.y - it.width / 2 && event.getY(event.actionIndex) <= (it.y + (it.width / 2)))
-                     ) {
+                     if (detectClick(event, it.x, it.y, it.radius)) {
                          if (selectedButton == it.id) {
                              selectedButton = 0
                          }
@@ -194,13 +213,28 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                  }
 
                  analogList.forEach {
-                     if ((event.getX(event.actionIndex) >= it.x - it.width / 2 && event.getX(event.actionIndex) <= (it.x + (it.width / 2))) &&
-                         (event.getY(event.actionIndex) >= it.y - it.width / 2 && event.getY(event.actionIndex) <= (it.y + (it.width / 2)))
-                     ) {
+                     if (detectClick(event, it.x, it.y, it.radius)) {
                          if (selectedVAxis == it.id) {
                              selectedVAxis = 0
                          }
                      }
+                 }
+
+                 if (detectClick(event, editButton.x, editButton.y, editButton.radius) && lastSelectedButton > 0) {
+                     if (buttonList.isNotEmpty() && lastSelectedType == BUTTON) {
+                         selectedButtonKeyName = buttonList[lastSelectedButton - 1].keyName
+                     }
+
+                     if (analogList.isNotEmpty() && lastSelectedType == ANALOG) {
+                         selectedAnalogUpKeyName = analogList[lastSelectedButton - 1].upKeyName
+                         selectedAnalogDownKeyName = analogList[lastSelectedButton - 1].downKeyName
+                         selectedAnalogLeftKeyName = analogList[lastSelectedButton - 1].leftKeyName
+                         selectedAnalogRightKeyName = analogList[lastSelectedButton - 1].rightKeyName
+                     }
+
+                     context.sendBroadcast(
+                         Intent(ACTION_EDIT_VIRTUAL_BUTTON)
+                     )
                  }
              }
          }
@@ -208,33 +242,17 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
         return true
     }
 
-    class Box(
+    class EditButton(
         var x: Float,
         var y: Float,
-        var width: Float,
-        var height: Float
+        var radius: Float,
     )
 
-    class VirtualButton(
-        val id: Int,
-        val text: String,
-        var x: Float,
-        var y: Float,
-        var width: Float,
-        val keyCodes: List<Int>
-    )
+    companion object {
+        const val BUTTON = 0
+        const val ANALOG = 1
 
-    class VirtualAnalog(
-        val id: Int,
-        var x: Float,
-        var y: Float,
-        var fingerX: Float,
-        var fingerY: Float,
-        var width: Float,
-        val upKeyCodes: List<Int>,
-        val downKeyCodes: List<Int>,
-        val leftKeyCodes: List<Int>,
-        val rightKeyCodes: List<Int>,
-        var isPressed: Boolean
-    )
+        var lastSelectedButton = 0
+        var lastSelectedType = BUTTON
+    }
 }

@@ -1,5 +1,10 @@
 package com.micewine.emu.activities
 
+import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.KeyEvent
@@ -13,18 +18,28 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 import com.micewine.emu.R
-import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.databinding.ActivityVirtualControllerMapperBinding
+import com.micewine.emu.fragments.EditVirtualButtonFragment
+import com.micewine.emu.views.OverlayView
+import com.micewine.emu.views.OverlayView.Companion.analogList
+import com.micewine.emu.views.OverlayView.Companion.buttonList
 import com.micewine.emu.views.OverlayViewCreator
-import com.micewine.emu.views.OverlayViewCreator.VirtualAnalog
-import com.micewine.emu.views.OverlayViewCreator.VirtualButton
 
 class VirtualControllerOverlayMapper : AppCompatActivity() {
     private var binding: ActivityVirtualControllerMapperBinding? = null
     private var overlayView: OverlayViewCreator? = null
     private var virtualControllerMapperDrawerLayout: DrawerLayout? = null
     private var navigationView: NavigationView? = null
+    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        @SuppressLint("UnspecifiedRegisterReceiverFlag")
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == ACTION_EDIT_VIRTUAL_BUTTON) {
+                EditVirtualButtonFragment().show(supportFragmentManager, "")
+            }
+        }
+    }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -34,21 +49,20 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
         overlayView = findViewById(R.id.overlayView)
 
         virtualControllerMapperDrawerLayout = findViewById(R.id.virtualControllerMapperDrawerLayout)
-
         virtualControllerMapperDrawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
 
         navigationView = findViewById(R.id.navigationView)
-
         navigationView?.setNavigationItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
                 R.id.addButton -> {
                     overlayView?.addButton(
-                        VirtualButton(
-                            overlayView?.buttonList?.count()!! + 1, "",
+                        OverlayView.VirtualButton(
+                            buttonList.count() + 1,
                             overlayView?.width!! / 2F,
                             overlayView?.height!! / 2F,
                             180F,
-                            getXKeyScanCodes("Enter")
+                            "Null",
+                            null
                         )
                     )
 
@@ -57,16 +71,21 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
 
                 R.id.addVAxis -> {
                     overlayView?.addAnalog(
-                        VirtualAnalog(overlayView?.analogList?.count()!! + 1,
+                        OverlayView.VirtualAnalog(
+                            analogList.count() + 1,
                             overlayView?.width!! / 2F,
                             overlayView?.height!! / 2F,
                             0F,
                             0F,
-                            250F,
-                            getXKeyScanCodes("Up"),
-                            getXKeyScanCodes("Down"),
-                            getXKeyScanCodes("Left"),
-                            getXKeyScanCodes("Right"),
+                            275F,
+                            "Null",
+                            null,
+                            "Null",
+                            null,
+                            "Null",
+                            null,
+                            "Null",
+                            null,
                             false
                         )
                     )
@@ -83,6 +102,8 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
 
             true
         }
+
+        registerReceiver(receiver, object : IntentFilter(ACTION_EDIT_VIRTUAL_BUTTON) {})
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -101,7 +122,7 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
+        unregisterReceiver(receiver)
         overlayView?.saveOnPreferences()
     }
 
@@ -120,5 +141,9 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
+    }
+
+    companion object {
+        const val ACTION_EDIT_VIRTUAL_BUTTON = "com.micewine.emu.ACTION_EDIT_VIRTUAL_BUTTON"
     }
 }

@@ -49,32 +49,22 @@ class Box64SettingsFragment : Fragment() {
 
     private fun setAdapter() {
         val adapterSettingsPreferences = AdapterSettingsPreferences(settingsList, requireActivity())
+
         recyclerView?.setAdapter(adapterSettingsPreferences)
 
         settingsList.clear()
 
         addToAdapter(R.string.box64_bigblock_title, R.string.box64_bigblock_description, arrayOf("0", "1", "2", "3"), SPINNER, "1", BOX64_DYNAREC_BIGBLOCK_KEY)
-
         addToAdapter(R.string.box64_strongmem_title, R.string.box64_strongmem_description, arrayOf("0", "1", "2", "3"), SPINNER, "0", BOX64_DYNAREC_STRONGMEM_KEY)
-
         addToAdapter(R.string.box64_x87double_title, R.string.box64_x87double_description, null, SWITCH, "false", BOX64_DYNAREC_X87DOUBLE_KEY)
-
         addToAdapter(R.string.box64_fastnan_title, R.string.box64_fastnan_description, null, SWITCH, "true", BOX64_DYNAREC_FASTNAN_KEY)
-
         addToAdapter(R.string.box64_fastround_title, R.string.box64_fastround_description, null, SWITCH, "true", BOX64_DYNAREC_FASTROUND_KEY)
-
         addToAdapter(R.string.box64_safeflags_title, R.string.box64_safeflags_description, arrayOf("0", "1", "2"), SPINNER, "1", BOX64_DYNAREC_SAFEFLAGS_KEY)
-
         addToAdapter(R.string.box64_callret_title, R.string.box64_callret_description, null, SWITCH, "true", BOX64_DYNAREC_CALLRET_KEY)
-
         addToAdapter(R.string.box64_aligned_atomics_title, R.string.box64_aligned_atomics_description, null, SWITCH, "false", BOX64_DYNAREC_ALIGNED_ATOMICS_KEY)
-
         addToAdapter(R.string.box64_bleeding_edge_title, R.string.box64_bleeding_edge_description, null, SWITCH, "true", BOX64_DYNAREC_BLEEDING_EDGE_KEY)
-
         addToAdapter(R.string.box64_dynarec_wait_title, R.string.box64_dynarec_wait_description, null, SWITCH, "true", BOX64_DYNAREC_WAIT_KEY)
-
         addToAdapter(R.string.box64_log_title, R.string.box64_log_description, arrayOf("0", "1"), SPINNER, "1", BOX64_LOG_KEY)
-
         addToAdapter(R.string.box64_avx_title, R.string.box64_avx_description, arrayOf("0", "1", "2"), SPINNER, "2", BOX64_AVX_KEY)
     }
 

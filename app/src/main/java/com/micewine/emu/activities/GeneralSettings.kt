@@ -74,11 +74,9 @@ class GeneralSettings : AppCompatActivity() {
         fragmentLoader(GeneralSettingsFragment(), true)
 
         generalSettingsToolbar = findViewById(R.id.generalSettingsToolbar)
-
         generalSettingsToolbar?.title = this.resources.getString(R.string.general_settings)
 
         backButton = findViewById(R.id.backButton)
-
         backButton?.setOnClickListener {
             onKeyDown(KeyEvent.KEYCODE_BACK, null)
         }
