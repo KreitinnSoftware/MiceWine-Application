@@ -3,6 +3,8 @@ package com.micewine.emu.views
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -23,7 +25,11 @@ import com.micewine.emu.views.OverlayView.Companion.buttonList
 import com.micewine.emu.views.OverlayView.Companion.detectClick
 
 class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0): View(context, attrs, defStyleAttr) {
-    private val editButton: EditButton = EditButton(0F, 0F, 150F)
+    private val editButton: CircleButton = CircleButton(0F, 0F, 150F)
+    private val removeButton: CircleButton = CircleButton(0F, 0F, 150F)
+
+    private var editIcon: Bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resources, android.R.drawable.ic_menu_edit), (editButton.radius / 2).toInt(), (editButton.radius / 2).toInt(), false)
+    private var removeIcon: Bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resources, android.R.drawable.ic_menu_delete), (removeButton.radius / 2).toInt(), (removeButton.radius / 2).toInt(), false)
 
     private val paint = Paint().apply {
         color = Color.BLACK
@@ -60,6 +66,9 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
         val currentButtons: MutableList<OverlayView.VirtualButton> = gson.fromJson(buttonJson, virtualButtonListType) ?: mutableListOf()
         val currentVAxis: MutableList<OverlayView.VirtualAnalog> = gson.fromJson(axisJson, virtualAxisListType) ?: mutableListOf()
+
+        buttonList.clear()
+        analogList.clear()
 
         currentButtons.forEach {
             buttonList.add(it)
@@ -124,11 +133,18 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
             canvas.drawCircle(it.x, it.y, it.radius / 4 - 10, whitePaint)
         }
 
-        editButton.x = width - 20F - editButton.radius / 2
-        editButton.y = 20F + editButton.radius / 2
-
         if (lastSelectedButton > 0) {
+            editButton.x = width - 20F - editButton.radius / 2
+            editButton.y = 20F + editButton.radius / 2
+
+            removeButton.x = editButton.x - removeButton.radius
+            removeButton.y = 20F + removeButton.radius / 2
+
             canvas.drawCircle(editButton.x, editButton.y, editButton.radius / 2, paint)
+            canvas.drawCircle(removeButton.x, removeButton.y, removeButton.radius / 2, paint)
+
+            canvas.drawBitmap(editIcon, editButton.x - editButton.radius / 4, editButton.y - editButton.radius / 4, whitePaint)
+            canvas.drawBitmap(removeIcon, removeButton.x - removeButton.radius / 4, removeButton.y - removeButton.radius / 4, whitePaint)
         }
     }
 
@@ -146,7 +162,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     override fun onTouchEvent(event: MotionEvent): Boolean {
          when (event.actionMasked) {
              MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
-                 if (!detectClick(event, editButton.x, editButton.y, editButton.radius)) {
+                 if (!detectClick(event, editButton.x, editButton.y, editButton.radius) && !detectClick(event, removeButton.x, removeButton.y, removeButton.radius)) {
                      lastSelectedButton = 0
                  }
 
@@ -236,13 +252,27 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                          Intent(ACTION_EDIT_VIRTUAL_BUTTON)
                      )
                  }
+
+                 if (detectClick(event, removeButton.x, removeButton.y, removeButton.radius) && lastSelectedButton > 0) {
+                     if (buttonList.isNotEmpty() && lastSelectedType == BUTTON) {
+                         buttonList.removeAt(lastSelectedButton - 1)
+                     }
+
+                     if (analogList.isNotEmpty() && lastSelectedType == ANALOG) {
+                         analogList.removeAt(lastSelectedButton - 1)
+                     }
+
+                     lastSelectedButton = 0
+
+                     invalidate()
+                 }
              }
          }
 
         return true
     }
 
-    class EditButton(
+    class CircleButton(
         var x: Float,
         var y: Float,
         var radius: Float,

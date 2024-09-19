@@ -2,6 +2,7 @@ package com.micewine.emu.fragments
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
@@ -10,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import androidx.fragment.app.DialogFragment
 import com.micewine.emu.R
+import com.micewine.emu.activities.VirtualControllerOverlayMapper.Companion.ACTION_INVALIDATE
 import com.micewine.emu.controller.XKeyCodes.getKeyNames
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.views.OverlayView.Companion.analogList
@@ -76,7 +78,11 @@ class EditVirtualButtonFragment : DialogFragment() {
                 analogList[lastSelectedButton - 1].rightKeyCodes = getXKeyScanCodes(analogRightKeySpinner.selectedItem.toString())
             }
 
-            dialog.dismiss()
+            context?.sendBroadcast(
+                Intent(ACTION_INVALIDATE)
+            )
+
+            dismiss()
         }
 
         return dialog

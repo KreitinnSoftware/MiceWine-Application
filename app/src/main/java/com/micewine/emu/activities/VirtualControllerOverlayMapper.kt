@@ -35,6 +35,8 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == ACTION_EDIT_VIRTUAL_BUTTON) {
                 EditVirtualButtonFragment().show(supportFragmentManager, "")
+            } else if (intent.action == ACTION_INVALIDATE) {
+                overlayView?.invalidate()
             }
         }
     }
@@ -103,7 +105,11 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
             true
         }
 
-        registerReceiver(receiver, object : IntentFilter(ACTION_EDIT_VIRTUAL_BUTTON) {})
+        registerReceiver(receiver, object : IntentFilter(ACTION_EDIT_VIRTUAL_BUTTON) {
+            init {
+                addAction(ACTION_INVALIDATE)
+            }
+        })
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -145,5 +151,6 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
 
     companion object {
         const val ACTION_EDIT_VIRTUAL_BUTTON = "com.micewine.emu.ACTION_EDIT_VIRTUAL_BUTTON"
+        const val ACTION_INVALIDATE = "com.micewine.emu.ACTION_INVALIDATE"
     }
 }
