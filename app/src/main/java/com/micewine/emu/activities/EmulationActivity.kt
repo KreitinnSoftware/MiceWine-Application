@@ -39,7 +39,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
-import com.micewine.emu.CmdEntryPoint
 import com.micewine.emu.CmdEntryPoint.Companion.ACTION_START
 import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
 import com.micewine.emu.ICmdEntryInterface
@@ -99,11 +98,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             } else if (intent.action == ACTION_PREFERENCES_CHANGED) {
                 Log.d("MainActivity", "preference: " + intent.getStringExtra("key"))
                 if ("additionalKbdVisible" != intent.getStringExtra("key")) onPreferencesChanged("")
-            } else if (intent.action == ACTION_BACK_MAIN) {
-                startActivityIfNeeded(
-                    Intent(this@EmulationActivity, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT }, 0
-                )
             } else if (intent.action == ACTION_STOP_ALL) {
                 finishAffinity()
             }
@@ -307,7 +301,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         registerReceiver(receiver, object : IntentFilter(ACTION_START) {
             init {
                 addAction(ACTION_PREFERENCES_CHANGED)
-                addAction(ACTION_BACK_MAIN)
                 addAction(ACTION_STOP_ALL)
             }
         })
@@ -493,7 +486,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
     companion object {
         private const val KEY_BACK = 158
-        const val ACTION_BACK_MAIN = "com.micewine.emu.ACTION_BACK_MAIN"
         var handler = Handler(Looper.getMainLooper())
 
         @JvmStatic

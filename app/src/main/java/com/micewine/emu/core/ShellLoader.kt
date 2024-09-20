@@ -135,6 +135,11 @@ object ShellLoader {
                     titleText = "VK_ERROR_DEVICE_LOST"
                     descriptionText = "Error on Vulkan Graphics Driver 'VK_ERROR_DEVICE_LOST'"
                     InfoDialogFragment().show(supportFragmentManager, "")
+                } else if (text.contains("X_CreateWindow")) {
+                    Log.v("X11 Driver", "BadWindow: X_CreateWindow")
+                    titleText = "X_CreateWindow"
+                    descriptionText = "Error on Creating X Window 'X_CreateWindow'"
+                    InfoDialogFragment().show(supportFragmentManager, "")
                 }
             }
         }

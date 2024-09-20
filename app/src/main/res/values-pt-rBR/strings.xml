@@ -100,4 +100,5 @@
     <string name="box64_avx_description">Ativa ou Desativa a Emulação de AVX ou AVX2 do Box64</string>
     <string name="box64_log_description">Nível de Logs do Box64</string>
     <string name="save">Salvar</string>
+    <string name="wine_is_closed">Os Processos do Wine Fecharam</string>
 </resources>

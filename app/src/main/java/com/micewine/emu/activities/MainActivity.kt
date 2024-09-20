@@ -26,7 +26,6 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
-import com.micewine.emu.activities.EmulationActivity.Companion.ACTION_BACK_MAIN
 import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_AVX_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_KEY
@@ -422,7 +421,13 @@ class MainActivity : AppCompatActivity() {
                 WineWrapper.wine("'$exePath'", winePrefix, "'${File(exePath).parent!!}'")
             }
 
-            sendBroadcast(Intent(ACTION_BACK_MAIN))
+            runCommand("pkill -9 wineserver")
+            runCommand("pkill -9 .exe")
+            runCommand("pkill -9 pulseaudio")
+
+            runOnUiThread {
+                Toast.makeText(this@MainActivity, getString(R.string.wine_is_closed), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -487,6 +492,7 @@ class MainActivity : AppCompatActivity() {
         @SuppressLint("SdCardPath")
         var appRootDir = File("/data/data/com.micewine.emu/files")
         var appBuiltinRootfs: Boolean = false
+        private var unixUsername = runCommandWithOutput("whoami").replace("\n", "")
         var customRootFSPath: String? = null
         var usrDir = File("$appRootDir/usr")
         var tmpDir = File("$usrDir/tmp")
@@ -544,12 +550,13 @@ class MainActivity : AppCompatActivity() {
                 val wineUtils = File("$appRootDir/wine-utils")
                 val startMenu = File("$driveC/ProgramData/Microsoft/Windows/Start Menu")
                 val userSharedFolder = File("/storage/emulated/0/MiceWine")
-                val localAppData = File("$driveC/users/\$(whoami)/AppData")
+                val localAppData = File("$driveC/users/$unixUsername/AppData")
                 val system32 = File("$driveC/windows/system32")
                 val syswow64 = File("$driveC/windows/syswow64")
 
                 WineWrapper.wine("wineboot -i", winePrefix)
 
+                localAppData.copyRecursively(File("$userSharedFolder/AppData"))
                 localAppData.deleteRecursively()
 
                 File("$userSharedFolder/AppData").mkdirs()
