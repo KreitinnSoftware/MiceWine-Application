@@ -20,6 +20,10 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_STRON
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_WAIT_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_LOG_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGILL_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGSEGV_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWBT_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWSEGV_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
 import com.micewine.emu.adapters.AdapterSettingsPreferences
@@ -66,6 +70,13 @@ class Box64SettingsFragment : Fragment() {
         addToAdapter(R.string.box64_dynarec_wait_title, R.string.box64_dynarec_wait_description, null, SWITCH, "true", BOX64_DYNAREC_WAIT_KEY)
         addToAdapter(R.string.box64_log_title, R.string.box64_log_description, arrayOf("0", "1"), SPINNER, "1", BOX64_LOG_KEY)
         addToAdapter(R.string.box64_avx_title, R.string.box64_avx_description, arrayOf("0", "1", "2"), SPINNER, "2", BOX64_AVX_KEY)
+
+        // Debugging Options
+
+        addToAdapter(R.string.box64_show_segv_title, R.string.box64_show_segv_description, null, SWITCH, "false", BOX64_SHOWSEGV_KEY)
+        addToAdapter(R.string.box64_no_sigsegv_title, R.string.box64_no_sigsegv_description, null, SWITCH, "false", BOX64_NOSIGSEGV_KEY)
+        addToAdapter(R.string.box64_show_bt_title, R.string.box64_show_bt_description, null, SWITCH, "false", BOX64_SHOWBT_KEY)
+        addToAdapter(R.string.box64_no_sigill_title, R.string.box64_no_sigill_description, null, SWITCH, "false", BOX64_NOSIGILL_KEY)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>?, type: Int, defaultValue: String, keyId: String) {

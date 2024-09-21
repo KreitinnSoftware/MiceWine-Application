@@ -15,6 +15,10 @@ import com.micewine.emu.activities.MainActivity.Companion.box64DynarecStrongmem
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecWait
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecX87double
 import com.micewine.emu.activities.MainActivity.Companion.box64LogLevel
+import com.micewine.emu.activities.MainActivity.Companion.box64NoSigSegv
+import com.micewine.emu.activities.MainActivity.Companion.box64NoSigill
+import com.micewine.emu.activities.MainActivity.Companion.box64ShowBt
+import com.micewine.emu.activities.MainActivity.Companion.box64ShowSegv
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedDXVKHud
 import com.micewine.emu.activities.MainActivity.Companion.selectedDriver
@@ -102,6 +106,10 @@ object EnvVars {
             putVar("BOX64_DYNAREC_ALIGNED_ATOMICS", box64DynarecAlignedAtomics)
             putVar("BOX64_DYNAREC_BLEEDING_EDGE", box64DynarecBleedingEdge)
             putVar("BOX64_DYNAREC_WAIT", box64DynarecWait)
+            putVar("BOX64_SHOWSEGV", box64ShowSegv)
+            putVar("BOX64_SHOWBT", box64ShowBt)
+            putVar("BOX64_NOSIGSEGV", box64NoSigSegv)
+            putVar("BOX64_NOSIGILL", box64NoSigill)
         }
 
         putVar("VKD3D_FEATURE_LEVEL", "12_0")

@@ -39,6 +39,10 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_STRON
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_WAIT_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_LOG_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGILL_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGSEGV_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWBT_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWSEGV_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
@@ -514,6 +518,10 @@ class MainActivity : AppCompatActivity() {
         var box64DynarecAlignedAtomics: String? = null
         var box64DynarecBleedingEdge: String? = null
         var box64DynarecWait: String? = null
+        var box64ShowSegv: String? = null
+        var box64ShowBt: String? = null
+        var box64NoSigSegv: String? = null
+        var box64NoSigill: String? = null
         var wineESync: String? = null
         var wineLogLevel: String? = null
         var selectedDriver: String? = null
@@ -607,6 +615,10 @@ class MainActivity : AppCompatActivity() {
             box64DynarecAlignedAtomics = booleanToString(preferences.getBoolean(BOX64_DYNAREC_ALIGNED_ATOMICS_KEY, false))
             box64DynarecBleedingEdge = booleanToString(preferences.getBoolean(BOX64_DYNAREC_BLEEDING_EDGE_KEY, true))
             box64DynarecWait = booleanToString(preferences.getBoolean(BOX64_DYNAREC_WAIT_KEY, true))
+            box64ShowSegv = booleanToString(preferences.getBoolean(BOX64_SHOWSEGV_KEY, true))
+            box64ShowBt = booleanToString(preferences.getBoolean(BOX64_SHOWBT_KEY, false))
+            box64NoSigSegv = booleanToString(preferences.getBoolean(BOX64_NOSIGSEGV_KEY, false))
+            box64NoSigill = booleanToString(preferences.getBoolean(BOX64_NOSIGILL_KEY, false))
             wineESync = booleanToString(preferences.getBoolean(WINE_ESYNC_KEY, false))
             wineLogLevel = preferences.getString(WINE_LOG_LEVEL_KEY, "default")
             selectedDriver = preferences.getString(SELECTED_DRIVER_KEY, "Turnip/Zink")
