@@ -76,12 +76,18 @@ class OverlayView @JvmOverloads constructor(
         super.onDraw(canvas)
 
         buttonList.forEach {
+            buttonPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
+            textPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
+
             canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
             paint.textSize = it.radius / 4
             canvas.drawText(it.keyName, it.x, it.y + 10, textPaint)
         }
 
         analogList.forEach {
+            paint.color = if (it.isPressed) Color.GRAY else Color.WHITE
+            buttonPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
+
             canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
             canvas.drawCircle(it.x + it.fingerX, it.y + it.fingerY, it.radius / 4 - 10, paint)
         }
@@ -93,35 +99,22 @@ class OverlayView @JvmOverloads constructor(
             MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_DOWN -> {
                 buttonList.forEach {
                     if (detectClick(event, it.x, it.y, it.radius)) {
+                        it.isPressed = true
                         handleButton(it, true)
                     }
                 }
 
                 analogList.forEach {
                     if (detectClick(event, it.x, it.y, it.radius)) {
-                        var posX = event.getX(event.actionIndex) - it.x
-                        var posY = event.getY(event.actionIndex) - it.y
-                        val maxVAxisPos = it.radius / 4
-
-                        if (posX > maxVAxisPos) {
-                            posX = maxVAxisPos
-                        } else if (posX < -maxVAxisPos) {
-                            posX = -maxVAxisPos
-                        }
-
-                        if (posY > maxVAxisPos) {
-                            posY = maxVAxisPos
-                        } else if (posY < -maxVAxisPos) {
-                            posY = -maxVAxisPos
-                        }
+                        val posX = (event.getX(event.actionIndex) - it.x).coerceIn(-it.radius / 4, it.radius / 4)
+                        val posY = (event.getY(event.actionIndex) - it.y).coerceIn(-it.radius / 4, it.radius / 4)
 
                         it.fingerX = posX
                         it.fingerY = posY
-
-                        val axisX = posX / maxVAxisPos
-                        val axisY = posY / maxVAxisPos
-
                         it.isPressed = true
+
+                        val axisX = posX / (it.radius / 4)
+                        val axisY = posY / (it.radius / 4)
 
                         virtualAxis(
                             axisX,
@@ -130,7 +123,7 @@ class OverlayView @JvmOverloads constructor(
                             it.downKeyCodes!!,
                             it.leftKeyCodes!!,
                             it.rightKeyCodes!!,
-                            0.30F
+                            it.deadZone
                         )
                     }
                 }
@@ -139,29 +132,23 @@ class OverlayView @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_MOVE -> {
+                buttonList.forEach {
+                    val clicked = detectClick(event, it.x, it.y, it.radius)
+
+                    it.isPressed = clicked
+                    handleButton(it, clicked)
+                }
+
                 analogList.forEach {
                     if (it.isPressed) {
-                        var posX = event.getX(event.actionIndex) - it.x
-                        var posY = event.getY(event.actionIndex) - it.y
-                        val maxVAxisPos = it.radius / 4
-
-                        if (posX > maxVAxisPos) {
-                            posX = maxVAxisPos
-                        } else if (posX < -maxVAxisPos) {
-                            posX = -maxVAxisPos
-                        }
-
-                        if (posY > maxVAxisPos) {
-                            posY = maxVAxisPos
-                        } else if (posY < -maxVAxisPos) {
-                            posY = -maxVAxisPos
-                        }
+                        val posX = (event.getX(event.actionIndex) - it.x).coerceIn(-it.radius / 4, it.radius / 4)
+                        val posY = (event.getY(event.actionIndex) - it.y).coerceIn(-it.radius / 4, it.radius / 4)
 
                         it.fingerX = posX
                         it.fingerY = posY
 
-                        val axisX = posX / maxVAxisPos
-                        val axisY = posY / maxVAxisPos
+                        val axisX = posX / (it.radius / 4)
+                        val axisY = posY / (it.radius / 4)
 
                         virtualAxis(
                             axisX,
@@ -170,12 +157,8 @@ class OverlayView @JvmOverloads constructor(
                             it.downKeyCodes!!,
                             it.leftKeyCodes!!,
                             it.rightKeyCodes!!,
-                            0.30F
+                            it.deadZone
                         )
-                    } else {
-                        if (detectClick(event, it.x, it.y, it.radius)) {
-                            it.isPressed = true
-                        }
                     }
                 }
 
@@ -184,9 +167,7 @@ class OverlayView @JvmOverloads constructor(
 
             MotionEvent.ACTION_POINTER_UP -> {
                 buttonList.forEach {
-                    if ((event.getX(event.actionIndex) >= it.x - it.radius / 2 && event.getX(event.actionIndex) <= (it.x + (it.radius / 2))) &&
-                        (event.getY(event.actionIndex) >= it.y - it.radius / 2 && event.getY(event.actionIndex) <= (it.y + (it.radius / 2)))
-                    ) {
+                    if (detectClick(event, it.x, it.y, it.radius)) {
                         handleButton(it, false)
                     }
                 }
@@ -223,7 +204,6 @@ class OverlayView @JvmOverloads constructor(
                 analogList.forEach {
                     it.fingerX = 0F
                     it.fingerY = 0F
-
                     it.isPressed = false
 
                     virtualAxis(
@@ -233,7 +213,7 @@ class OverlayView @JvmOverloads constructor(
                         it.downKeyCodes!!,
                         it.leftKeyCodes!!,
                         it.rightKeyCodes!!,
-                        0.30F
+                        it.deadZone
                     )
                 }
 
@@ -271,6 +251,8 @@ class OverlayView @JvmOverloads constructor(
     }
 
     private fun handleButton(button: VirtualButton, pressed: Boolean) {
+        button.isPressed = pressed
+
         lorieView.sendKeyEvent(button.keyCodes!![0], button.keyCodes!![1], pressed)
     }
 
@@ -280,7 +262,8 @@ class OverlayView @JvmOverloads constructor(
         var y: Float,
         var radius: Float,
         var keyName: String,
-        var keyCodes: List<Int>?
+        var keyCodes: List<Int>?,
+        var isPressed: Boolean
     )
 
     class VirtualAnalog(
@@ -298,7 +281,8 @@ class OverlayView @JvmOverloads constructor(
         var leftKeyCodes: List<Int>?,
         var rightKeyName: String,
         var rightKeyCodes: List<Int>?,
-        var isPressed: Boolean
+        var isPressed: Boolean,
+        var deadZone: Float
     )
 
     companion object {

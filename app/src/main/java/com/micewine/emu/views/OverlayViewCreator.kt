@@ -105,13 +105,8 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
         super.onDraw(canvas)
 
         buttonList.forEach {
-            if (lastSelectedButton == it.id && lastSelectedType == BUTTON) {
-                buttonPaint.color = Color.GRAY
-                textPaint.color = Color.GRAY
-            } else {
-                buttonPaint.color = Color.WHITE
-                textPaint.color = Color.GRAY
-            }
+            buttonPaint.color = if (lastSelectedButton == it.id && lastSelectedType == BUTTON) Color.GRAY else Color.WHITE
+            textPaint.color = buttonPaint.color
 
             canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
 
@@ -121,16 +116,13 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
         }
 
         analogList.forEach {
-            if (lastSelectedButton == it.id && lastSelectedType == ANALOG) {
-                buttonPaint.color = Color.GRAY
-                whitePaint.color = Color.GRAY
-            } else {
-                buttonPaint.color = Color.WHITE
-                whitePaint.color = Color.WHITE
-            }
+            buttonPaint.color = if (lastSelectedButton == it.id && lastSelectedType == ANALOG) Color.GRAY else Color.WHITE
+            whitePaint.color = buttonPaint.color
 
-            canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
-            canvas.drawCircle(it.x, it.y, it.radius / 4 - 10, whitePaint)
+            canvas.apply {
+                drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
+                drawCircle(it.x, it.y, it.radius / 4 - 10, whitePaint)
+            }
         }
 
         if (lastSelectedButton > 0) {
@@ -140,11 +132,12 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
             removeButton.x = editButton.x - removeButton.radius
             removeButton.y = 20F + removeButton.radius / 2
 
-            canvas.drawCircle(editButton.x, editButton.y, editButton.radius / 2, paint)
-            canvas.drawCircle(removeButton.x, removeButton.y, removeButton.radius / 2, paint)
-
-            canvas.drawBitmap(editIcon, editButton.x - editButton.radius / 4, editButton.y - editButton.radius / 4, whitePaint)
-            canvas.drawBitmap(removeIcon, removeButton.x - removeButton.radius / 4, removeButton.y - removeButton.radius / 4, whitePaint)
+            canvas.apply {
+                drawCircle(editButton.x, editButton.y, editButton.radius / 2, paint)
+                drawCircle(removeButton.x, removeButton.y, removeButton.radius / 2, paint)
+                drawBitmap(editIcon, editButton.x - editButton.radius / 4, editButton.y - editButton.radius / 4, whitePaint)
+                drawBitmap(removeIcon, removeButton.x - removeButton.radius / 4, removeButton.y - removeButton.radius / 4, whitePaint)
+            }
         }
     }
 

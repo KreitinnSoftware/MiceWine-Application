@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 import com.micewine.emu.R
+import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.databinding.ActivityVirtualControllerMapperBinding
 import com.micewine.emu.fragments.EditVirtualButtonFragment
 import com.micewine.emu.views.OverlayView
@@ -64,7 +65,8 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
                             overlayView?.height!! / 2F,
                             180F,
                             "Null",
-                            null
+                            null,
+                            false
                         )
                     )
 
@@ -81,14 +83,15 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
                             0F,
                             275F,
                             "Null",
-                            null,
+                            getXKeyScanCodes(""),
                             "Null",
-                            null,
+                            getXKeyScanCodes(""),
                             "Null",
-                            null,
+                            getXKeyScanCodes(""),
                             "Null",
-                            null,
-                            false
+                            getXKeyScanCodes(""),
+                            false,
+                            0.45F
                         )
                     )
 
