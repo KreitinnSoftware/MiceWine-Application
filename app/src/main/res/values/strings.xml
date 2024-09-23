@@ -115,12 +115,13 @@
     <string name="box64_log_description">Box64 Log Level</string>
     <string name="save">Save</string>
     <string name="wine_is_closed">The Wine Processes is Closed</string>
-    <string name="box64_show_segv_title">BOX64_SHOWSEGV</string>
+    <string name="box64_show_segv_title" translatable="false">BOX64_SHOWSEGV</string>
     <string name="box64_show_segv_description">Show Segfault signal even if a signal handler is present</string>
-    <string name="box64_show_bt_title">BOX64_SHOWBT</string>
+    <string name="box64_show_bt_title" translatable="false">BOX64_SHOWBT</string>
     <string name="box64_show_bt_description">Show some Backtrace (Native and Emulated) when a signal (SEGV, ILL or BUS) is caught</string>
-    <string name="box64_no_sigsegv_title">BOX64_NOSIGSEGV</string>
-    <string name="box64_no_sigill_title">BOX64_NOSIGILL</string>
+    <string name="box64_no_sigsegv_title" translatable="false">BOX64_NOSIGSEGV</string>
+    <string name="box64_no_sigill_title" translatable="false">BOX64_NOSIGILL</string>
     <string name="box64_no_sigsegv_description">Disable handling of SigSEGV. (Very useful for debugging.)</string>
     <string name="box64_no_sigill_description">Disable handling of SigILL (to ease debugging mainly).</string>
+    <string name="button_size">Button Size</string>
 </resources>

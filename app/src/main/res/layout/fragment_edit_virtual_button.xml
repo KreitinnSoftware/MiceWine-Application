@@ -6,13 +6,36 @@
     android:theme="@style/Theme.MiceWine"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/keyName"
-        android:textSize="16sp"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:importantForAutofill="no">
-    </TextView>
+        android:padding="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:text="@string/button_size"
+            android:textSize="16sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:importantForAutofill="no">
+        </TextView>
+
+        <TextView
+            android:id="@+id/radiusSeekbarValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:padding="8dp">
+        </TextView>
+
+        <SeekBar
+            android:id="@+id/radiusSeekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp">
+        </SeekBar>
+
+    </LinearLayout>
 
     <Spinner
         android:id="@+id/buttonSpinner"

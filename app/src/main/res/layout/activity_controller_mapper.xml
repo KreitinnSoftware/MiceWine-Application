@@ -52,8 +52,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
@@ -62,8 +61,7 @@
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:text="@string/deadZoneTitle"
-                android:padding="14dp"
-                >
+                android:padding="14dp">
             </TextView>
 
             <TextView
@@ -74,15 +72,13 @@
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:text=""
-                android:padding="14dp"
-                >
+                android:padding="14dp">
             </TextView>
 
             <SeekBar
                 android:id="@+id/deadZoneSeekBar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                >
+                android:layout_height="wrap_content">
             </SeekBar>
 
         </LinearLayout>
@@ -91,8 +87,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
@@ -101,8 +96,7 @@
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:text="@string/mouseSensibilityTitle"
-                android:padding="14dp"
-                >
+                android:padding="14dp">
             </TextView>
 
             <TextView
@@ -113,15 +107,13 @@
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:text=""
-                android:padding="14dp"
-                >
+                android:padding="14dp">
             </TextView>
 
             <SeekBar
                 android:id="@+id/mouseSensibilitySeekBar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                >
+                android:layout_height="wrap_content">
             </SeekBar>
 
         </LinearLayout>
@@ -136,8 +128,7 @@
         android:textStyle="bold"
         android:text="@string/selectedControllerPreset"
         android:textAlignment="center"
-        android:padding="14dp"
-        >
+        android:padding="14dp">
     </TextView>
 
     <LinearLayout

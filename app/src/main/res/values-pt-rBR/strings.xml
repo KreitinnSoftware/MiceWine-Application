@@ -105,4 +105,5 @@
     <string name="box64_show_bt_description">Exibir Backtrace (Emulado) quando um sinal (SEGV, ILL ou BUS) for capturado.</string>
     <string name="box64_no_sigsegv_description">Desabilitar o tratamento de SigSEGV. (Muito útil para depuração).</string>
     <string name="box64_no_sigill_description">Desabilitar o tratamento de SigILL (principalmente para facilitar a depuração).</string>
+    <string name="button_size">Tamanho do Botão</string>
 </resources>

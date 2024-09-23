@@ -20,6 +20,7 @@ import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAn
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogRightKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogUpKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonKeyName
+import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonRadius
 import com.micewine.emu.views.OverlayView.Companion.analogList
 import com.micewine.emu.views.OverlayView.Companion.buttonList
 import com.micewine.emu.views.OverlayView.Companion.detectClick
@@ -232,6 +233,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                  if (detectClick(event, editButton.x, editButton.y, editButton.radius) && lastSelectedButton > 0) {
                      if (buttonList.isNotEmpty() && lastSelectedType == BUTTON) {
                          selectedButtonKeyName = buttonList[lastSelectedButton - 1].keyName
+                         selectedButtonRadius = buttonList[lastSelectedButton - 1].radius.toInt()
                      }
 
                      if (analogList.isNotEmpty() && lastSelectedType == ANALOG) {
@@ -239,6 +241,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                          selectedAnalogDownKeyName = analogList[lastSelectedButton - 1].downKeyName
                          selectedAnalogLeftKeyName = analogList[lastSelectedButton - 1].leftKeyName
                          selectedAnalogRightKeyName = analogList[lastSelectedButton - 1].rightKeyName
+                         selectedButtonRadius = analogList[lastSelectedButton - 1].radius.toInt()
                      }
 
                      context.sendBroadcast(

@@ -272,7 +272,7 @@ class OverlayView @JvmOverloads constructor(
         var y: Float,
         var fingerX: Float,
         var fingerY: Float,
-        val radius: Float,
+        var radius: Float,
         var upKeyName: String,
         var upKeyCodes: List<Int>?,
         var downKeyName: String,
