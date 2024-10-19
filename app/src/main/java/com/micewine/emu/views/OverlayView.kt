@@ -98,20 +98,24 @@ class OverlayView @JvmOverloads constructor(
         when (event.actionMasked) {
             MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_DOWN -> {
                 buttonList.forEach {
-                    if (detectClick(event, it.x, it.y, it.radius)) {
+                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
                         it.isPressed = true
+                        it.fingerId = event.actionIndex
                         handleButton(it, true)
+
+                        return@forEach
                     }
                 }
 
                 analogList.forEach {
-                    if (detectClick(event, it.x, it.y, it.radius)) {
+                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
                         val posX = (event.getX(event.actionIndex) - it.x).coerceIn(-it.radius / 4, it.radius / 4)
                         val posY = (event.getY(event.actionIndex) - it.y).coerceIn(-it.radius / 4, it.radius / 4)
 
                         it.fingerX = posX
                         it.fingerY = posY
                         it.isPressed = true
+                        it.fingerId = event.actionIndex
 
                         val axisX = posX / (it.radius / 4)
                         val axisY = posY / (it.radius / 4)
@@ -125,6 +129,8 @@ class OverlayView @JvmOverloads constructor(
                             it.rightKeyCodes!!,
                             it.deadZone
                         )
+
+                        return@forEach
                     }
                 }
 
@@ -132,33 +138,37 @@ class OverlayView @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_MOVE -> {
-                buttonList.forEach {
-                    val clicked = detectClick(event, it.x, it.y, it.radius)
+                for (i in 0 until event.pointerCount) {
+                    buttonList.forEach {
+                        if (it.fingerId == i) {
+                            val clicked = detectClick(event, i, it.x, it.y, it.radius)
 
-                    it.isPressed = clicked
-                    handleButton(it, clicked)
-                }
+                            it.isPressed = clicked
+                            handleButton(it, clicked)
+                        }
+                    }
 
-                analogList.forEach {
-                    if (it.isPressed) {
-                        val posX = (event.getX(event.actionIndex) - it.x).coerceIn(-it.radius / 4, it.radius / 4)
-                        val posY = (event.getY(event.actionIndex) - it.y).coerceIn(-it.radius / 4, it.radius / 4)
+                    analogList.forEach {
+                        if (it.isPressed && it.fingerId == i) {
+                            val posX = (event.getX(i) - it.x).coerceIn(-it.radius / 4, it.radius / 4)
+                            val posY = (event.getY(i) - it.y).coerceIn(-it.radius / 4, it.radius / 4)
 
-                        it.fingerX = posX
-                        it.fingerY = posY
+                            it.fingerX = posX
+                            it.fingerY = posY
 
-                        val axisX = posX / (it.radius / 4)
-                        val axisY = posY / (it.radius / 4)
+                            val axisX = posX / (it.radius / 4)
+                            val axisY = posY / (it.radius / 4)
 
-                        virtualAxis(
-                            axisX,
-                            axisY,
-                            it.upKeyCodes!!,
-                            it.downKeyCodes!!,
-                            it.leftKeyCodes!!,
-                            it.rightKeyCodes!!,
-                            it.deadZone
-                        )
+                            virtualAxis(
+                                axisX,
+                                axisY,
+                                it.upKeyCodes!!,
+                                it.downKeyCodes!!,
+                                it.leftKeyCodes!!,
+                                it.rightKeyCodes!!,
+                                it.deadZone
+                            )
+                        }
                     }
                 }
 
@@ -167,7 +177,7 @@ class OverlayView @JvmOverloads constructor(
 
             MotionEvent.ACTION_POINTER_UP -> {
                 buttonList.forEach {
-                    if (detectClick(event, it.x, it.y, it.radius)) {
+                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
                         handleButton(it, false)
                     }
                 }
@@ -180,6 +190,7 @@ class OverlayView @JvmOverloads constructor(
                         it.fingerY = 0F
 
                         it.isPressed = false
+                        it.fingerId = -1
 
                         virtualAxis(
                             0F,
@@ -263,6 +274,7 @@ class OverlayView @JvmOverloads constructor(
         var radius: Float,
         var keyName: String,
         var keyCodes: List<Int>?,
+        var fingerId: Int,
         var isPressed: Boolean
     )
 
@@ -282,6 +294,7 @@ class OverlayView @JvmOverloads constructor(
         var rightKeyName: String,
         var rightKeyCodes: List<Int>?,
         var isPressed: Boolean,
+        var fingerId: Int,
         var deadZone: Float
     )
 
@@ -289,9 +302,9 @@ class OverlayView @JvmOverloads constructor(
         val buttonList = mutableListOf<VirtualButton>()
         val analogList = mutableListOf<VirtualAnalog>()
 
-        fun detectClick(event: MotionEvent, x: Float, y: Float, radius: Float): Boolean {
-            return (event.getX(event.actionIndex) >= x - radius / 2 && event.getX(event.actionIndex) <= (x + (radius / 2))) &&
-                    (event.getY(event.actionIndex) >= y - radius / 2 && event.getY(event.actionIndex) <= (y + (radius / 2)))
+        fun detectClick(event: MotionEvent, index: Int, x: Float, y: Float, radius: Float): Boolean {
+            return (event.getX(index) >= x - radius / 2 && event.getX(index) <= (x + (radius / 2))) &&
+                    (event.getY(index) >= y - radius / 2 && event.getY(index) <= (y + (radius / 2)))
         }
     }
 }

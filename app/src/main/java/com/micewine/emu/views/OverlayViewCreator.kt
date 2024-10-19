@@ -156,12 +156,12 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     override fun onTouchEvent(event: MotionEvent): Boolean {
          when (event.actionMasked) {
              MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
-                 if (!detectClick(event, editButton.x, editButton.y, editButton.radius) && !detectClick(event, removeButton.x, removeButton.y, removeButton.radius)) {
+                 if (!detectClick(event, event.actionIndex, editButton.x, editButton.y, editButton.radius) && !detectClick(event, event.actionIndex, removeButton.x, removeButton.y, removeButton.radius)) {
                      lastSelectedButton = 0
                  }
 
                  buttonList.forEach {
-                     if (detectClick(event, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
                          if (selectedButton == 0) {
                              selectedButton = it.id
                              lastSelectedType = BUTTON
@@ -171,7 +171,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                  }
 
                  analogList.forEach {
-                     if (detectClick(event, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
                          if (selectedVAxis == 0) {
                              selectedVAxis = it.id
                              lastSelectedType = ANALOG
@@ -185,7 +185,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
              MotionEvent.ACTION_MOVE -> {
                  buttonList.forEach {
-                     if (detectClick(event, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
                          if (selectedButton > 0) {
                              buttonList[buttonList.indexOfFirst { i ->
                                  i.id == selectedButton
@@ -198,7 +198,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                  }
 
                  analogList.forEach {
-                     if (detectClick(event, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
                          if (selectedVAxis > 0) {
                              analogList[analogList.indexOfFirst { i ->
                                  i.id == selectedVAxis
@@ -215,7 +215,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
              MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_UP -> {
                  buttonList.forEach {
-                     if (detectClick(event, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
                          if (selectedButton == it.id) {
                              selectedButton = 0
                          }
@@ -223,14 +223,14 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                  }
 
                  analogList.forEach {
-                     if (detectClick(event, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
                          if (selectedVAxis == it.id) {
                              selectedVAxis = 0
                          }
                      }
                  }
 
-                 if (detectClick(event, editButton.x, editButton.y, editButton.radius) && lastSelectedButton > 0) {
+                 if (detectClick(event, event.actionIndex, editButton.x, editButton.y, editButton.radius) && lastSelectedButton > 0) {
                      if (buttonList.isNotEmpty() && lastSelectedType == BUTTON) {
                          selectedButtonKeyName = buttonList[lastSelectedButton - 1].keyName
                          selectedButtonRadius = buttonList[lastSelectedButton - 1].radius.toInt()
@@ -249,7 +249,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                      )
                  }
 
-                 if (detectClick(event, removeButton.x, removeButton.y, removeButton.radius) && lastSelectedButton > 0) {
+                 if (detectClick(event, event.actionIndex, removeButton.x, removeButton.y, removeButton.radius) && lastSelectedButton > 0) {
                      if (buttonList.isNotEmpty() && lastSelectedType == BUTTON) {
                          buttonList.removeAt(lastSelectedButton - 1)
                      }

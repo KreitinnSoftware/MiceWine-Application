@@ -66,6 +66,7 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
                             180F,
                             "Null",
                             null,
+                            -1,
                             false
                         )
                     )
@@ -91,6 +92,7 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
                             "Null",
                             getXKeyScanCodes(""),
                             false,
+                            -1,
                             0.45F
                         )
                     )

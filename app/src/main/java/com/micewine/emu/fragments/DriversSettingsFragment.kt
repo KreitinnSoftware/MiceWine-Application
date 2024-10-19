@@ -1,5 +1,6 @@
 package com.micewine.emu.fragments
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -72,9 +73,15 @@ class DriversSettingsFragment : Fragment() {
             wined3dVersions.add(it.name)
         }
 
-        addToAdapter(R.string.select_driver_title, R.string.null_description, arrayOf(
-            "Turnip/Zink", "Android/Zink"),
-            SPINNER, "Turnip/Zink", SELECTED_DRIVER_KEY)
+        if (Build.SUPPORTED_ABIS[0] == "x86_64") {
+            addToAdapter(R.string.select_driver_title, R.string.null_description, arrayOf(
+                "AMD/Zink", "Android/Zink"),
+                SPINNER, "AMD/Zink", SELECTED_DRIVER_KEY)
+        } else {
+            addToAdapter(R.string.select_driver_title, R.string.null_description, arrayOf(
+                "Turnip/Zink", "Android/Zink"),
+                SPINNER, "Turnip/Zink", SELECTED_DRIVER_KEY)
+        }
         addToAdapter(R.string.select_d3dx_title, R.string.null_description, arrayOf(
             "DXVK", "WineD3D"),
             SPINNER, "DXVK", SELECTED_D3DX_RENDERER_KEY)

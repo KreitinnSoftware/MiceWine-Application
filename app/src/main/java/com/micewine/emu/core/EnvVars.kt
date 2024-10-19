@@ -75,6 +75,13 @@ object EnvVars {
                 putVar("VK_ICD_FILENAMES", "$usrDir/share/vulkan/icd.d/freedreno_icd.aarch64.json")
                 putVar("ZINK_DEBUG", "compact")
             }
+            "AMD/Zink" -> {
+                putVar("GALLIUM_DRIVER", "zink")
+                putVar("MESA_LOADER_DRIVER_OVERRIDE", "zink")
+                putVar("TU_DEBUG", "$selectedTuDebugPreset")
+                putVar("VK_ICD_FILENAMES", "$usrDir/share/vulkan/icd.d/radeon_icd.x86_64.json")
+                putVar("ZINK_DEBUG", "compact")
+            }
             "Android/Zink" -> {
                 putVar("GALLIUM_DRIVER", "zink")
                 putVar("MESA_LOADER_DRIVER_OVERRIDE", "zink")
