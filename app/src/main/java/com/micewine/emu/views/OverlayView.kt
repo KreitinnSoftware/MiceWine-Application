@@ -14,6 +14,7 @@ import com.google.gson.reflect.TypeToken
 import com.micewine.emu.LorieView
 import com.micewine.emu.controller.ControllerUtils.handleAxis
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
+import com.micewine.emu.input.InputStub.BUTTON_UNDEFINED
 
 class OverlayView @JvmOverloads constructor(
     context: Context,
@@ -115,7 +116,7 @@ class OverlayView @JvmOverloads constructor(
                         it.fingerX = posX
                         it.fingerY = posY
                         it.isPressed = true
-                        it.fingerId = event.actionIndex
+                        it.fingerId = event.getPointerId(event.actionIndex)
 
                         val axisX = posX / (it.radius / 4)
                         val axisY = posY / (it.radius / 4)
@@ -139,12 +140,17 @@ class OverlayView @JvmOverloads constructor(
 
             MotionEvent.ACTION_MOVE -> {
                 for (i in 0 until event.pointerCount) {
+                    var isFingerPressingButton = false
+
                     buttonList.forEach {
                         if (it.fingerId == i) {
                             val clicked = detectClick(event, i, it.x, it.y, it.radius)
-
                             it.isPressed = clicked
                             handleButton(it, clicked)
+
+                            if (clicked) {
+                                isFingerPressingButton = true
+                            }
                         }
                     }
 
@@ -167,6 +173,23 @@ class OverlayView @JvmOverloads constructor(
                                 it.leftKeyCodes!!,
                                 it.rightKeyCodes!!,
                                 it.deadZone
+                            )
+
+                            isFingerPressingButton = true
+                        }
+                    }
+
+                    if (!isFingerPressingButton) {
+                        if (event.historySize > 0) {
+                            val deltaX = event.getX(i) - event.getHistoricalX(i, 0)
+                            val deltaY = event.getY(i) - event.getHistoricalY(i, 0)
+
+                            lorieView.sendMouseEvent(
+                                deltaX,
+                                deltaY,
+                                BUTTON_UNDEFINED,
+                                false,
+                                relative = true
                             )
                         }
                     }
