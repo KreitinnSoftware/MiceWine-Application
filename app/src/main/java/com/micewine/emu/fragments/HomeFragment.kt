@@ -3,6 +3,7 @@ package com.micewine.emu.fragments
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -19,10 +21,12 @@ import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterGame
 import com.micewine.emu.databinding.FragmentHomeBinding
 import java.io.File
+import kotlin.math.max
 
 class HomeFragment : Fragment() {
     private var binding: FragmentHomeBinding? = null
     private var rootView: View? = null
+    private var layoutManager: GridLayoutManager? = null
     private var preferences: SharedPreferences? = null
 
     override fun onCreateView(
@@ -32,14 +36,45 @@ class HomeFragment : Fragment() {
         rootView = binding!!.root
 
         recyclerView = rootView?.findViewById(R.id.recyclerViewGame)
-
         preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())!!
+
+        layoutManager = recyclerView?.layoutManager as GridLayoutManager?
+
+        val spanCount = max(1F,requireActivity().resources.displayMetrics.widthPixels / dpToPx(150, requireContext())).toInt()
+
+        recyclerView?.layoutManager = GridLayoutManager(requireContext(), spanCount)
+        recyclerView?.addItemDecoration(GridSpacingItemDecoration(spanCount, 20))
 
         setAdapter(requireActivity(), preferences!!)
 
         registerForContextMenu(recyclerView!!)
 
         return rootView
+    }
+
+    private fun dpToPx(dp: Int, context: Context): Float {
+        val density = context.resources.displayMetrics.density
+        return dp * density
+    }
+
+    class GridSpacingItemDecoration(
+        private val spanCount: Int,
+        private val spacing: Int,
+    ) : RecyclerView.ItemDecoration() {
+        override fun getItemOffsets(
+            outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State
+        ) {
+            val position = parent.getChildAdapterPosition(view)
+            val column = position % spanCount
+
+            outRect.left = spacing - column * spacing / spanCount
+            outRect.right = (column + 1) * spacing / spanCount
+
+            if (position < spanCount) {
+                outRect.top = spacing
+            }
+            outRect.bottom = spacing
+        }
     }
 
     companion object {
@@ -78,13 +113,9 @@ class HomeFragment : Fragment() {
 
         fun saveToGameList(preferences: SharedPreferences, path: String, prettyName: String, icon: String) {
             val editor = preferences.edit()
-
             val currentList = loadGameList(preferences)
-
             val game = arrayOf(prettyName, path, icon)
-
             val gameExists = currentList.any { it[0] == game[0] }
-
             val index = currentList.count()
 
             if (gameExists) {
@@ -103,9 +134,7 @@ class HomeFragment : Fragment() {
 
         fun removeGameFromList(preferences: SharedPreferences, array: Array<String>) {
             val editor = preferences.edit()
-
             val currentList = loadGameList(preferences)
-
             val index = currentList.indexOfFirst { it[0] == array[0] && it[1] == array[1] }
 
             currentList.removeAt(index)
@@ -120,9 +149,7 @@ class HomeFragment : Fragment() {
 
         fun renameGameFromList(preferences: SharedPreferences, gameArray: Array<String>, newName: String) {
             val editor = preferences.edit()
-
             val currentList = loadGameList(preferences)
-
             val index = currentList.indexOfFirst { it[0] == gameArray[0] && it[1] == gameArray[1] }
 
             currentList[index][0] = newName
@@ -137,9 +164,7 @@ class HomeFragment : Fragment() {
 
         fun setIconToGame(context: Context, preferences: SharedPreferences, uri: Uri, gameArray: Array<String>) {
             val editor = preferences.edit()
-
             val currentList = loadGameList(preferences)
-
             val index = currentList.indexOfFirst { it[0] == gameArray[0] && it[1] == gameArray[1] }
 
             createIconCache(context, uri, gameArray[0])

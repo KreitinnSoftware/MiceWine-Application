@@ -2,6 +2,7 @@ package com.micewine.emu.adapters
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
@@ -15,11 +16,9 @@ import com.micewine.emu.activities.MainActivity.Companion.ACTION_RUN_WINE
 import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
 import java.io.File
 
-class AdapterGame(private val gameList: List<GameList>, private val activity: Activity) :
-    RecyclerView.Adapter<AdapterGame.ViewHolder>() {
+class AdapterGame(private val gameList: List<GameList>, private val activity: Activity) : RecyclerView.Adapter<AdapterGame.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView =
-            LayoutInflater.from(parent.context).inflate(R.layout.adapter_game_item, parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_game_item, parent, false)
         return ViewHolder(itemView)
     }
 
@@ -28,14 +27,22 @@ class AdapterGame(private val gameList: List<GameList>, private val activity: Ac
         holder.titleGame.text = sList.name
 
         if (sList.imageGame == "" || !File(sList.imageGame).exists()) {
-            holder.gameImage.setImageResource(R.drawable.default_icon)
+            holder.gameImage.setImageBitmap(resizeBitmap(
+                BitmapFactory.decodeResource(activity.resources, R.drawable.default_icon), holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height)
+            )
         } else {
-            holder.gameImage.setImageBitmap(BitmapFactory.decodeFile(sList.imageGame))
+            holder.gameImage.setImageBitmap(resizeBitmap(
+                BitmapFactory.decodeFile(sList.imageGame), holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height)
+            )
         }
     }
 
     override fun getItemCount(): Int {
         return gameList.size
+    }
+
+    private fun resizeBitmap(originalBitmap: Bitmap, width: Int, height: Int): Bitmap {
+        return Bitmap.createScaledBitmap(originalBitmap, width, height, false)
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
@@ -63,7 +70,6 @@ class AdapterGame(private val gameList: List<GameList>, private val activity: Ac
             }
 
             activity.sendBroadcast(runWineIntent)
-
             activity.startActivityIfNeeded(intent, 0)
         }
 
