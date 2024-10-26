@@ -3,8 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    style="@style/CustomAlertDialog"
-    android:padding="16dp">
+    android:keepScreenOn="true"
+    android:padding="16dp"
+    style="@style/CustomAlertDialog">
 
     <TextView
         android:id="@+id/titleText"
@@ -12,8 +13,7 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textSize="16sp"
-        android:textAlignment="center"
-        >
+        android:textAlignment="center">
     </TextView>
 
     <TextView
@@ -21,7 +21,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:textAlignment="center" />
+        android:textAlignment="center">
+    </TextView>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -29,6 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="8dp"
         android:layout_margin="0dp"
-        android:theme="@style/Theme.MiceWine" />
+        android:theme="@style/Theme.MiceWine">
+    </ProgressBar>
 
 </LinearLayout>

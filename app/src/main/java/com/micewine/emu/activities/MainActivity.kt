@@ -55,7 +55,8 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VKD3D_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.WINE_ESYNC_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.WINE_LOG_LEVEL_KEY
-import com.micewine.emu.core.ObbExtractor.extractZip
+import com.micewine.emu.core.RatPackageManager
+import com.micewine.emu.core.RatPackageManager.installRat
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
@@ -70,6 +71,7 @@ import com.micewine.emu.fragments.HomeFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.RenameGameItemFragment
 import com.micewine.emu.fragments.SettingsFragment
 import com.micewine.emu.fragments.SetupFragment
+import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
 import kotlinx.coroutines.Dispatchers
@@ -452,34 +454,58 @@ class MainActivity : AppCompatActivity() {
     private suspend fun setupMiceWine(rootfs: String) {
         withContext(Dispatchers.IO) {
             appRootDir.mkdirs()
+            ratPackagesInfoDir.mkdirs()
 
             progressBarIsIndeterminate = true
+
+            val ratFile: RatPackageManager.RatPackage
+
+            if (appBuiltinRootfs && rootfs == "") {
+                dialogTitleText = getString(R.string.extracting_from_assets)
+
+                copyAssets(this@MainActivity, "rootfs.rat", "$appRootDir")
+
+                dialogTitleText = getString(R.string.checking_rat_type)
+
+                ratFile = RatPackageManager.RatPackage("$appRootDir/rootfs.rat")
+            } else {
+                dialogTitleText = getString(R.string.checking_rat_type)
+
+                ratFile = RatPackageManager.RatPackage("$customRootFSPath")
+            }
+
+            if (ratFile.category != "rootfs") {
+                abortSetup = true
+
+                runOnUiThread {
+                    Toast.makeText(this@MainActivity, getString(R.string.invalid_rootfs_rat_file), Toast.LENGTH_SHORT).show()
+                }
+
+                FloatingFileManagerFragment().show(supportFragmentManager, "")
+
+                return@withContext
+            }
 
             dialogTitleText = getString(R.string.extracting_resources_text)
 
             if (appBuiltinRootfs && rootfs == "") {
-                copyAssets(this@MainActivity, "rootfs.zip", appRootDir.toString())
-
-                extractZip("$appRootDir/rootfs.zip", "$appRootDir")
-
-                File("$appRootDir/rootfs.zip").delete()
+                installRat(ratFile).also {
+                    File("$appRootDir/rootfs.rat").delete()
+                }
             } else {
-                extractZip(rootfs, "$appRootDir")
+                installRat(ratFile)
             }
+
+            tmpDir.mkdirs()
+            homeDir.mkdirs()
 
             File("$appRootDir/wine-utils/CoreFonts").copyRecursively(File("$appRootDir/wine/share/wine/fonts"), true)
 
             runCommand("chmod 700 -R $appRootDir")
-            runCommand("$usrDir/generateSymlinks.sh")
 
             File("$usrDir/icons").mkdirs()
 
-            tmpDir.mkdirs()
-
-            homeDir.mkdirs()
-
             dialogTitleText = getString(R.string.creatingWinePrefix)
-
             progressBarIsIndeterminate = true
 
             lifecycleScope.launch { runXServer(":0") }
@@ -487,14 +513,14 @@ class MainActivity : AppCompatActivity() {
             setupWinePrefix(File("$homeDir/.wine"))
 
             fileManagerCwd = fileManagerDefaultDir
-
             setupDone = true
         }
     }
 
     companion object {
         @SuppressLint("SdCardPath")
-        var appRootDir = File("/data/data/com.micewine.emu/files")
+        val appRootDir = File("/data/data/com.micewine.emu/files")
+        var ratPackagesInfoDir = File("$appRootDir/packages")
         var appBuiltinRootfs: Boolean = false
         private var unixUsername = runCommandWithOutput("whoami").replace("\n", "")
         var customRootFSPath: String? = null

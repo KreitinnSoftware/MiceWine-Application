@@ -3,7 +3,6 @@ package com.micewine.emu.adapters
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,6 +48,8 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                 } else {
                     holder.icon.setImageResource(R.drawable.ic_log)
                 }
+            } else if (sList.file.name.endsWith(".rat")) {
+                holder.icon.setImageResource(R.drawable.icon_grayscale)
             } else {
                 holder.icon.setImageResource(R.drawable.ic_log)
             }
@@ -81,7 +82,7 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
 
                     refreshFiles()
                 } else if (settingsModel.file.isFile) {
-                    if (settingsModel.file.name.contains(".zip")) {
+                    if (settingsModel.file.name.contains(".rat")) {
                         customRootFSPath = settingsModel.file.path
                     }
                 } else if (settingsModel.file.isDirectory) {

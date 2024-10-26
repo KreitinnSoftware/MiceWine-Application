@@ -6,10 +6,11 @@ import android.app.Dialog
 import android.os.Bundle
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.customRootFSPath
 import com.micewine.emu.activities.MainActivity.Companion.setupDone
+import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.calledSetup
 
 class SetupFragment : DialogFragment() {
     @SuppressLint("SetTextI18n")
@@ -24,7 +25,7 @@ class SetupFragment : DialogFragment() {
         isCancelable = false
 
         Thread {
-            while (!setupDone) {
+            while (!setupDone && !abortSetup) {
                 requireActivity().runOnUiThread {
                     if (progressBarValue > 0) {
                         progressTextBar.text = "$progressBarValue%"
@@ -40,6 +41,12 @@ class SetupFragment : DialogFragment() {
                 Thread.sleep(16)
             }
 
+            if (abortSetup) {
+                abortSetup = false
+                calledSetup = false
+                customRootFSPath = null
+            }
+
             dismiss()
         }.start()
 
@@ -50,5 +57,6 @@ class SetupFragment : DialogFragment() {
         var progressBarValue: Int = 0
         var progressBarIsIndeterminate: Boolean = false
         var dialogTitleText: String = ""
+        var abortSetup: Boolean = false
     }
 }

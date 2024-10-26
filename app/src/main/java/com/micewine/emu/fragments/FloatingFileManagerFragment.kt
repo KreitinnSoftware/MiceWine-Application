@@ -5,7 +5,6 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
@@ -21,16 +20,13 @@ class FloatingFileManagerFragment: DialogFragment() {
         val view = inflater.inflate(R.layout.fragment_floating_file_manager, null)
 
         recyclerView  = view.findViewById(R.id.recyclerViewFiles)
-
         recyclerView?.adapter = AdapterFiles(fileList, requireContext(), true)
 
         fileManagerCwd = "/storage/emulated/0"
 
         refreshFiles()
 
-        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
-            .setView(view)
-            .create()
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create()
 
         isCancelable = false
 
@@ -39,7 +35,7 @@ class FloatingFileManagerFragment: DialogFragment() {
                 Thread.sleep(16)
             }
 
-            dialog.dismiss()
+            dismiss()
         }.start()
 
         return dialog
@@ -59,7 +55,7 @@ class FloatingFileManagerFragment: DialogFragment() {
 
     companion object {
         private var recyclerView: RecyclerView? = null
-        private var calledSetup: Boolean = false
+        var calledSetup: Boolean = false
         private val fileList: MutableList<AdapterFiles.FileList> = ArrayList()
 
         fun refreshFiles() {
@@ -78,7 +74,7 @@ class FloatingFileManagerFragment: DialogFragment() {
             }
 
             File(fileManagerCwd).listFiles()?.sorted()?.forEach {
-                if (it.isFile) {
+                if (it.isFile && it.name.endsWith(".rat")) {
                     addToAdapter(it)
                 }
             }

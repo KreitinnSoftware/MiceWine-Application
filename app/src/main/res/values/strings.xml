@@ -62,10 +62,11 @@
     <string name="welcome_text_1">Welcome to MiceWine!</string>
     <string name="continueText">Continue</string>
     <string name="get_file_permission_text">Allow File Management Permission</string>
-    <string name="rootfs_not_builtin_text">"This APK is compiled without built-in RootFS"</string>
     <string name="extracting_resources_text">"Extracting Files…\nIt may take a while"</string>
     <string name="extracted_resources_text">Extraction Done!</string>
     <string name="extracting_from_assets">Extracting From Assets…</string>
+    <string name="checking_rat_type">Checking Rat File Type…</string>
+    <string name="invalid_rootfs_rat_file">Invalid RootFS Rat File.</string>
     <string name="editControllerPreferences">Edit Controller Preferences</string>
     <string name="removeGameItem">Delete</string>
     <string name="executableAlreadyAdded">Executable Already Added</string>
