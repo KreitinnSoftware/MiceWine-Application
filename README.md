@@ -14,11 +14,13 @@ Support Android 10+
 
 ### Compatible GPUs
 
-| GPU        | Support             | Driver            |
-|------------|---------------------|-------------------|
-| Adreno 7xx | Supported           | Turnip/Zink       |
-| Adreno 6xx | Supported           | Turnip/Zink       |
-| Others     | Parcially Supported | Zink (WIP)        |
+| GPU        | Support             | Driver                      |
+|------------|---------------------|-----------------------------|
+| Adreno 7xx | Supported           | Turnip/Zink                 |
+| Adreno 6xx | Supported           | Turnip/Zink                 |
+| Others     | Parcially Supported | Native/Zink (Experimental)  |
+
+About Native Vulkan on Non-Adreno GPUs is Experimental, Require Some Testing
 
 ## Third Party Open Source Applications:
 
