@@ -26,14 +26,20 @@ class AdapterGame(private val gameList: List<GameList>, private val activity: Ac
         val sList = gameList[position]
         holder.titleGame.text = sList.name
 
-        if (sList.imageGame == "" || !File(sList.imageGame).exists()) {
+        if (sList.imageGame == "") {
             holder.gameImage.setImageBitmap(resizeBitmap(
                 BitmapFactory.decodeResource(activity.resources, R.drawable.default_icon), holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height)
             )
-        } else {
-            holder.gameImage.setImageBitmap(resizeBitmap(
-                BitmapFactory.decodeFile(sList.imageGame), holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height)
-            )
+        } else if (File(sList.imageGame).exists()) {
+            val imageBitmap = BitmapFactory.decodeFile(sList.imageGame)
+
+            if (imageBitmap != null) {
+                holder.gameImage.setImageBitmap(
+                    resizeBitmap(
+                        imageBitmap, holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height
+                    )
+                )
+            }
         }
     }
 

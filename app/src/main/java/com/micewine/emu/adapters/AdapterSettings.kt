@@ -12,6 +12,7 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.ControllerMapper
 import com.micewine.emu.activities.GeneralSettings
 import com.micewine.emu.activities.GeneralSettings.Companion.ACTION_PREFERENCE_SELECT
+import com.micewine.emu.activities.DriverManagerActivity
 import com.micewine.emu.activities.VirtualControllerOverlayMapper
 
 class AdapterSettings(private val settingsList: List<SettingsList>, private val context: Context) :
@@ -23,8 +24,8 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val sList = settingsList[position]
-        holder.settingsName.setText(sList.titleSettings)
-        holder.settingsDescription.setText(sList.descriptionSettings)
+        holder.settingsName.text = sList.titleSettings
+        holder.settingsDescription.text = sList.descriptionSettings
         holder.imageSettings.setImageResource(sList.imageSettings)
     }
 
@@ -46,29 +47,34 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
             val settingsModel = settingsList[getAdapterPosition()]
 
             when (settingsModel.titleSettings) {
-                R.string.settingsTitle -> {
+                context.getString(R.string.settingsTitle) -> {
                     val intent = Intent(context, GeneralSettings::class.java)
                     context.startActivity(intent)
                 }
 
-                R.string.controllerMapperTitle -> {
+                context.getString(R.string.controllerMapperTitle) -> {
                     val intent = Intent(context, ControllerMapper::class.java)
                     context.startActivity(intent)
                 }
 
-                R.string.virtualControllerMapperTitle -> {
+                context.getString(R.string.virtualControllerMapperTitle) -> {
                     val intent = Intent(context, VirtualControllerOverlayMapper::class.java)
+                    context.startActivity(intent)
+                }
+
+                context.getString(R.string.driverManagerTitle) -> {
+                    val intent = Intent(context, DriverManagerActivity::class.java)
                     context.startActivity(intent)
                 }
 
                 else -> {
                     val intent = Intent(ACTION_PREFERENCE_SELECT)
-                    intent.putExtra("preference", context.resources.getString(settingsModel.titleSettings))
+                    intent.putExtra("preference", settingsModel.titleSettings)
                     context.sendBroadcast(intent)
                 }
             }
         }
     }
 
-    class SettingsList(var titleSettings: Int, var descriptionSettings: Int, var imageSettings: Int)
+    class SettingsList(var titleSettings: String, var descriptionSettings: String, var imageSettings: Int)
 }

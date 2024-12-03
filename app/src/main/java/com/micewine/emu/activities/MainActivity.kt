@@ -13,6 +13,7 @@ import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
+import android.os.Build
 import android.os.Bundle
 import android.view.ContextMenu
 import android.view.KeyEvent
@@ -26,6 +27,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
+import com.micewine.emu.activities.DriverManagerActivity.Companion.generateICDFile
 import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_AVX_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_KEY
@@ -34,9 +36,12 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BLEED
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTROUND_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_NATIVEFLAGS_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_PAUSE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_SAFEFLAGS_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_STRONGMEM_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_WAIT_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_WEAKBARRIER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_LOG_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGILL_KEY
@@ -44,6 +49,8 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGSEGV_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWBT_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWSEGV_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_DRI3
+import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_MANGOHUD
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_KEY
@@ -61,6 +68,8 @@ import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.ActivityMainBinding
+import com.micewine.emu.fragments.AskInstallRatPackageFragment
+import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ratCandidate
 import com.micewine.emu.fragments.DeleteGameItemFragment
 import com.micewine.emu.fragments.FileManagerFragment
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
@@ -69,6 +78,7 @@ import com.micewine.emu.fragments.HomeFragment
 import com.micewine.emu.fragments.HomeFragment.Companion.saveToGameList
 import com.micewine.emu.fragments.HomeFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.RenameGameItemFragment
+import com.micewine.emu.fragments.RenameGameItemFragment.Companion.initialTextRenameGameFragment
 import com.micewine.emu.fragments.SettingsFragment
 import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
@@ -94,6 +104,12 @@ class MainActivity : AppCompatActivity() {
 
                     tmpDir.deleteRecursively()
                     tmpDir.mkdirs()
+
+                    setSharedVars(this@MainActivity)
+
+                    val driverLibPath = File("$ratPackagesDir/$selectedDriver/pkg-header").readLines()[4].substringAfter("=")
+
+                    generateICDFile(driverLibPath, File("$appRootDir/vulkan_icd.json"))
 
                     lifecycleScope.launch { runXServer(":0") }
                     lifecycleScope.launch { runWine(exePath, File("$homeDir/.wine")) }
@@ -125,6 +141,9 @@ class MainActivity : AppCompatActivity() {
                             }
 
                             startActivityIfNeeded(emulationActivityIntent, 0)
+                        } else if (file.name.endsWith(".rat")) {
+                            ratCandidate = RatPackageManager.RatPackage(file.path)
+                            AskInstallRatPackageFragment().show(supportFragmentManager, "")
                         }
                     } else if (file.isDirectory) {
                         fileManagerCwd = file.path
@@ -135,13 +154,44 @@ class MainActivity : AppCompatActivity() {
 
                 ACTION_SETUP -> {
                     lifecycleScope.launch {
-                        if (appBuiltinRootfs) {
-                            setupMiceWine("")
-                        } else {
+                        var rootFSPath = ""
+
+                        if (!appBuiltinRootfs) {
                             SetupFragment().show(supportFragmentManager, "")
 
-                            setupMiceWine("$customRootFSPath")
+                            rootFSPath = customRootFSPath!!
                         }
+
+                        setupMiceWine(rootFSPath)
+                    }
+                }
+
+                ACTION_INSTALL_RAT -> {
+                    lifecycleScope.launch {
+                        val ratFile: RatPackageManager.RatPackage = if (intent.getStringExtra("ratFile") == "") {
+                            ratCandidate!!
+                        } else {
+                            RatPackageManager.RatPackage(intent.getStringExtra("ratFile")!!)
+                        }
+
+                        if (ratFile.architecture != Build.SUPPORTED_ABIS[0].replace("arm64-v8a", "aarch64")) {
+                            Toast.makeText(context, "Invalid Architecture Rat File.", Toast.LENGTH_SHORT).show()
+                            return@launch
+                        }
+
+                        if (ratFile.category == "rootfs") {
+                            Toast.makeText(context, "You cannot install rootfs after installation.", Toast.LENGTH_SHORT).show()
+                            return@launch
+                        }
+
+                        if (ratFile.category != "VulkanDriver") {
+                            Toast.makeText(context, "You cannot install other packages than Vulkan Drivers.", Toast.LENGTH_SHORT).show()
+                            return@launch
+                        }
+
+                        installRat(ratFile, context)
+
+                        Toast.makeText(context, "Rat Package Installed!", Toast.LENGTH_LONG).show()
                     }
                 }
             }
@@ -195,6 +245,7 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(receiver, object : IntentFilter(ACTION_RUN_WINE) {
             init {
                 addAction(ACTION_SETUP)
+                addAction(ACTION_INSTALL_RAT)
                 addAction(ACTION_SELECT_FILE_MANAGER)
             }
         })
@@ -281,6 +332,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.renameGameItem -> {
+                initialTextRenameGameFragment = selectedGameArray[0]
                 RenameGameItemFragment().show(supportFragmentManager, "")
             }
 
@@ -454,7 +506,7 @@ class MainActivity : AppCompatActivity() {
     private suspend fun setupMiceWine(rootfs: String) {
         withContext(Dispatchers.IO) {
             appRootDir.mkdirs()
-            ratPackagesInfoDir.mkdirs()
+            ratPackagesDir.mkdirs()
 
             progressBarIsIndeterminate = true
 
@@ -488,12 +540,10 @@ class MainActivity : AppCompatActivity() {
 
             dialogTitleText = getString(R.string.extracting_resources_text)
 
+            installRat(ratFile, this@MainActivity)
+
             if (appBuiltinRootfs && rootfs == "") {
-                installRat(ratFile).also {
-                    File("$appRootDir/rootfs.rat").delete()
-                }
-            } else {
-                installRat(ratFile)
+                File("$appRootDir/rootfs.rat").delete()
             }
 
             tmpDir.mkdirs()
@@ -520,7 +570,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         @SuppressLint("SdCardPath")
         val appRootDir = File("/data/data/com.micewine.emu/files")
-        var ratPackagesInfoDir = File("$appRootDir/packages")
+        var ratPackagesDir = File("$appRootDir/packages")
         var appBuiltinRootfs: Boolean = false
         private var unixUsername = runCommandWithOutput("whoami").replace("\n", "")
         var customRootFSPath: String? = null
@@ -531,17 +581,22 @@ class MainActivity : AppCompatActivity() {
         var enableRamCounter: Boolean = false
         var enableCpuCounter: Boolean = false
         var enableDebugInfo: Boolean = false
+        var enableDRI3: Boolean = false
+        var enableMangoHUD: Boolean = false
         var appLang: String? = null
         var box64LogLevel: String? = null
         var box64Avx: String? = null
         var box64DynarecBigblock: String? = null
         var box64DynarecStrongmem: String? = null
+        var box64DynarecWeakbarrier: String? = null
+        var box64DynarecPause: String? = null
         var box64DynarecX87double: String? = null
         var box64DynarecFastnan: String? = null
         var box64DynarecFastround: String? = null
         var box64DynarecSafeflags: String? = null
         var box64DynarecCallret: String? = null
         var box64DynarecAlignedAtomics: String? = null
+        var box64DynarecNativeflags: String? = null
         var box64DynarecBleedingEdge: String? = null
         var box64DynarecWait: String? = null
         var box64ShowSegv: String? = null
@@ -572,6 +627,7 @@ class MainActivity : AppCompatActivity() {
 
         const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
         const val ACTION_SETUP = "com.micewine.emu.ACTION_SETUP"
+        const val ACTION_INSTALL_RAT = "com.micewine.emu.ACTION_INSTALL_RAT"
         const val ACTION_STOP_ALL = "com.micewine.emu.ACTION_STOP_ALL"
         const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
         const val RAM_COUNTER_KEY = "ramCounter"
@@ -633,21 +689,26 @@ class MainActivity : AppCompatActivity() {
             box64Avx = preferences.getString(BOX64_AVX_KEY, "2")
             box64DynarecBigblock = preferences.getString(BOX64_DYNAREC_BIGBLOCK_KEY, "1")
             box64DynarecStrongmem = preferences.getString(BOX64_DYNAREC_STRONGMEM_KEY, "0")
+            box64DynarecWeakbarrier = preferences.getString(BOX64_DYNAREC_WEAKBARRIER_KEY, "0")
+            box64DynarecPause = preferences.getString(BOX64_DYNAREC_PAUSE_KEY, "0")
             box64DynarecX87double = booleanToString(preferences.getBoolean(BOX64_DYNAREC_X87DOUBLE_KEY, false))
             box64DynarecFastnan = booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTNAN_KEY, true))
             box64DynarecFastround = booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTROUND_KEY, true))
             box64DynarecSafeflags = preferences.getString(BOX64_DYNAREC_SAFEFLAGS_KEY, "1")
             box64DynarecCallret = booleanToString(preferences.getBoolean(BOX64_DYNAREC_CALLRET_KEY, true))
             box64DynarecAlignedAtomics = booleanToString(preferences.getBoolean(BOX64_DYNAREC_ALIGNED_ATOMICS_KEY, false))
+            box64DynarecNativeflags = booleanToString(preferences.getBoolean(BOX64_DYNAREC_NATIVEFLAGS_KEY, true))
             box64DynarecBleedingEdge = booleanToString(preferences.getBoolean(BOX64_DYNAREC_BLEEDING_EDGE_KEY, true))
             box64DynarecWait = booleanToString(preferences.getBoolean(BOX64_DYNAREC_WAIT_KEY, true))
             box64ShowSegv = booleanToString(preferences.getBoolean(BOX64_SHOWSEGV_KEY, true))
             box64ShowBt = booleanToString(preferences.getBoolean(BOX64_SHOWBT_KEY, false))
             box64NoSigSegv = booleanToString(preferences.getBoolean(BOX64_NOSIGSEGV_KEY, false))
             box64NoSigill = booleanToString(preferences.getBoolean(BOX64_NOSIGILL_KEY, false))
+            enableDRI3 = preferences.getBoolean(ENABLE_DRI3, true)
+            enableMangoHUD = preferences.getBoolean(ENABLE_MANGOHUD, true)
             wineESync = booleanToString(preferences.getBoolean(WINE_ESYNC_KEY, false))
             wineLogLevel = preferences.getString(WINE_LOG_LEVEL_KEY, "default")
-            selectedDriver = preferences.getString(SELECTED_DRIVER_KEY, "Turnip/Zink")
+            selectedDriver = preferences.getString(SELECTED_DRIVER_KEY, "")
             d3dxRenderer = preferences.getString(SELECTED_D3DX_RENDERER_KEY, "DXVK")
             selectedWineD3D = preferences.getString(SELECTED_WINED3D_KEY, "WineD3D-9.0")
             selectedDXVK = preferences.getString(SELECTED_DXVK_KEY, "DXVK-1.10.3-async")
@@ -759,7 +820,6 @@ class MainActivity : AppCompatActivity() {
                     .build()
 
                 val pinnedShortcutCallbackIntent = shortcutManager.createShortcutResultIntent(pinShortcutInfo)
-
                 val successCallback = PendingIntent.getBroadcast(context, 0, pinnedShortcutCallbackIntent, PendingIntent.FLAG_IMMUTABLE)
 
                 shortcutManager.requestPinShortcut(pinShortcutInfo, successCallback.intentSender)

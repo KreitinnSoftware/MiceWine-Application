@@ -37,7 +37,6 @@ class WelcomeActivity : AppCompatActivity() {
         fragmentLoader(true)
 
         button = findViewById(R.id.continueButton)
-
         button?.setOnClickListener {
             if (selectedFragment == 1) {
                 if (fileManagementPermission) {
@@ -116,7 +115,6 @@ class WelcomeActivity : AppCompatActivity() {
             fileManagementPermission = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
         }
     }
-
 
     companion object {
         private const val REQUEST_CODE = 1000

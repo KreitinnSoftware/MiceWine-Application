@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.preference.PreferenceManager
@@ -222,7 +223,7 @@ class OverlayView @JvmOverloads constructor(
                             it.downKeyCodes!!,
                             it.leftKeyCodes!!,
                             it.rightKeyCodes!!,
-                            0.30F
+                            it.deadZone
                         )
                     }
                 }
@@ -267,15 +268,12 @@ class OverlayView @JvmOverloads constructor(
         rightKeyCodes: List<Int>,
         deadZone: Float
     ) {
-        val axisXNeutral = axisX < deadZone && axisX > -deadZone
-        val axisYNeutral = axisY < deadZone && axisY > -deadZone
-
         handleAxis(
             lorieView,
             axisX,
             axisY,
-            axisXNeutral,
-            axisYNeutral,
+            axisX < deadZone && axisX > -deadZone,
+            axisY < deadZone && axisY > -deadZone,
             rightKeyCodes,
             leftKeyCodes,
             downKeyCodes,

@@ -10,18 +10,22 @@ import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBleedingEd
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecCallret
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastnan
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastround
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecNativeflags
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecPause
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecSafeflags
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecStrongmem
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecWait
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecWeakbarrier
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecX87double
 import com.micewine.emu.activities.MainActivity.Companion.box64LogLevel
 import com.micewine.emu.activities.MainActivity.Companion.box64NoSigSegv
 import com.micewine.emu.activities.MainActivity.Companion.box64NoSigill
 import com.micewine.emu.activities.MainActivity.Companion.box64ShowBt
 import com.micewine.emu.activities.MainActivity.Companion.box64ShowSegv
+import com.micewine.emu.activities.MainActivity.Companion.enableDRI3
+import com.micewine.emu.activities.MainActivity.Companion.enableMangoHUD
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedDXVKHud
-import com.micewine.emu.activities.MainActivity.Companion.selectedDriver
 import com.micewine.emu.activities.MainActivity.Companion.selectedMesaVkWsiPresentMode
 import com.micewine.emu.activities.MainActivity.Companion.selectedTuDebugPreset
 import com.micewine.emu.activities.MainActivity.Companion.selectedGLProfile
@@ -46,6 +50,7 @@ object EnvVars {
         putVar("LANG", "$appLang.UTF-8")
         putVar("TMPDIR", tmpDir.path)
         putVar("HOME", homeDir.path)
+        putVar("XDG_CONFIG_HOME", "$homeDir/.config")
         putVar("DISPLAY", ":0")
         putVar("LD_LIBRARY_PATH", "$usrDir/lib")
         putVar("PATH", "\$PATH:$usrDir/bin:$appRootDir/wine/bin")
@@ -66,36 +71,24 @@ object EnvVars {
 
         putVar("MESA_GL_VERSION_OVERRIDE", glVersionStr)
         putVar("MESA_GLSL_VERSION_OVERRIDE", glslVersion)
+        putVar("VK_ICD_FILENAMES", "$appRootDir/vulkan_icd.json")
 
-        when (selectedDriver) {
-            "Turnip/Zink" -> {
-                putVar("GALLIUM_DRIVER", "zink")
-                putVar("MESA_LOADER_DRIVER_OVERRIDE", "zink")
-                putVar("TU_DEBUG", "$selectedTuDebugPreset")
-                putVar("VK_ICD_FILENAMES", "$usrDir/share/vulkan/icd.d/freedreno_icd.aarch64.json")
-                putVar("ZINK_DEBUG", "compact")
-            }
-            "AMD/Zink" -> {
-                putVar("GALLIUM_DRIVER", "zink")
-                putVar("MESA_LOADER_DRIVER_OVERRIDE", "zink")
-                putVar("TU_DEBUG", "$selectedTuDebugPreset")
-                putVar("VK_ICD_FILENAMES", "$usrDir/share/vulkan/icd.d/radeon_icd.x86_64.json")
-                putVar("ZINK_DEBUG", "compact")
-            }
-            "Android/Zink" -> {
-                putVar("GALLIUM_DRIVER", "zink")
-                putVar("MESA_LOADER_DRIVER_OVERRIDE", "zink")
-                putVar("LD_LIBRARY_PATH", "/system/lib64:$usrDir/lib")
-                putVar("VK_ICD_FILENAMES", "$usrDir/share/vulkan/icd.d/sysvk_icd.json")
-                putVar("ZINK_DEBUG", "compact")
-            }
+        putVar("GALLIUM_DRIVER", "zink")
+        putVar("TU_DEBUG", "$selectedTuDebugPreset")
+        putVar("ZINK_DEBUG", "compact")
+
+        if (!enableDRI3) {
+            putVar("MESA_VK_WSI_DEBUG", "sw")
         }
 
         putVar("DXVK_ASYNC", "1")
         putVar("DXVK_STATE_CACHE_PATH", "$homeDir/.cache/dxvk-shader-cache")
         putVar("DXVK_HUD", selectedDXVKHud)
 
-        putVar("GALLIUM_HUD", "simple,fps")
+        if (enableMangoHUD) {
+            putVar("MANGOHUD", "1")
+            putVar("MANGOHUD_CONFIGFILE", "$usrDir/etc/MangoHud.conf")
+        }
 
         if (Build.SUPPORTED_ABIS[0] != "x86_64") {
             putVar("BOX64_LOG", box64LogLevel)
@@ -105,12 +98,15 @@ object EnvVars {
             putVar("BOX64_RCFILE", "$usrDir/etc/box64.box64rc")
             putVar("BOX64_DYNAREC_BIGBLOCK", box64DynarecBigblock)
             putVar("BOX64_DYNAREC_STRONGMEM", box64DynarecStrongmem)
+            putVar("BOX64_DYNAREC_WEAKBARRIER", box64DynarecWeakbarrier)
+            putVar("BOX64_DYNAREC_PAUSE", box64DynarecPause)
             putVar("BOX64_DYNAREC_X87DOUBLE", box64DynarecX87double)
             putVar("BOX64_DYNAREC_FASTNAN", box64DynarecFastnan)
             putVar("BOX64_DYNAREC_FASTROUND", box64DynarecFastround)
             putVar("BOX64_DYNAREC_SAFEFLAGS", box64DynarecSafeflags)
             putVar("BOX64_DYNAREC_CALLRET", box64DynarecCallret)
             putVar("BOX64_DYNAREC_ALIGNED_ATOMICS", box64DynarecAlignedAtomics)
+            putVar("BOX64_DYNAREC_NATIVEFLAGS", box64DynarecNativeflags)
             putVar("BOX64_DYNAREC_BLEEDING_EDGE", box64DynarecBleedingEdge)
             putVar("BOX64_DYNAREC_WAIT", box64DynarecWait)
             putVar("BOX64_SHOWSEGV", box64ShowSegv)

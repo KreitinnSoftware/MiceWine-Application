@@ -25,8 +25,7 @@
             android:id="@+id/controllerMapperToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:title="@string/controllerMapperTitle"
-            >
+            android:title="@string/controllerMapperTitle">
         </androidx.appcompat.widget.Toolbar>
     </LinearLayout>
 
@@ -38,8 +37,7 @@
         android:textSize="15sp"
         android:textStyle="bold"
         android:text="@string/no_controllers_connected"
-        android:padding="14dp"
-        >
+        android:padding="8dp">
     </TextView>
 
     <LinearLayout
@@ -58,10 +56,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="15sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 android:text="@string/deadZoneTitle"
-                android:padding="14dp">
+                android:padding="8dp">
             </TextView>
 
             <TextView
@@ -71,8 +69,7 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:text=""
-                android:padding="14dp">
+                android:padding="8dp">
             </TextView>
 
             <SeekBar
@@ -93,10 +90,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="15sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 android:text="@string/mouseSensibilityTitle"
-                android:padding="14dp">
+                android:padding="8dp">
             </TextView>
 
             <TextView
@@ -106,8 +103,7 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:text=""
-                android:padding="14dp">
+                android:padding="8dp">
             </TextView>
 
             <SeekBar
@@ -128,7 +124,7 @@
         android:textStyle="bold"
         android:text="@string/selectedControllerPreset"
         android:textAlignment="center"
-        android:padding="14dp">
+        android:padding="8dp">
     </TextView>
 
     <LinearLayout
@@ -140,7 +136,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="10dp">
+            android:padding="8dp">
         </Spinner>
 
         <ImageButton

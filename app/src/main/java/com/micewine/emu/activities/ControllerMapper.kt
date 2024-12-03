@@ -357,10 +357,7 @@ class ControllerMapper : AppCompatActivity() {
 
         fun addControllerPreset(context: Context, name: String) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val editor = preferences.edit()
-
             val currentList = loadControllerPresets(context)
-
             val defaultList = ArrayList(Collections.nCopies(25, ":")).apply {
                 this[0] = name
                 this[mappingMap[DEAD_ZONE_KEY]!!] = "25"
@@ -369,50 +366,50 @@ class ControllerMapper : AppCompatActivity() {
 
             currentList.add(defaultList)
 
-            val gson = Gson()
-            val json = gson.toJson(currentList)
+            val json = Gson().toJson(currentList)
 
-            editor.putString("controllerPresetList", json)
-            editor.putString(SELECTED_CONTROLLER_PRESET_KEY, name)
-            editor.apply()
+            preferences.edit().apply {
+                putString("controllerPresetList", json)
+                putString(SELECTED_CONTROLLER_PRESET_KEY, name)
+                apply()
+            }
 
-            val intent = Intent(ACTION_UPDATE_CONTROLLER_MAPPER)
-            intent.putExtra("name", name)
-            context.sendBroadcast(intent)
+            val intent = Intent(ACTION_UPDATE_CONTROLLER_MAPPER).apply {
+                putExtra("name", name)
+            }
+
+            context.apply {
+                sendBroadcast(intent)
+            }
         }
 
         fun editControllerPreset(context: Context, name: String, key: String, selectedItem: String, mappingType: String) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val editor = preferences.edit()
-
             val currentList = loadControllerPresets(context)
 
             var index = currentList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
                 currentList[0][0] = name
-
                 index = 0
             }
 
             currentList[index][mappingMap[key]!!] = "$selectedItem:$mappingType"
 
-            val gson = Gson()
-            val json = gson.toJson(currentList)
+            val json = Gson().toJson(currentList)
 
-            editor.putString("controllerPresetList", json)
-            editor.apply()
+            preferences.edit().apply {
+                putString("controllerPresetList", json)
+                apply()
+            }
         }
 
         private fun loadControllerPresets(context: Context): MutableList<MutableList<String>> {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val gson = Gson()
-
             val json = preferences.getString("controllerPresetList", "")
-
             val listType = object : TypeToken<MutableList<List<String>>>() {}.type
 
-            return gson.fromJson(json, listType) ?: mutableListOf(ArrayList(Collections.nCopies(25, ":")).apply {
+            return Gson().fromJson(json, listType) ?: mutableListOf(ArrayList(Collections.nCopies(25, ":")).apply {
                 this[0] = "default"
                 this[mappingMap[DEAD_ZONE_KEY]!!] = "25"
                 this[mappingMap[MOUSE_SENSIBILITY_KEY]!!] = "100"
@@ -421,7 +418,6 @@ class ControllerMapper : AppCompatActivity() {
 
         fun getControllerPresetsName(context: Context): List<String> {
             val currentList = loadControllerPresets(context)
-
             val presetsName: MutableList<String> = mutableListOf()
 
             currentList.forEach {

@@ -85,9 +85,7 @@ class EditVirtualButtonFragment : DialogFragment() {
             view.findViewById<LinearLayout>(R.id.layoutAnalogRight).visibility = View.GONE
         }
 
-        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
-            .setView(view)
-            .create()
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create()
 
         saveButton.setOnClickListener {
             if (lastSelectedType == BUTTON && buttonList.isNotEmpty()) {

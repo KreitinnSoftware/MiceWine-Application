@@ -20,6 +20,8 @@ import android.view.MotionEvent.AXIS_RZ
 import android.view.MotionEvent.AXIS_X
 import android.view.MotionEvent.AXIS_Y
 import android.view.MotionEvent.AXIS_Z
+import android.view.PointerIcon
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.preference.PreferenceManager
 import com.micewine.emu.LorieView
 import com.micewine.emu.activities.ControllerMapper
@@ -48,6 +50,7 @@ import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_Y_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.SELECTED_CONTROLLER_PRESET_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.getDeadZone
 import com.micewine.emu.activities.ControllerMapper.Companion.getMouseSensibility
+import com.micewine.emu.activities.EmulationActivity
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
@@ -58,8 +61,8 @@ import kotlinx.coroutines.withContext
 import kotlin.math.absoluteValue
 
 object ControllerUtils {
-    private const val KEYBOARD = 0
-    private const val MOUSE = 1
+    const val KEYBOARD = 0
+    const val MOUSE = 1
 
     private lateinit var axisX_plus_mapping: List<Int>
     private lateinit var axisY_plus_mapping: List<Int>

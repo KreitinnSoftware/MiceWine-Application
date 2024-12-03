@@ -32,7 +32,7 @@
         </activity>
         <activity
             android:name=".activities.ControllerMapper"
-            android:theme="@style/Theme.MiceWine.FullScreen"
+            android:theme="@style/Theme.MiceWine"
             android:exported="false">
         </activity>
         <activity
@@ -44,6 +44,11 @@
             android:name=".activities.VirtualControllerOverlayMapper"
             android:theme="@style/Theme.MiceWine.FullScreen"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".activities.DriverManagerActivity"
+            android:theme="@style/Theme.MiceWine"
             android:exported="false">
         </activity>
         <activity

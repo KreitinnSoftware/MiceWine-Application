@@ -1,5 +1,7 @@
 package com.micewine.emu.controller
 
+import com.micewine.emu.controller.ControllerUtils.KEYBOARD
+
 object XKeyCodes {
     private val scanKeyCodes = mapOf(
         "Up" to (103 to 19),
@@ -86,6 +88,6 @@ object XKeyCodes {
     fun getXKeyScanCodes(key: String): MutableList<Int> {
         val scanCode = scanKeyCodes[key]?.first ?: 0
         val keyCode = scanKeyCodes[key]?.second ?: 0
-        return mutableListOf(scanCode, keyCode, 0)
+        return mutableListOf(scanCode, keyCode, KEYBOARD)
     }
 }

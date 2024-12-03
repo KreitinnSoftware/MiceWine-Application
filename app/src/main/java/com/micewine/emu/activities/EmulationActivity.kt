@@ -9,6 +9,7 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.content.res.Configuration.KEYBOARD_QWERTY
 import android.media.AudioManager
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -62,7 +63,6 @@ import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.input.TouchInputHandler.RenderStub.NullStub
-import com.micewine.emu.utils.KeyInterceptor
 import com.micewine.emu.views.OverlayView
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -74,32 +74,32 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == ACTION_START) {
-                try {
-                    Log.v("LorieBroadcastReceiver", "Got new ACTION_START intent")
-                    val b = intent.getBundleExtra("")?.getBinder("")
-                    service = ICmdEntryInterface.Stub.asInterface(b)
-                    service?.asBinder()?.linkToDeath(
-                        {
-                            service = null
-                            requestConnection()
-                            Log.v("Lorie", "Disconnected")
-                            runOnUiThread { clientConnectedStateChanged(false) }
-                        }, 0
-                    )
-                    onReceiveConnection()
-                } catch (e: Exception) {
-                    Log.e(
-                        "MainActivity",
-                        "Something went wrong while we extracted connection details from binder.",
-                        e
-                    )
+            when (intent.action) {
+                ACTION_START -> {
+                    try {
+                        Log.v("LorieBroadcastReceiver", "Got new ACTION_START intent")
+                        val b = intent.getBundleExtra("")?.getBinder("")
+                        service = ICmdEntryInterface.Stub.asInterface(b)
+                        service?.asBinder()?.linkToDeath(
+                            {
+                                service = null
+                                requestConnection()
+                                Log.v("Lorie", "Disconnected")
+                                runOnUiThread { clientConnectedStateChanged(false) }
+                            }, 0
+                        )
+                        onReceiveConnection()
+                    } catch (e: Exception) {
+                        Log.e("MainActivity", "Something went wrong while we extracted connection details from binder.", e)
+                    }
                 }
-            } else if (intent.action == ACTION_PREFERENCES_CHANGED) {
-                Log.d("MainActivity", "preference: " + intent.getStringExtra("key"))
-                if ("additionalKbdVisible" != intent.getStringExtra("key")) onPreferencesChanged("")
-            } else if (intent.action == ACTION_STOP_ALL) {
-                finishAffinity()
+                ACTION_PREFERENCES_CHANGED -> {
+                    Log.d("MainActivity", "preference: " + intent.getStringExtra("key"))
+                    onPreferencesChanged()
+                }
+                ACTION_STOP_ALL -> {
+                    finishAffinity()
+                }
             }
         }
     }
@@ -116,8 +116,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        preferences.registerOnSharedPreferenceChangeListener { _: SharedPreferences?, key: String? ->
-            onPreferencesChanged(key)
+        preferences.registerOnSharedPreferenceChangeListener { _: SharedPreferences?, _: String? ->
+            onPreferencesChanged()
         }
 
         initSharedLogs(supportFragmentManager)
@@ -179,9 +179,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 }
 
                 R.id.setScreenStretch -> {
-                    val editPrefs = preferences.edit()
-                    editPrefs.putBoolean("displayStretch", !preferences.getBoolean("displayStretch", false))
-                    editPrefs.apply()
+                    preferences.edit().apply {
+                        putBoolean("displayStretch", !preferences.getBoolean("displayStretch", false))
+                        apply()
+                    }
 
                     lorieView.requestLayout()
                 }
@@ -201,8 +202,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 }
 
                 R.id.editControllerPreferences -> {
-                    val i = Intent(this, ControllerMapper::class.java)
-                    startActivity(i)
+                    startActivity(Intent(this, ControllerMapper::class.java))
                 }
             }
             true
@@ -230,19 +230,15 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     } else {
                         drawerLayout?.closeDrawers()
                     }
+
+                    lorieView.releasePointerCapture()
                     return@OnKeyListener true
                 }
             } else if (k == KeyEvent.KEYCODE_VOLUME_DOWN) {
-                audioManager.adjustStreamVolume(
-                    AudioManager.STREAM_MUSIC,
-                    AudioManager.ADJUST_LOWER,
-                    AudioManager.FLAG_SHOW_UI)
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
                 return@OnKeyListener true
             } else if (k == KeyEvent.KEYCODE_VOLUME_UP) {
-                audioManager.adjustStreamVolume(
-                    AudioManager.STREAM_MUSIC,
-                    AudioManager.ADJUST_RAISE,
-                    AudioManager.FLAG_SHOW_UI)
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
                 return@OnKeyListener true
             }
 
@@ -250,18 +246,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             mInputHandler!!.sendKeyEvent(v, e)
         }
         lorieParent.setOnTouchListener { _: View?, e: MotionEvent? ->
-            mInputHandler!!.handleTouchEvent(
-                lorieParent,
-                lorieView,
-                e
-            )
+            mInputHandler!!.handleTouchEvent(lorieParent, lorieView, e)
         }
         lorieParent.setOnHoverListener { _: View?, e: MotionEvent? ->
-            mInputHandler!!.handleTouchEvent(
-                lorieParent,
-                lorieView,
-                e
-            )
+            mInputHandler!!.handleTouchEvent(lorieParent, lorieView, e)
         }
         lorieParent.setOnGenericMotionListener { _: View?, e: MotionEvent? ->
             mInputHandler!!.handleTouchEvent(lorieParent, lorieView, e)
@@ -306,7 +294,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         })
 
         requestConnection()
-        onPreferencesChanged("")
+        onPreferencesChanged()
         checkXEvents()
 
         setSharedVars(this)
@@ -347,19 +335,30 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
     }
 
+    private fun isKeyboardConnected(): Boolean {
+        return resources.configuration.keyboard == KEYBOARD_QWERTY
+    }
+
     private fun tryConnect() {
         if (mClientConnected) {
             return
         }
         try {
             Log.v("LorieBroadcastReceiver", "Extracting X connection socket.")
-            val fd = if (service == null) null else service!!.getXConnection()
+            val fd = if (service == null) {
+                null
+            } else {
+                service!!.getXConnection()
+            }
+
             if (fd != null) {
                 LorieView.connect(fd.detachFd())
                 lorieView.triggerCallback()
                 clientConnectedStateChanged(true)
                 LorieView.setClipboardSyncEnabled(true)
-            } else handler.postDelayed({ tryConnect() }, 500)
+            } else {
+                handler.postDelayed({ tryConnect() }, 500)
+            }
         } catch (e: Exception) {
             Log.e("MainActivity", "Something went wrong while we were establishing connection", e)
             service = null
@@ -369,30 +368,17 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
     }
 
-    fun onPreferencesChanged(key: String?) {
-        if ("additionalKbdVisible" == key) {
-            return
-        }
-
-        val p = PreferenceManager.getDefaultSharedPreferences(this)
-        val lorieView = lorieView
-
+    fun onPreferencesChanged() {
         mInputHandler!!.setInputMode(TouchInputHandler.InputMode.TRACKPAD)
         mInputHandler!!.setTapToMove(false)
-        mInputHandler!!.setPreferScancodes(true)
-        mInputHandler!!.setPointerCaptureEnabled(false)
+        mInputHandler!!.setPreferScancodes(isKeyboardConnected())
+        mInputHandler!!.setPointerCaptureEnabled(true)
 
-        if (!p.getBoolean("pointerCapture", false) && lorieView.hasPointerCapture()) {
-            lorieView.releasePointerCapture()
-        }
+        lorieView.releasePointerCapture()
 
         onWindowFocusChanged(true)
         LorieView.setClipboardSyncEnabled(false)
         lorieView.triggerCallback()
-
-        if (checkSelfPermission(permission.WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED) {
-            KeyInterceptor.shutdown()
-        }
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
 
@@ -424,8 +410,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         super.onPause()
     }
 
-    private val lorieView: LorieView
-        get() = findViewById(R.id.lorieView)
+    private val lorieView: LorieView get() = findViewById(R.id.lorieView)
 
     fun handleKey(e: KeyEvent): Boolean {
         mLorieKeyListener!!.onKey(lorieView, e.keyCode, e)
@@ -475,7 +460,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 tryConnect()
             }
 
-            if (connected) lorieView.pointerIcon = PointerIcon.getSystemIcon(this, PointerIcon.TYPE_NULL)
+            if (connected) {
+                lorieView.pointerIcon = PointerIcon.getSystemIcon(this, PointerIcon.TYPE_NULL)
+            }
         }
     }
 
@@ -485,7 +472,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     }
 
     companion object {
-        private const val KEY_BACK = 158
+        const val KEY_BACK = 158
         var handler = Handler(Looper.getMainLooper())
 
         @JvmStatic

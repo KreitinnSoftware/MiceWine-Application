@@ -37,6 +37,18 @@
     <string name="box64_safeflags_description">Handling of flags on CALL/RET opcodes</string>
     <string name="box64_callret_title" translatable="false">BOX64_DYNAREC_CALLRET</string>
     <string name="box64_callret_description">Optimization of CALL/RET opcodes (not compatible with jit/dynarec/smc)</string>
+    <string name="box64_aligned_atomics_title" translatable="false">BOX64_DYNAREC_ALIGNED_ATOMICS</string>
+    <string name="box64_aligned_atomics_description">Generated code for aligned atomics only</string>
+    <string name="box64_bleeding_edge_title" translatable="false">BOX64_DYNAREC_BLEEDING_EDGE</string>
+    <string name="box64_bleeding_edge_description">Detect MonoBleedingEdge and apply conservative settings</string>
+    <string name="box64_dynarec_wait_title" translatable="false">BOX64_DYNAREC_WAIT</string>
+    <string name="box64_dynarec_wait_description">Behavior with FillBlock is not available (FillBlock build Dynarec blocks and is not multithreaded)</string>
+    <string name="box64_weakbarrier_description">Tweaking the memory barriers to reduce the performance impact by STRONGMEM</string>
+    <string name="box64_weakbarrier_title" translatable="false">BOX64_DYNAREC_WEAKBARRIER</string>
+    <string name="box64_pause_description">Enable/Disable x86 PAUSE emulation, which may help the performance of spinlocks</string>
+    <string name="box64_pause_title" translatable="false">BOX64_DYNAREC_PAUSE</string>
+    <string name="box64_nativeflags_title" translatable="false">BOX64_DYNAREC_NATIVEFLAGS</string>
+    <string name="box64_nativeflags_description">Generate code will use native flags if possible</string>
     <string name="stretch_display">Stretch Display</string>
     <string name="display_resolution_title">Display Resolution</string>
     <string name="display_resolution_description">Change Virtual Display Resolution</string>
@@ -87,12 +99,6 @@
     <string name="removeGameItemWarning">Are you sure you want to remove it?</string>
     <string name="enableCPUCounter">Enable/Disable CPU Usage Counter</string>
     <string name="enableCPUCounterDescription">Enable or Disable CPU Usage on Screen</string>
-    <string name="box64_aligned_atomics_title" translatable="false">BOX64_DYNAREC_ALIGNED_ATOMICS</string>
-    <string name="box64_aligned_atomics_description">Generated code for aligned atomics only</string>
-    <string name="box64_bleeding_edge_title" translatable="false">BOX64_DYNAREC_BLEEDING_EDGE</string>
-    <string name="box64_bleeding_edge_description">Detect MonoBleedingEdge and apply conservative settings</string>
-    <string name="box64_dynarec_wait_title" translatable="false">BOX64_DYNAREC_WAIT</string>
-    <string name="box64_dynarec_wait_description">Behavior with FillBlock is not available (FillBlock build Dynarec blocks and is not multithreaded)</string>
     <string name="virtualControllerMapperTitle">Virtual Controller Mapper</string>
     <string name="mesa_vk_wsi_present_mode_title" translatable="false">MESA_VK_WSI_PRESENT_MODE</string>
     <string name="tu_debug_title" translatable="false">TU_DEBUG</string>
@@ -125,4 +131,9 @@
     <string name="box64_no_sigsegv_description">Disable handling of SigSEGV. (Very useful for debugging.)</string>
     <string name="box64_no_sigill_description">Disable handling of SigILL (to ease debugging mainly).</string>
     <string name="button_size">Button Size</string>
+    <string name="driverManagerTitle">Driver Manager</string>
+    <string name="driverManagerDescription">Manage Drivers</string>
+    <string name="installRatPackageWarning">You want to install</string>
+    <string name="enableDRI3">Enable DRI3</string>
+    <string name="enable_mangohud_title">Enable MangoHud</string>
 </resources>

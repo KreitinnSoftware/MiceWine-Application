@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.micewine.emu.activities.EmulationActivity.Companion.handler
 import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
+import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.fragments.InfoDialogFragment
 import com.micewine.emu.fragments.InfoDialogFragment.Companion.descriptionText
 import com.micewine.emu.fragments.InfoDialogFragment.Companion.titleText
@@ -103,6 +104,7 @@ object ShellLoader {
 
         fun runCommand(cmd: String) {
             Log.v("ShellLoader", "Trying to exec: '$cmd'")
+
             os?.writeBytes("$cmd\nexit\n")
             os?.flush()
 

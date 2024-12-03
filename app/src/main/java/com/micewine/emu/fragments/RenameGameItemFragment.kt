@@ -22,11 +22,11 @@ class RenameGameItemFragment : DialogFragment() {
         val editTextNewName = view.findViewById<EditText>(R.id.editTextNewName)
         val buttonContinue = view.findViewById<Button>(R.id.buttonContinue)
 
-        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
-            .setView(view)
-            .create()
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create()
 
         preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+
+        editTextNewName.setText(initialTextRenameGameFragment)
 
         buttonContinue.setOnClickListener {
             val newName = editTextNewName.text.toString()
@@ -41,5 +41,9 @@ class RenameGameItemFragment : DialogFragment() {
         }
 
         return dialog
+    }
+
+    companion object {
+        var initialTextRenameGameFragment: String = ""
     }
 }

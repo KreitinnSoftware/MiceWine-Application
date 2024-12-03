@@ -44,6 +44,6 @@ class GeneralSettingsFragment : Fragment() {
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, icon: Int) {
-        settingsList.add(SettingsList(titleId, descriptionId, icon))
+        settingsList.add(SettingsList(context?.getString(titleId)!!, context?.getString(descriptionId)!!, icon))
     }
 }

@@ -45,23 +45,19 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
         when (sList.type) {
             SWITCH -> {
                 holder.spinnerOptions.visibility = View.GONE
+                holder.settingsSwitch.visibility = View.VISIBLE
 
-                holder.settingsSwitch.isChecked =
-                    preferences.getBoolean(sList.key, sList.defaultValue.toBoolean())
-
+                holder.settingsSwitch.isChecked = preferences.getBoolean(sList.key, sList.defaultValue.toBoolean())
                 holder.settingsSwitch.setOnClickListener {
-                    val editor = preferences.edit()
-
-                    editor.putBoolean(
-                        sList.key,
-                        !preferences.getBoolean(sList.key, sList.defaultValue.toBoolean())
-                    )
-
-                    editor.apply()
+                    preferences.edit().apply {
+                        putBoolean(sList.key, !preferences.getBoolean(sList.key, sList.defaultValue.toBoolean()))
+                        apply()
+                    }
                 }
             }
             SPINNER -> {
                 holder.settingsSwitch.visibility = View.GONE
+                holder.spinnerOptions.visibility = View.VISIBLE
 
                 holder.spinnerOptions.adapter = ArrayAdapter(
                     activity,
@@ -88,11 +84,10 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
                         ) {
                             val selectedItem = parent?.getItemAtPosition(position).toString()
 
-                            val editor = preferences.edit()
-
-                            editor.putString(sList.key, selectedItem)
-
-                            editor.apply()
+                            preferences.edit().apply {
+                                putString(sList.key, selectedItem)
+                                apply()
+                            }
                         }
 
                         override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -101,6 +96,7 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
             }
             CHECKBOX -> {
                 holder.settingsSwitch.visibility = View.GONE
+                holder.spinnerOptions.visibility = View.VISIBLE
 
                 holder.spinnerOptions.adapter = CheckableAdapter(
                     activity,

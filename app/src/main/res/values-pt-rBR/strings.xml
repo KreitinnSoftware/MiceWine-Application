@@ -14,8 +14,6 @@
     <string name="general_settings">Configurações Gerais</string>
     <string name="exit">Sair</string>
     <string name="open_keyboard">Abrir Teclado</string>
-    <string name="box64_settings_title">Configurações do Box64</string>
-    <string name="box64_settings_description">Configurar Box64</string>
     <string name="wine_settings_title">Configurações do Wine</string>
     <string name="wine_settings_description">Configurar Wine</string>
     <string name="display_settings_title">Configurações do Display</string>
@@ -23,6 +21,8 @@
     <string name="driver_settings_title">Configurações de Drivers</string>
     <string name="driver_settings_description">Configurar Drivers de GPU</string>
     <string name="home_title">Início</string>
+    <string name="box64_settings_title">Configurações do Box64</string>
+    <string name="box64_settings_description">Configurar Box64</string>
     <string name="box64_bigblock_description">Ativa/Desativa Criação de Blocos Grandes do Box64</string>
     <string name="box64_strongmem_description">Ativa/Desativa a simulação do modelo de Memória Forte</string>
     <string name="box64_x87double_description">Forçar o uso de Double para emulação de x87</string>
@@ -30,6 +30,12 @@
     <string name="box64_fastround_description">Ativa/Desativa a geração de arredondamento x86 preciso</string>
     <string name="box64_safeflags_description">Manuseamento de flags em opcodes CALL/RET</string>
     <string name="box64_callret_description">Otimização de opcodes CALL/RET (não compativel com jit/dynarec/smc)</string>
+    <string name="box64_aligned_atomics_description">Codigo gerado para atomics alinhados apenas</string>
+    <string name="box64_bleeding_edge_description">Detectar MonoBleedingEdge e aplicar configurações conservativas</string>
+    <string name="box64_dynarec_wait_description">Comportamento com FillBlock quando não está disponível (FillBlock cria blocos de Dynarec e não é multithreaded)</string>
+    <string name="box64_weakbarrier_description">Ajustando as barreiras de memória para reduzir o impacto no desempenho usando STRONGMEM</string>
+    <string name="box64_pause_description">Ativar/Desativar a emulação de PAUSE x86, o que pode ajudar no desempenho de spinlocks.</string>
+    <string name="box64_nativeflags_description">Generate code will use native flags if possible</string>
     <string name="stretch_display">Esticar Tela</string>
     <string name="display_resolution_title">Resolução do Display</string>
     <string name="display_resolution_description">Mudar a resolução do display virtual</string>
@@ -80,9 +86,6 @@
     <string name="removeGameItemWarning">Você tem certeza que quer remover?</string>
     <string name="enableCPUCounter">Ativar/Desativar Contador de uso de CPU</string>
     <string name="enableCPUCounterDescription">Ativa ou Desativa Contador de uso de CPU na Tela</string>
-    <string name="box64_aligned_atomics_description">Codigo gerado para atomics alinhados apenas</string>
-    <string name="box64_bleeding_edge_description">Detectar MonoBleedingEdge e aplicar configurações conservativas</string>
-    <string name="box64_dynarec_wait_description">Comportamento com FillBlock quando não está disponível (FillBlock cria blocos de Dynarec e não é multithreaded)</string>
     <string name="virtualControllerMapperTitle">Mapeador de Controles Virtuais</string>
     <string name="addButton">Adicionar Botão</string>
     <string name="addVAxis">Adicionar Analogico Virtual</string>
@@ -107,4 +110,9 @@
     <string name="box64_no_sigsegv_description">Desabilitar o tratamento de SigSEGV. (Muito útil para depuração).</string>
     <string name="box64_no_sigill_description">Desabilitar o tratamento de SigILL (principalmente para facilitar a depuração).</string>
     <string name="button_size">Tamanho do Botão</string>
+    <string name="driverManagerTitle">Gerenciador de Drivers</string>
+    <string name="driverManagerDescription">Gerencie Drivers</string>
+    <string name="installRatPackageWarning">Você quer instalar</string>
+    <string name="enableDRI3">Ativar DRI3</string>
+    <string name="enable_mangohud_title">Ativar MangoHud</string>
 </resources>
