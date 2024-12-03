@@ -53,12 +53,12 @@
         </activity>
         <activity
             android:name=".activities.MainActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/Theme.MiceWine">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -73,5 +73,4 @@
             android:windowSoftInputMode="stateHidden">
         </activity>
     </application>
-
 </manifest>
