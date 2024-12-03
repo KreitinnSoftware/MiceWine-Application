@@ -3,6 +3,8 @@ package com.micewine.emu.activities
 import android.Manifest.permission
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -29,7 +31,10 @@ import android.view.Window
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.ScrollView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -37,8 +42,10 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import com.micewine.emu.CmdEntryPoint.Companion.ACTION_START
 import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
@@ -58,7 +65,6 @@ import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
-import com.micewine.emu.fragments.FloatingLogViewerFragment
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
@@ -66,6 +72,7 @@ import com.micewine.emu.input.TouchInputHandler.RenderStub.NullStub
 import com.micewine.emu.views.OverlayView
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+
 
 class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
     private var mInputHandler: TouchInputHandler? = null
@@ -105,6 +112,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     }
     private var mLorieKeyListener: View.OnKeyListener? = null
     private var drawerLayout: DrawerLayout? = null
+    private var logsNavigationView: NavigationView? = null
 
     init {
         instance = this
@@ -142,6 +150,37 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         drawerLayout = findViewById(R.id.DrawerLayout)
         drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+
+        logsNavigationView = findViewById(R.id.NavigationViewLogs)
+
+        val headerView: View = logsNavigationView!!.getHeaderView(0)
+
+        val observer: Observer<String>
+        val logTextView = headerView.findViewById<TextView>(R.id.logsTextView)
+        val scrollView = headerView.findViewById<ScrollView>(R.id.scrollView)
+        val closeButton = headerView.findViewById<MaterialButton>(R.id.closeButton)
+        val copyButton = headerView.findViewById<MaterialButton>(R.id.copyButton)
+        val clipboard: ClipboardManager? = ContextCompat.getSystemService(this, ClipboardManager::class.java)
+
+        observer = Observer { out: String? ->
+            if (out != null) {
+                logTextView.append("$out")
+                scrollView.fullScroll(ScrollView.FOCUS_UP)
+            }
+        }
+
+        sharedLogs?.logsTextHead?.observe(this, observer)
+
+        scrollView.fullScroll(ScrollView.FOCUS_UP)
+
+        closeButton.setOnClickListener {
+            drawerLayout?.closeDrawers()
+        }
+
+        copyButton.setOnClickListener {
+            val clip = ClipData.newPlainText("MiceWine Logs", logTextView.text)
+            clipboard?.setPrimaryClip(clip)
+        }
 
         val lorieView = findViewById<LorieView>(R.id.lorieView)
         val lorieParent = lorieView.parent as View
@@ -188,7 +227,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 }
 
                 R.id.openLogViewer -> {
-                    FloatingLogViewerFragment().show(supportFragmentManager, "")
+                    drawerLayout?.openDrawer(GravityCompat.END)
+                    drawerLayout?.closeDrawer(GravityCompat.START)
                 }
 
                 R.id.openCloseOverlay -> {

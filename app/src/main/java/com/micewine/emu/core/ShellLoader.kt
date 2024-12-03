@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.micewine.emu.activities.EmulationActivity.Companion.handler
 import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
-import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.fragments.InfoDialogFragment
 import com.micewine.emu.fragments.InfoDialogFragment.Companion.descriptionText
 import com.micewine.emu.fragments.InfoDialogFragment.Companion.titleText
@@ -43,7 +42,6 @@ object ShellLoader {
             }
 
             stdoutThread.start()
-
             stdoutThread.join()
 
             os.close()
@@ -51,7 +49,7 @@ object ShellLoader {
             shell.waitFor()
             shell.destroy()
 
-            return output.toString()
+            return "$output"
         } catch (_: IOException) {
         }
 
@@ -116,13 +114,11 @@ object ShellLoader {
     }
 
     class ViewModelAppLogs(private val supportFragmentManager: FragmentManager) : ViewModel() {
-        val logsText = MutableLiveData<String>()
         val logsTextHead = MutableLiveData<String>()
 
         fun appendText(text: String) {
             handler.post {
                 logsTextHead.value = "$text\n"
-                logsText.value += "$text\n"
 
                 // Check for errors
                 if (text.contains("err:module:import_dll")) {
@@ -143,13 +139,6 @@ object ShellLoader {
                     descriptionText = "Error on Creating X Window 'X_CreateWindow'"
                     InfoDialogFragment().show(supportFragmentManager, "")
                 }
-            }
-        }
-
-        fun clear() {
-            handler.post {
-                logsTextHead.value = ""
-                logsText.value = ""
             }
         }
     }

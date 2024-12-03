@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="false"
-    android:keepScreenOn="true"
-    >
+    android:keepScreenOn="true">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -47,6 +46,15 @@
         android:background="@color/darker_gray"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/emulation_drawer">
+    </com.google.android.material.navigation.NavigationView>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/NavigationViewLogs"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="@color/darker_gray"
+        app:headerLayout="@layout/nav_logs_header">
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

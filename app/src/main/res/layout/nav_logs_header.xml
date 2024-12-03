@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="20dp"
     android:orientation="vertical">
 
     <ScrollView
@@ -16,7 +14,7 @@
         android:padding="10dp">
 
         <TextView
-            android:id="@+id/logShell"
+            android:id="@+id/logsTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
@@ -31,6 +29,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
         android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton
@@ -40,9 +40,8 @@
             android:layout_width="0dp"
             android:layout_weight="0.5"
             android:layout_height="60dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginBottom="10dp">
+            android:layout_marginEnd="10dp"
+            tools:ignore="PrivateResource">
         </com.google.android.material.button.MaterialButton>
 
         <com.google.android.material.button.MaterialButton
@@ -52,9 +51,7 @@
             android:layout_width="0dp"
             android:layout_weight="0.5"
             android:layout_height="60dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginBottom="10dp">
+            android:layout_marginStart="10dp">
         </com.google.android.material.button.MaterialButton>
 
     </LinearLayout>
