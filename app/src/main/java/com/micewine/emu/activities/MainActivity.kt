@@ -444,15 +444,25 @@ class MainActivity : AppCompatActivity() {
         when (d3dxRenderer) {
             "DXVK" -> {
                 if (selectedDXVK.exists()) {
-                    File("$selectedDXVK/x64").copyRecursively(system32, true)
-                    File("$selectedDXVK/x32").copyRecursively(syswow64, true)
+                    val x64Folder = File("$selectedDXVK/x64")
+                    val x32Folder = File("$selectedDXVK/x32")
+
+                    if (x64Folder.exists() && x32Folder.exists()) {
+                        x64Folder.copyRecursively(system32, true)
+                        x32Folder.copyRecursively(syswow64, true)
+                    }
                 }
             }
 
             "WineD3D" -> {
                 if (selectedWineD3D.exists()) {
-                    File("$selectedWineD3D/x64").copyRecursively(system32, true)
-                    File("$selectedWineD3D/x32").copyRecursively(syswow64, true)
+                    val x64Folder = File("$selectedWineD3D/x64")
+                    val x32Folder = File("$selectedWineD3D/x32")
+
+                    if (x64Folder.exists() && x32Folder.exists()) {
+                        x64Folder.copyRecursively(system32, true)
+                        x32Folder.copyRecursively(syswow64, true)
+                    }
                 }
             }
         }
@@ -465,8 +475,6 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun runWine(exePath: String, winePrefix: File) {
         withContext(Dispatchers.Default) {
-            sharedLogs?.clear()
-
             installDXWrapper(winePrefix)
 
             runCommand("pkill -9 wineserver")

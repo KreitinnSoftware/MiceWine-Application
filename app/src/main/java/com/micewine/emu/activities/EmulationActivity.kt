@@ -203,6 +203,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     runCommand("pkill -9 .exe")
                     runCommand("pkill -9 pulseaudio")
 
+                    logTextView.text = ""
+
                     val intent = Intent(this, MainActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
                     }
