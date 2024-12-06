@@ -81,7 +81,7 @@ class DriversSettingsFragment : Fragment() {
         addToAdapter(R.string.enable_mangohud_title, R.string.null_description, null, SWITCH, "true", ENABLE_MANGOHUD)
         addToAdapter(R.string.select_dxvk_hud_preset_title, R.string.null_description, arrayOf("fps", "gpuload", "devinfo", "version", "api"), CHECKBOX, "", SELECTED_DXVK_HUD_PRESET_KEY)
         addToAdapter(R.string.mesa_vk_wsi_present_mode_title, R.string.null_description, arrayOf("fifo", "relaxed", "mailbox", "immediate"), SPINNER, "mailbox", SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY)
-        addToAdapter(R.string.tu_debug_title, R.string.null_description, arrayOf("noconform", "flushall", "syncdraw"), CHECKBOX, "noconform", SELECTED_TU_DEBUG_PRESET_KEY)
+        addToAdapter(R.string.tu_debug_title, R.string.null_description, arrayOf("noconform", "flushall", "syncdraw", "sysmem", "gmem", "nolrz", "noubwc", "nomultipos", "forcebin"), CHECKBOX, "noconform", SELECTED_TU_DEBUG_PRESET_KEY)
         addToAdapter(R.string.select_wined3d_title, R.string.null_description, wined3dVersions.toTypedArray(), SPINNER, "WineD3D-(9.3)", SELECTED_WINED3D_KEY)
         addToAdapter(R.string.select_gl_profile_title, R.string.null_description, arrayOf(
             "GL 2.1", "GL 3.0",
