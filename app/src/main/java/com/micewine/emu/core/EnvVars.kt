@@ -52,7 +52,7 @@ object EnvVars {
         putVar("HOME", homeDir.path)
         putVar("XDG_CONFIG_HOME", "$homeDir/.config")
         putVar("DISPLAY", ":0")
-        putVar("LD_LIBRARY_PATH", "$usrDir/lib")
+        putVar("LD_LIBRARY_PATH", "/system/lib64:$usrDir/lib")
         putVar("PATH", "\$PATH:$usrDir/bin:$appRootDir/wine/bin")
         putVar("PREFIX", usrDir.path)
         putVar("MESA_SHADER_CACHE_DIR", "$homeDir/.cache")
