@@ -15,6 +15,7 @@ import com.micewine.emu.activities.MainActivity.Companion.miceWineVersion
 import com.micewine.emu.activities.MainActivity.Companion.selectedDXVK
 import com.micewine.emu.activities.MainActivity.Companion.selectedWineD3D
 import com.micewine.emu.activities.MainActivity.Companion.totalCpuUsage
+import com.micewine.emu.activities.MainActivity.Companion.vulkanDriverDeviceName
 
 class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0): View(context, attrs, defStyleAttr) {
     private val paint: Paint = Paint().apply {
@@ -41,13 +42,15 @@ class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: Attri
     }
 
     private fun onScreenInfo(c: Canvas) {
-        drawText(miceWineVersion, c.width - paint.measureText(miceWineVersion) - 20F, 40F, c)
+        drawText(miceWineVersion, getTextEndX(c, miceWineVersion), 40F, c)
 
         if (d3dxRenderer == "DXVK") {
-            drawText(selectedDXVK!!, c.width - paint.measureText(selectedDXVK) - 20F, 80F, c)
+            drawText(selectedDXVK!!, getTextEndX(c, selectedDXVK!!), 80F, c)
         } else if (d3dxRenderer == "WineD3D") {
-            drawText(selectedWineD3D!!, c.width - paint.measureText(selectedWineD3D) - 20F, 80F, c)
+            drawText(selectedWineD3D!!, getTextEndX(c, selectedWineD3D!!), 80F, c)
         }
+
+        drawText(vulkanDriverDeviceName!!, getTextEndX(c, vulkanDriverDeviceName!!), 120F, c)
     }
 
     private fun drawText(text: String, x: Float, y: Float, c: Canvas) {
@@ -58,5 +61,9 @@ class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: Attri
         paint.style = Paint.Style.FILL
         paint.color = Color.WHITE
         c.drawText(text, x, y, paint)
+    }
+
+    private fun getTextEndX(canvas: Canvas, string: String): Float {
+        return canvas.width - paint.measureText(string) - 20F
     }
 }

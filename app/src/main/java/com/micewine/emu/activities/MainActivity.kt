@@ -28,7 +28,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
 import com.micewine.emu.activities.DriverManagerActivity.Companion.generateICDFile
-import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_AVX_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_KEY
@@ -62,6 +61,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VKD3D_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.WINE_ESYNC_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.WINE_LOG_LEVEL_KEY
+import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.RatPackageManager.installRat
 import com.micewine.emu.core.ShellLoader.runCommand
@@ -105,11 +105,11 @@ class MainActivity : AppCompatActivity() {
                     tmpDir.deleteRecursively()
                     tmpDir.mkdirs()
 
-                    setSharedVars(this@MainActivity)
-
                     val driverLibPath = File("$ratPackagesDir/$selectedDriver/pkg-header").readLines()[4].substringAfter("=")
 
                     generateICDFile(driverLibPath, File("$appRootDir/vulkan_icd.json"))
+
+                    setSharedVars(this@MainActivity)
 
                     lifecycleScope.launch { runXServer(":0") }
                     lifecycleScope.launch { runWine(exePath, File("$homeDir/.wine")) }
@@ -629,6 +629,7 @@ class MainActivity : AppCompatActivity() {
         var fileManagerCwd: String = fileManagerDefaultDir
         var selectedFile: String = ""
         var miceWineVersion: String = "MiceWine (git-${BuildConfig.GIT_SHORT_SHA})"
+        var vulkanDriverDeviceName: String? = null
         private var selectedResolution: String? = ""
 
         var selectedFragment = "HomeFragment"
@@ -729,6 +730,8 @@ class MainActivity : AppCompatActivity() {
             enableRamCounter = preferences.getBoolean(RAM_COUNTER_KEY, true)
             enableCpuCounter = preferences.getBoolean(CPU_COUNTER_KEY, false)
             enableDebugInfo = preferences.getBoolean(ENABLE_DEBUG_INFO_KEY, true)
+
+            vulkanDriverDeviceName = getVulkanDeviceName()
         }
 
         fun copyAssets(activity: Activity, filename: String, outputPath: String) {
@@ -755,6 +758,10 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+
+        private fun getVulkanDeviceName(): String {
+            return runCommandWithOutput(getEnv() + "DISPLAY= vulkaninfo | grep deviceName | cut -d '=' -f 2")
         }
 
         @Throws(IOException::class)
@@ -790,18 +797,22 @@ class MainActivity : AppCompatActivity() {
                     usedMemory = totalMemory - availableMemory
 
                     memoryStats = "$usedMemory/$totalMemory"
+
+                    Thread.sleep(800)
                 }
             }
         }
 
         suspend fun getCpuInfo() {
             withContext(Dispatchers.IO) {
+                val availProcessors = Runtime.getRuntime().availableProcessors()
+
                 while (enableCpuCounter) {
-                    val usageInfo = runCommandWithOutput("top -bn 1 -u \$(whoami) -o %CPU -q | head -n 1").toFloat() / Runtime.getRuntime().availableProcessors()
+                    val usageInfo = runCommandWithOutput("top -bn 1 -u \$(whoami) -o %CPU -q | head -n 1").toFloat() / availProcessors
 
                     totalCpuUsage = "$usageInfo%"
 
-                    Thread.sleep(750)
+                    Thread.sleep(800)
                 }
             }
         }
