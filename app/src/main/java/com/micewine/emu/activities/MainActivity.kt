@@ -175,7 +175,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         if (ratFile.architecture != Build.SUPPORTED_ABIS[0].replace("arm64-v8a", "aarch64")) {
-                            Toast.makeText(context, "Invalid Architecture Rat File.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, R.string.invalid_architecture_rat_file, Toast.LENGTH_SHORT).show()
                             return@launch
                         }
 
@@ -538,7 +538,19 @@ class MainActivity : AppCompatActivity() {
                 abortSetup = true
 
                 runOnUiThread {
-                    Toast.makeText(this@MainActivity, getString(R.string.invalid_rootfs_rat_file), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, R.string.invalid_rootfs_rat_file, Toast.LENGTH_SHORT).show()
+                }
+
+                FloatingFileManagerFragment().show(supportFragmentManager, "")
+
+                return@withContext
+            }
+
+            if (ratFile.architecture != Build.SUPPORTED_ABIS[0].replace("arm64-v8a", "aarch64")) {
+                abortSetup = true
+
+                runOnUiThread {
+                    Toast.makeText(this@MainActivity, R.string.invalid_architecture_rat_file, Toast.LENGTH_SHORT).show()
                 }
 
                 FloatingFileManagerFragment().show(supportFragmentManager, "")

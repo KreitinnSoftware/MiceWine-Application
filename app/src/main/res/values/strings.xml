@@ -136,4 +136,5 @@
     <string name="installRatPackageWarning">You want to install</string>
     <string name="enableDRI3">Enable DRI3</string>
     <string name="enable_mangohud_title">Enable MangoHud</string>
+    <string name="invalid_architecture_rat_file">Invalid Architecture Rat File.</string>
 </resources>
