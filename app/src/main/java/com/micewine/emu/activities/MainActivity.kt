@@ -84,6 +84,7 @@ import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
+import com.micewine.emu.utils.FilePathResolver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -266,6 +267,22 @@ class MainActivity : AppCompatActivity() {
             )
 
             startActivityIfNeeded(intent, 0)
+        }
+
+        intent?.data?.let { uri ->
+            val filePath = FilePathResolver.resolvePath(this, uri)
+
+            val runWineIntent = Intent(ACTION_RUN_WINE).apply {
+                putExtra("exePath", filePath)
+            }
+
+            sendBroadcast(runWineIntent)
+
+            val emulationActivityIntent = Intent(this@MainActivity, EmulationActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+            }
+
+            startActivityIfNeeded(emulationActivityIntent, 0)
         }
     }
 
