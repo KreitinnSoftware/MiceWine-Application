@@ -90,6 +90,7 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.8.3")
     implementation("androidx.activity:activity-ktx:1.9.3")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.github.vatbub:mslinks:1.0.6.2")
     implementation(project(":app:stub"))
 }
 

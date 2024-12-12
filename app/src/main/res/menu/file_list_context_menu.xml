@@ -13,6 +13,9 @@
         android:title="@string/createShortcutOnHome">
     </item>
     <item
+        android:id="@+id/createLnk"
+        android:title="@string/createLnk" />
+    <item
         android:id="@+id/renameFile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
