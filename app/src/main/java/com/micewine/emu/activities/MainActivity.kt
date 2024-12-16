@@ -479,7 +479,7 @@ class MainActivity : AppCompatActivity() {
 
             runCommand("pkill -9 wineserver")
             runCommand("pkill -9 .exe")
-            runCommand("pkill -9 pulseaudio")
+            runCommand(getEnv() + "$usrDir/bin/pulseaudio --start --exit-idle=-1")
 
             if (exePath == "") {
                 WineWrapper.wine("explorer /desktop=shell,$selectedResolution TFM", winePrefix)
@@ -489,7 +489,6 @@ class MainActivity : AppCompatActivity() {
 
             runCommand("pkill -9 wineserver")
             runCommand("pkill -9 .exe")
-            runCommand("pkill -9 pulseaudio")
 
             runOnUiThread {
                 Toast.makeText(this@MainActivity, getString(R.string.wine_is_closed), Toast.LENGTH_SHORT).show()
