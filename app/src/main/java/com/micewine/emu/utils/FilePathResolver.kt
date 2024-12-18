@@ -16,9 +16,7 @@ object FilePathResolver {
         val realPath = resolveRealPathFromUri(context, uri) // Get the resolved real path
 
         if (realPath != null) {
-            val dosHomeDirs = getDosHomeDirs()
-
-            dosHomeDirs.forEach { dosHome ->
+            getDosHomeDirs().forEach { dosHome ->
                 val symlinkTo = File(dosHome).canonicalPath
                 if (realPath.startsWith(symlinkTo)) {
                     val resolvedPath = realPath.replaceFirst(symlinkTo, dosHome)
@@ -32,8 +30,8 @@ object FilePathResolver {
 
     private fun getDosHomeDirs(): List<String> {
         val dosHomeDirs = mutableListOf<String>()
-
         val dosHomeDir = File(MainActivity.fileManagerDefaultDir)
+
         if (dosHomeDir.exists() && dosHomeDir.isDirectory) {
             dosHomeDirs.addAll(dosHomeDir.listFiles()?.map { it.absolutePath } ?: emptyList())
         }
@@ -57,7 +55,7 @@ object FilePathResolver {
                     if (File("storage" + "/" + docId.replace(":", "/")).exists()) {
                         return "/storage/" + docId.replace(":", "/")
                     }
-                    val availableExternalStorages = getStorageDirectories(context)
+                    val availableExternalStorages = getStorageDirectories()
                     var root = ""
                     for (s in availableExternalStorages) {
                         root = if (split[1].startsWith("/")) {
@@ -82,22 +80,23 @@ object FilePathResolver {
                 val fileName = getFilePath(context, uri)
                 val subFolderName = getSubFolders(uri)
                 if (fileName != null) {
-                    return Environment.getExternalStorageDirectory()
-                        .toString() + "/Download/" + subFolderName + fileName
+                    return Environment.getExternalStorageDirectory().toString() + "/Download/" + subFolderName + fileName
                 }
                 val id = DocumentsContract.getDocumentId(uri)
                 val contentUri = ContentUris.withAppendedId(
                     Uri.parse("content://downloads/public_downloads"),
                     java.lang.Long.valueOf(id)
                 )
+
                 return getDataColumn(context, contentUri, null, null)
             } else if (isDownloadsDocument(uri)) {
                 val fileName = getFilePath(context, uri)
+
                 if (fileName != null) {
-                    return Environment.getExternalStorageDirectory()
-                        .toString() + "/Download/" + fileName
+                    return Environment.getExternalStorageDirectory().toString() + "/Download/" + fileName
                 }
                 var id = DocumentsContract.getDocumentId(uri)
+
                 if (id.startsWith("raw:")) {
                     id = id.replaceFirst("raw:".toRegex(), "")
                     val file = File(id)
@@ -112,16 +111,15 @@ object FilePathResolver {
                     Uri.parse("content://downloads/public_downloads"),
                     java.lang.Long.valueOf(id)
                 )
+
                 return getDataColumn(context, contentUri, null, null)
             } else if (isMediaDocument(uri)) {
                 val docId = DocumentsContract.getDocumentId(uri)
                 val split = docId.split(":").toTypedArray()
-                var contentUri: Uri? = null
                 val selection = "_id=?"
-                val selectionArgs = arrayOf(
-                    split[1]
-                )
-                return getDataColumn(context, contentUri, selection, selectionArgs)
+                val selectionArgs = arrayOf(split[1])
+
+                return getDataColumn(context, null, selection, selectionArgs)
             }
         } else if ("content".equals(uri.scheme, ignoreCase = true)) {
             if (getDataColumn(context, uri, null, null) == null) {
@@ -135,14 +133,14 @@ object FilePathResolver {
     }
 
     private fun getSubFolders(uri: Uri): String {
-        val replaceChars =
-            uri.toString().replace("%2F", "/").replace("%20", " ").replace("%3A", ":")
+        val replaceChars = uri.toString().replace("%2F", "/").replace("%20", " ").replace("%3A", ":")
         val bits = replaceChars.split("/").toTypedArray()
         val sub5 = bits[bits.size - 2]
         val sub4 = bits[bits.size - 3]
         val sub3 = bits[bits.size - 4]
         val sub2 = bits[bits.size - 5]
         val sub1 = bits[bits.size - 6]
+
         return when {
             sub1 == "Download" -> "$sub2/$sub3/$sub4/$sub5/"
             sub2 == "Download" -> "$sub3/$sub4/$sub5/"
@@ -200,7 +198,7 @@ object FilePathResolver {
         return "com.android.externalstorage.documents" == uri.authority
     }
 
-    fun isDownloadsDocument(uri: Uri): Boolean {
+    private fun isDownloadsDocument(uri: Uri): Boolean {
         return "com.android.providers.downloads.documents" == uri.authority
     }
 
@@ -213,21 +211,22 @@ object FilePathResolver {
         return "com.android.providers.media.documents" == uri.authority
     }
 
-    private fun getStorageDirectories(context: Context): List<String> {
+    private fun getStorageDirectories(): List<String> {
         val paths = mutableListOf<String>()
-        val externalStorage = Environment.getExternalStorageDirectory()
-        paths.add(externalStorage.toString()) // Add the default external storage path
-        val additionalStoragePaths = getAdditionalStoragePaths(context)
-        paths.addAll(additionalStoragePaths)
+        paths.add(Environment.getExternalStorageDirectory().toString()) // Add the default external storage path
+        paths.addAll(getAdditionalStoragePaths())
+
         return paths
     }
 
-    private fun getAdditionalStoragePaths(context: Context): List<String> {
+    private fun getAdditionalStoragePaths(): List<String> {
         val storagePaths = mutableListOf<String>()
         val file = File("/storage")
+
         if (file.exists()) {
             file.listFiles()?.forEach { storagePaths.add(it.absolutePath) }
         }
+
         return storagePaths
     }
 }

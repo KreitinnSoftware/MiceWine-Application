@@ -4,7 +4,7 @@ import com.micewine.emu.activities.MainActivity
 import java.io.File
 
 object DriveUtils {
-    class DriveInfo(val letter: String, val source: String, val absPath: String, val relativePath: String) {
+    class DriveInfo(val letter: String, val source: String, private val relativePath: String) {
         private val drivesBaseDirectory = MainActivity.fileManagerDefaultDir + UNIX_SEPARATOR
 
         fun getWindowsPath(absolute: Boolean = false): String {
@@ -31,16 +31,14 @@ object DriveUtils {
 
     private val drivesBaseDirectory = MainActivity.fileManagerDefaultDir + UNIX_SEPARATOR
 
-
     fun parseUnixPath(path: String): DriveInfo? {
-
         val drives = File(drivesBaseDirectory).listFiles()
         drives?.mapIndexed { _, file ->
             if (file.isDirectory && path.startsWith(file.absolutePath)) {
                 val symlinkTo = file.canonicalPath
                 val letter = file.absolutePath.replace(drivesBaseDirectory, "")[0].toString()
                 val relativePath = path.replace(drivesBaseDirectory, "").replace("$letter:$UNIX_SEPARATOR", "")
-                return DriveInfo(letter, symlinkTo, file.absolutePath, relativePath)
+                return DriveInfo(letter, symlinkTo, relativePath)
             }
         }
         return null
@@ -49,21 +47,5 @@ object DriveUtils {
     fun parseWindowsPath(path: String): DriveInfo? {
         val absPath = drivesBaseDirectory + path.replace(WINDOWS_SEPARATOR, UNIX_SEPARATOR)
         return parseUnixPath(absPath)
-    }
-
-    fun getDrives(): List<DriveInfo> {
-        val driveInfo = mutableListOf<DriveInfo>()
-
-        val drives = File(drivesBaseDirectory).listFiles()
-        drives?.mapIndexed { _, file ->
-            if (file.isDirectory) {
-                val symlinkTo = file.canonicalPath
-                val letter = file.absolutePath.replace(drivesBaseDirectory, "")[0].toString()
-                val relativePath = file.absolutePath
-                driveInfo.add(DriveInfo(letter, symlinkTo, file.absolutePath, relativePath))
-            }
-        }
-
-        return driveInfo
     }
 }
