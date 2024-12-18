@@ -41,6 +41,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/ic_joystick"
-        android:title="@string/editControllerPreferences">
+        android:title="@string/edit_controller_preferences">
     </item>
 </menu>

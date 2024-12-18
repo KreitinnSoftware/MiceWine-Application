@@ -32,7 +32,7 @@ class DriverManagerActivity : AppCompatActivity() {
         }
 
         ratManagerToolBar = findViewById(R.id.driverManagerToolbar)
-        ratManagerToolBar?.setTitle(R.string.driverManagerTitle)
+        ratManagerToolBar?.setTitle(R.string.driver_manager_title)
 
         fragmentLoader(DriverListFragment(), true)
     }

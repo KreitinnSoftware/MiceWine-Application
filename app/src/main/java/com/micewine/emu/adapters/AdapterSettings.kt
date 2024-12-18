@@ -47,22 +47,22 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
             val settingsModel = settingsList[getAdapterPosition()]
 
             when (settingsModel.titleSettings) {
-                context.getString(R.string.settingsTitle) -> {
+                context.getString(R.string.settings_title) -> {
                     val intent = Intent(context, GeneralSettings::class.java)
                     context.startActivity(intent)
                 }
 
-                context.getString(R.string.controllerMapperTitle) -> {
+                context.getString(R.string.controller_mapper_title) -> {
                     val intent = Intent(context, ControllerMapper::class.java)
                     context.startActivity(intent)
                 }
 
-                context.getString(R.string.virtualControllerMapperTitle) -> {
+                context.getString(R.string.virtual_controller_mapper_title) -> {
                     val intent = Intent(context, VirtualControllerOverlayMapper::class.java)
                     context.startActivity(intent)
                 }
 
-                context.getString(R.string.driverManagerTitle) -> {
+                context.getString(R.string.driver_manager_title) -> {
                     val intent = Intent(context, DriverManagerActivity::class.java)
                     context.startActivity(intent)
                 }

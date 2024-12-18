@@ -4,25 +4,25 @@
         android:id="@+id/addToLauncher"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="@string/addGameToHome">
+        android:title="@string/add_game_to_home">
     </item>
     <item
         android:id="@+id/editGameIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="@string/editGameIcon">
+        android:title="@string/edit_game_icon">
     </item>
     <item
         android:id="@+id/renameGameItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="@string/renameGameItem">
+        android:title="@string/rename_game_item">
     </item>
     <item
         android:id="@+id/removeGameItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="@string/removeGameItem">
+        android:title="@string/remove_game_item">
     </item>
 </menu>
 

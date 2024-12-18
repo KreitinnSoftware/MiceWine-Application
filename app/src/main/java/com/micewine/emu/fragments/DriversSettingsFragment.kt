@@ -74,7 +74,7 @@ class DriversSettingsFragment : Fragment() {
             wined3dVersions.add(it.name)
         }
 
-        addToAdapter(R.string.enableDRI3, R.string.null_description, null, SWITCH, "true", ENABLE_DRI3)
+        addToAdapter(R.string.enable_dri3, R.string.null_description, null, SWITCH, "true", ENABLE_DRI3)
         addToAdapter(R.string.select_d3dx_title, R.string.null_description, arrayOf("DXVK", "WineD3D"), SPINNER, "DXVK", SELECTED_D3DX_RENDERER_KEY)
         addToAdapter(R.string.select_dxvk_title, R.string.null_description, dxvkVersions.toTypedArray(), SPINNER, "DXVK-1.10.3-async", SELECTED_DXVK_KEY)
         addToAdapter(R.string.select_vkd3d_title, R.string.null_description, vkd3dVersions.toTypedArray(), SPINNER, "VKD3D-2.13", SELECTED_VKD3D_KEY)

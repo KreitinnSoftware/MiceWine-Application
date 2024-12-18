@@ -40,11 +40,11 @@ class AdapterSettingsController(private val settingsControllerList: List<Setting
         holder.mappingType.isChecked = mapping[1].toBoolean()
 
         if (mapping[1].toBoolean()) {
-            holder.mappingTypeText.text = context.getString(R.string.mouse)
+            holder.mappingTypeText.text = context.getString(R.string.mouse_text)
             holder.keyBindSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, mouseEntries)
             holder.keyBindSpinner.setSelection(mouseEntries.indexOf(mapping[0]))
         } else {
-            holder.mappingTypeText.text = context.getString(R.string.keyboard)
+            holder.mappingTypeText.text = context.getString(R.string.keyboard_text)
             holder.keyBindSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, keyboardEntries)
             holder.keyBindSpinner.setSelection(keyboardEntries.indexOf(mapping[0]))
         }
@@ -63,11 +63,11 @@ class AdapterSettingsController(private val settingsControllerList: List<Setting
             mapping = getMapping(context, preferences.getString(ControllerMapper.SELECTED_CONTROLLER_PRESET_KEY, "default")!!, sList.key)
 
             if (mapping[1].toBoolean()) {
-                holder.mappingTypeText.text = context.getString(R.string.mouse)
+                holder.mappingTypeText.text = context.getString(R.string.mouse_text)
                 holder.keyBindSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, mouseEntries)
                 holder.keyBindSpinner.setSelection(mouseEntries.indexOf(mapping[0]))
             } else {
-                holder.mappingTypeText.text = context.getString(R.string.keyboard)
+                holder.mappingTypeText.text = context.getString(R.string.keyboard_text)
                 holder.keyBindSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, keyboardEntries)
                 holder.keyBindSpinner.setSelection(keyboardEntries.indexOf(mapping[0]))
             }

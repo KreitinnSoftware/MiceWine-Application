@@ -1,32 +1,15 @@
 <resources>
     <string name="app_name" translatable="false">MiceWine</string>
     <string name="app_lang">en_US</string>
-    <string name="full_screen">Fullscreen</string>
-    <string name="settingsTitle">Settings</string>
-    <string name="settingsDescription">Configure MiceWine</string>
-    <string name="app_close">Exit</string>
-    <string name="logTitle">Log</string>
-    <string name="logDescription">See MiceWine Logs</string>
-    <string name="clear_log">Clear</string>
-    <string name="desktop_mode_init">Desktop</string>
-    <string name="aboutTitle">About</string>
-    <string name="aboutDescription">About MiceWine</string>
-    <string name="general_settings">General Settings</string>
-    <string name="exit">Exit</string>
-    <string name="open_keyboard">Open Keyboard</string>
-    <string name="box64_settings_title">Box64 Settings</string>
-    <string name="box64_settings_description">Configure Box64</string>
-    <string name="wine_settings_title">Wine Settings</string>
-    <string name="wine_settings_description">Configure Wine</string>
-    <string name="display_settings_title">Display Settings</string>
-    <string name="display_settings_description">Configure Display</string>
-    <string name="driver_settings_title">Drivers Settings</string>
-    <string name="driver_settings_description">Configure GPU Drivers</string>
-    <string name="home_title">Home</string>
+
     <string name="box64_bigblock_title" translatable="false">BOX64_DYNAREC_BIGBLOCK</string>
     <string name="box64_bigblock_description">Enables/Disables Box64\'s Dynarec building BigBlock</string>
     <string name="box64_strongmem_title" translatable="false">BOX64_DYNAREC_STRONGMEM</string>
     <string name="box64_strongmem_description">Enable/Disable simulation of Strong Memory model</string>
+    <string name="box64_weakbarrier_title" translatable="false">BOX64_DYNAREC_WEAKBARRIER</string>
+    <string name="box64_weakbarrier_description">Tweaking the memory barriers to reduce the performance impact by STRONGMEM</string>
+    <string name="box64_pause_title" translatable="false">BOX64_DYNAREC_PAUSE</string>
+    <string name="box64_pause_description">Enable/Disable x86 PAUSE emulation, which may help the performance of spinlocks</string>
     <string name="box64_x87double_title" translatable="false">BOX64_DYNAREC_X87DOUBLE</string>
     <string name="box64_x87double_description">Force the use of Double for x87 emulation</string>
     <string name="box64_fastnan_title" translatable="false">BOX64_DYNAREC_FASTNAN</string>
@@ -39,16 +22,47 @@
     <string name="box64_callret_description">Optimization of CALL/RET opcodes (not compatible with jit/dynarec/smc)</string>
     <string name="box64_aligned_atomics_title" translatable="false">BOX64_DYNAREC_ALIGNED_ATOMICS</string>
     <string name="box64_aligned_atomics_description">Generated code for aligned atomics only</string>
+    <string name="box64_nativeflags_title" translatable="false">BOX64_DYNAREC_NATIVEFLAGS</string>
+    <string name="box64_nativeflags_description">Generate code will use native flags if possible</string>
     <string name="box64_bleeding_edge_title" translatable="false">BOX64_DYNAREC_BLEEDING_EDGE</string>
     <string name="box64_bleeding_edge_description">Detect MonoBleedingEdge and apply conservative settings</string>
     <string name="box64_dynarec_wait_title" translatable="false">BOX64_DYNAREC_WAIT</string>
     <string name="box64_dynarec_wait_description">Behavior with FillBlock is not available (FillBlock build Dynarec blocks and is not multithreaded)</string>
-    <string name="box64_weakbarrier_description">Tweaking the memory barriers to reduce the performance impact by STRONGMEM</string>
-    <string name="box64_weakbarrier_title" translatable="false">BOX64_DYNAREC_WEAKBARRIER</string>
-    <string name="box64_pause_description">Enable/Disable x86 PAUSE emulation, which may help the performance of spinlocks</string>
-    <string name="box64_pause_title" translatable="false">BOX64_DYNAREC_PAUSE</string>
-    <string name="box64_nativeflags_title" translatable="false">BOX64_DYNAREC_NATIVEFLAGS</string>
-    <string name="box64_nativeflags_description">Generate code will use native flags if possible</string>
+    <string name="box64_log_title" translatable="false">BOX64_LOG</string>
+    <string name="box64_log_description">Box64 Log Level</string>
+    <string name="box64_avx_title" translatable="false">BOX64_AVX</string>
+    <string name="box64_avx_description">Enable or Disable Box64 AVX or AVX2 Emulation</string>
+    <string name="box64_show_segv_title" translatable="false">BOX64_SHOWSEGV</string>
+    <string name="box64_show_segv_description">Show Segfault signal even if a signal handler is present</string>
+    <string name="box64_no_sigsegv_title" translatable="false">BOX64_NOSIGSEGV</string>
+    <string name="box64_no_sigsegv_description">Disable handling of SigSEGV. (Very useful for debugging.)</string>
+    <string name="box64_show_bt_title" translatable="false">BOX64_SHOWBT</string>
+    <string name="box64_show_bt_description">Show some Backtrace (Native and Emulated) when a signal (SEGV, ILL or BUS) is caught</string>
+    <string name="box64_no_sigill_title" translatable="false">BOX64_NOSIGILL</string>
+    <string name="box64_no_sigill_description">Disable handling of SigILL (to ease debugging mainly).</string>
+
+    <string name="full_screen">Fullscreen</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_description">Configure MiceWine</string>
+    <string name="app_close">Exit</string>
+    <string name="log_title">Log</string>
+    <string name="log_description">See MiceWine Logs</string>
+    <string name="clear_log">Clear</string>
+    <string name="desktop_mode_init">Desktop</string>
+    <string name="about_title">About</string>
+    <string name="about_description">About MiceWine</string>
+    <string name="general_settings">General Settings</string>
+    <string name="exit">Exit</string>
+    <string name="open_keyboard">Open Keyboard</string>
+    <string name="box64_settings_title">Box64 Settings</string>
+    <string name="box64_settings_description">Configure Box64</string>
+    <string name="wine_settings_title">Wine Settings</string>
+    <string name="wine_settings_description">Configure Wine</string>
+    <string name="display_settings_title">Display Settings</string>
+    <string name="display_settings_description">Configure Display</string>
+    <string name="driver_settings_title">Drivers Settings</string>
+    <string name="driver_settings_description">Configure GPU Drivers</string>
+    <string name="home_title">Home</string>
     <string name="stretch_display">Stretch Display</string>
     <string name="display_resolution_title">Display Resolution</string>
     <string name="display_resolution_description">Change Virtual Display Resolution</string>
@@ -63,80 +77,67 @@
     <string name="select_wined3d_description">Select WineD3D Version</string>
     <string name="select_dxvk_hud_preset_title">Select DXVK HUD Preset</string>
     <string name="select_dxvk_hud_preset_description">Select DXVK HUD Preset for more or less information</string>
-    <string name="controllerMapperTitle">Controller Mapper</string>
-    <string name="controllerMapperDescription">Configure your Gamepad</string>
+    <string name="controller_mapper_title">Controller Mapper</string>
+    <string name="controller_mapper_description">Configure your Gamepad</string>
     <string name="no_controllers_connected">No Controllers Connected.</string>
     <string name="connected_controller">Connected Controller: %1$s</string>
-    <string name="deadZoneTitle">Dead Zone</string>
-    <string name="mouseSensibilityTitle">Virtual Mouse Sensibility</string>
+    <string name="dead_zone_title">Dead Zone</string>
+    <string name="mouse_sensibility_title">Virtual Mouse Sensibility</string>
     <string name="open_overlay">Open/Close Overlay</string>
-    <string name="welcomeActivityTitle">Test Welcome Activity</string>
-    <string name="welcome_text_1">Welcome to MiceWine!</string>
-    <string name="continueText">Continue</string>
+    <string name="welcome_text">Welcome to MiceWine!</string>
+    <string name="continue_text">Continue</string>
     <string name="get_file_permission_text">Allow File Management Permission</string>
     <string name="extracting_resources_text">"Extracting Files…\nIt may take a while"</string>
     <string name="extracted_resources_text">Extraction Done!</string>
     <string name="extracting_from_assets">Extracting From Assets…</string>
     <string name="checking_rat_type">Checking Rat File Type…</string>
     <string name="invalid_rootfs_rat_file">Invalid RootFS Rat File.</string>
-    <string name="editControllerPreferences">Edit Controller Preferences</string>
-    <string name="removeGameItem">Delete</string>
-    <string name="executableAlreadyAdded">Executable Already Added</string>
-    <string name="selectExecutableFile">Select a .exe/.bat file</string>
-    <string name="renameGameItem">Rename</string>
-    <string name="incompatibleSelectedFile">Selected File is Incompatible</string>
-    <string name="newName">Type a New Name</string>
-    <string name="enableRamCounter">Enable/Disable Ram Counter</string>
-    <string name="enableRamCounterDescription">Enable or Disable RAM Counter on Screen</string>
-    <string name="selectedControllerPreset">Selected Controller Preset</string>
-    <string name="mouse">Mouse</string>
-    <string name="keyboard">Keyboard</string>
-    <string name="controllerPresetCreateText">Type a Name</string>
-    <string name="removeLastPresetError">The Last Preset Cannot be Removed</string>
-    <string name="editGameIcon">Edit Icon</string>
-    <string name="addGameToHome">Create Shortcut on Launcher</string>
-    <string name="cancelText">Cancel</string>
-    <string name="removeGameItemWarning">Are you sure you want to remove it?</string>
-    <string name="enableCPUCounter">Enable/Disable CPU Usage Counter</string>
-    <string name="enableCPUCounterDescription">Enable or Disable CPU Usage on Screen</string>
-    <string name="virtualControllerMapperTitle">Virtual Controller Mapper</string>
+    <string name="edit_controller_preferences">Edit Controller Preferences</string>
+    <string name="remove_game_item">Delete</string>
+    <string name="executable_already_added">Executable Already Added</string>
+    <string name="select_executable_file">Select a .exe/.bat file</string>
+    <string name="rename_game_item">Rename</string>
+    <string name="incompatible_selected_file">Selected File is Incompatible</string>
+    <string name="new_name_text">Type a New Name</string>
+    <string name="enable_ram_counter">Enable/Disable Ram Counter</string>
+    <string name="enable_ram_counter_description">Enable or Disable RAM Counter on Screen</string>
+    <string name="selected_controller_preset">Selected Controller Preset</string>
+    <string name="mouse_text">Mouse</string>
+    <string name="keyboard_text">Keyboard</string>
+    <string name="controller_preset_create_text">Type a Name</string>
+    <string name="remove_last_preset_error">The Last Preset Cannot be Removed</string>
+    <string name="edit_game_icon">Edit Icon</string>
+    <string name="add_game_to_home">Create Shortcut on Launcher</string>
+    <string name="cancel_text">Cancel</string>
+    <string name="remove_game_item_warning">Are you sure you want to remove it?</string>
+    <string name="enable_cpu_counter">Enable/Disable CPU Usage Counter</string>
+    <string name="enable_cpu_counter_description">Enable or Disable CPU Usage on Screen</string>
+    <string name="virtual_controller_mapper_title">Virtual Controller Mapper</string>
     <string name="mesa_vk_wsi_present_mode_title" translatable="false">MESA_VK_WSI_PRESENT_MODE</string>
     <string name="tu_debug_title" translatable="false">TU_DEBUG</string>
-    <string name="addButton">Add Button</string>
-    <string name="addVAxis">Add Virtual Axis</string>
-    <string name="fileManagerTitle">File Manager</string>
-    <string name="createShortcutOnHome">Create Shortcut on Home</string>
-    <string name="executeExe">Execute</string>
-    <string name="creatingWinePrefix">Creating Wine Prefix…</string>
+    <string name="add_button">Add Button</string>
+    <string name="add_virtual_axis">Add Virtual Axis</string>
+    <string name="file_manager_title">File Manager</string>
+    <string name="create_shortcut_on_home">Create Shortcut on Home</string>
+    <string name="execute_exe">Execute</string>
+    <string name="creating_wine_prefix">Creating Wine Prefix…</string>
     <string name="select_rootfs_file">Select RootFS File</string>
-    <string name="enableDebugInfo">Enable/Disable Debug Info</string>
-    <string name="enableDebugInfoDescription">Enable or Disable Debug Info on Screen</string>
+    <string name="enable_debug_info">Enable/Disable Debug Info</string>
+    <string name="enable_debug_info_description">Enable or Disable Debug Info on Screen</string>
     <string name="open_log_viewer">Open Log Viewer</string>
-    <string name="controllerVirtualMapperDescription">Configure On-Screen Controllers</string>
+    <string name="controller_virtual_mapper_description">Configure On-Screen Controllers</string>
     <string name="select_vkd3d_title">Select VKD3D Version</string>
     <string name="wine_esync_title">Enable or Disable Wine ESync (experimental)</string>
     <string name="wine_log_level_title">Wine Log Level</string>
-    <string name="box64_log_title" translatable="false">BOX64_LOG</string>
-    <string name="box64_avx_title" translatable="false">BOX64_AVX</string>
-    <string name="box64_avx_description">Enable or Disable Box64 AVX or AVX2 Emulation</string>
-    <string name="box64_log_description">Box64 Log Level</string>
-    <string name="save">Save</string>
+    <string name="save_text">Save</string>
     <string name="wine_is_closed">The Wine Processes is Closed</string>
-    <string name="box64_show_segv_title" translatable="false">BOX64_SHOWSEGV</string>
-    <string name="box64_show_segv_description">Show Segfault signal even if a signal handler is present</string>
-    <string name="box64_show_bt_title" translatable="false">BOX64_SHOWBT</string>
-    <string name="box64_show_bt_description">Show some Backtrace (Native and Emulated) when a signal (SEGV, ILL or BUS) is caught</string>
-    <string name="box64_no_sigsegv_title" translatable="false">BOX64_NOSIGSEGV</string>
-    <string name="box64_no_sigill_title" translatable="false">BOX64_NOSIGILL</string>
-    <string name="box64_no_sigsegv_description">Disable handling of SigSEGV. (Very useful for debugging.)</string>
-    <string name="box64_no_sigill_description">Disable handling of SigILL (to ease debugging mainly).</string>
     <string name="button_size">Button Size</string>
-    <string name="driverManagerTitle">Driver Manager</string>
-    <string name="driverManagerDescription">Manage Drivers</string>
-    <string name="installRatPackageWarning">You want to install</string>
-    <string name="enableDRI3">Enable DRI3</string>
+    <string name="driver_manager_title">Driver Manager</string>
+    <string name="driver_manager_description">Manage Drivers</string>
+    <string name="install_rat_package_warning">You want to install</string>
+    <string name="enable_dri3">Enable DRI3</string>
     <string name="enable_mangohud_title">Enable MangoHud</string>
     <string name="invalid_architecture_rat_file">Invalid Architecture Rat File.</string>
-    <string name="lnkUnsupported">Failed to read .lnk file</string>
-    <string name="createLnk">Save link</string>
+    <string name="lnk_read_fail">Failed to read .lnk file</string>
+    <string name="create_lnk">Create .lnk file</string>
 </resources>

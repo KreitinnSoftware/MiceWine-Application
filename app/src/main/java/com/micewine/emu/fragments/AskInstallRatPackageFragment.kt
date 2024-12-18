@@ -28,7 +28,7 @@ class AskInstallRatPackageFragment : DialogFragment() {
         val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create()
 
         val askInstallText = view.findViewById<TextView>(R.id.askInstallText)
-        askInstallText.text = "${activity?.getString(R.string.installRatPackageWarning)} ${ratCandidate?.name} (${ratCandidate?.version})?"
+        askInstallText.text = "${activity?.getString(R.string.install_rat_package_warning)} ${ratCandidate?.name} (${ratCandidate?.version})?"
 
         preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 

@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/welcome_text_1"
+            android:text="@string/welcome_text"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textSize="28sp"
             android:textStyle="bold"

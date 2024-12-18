@@ -13,13 +13,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/a_button"
-        android:title="@string/addButton">
+        android:title="@string/add_button">
     </item>
     <item
         android:id="@+id/addVAxis"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/l_up"
-        android:title="@string/addVAxis">
+        android:title="@string/add_virtual_axis">
     </item>
 </menu>

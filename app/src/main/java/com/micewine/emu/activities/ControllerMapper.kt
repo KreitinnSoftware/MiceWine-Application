@@ -69,7 +69,7 @@ class ControllerMapper : AppCompatActivity() {
 
         fragmentLoader(ControllerMapperFragment(), true)
 
-        findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.controllerMapperTitle)
+        findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.controller_mapper_title)
 
         controllerConnected = findViewById(R.id.controllerConnected)
 
@@ -85,7 +85,7 @@ class ControllerMapper : AppCompatActivity() {
         backButton?.setOnClickListener {
             if (supportFragmentManager.backStackEntryCount > 0) {
                 supportFragmentManager.popBackStack()
-                findViewById<Toolbar>(R.id.controllerMapperToolbar).title = this.resources.getString(R.string.controllerMapperTitle)
+                findViewById<Toolbar>(R.id.controllerMapperToolbar).title = this.resources.getString(R.string.controller_mapper_title)
             } else {
                 finish()
             }
@@ -337,7 +337,7 @@ class ControllerMapper : AppCompatActivity() {
 
             if (currentList.count() == 1) {
                 Toast.makeText(context,
-                    context.getString(R.string.removeLastPresetError), Toast.LENGTH_SHORT).show()
+                    context.getString(R.string.remove_last_preset_error), Toast.LENGTH_SHORT).show()
 
                 return
             }

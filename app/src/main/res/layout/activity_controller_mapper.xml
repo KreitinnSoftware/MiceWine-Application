@@ -25,7 +25,7 @@
             android:id="@+id/controllerMapperToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:title="@string/controllerMapperTitle">
+            android:title="@string/controller_mapper_title">
         </androidx.appcompat.widget.Toolbar>
     </LinearLayout>
 
@@ -58,7 +58,7 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:text="@string/deadZoneTitle"
+                android:text="@string/dead_zone_title"
                 android:padding="8dp">
             </TextView>
 
@@ -92,7 +92,7 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:text="@string/mouseSensibilityTitle"
+                android:text="@string/mouse_sensibility_title"
                 android:padding="8dp">
             </TextView>
 
@@ -122,7 +122,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="15sp"
         android:textStyle="bold"
-        android:text="@string/selectedControllerPreset"
+        android:text="@string/selected_controller_preset"
         android:textAlignment="center"
         android:padding="8dp">
     </TextView>

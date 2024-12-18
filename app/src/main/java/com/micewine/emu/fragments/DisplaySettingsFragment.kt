@@ -52,11 +52,11 @@ class DisplaySettingsFragment : Fragment() {
             "1080x1920", "2160x1080"
             ),
             SPINNER, "1280x720", DISPLAY_RESOLUTION_KEY)
-        addToAdapter(R.string.enableRamCounter, R.string.enableRamCounterDescription, null,
+        addToAdapter(R.string.enable_ram_counter, R.string.enable_ram_counter_description, null,
             SWITCH, "true", RAM_COUNTER_KEY)
-        addToAdapter(R.string.enableCPUCounter, R.string.enableCPUCounterDescription, null,
+        addToAdapter(R.string.enable_cpu_counter, R.string.enable_cpu_counter_description, null,
             SWITCH, "false", CPU_COUNTER_KEY)
-        addToAdapter(R.string.enableDebugInfo, R.string.enableDebugInfoDescription, null,
+        addToAdapter(R.string.enable_debug_info, R.string.enable_debug_info_description, null,
             SWITCH, "true", ENABLE_DEBUG_INFO_KEY)
     }
 

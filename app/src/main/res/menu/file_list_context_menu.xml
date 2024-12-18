@@ -4,28 +4,28 @@
         android:id="@+id/executeExe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="@string/executeExe">
+        android:title="@string/execute_exe">
     </item>
     <item
         android:id="@+id/addToHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="@string/createShortcutOnHome">
+        android:title="@string/create_shortcut_on_home">
     </item>
     <item
         android:id="@+id/createLnk"
-        android:title="@string/createLnk" />
+        android:title="@string/create_lnk" />
     <item
         android:id="@+id/renameFile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="@string/renameGameItem">
+        android:title="@string/rename_game_item">
     </item>
     <item
         android:id="@+id/deleteFile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="@string/removeGameItem">
+        android:title="@string/remove_game_item">
     </item>
 </menu>
 

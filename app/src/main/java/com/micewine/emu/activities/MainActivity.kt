@@ -15,7 +15,6 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.ContextMenu
 import android.view.KeyEvent
 import android.view.MenuItem
@@ -27,6 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
+import com.micewine.emu.CmdEntryPoint
 import com.micewine.emu.R
 import com.micewine.emu.activities.DriverManagerActivity.Companion.generateICDFile
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_AVX_KEY
@@ -101,8 +101,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
 
 
 class MainActivity : AppCompatActivity() {
@@ -376,7 +374,7 @@ class MainActivity : AppCompatActivity() {
                 } else if (selectedFile.endsWith(".bat") || selectedFile.endsWith(".msi")) {
                     saveToGameList(preferences!!, selectedFile, File(selectedFile).nameWithoutExtension, "")
                 } else {
-                    Toast.makeText(this, getString(R.string.incompatibleSelectedFile), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.incompatible_selected_file), Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -603,7 +601,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     catch (e: ShellLinkException) {
                         runOnUiThread {
-                            Toast.makeText(this@MainActivity, getString(R.string.lnkUnsupported), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@MainActivity, getString(R.string.lnk_read_fail), Toast.LENGTH_SHORT).show()
 
                         }
                     }
@@ -700,7 +698,7 @@ class MainActivity : AppCompatActivity() {
 
             File("$usrDir/icons").mkdirs()
 
-            dialogTitleText = getString(R.string.creatingWinePrefix)
+            dialogTitleText = getString(R.string.creating_wine_prefix)
             progressBarIsIndeterminate = true
 
             lifecycleScope.launch { runXServer(":0") }

@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/controllerPresetCreateText"
+        android:text="@string/controller_preset_create_text"
         android:textStyle="bold"
         android:textSize="16sp"
         >
@@ -35,7 +35,7 @@
             android:id="@+id/buttonContinue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/continueText">
+            android:text="@string/continue_text">
         </Button>
 
     </LinearLayout>

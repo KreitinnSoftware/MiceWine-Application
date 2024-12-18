@@ -33,11 +33,11 @@ class SettingsFragment : Fragment() {
 
         settingsList.clear()
 
-        addToAdapter(R.string.settingsTitle, R.string.settingsDescription, R.drawable.ic_settings_outline)
-        addToAdapter(R.string.controllerMapperTitle, R.string.controllerMapperDescription, R.drawable.ic_joystick)
-        addToAdapter(R.string.virtualControllerMapperTitle, R.string.controllerVirtualMapperDescription, R.drawable.ic_joystick)
-        addToAdapter(R.string.driverManagerTitle, R.string.driverManagerDescription, R.drawable.ic_gpu)
-        addToAdapter(R.string.aboutTitle, R.string.aboutDescription, R.drawable.ic_info_outline)
+        addToAdapter(R.string.settings_title, R.string.settings_description, R.drawable.ic_settings_outline)
+        addToAdapter(R.string.controller_mapper_title, R.string.controller_mapper_description, R.drawable.ic_joystick)
+        addToAdapter(R.string.virtual_controller_mapper_title, R.string.controller_virtual_mapper_description, R.drawable.ic_joystick)
+        addToAdapter(R.string.driver_manager_title, R.string.driver_manager_description, R.drawable.ic_gpu)
+        addToAdapter(R.string.about_title, R.string.about_description, R.drawable.ic_info_outline)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, icon: Int) {
