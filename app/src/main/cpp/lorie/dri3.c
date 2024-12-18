@@ -9,6 +9,7 @@
 #include <android/hardware_buffer.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include "drm_fourcc.h"
 #include "screenint.h"
 #include "lorie.h"
 #include "renderer.h"
@@ -189,25 +190,35 @@ static RegionPtr lorieCopyArea(DrawablePtr pSrc, DrawablePtr pDst, GCPtr pGC, in
     loriePixFromDrawable(pDst, 1);
     loriePixPriv(pDst, 1);
     RegionPtr r = NULL;
-    Bool wasLocked = TRUE;
-    if (pPixPriv0 && !pPixPriv1) {
-        wasLocked = pSrcPix0->devPrivate.ptr != NULL;
-        if (!wasLocked) {
-            void *addr = NULL;
-            int error;
-            if ((error = AHardwareBuffer_lock(pPixPriv0->buffer, AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN, -1, NULL, &addr)) != 0)
-                log(ERROR, "DRI3: AHardwareBuffer_lock failed: %d", error);
-            if (addr)
-                pSrc->pScreen->ModifyPixmapHeader(pSrcPix0, 0, 0, 0, 0, 0, addr);
-        }
+    void *addr[2] = {0};
+    int error;
+
+    if (pSrcPix0 && pSrcPix0->devPrivate.ptr == NULL && pPixPriv0) {
+        if ((error = AHardwareBuffer_lock(pPixPriv0->buffer, AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN, -1, NULL, &addr[0])) != 0)
+            log(ERROR, "DRI3: AHardwareBuffer_lock failed: %d", error);
+        if (addr[0])
+            pSrc->pScreen->ModifyPixmapHeader(pSrcPix0, 0, 0, 0, 0, 0, addr[0]);
+    }
+    if (pDstPix1 && pDstPix1->devPrivate.ptr == NULL && pPixPriv1) {
+        if ((error = AHardwareBuffer_lock(pPixPriv1->buffer, AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN, -1, NULL, &addr[1])) != 0)
+            log(ERROR, "DRI3: AHardwareBuffer_lock failed: %d", error);
+        if (addr[1])
+            pSrc->pScreen->ModifyPixmapHeader(pDstPix1, 0, 0, 0, 0, 0, addr[1]);
     }
 
-    if (!pPixPriv1)
-        r = (*pGC->ops->CopyArea) (pSrc, pDst, pGC, srcx, srcy, w, h, dstx, dsty);
+    if ((pSrc->type == DRAWABLE_WINDOW || (pSrc->type == DRAWABLE_PIXMAP && pSrcPix0->devPrivate.ptr))
+            && (pDst->type == DRAWABLE_WINDOW || (pDst->type == DRAWABLE_PIXMAP && pDstPix1->devPrivate.ptr))) {
+        r = (*pGC->ops->CopyArea)(pSrc, pDst, pGC, srcx, srcy, w, h, dstx, dsty);
+    }
 
-    if (!wasLocked) {
+    if (addr[0]) {
         AHardwareBuffer_unlock(pPixPriv0->buffer, NULL);
         pSrcPix0->devPrivate.ptr = NULL;
+    }
+
+    if (addr[1]) {
+        AHardwareBuffer_unlock(pPixPriv1->buffer, NULL);
+        pDstPix1->devPrivate.ptr = NULL;
     }
     LORIE_GC_OP_EPILOGUE(pGC)
     return r;
@@ -441,12 +452,13 @@ static PixmapPtr loriePixmapFromFds(ScreenPtr screen, CARD8 num_fds, const int *
         return NULL;
     }
 
-    if (modifier != RAW_MMAPPABLE_FD && modifier != AHARDWAREBUFFER_SOCKET_FD) {
+    if (modifier != RAW_MMAPPABLE_FD && modifier != AHARDWAREBUFFER_SOCKET_FD &&
+        modifier != DRM_FORMAT_MOD_INVALID) {
         log(ERROR, "DRI3: Modifier is not RAW_MMAPPABLE_FD or AHARDWAREBUFFER_SOCKET_FD");
         return NULL;
     }
 
-    if (modifier == RAW_MMAPPABLE_FD) {
+    if (modifier == DRM_FORMAT_MOD_INVALID || modifier == RAW_MMAPPABLE_FD) {
         void *addr = mmap(NULL, strides[0] * height, PROT_READ, MAP_SHARED, fds[0], offsets[0]);
         if (!addr || addr == MAP_FAILED) {
             log(ERROR, "DRI3: RAW_MMAPPABLE_FD: mmap failed");

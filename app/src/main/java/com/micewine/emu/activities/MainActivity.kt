@@ -87,6 +87,7 @@ import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
 import com.micewine.emu.utils.DriveUtils
 import io.ByteWriter
+import com.micewine.emu.utils.FilePathResolver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -279,6 +280,22 @@ class MainActivity : AppCompatActivity() {
             )
 
             startActivityIfNeeded(intent, 0)
+        }
+
+        intent?.data?.let { uri ->
+            val filePath = FilePathResolver.resolvePath(this, uri)
+
+            val runWineIntent = Intent(ACTION_RUN_WINE).apply {
+                putExtra("exePath", filePath)
+            }
+
+            sendBroadcast(runWineIntent)
+
+            val emulationActivityIntent = Intent(this@MainActivity, EmulationActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+            }
+
+            startActivityIfNeeded(emulationActivityIntent, 0)
         }
     }
 
@@ -571,7 +588,7 @@ class MainActivity : AppCompatActivity() {
 
             runCommand("pkill -9 wineserver")
             runCommand("pkill -9 .exe")
-            runCommand("pkill -9 pulseaudio")
+            runCommand(getEnv() + "$usrDir/bin/pulseaudio --start --exit-idle=-1")
 
             if (exePath == "") {
                 WineWrapper.wine("explorer /desktop=shell,$selectedResolution TFM", winePrefix)
@@ -598,7 +615,6 @@ class MainActivity : AppCompatActivity() {
 
             runCommand("pkill -9 wineserver")
             runCommand("pkill -9 .exe")
-            runCommand("pkill -9 pulseaudio")
 
             runOnUiThread {
                 Toast.makeText(this@MainActivity, getString(R.string.wine_is_closed), Toast.LENGTH_SHORT).show()
