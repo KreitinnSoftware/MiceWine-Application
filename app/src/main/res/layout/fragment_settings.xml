@@ -24,8 +24,6 @@
                 android:layout_height="140dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_grayscale"
-                app:tintMode="multiply"
-                app:tint="?attr/colorAccent"
                 android:importantForAccessibility="no">
             </ImageView>
 
