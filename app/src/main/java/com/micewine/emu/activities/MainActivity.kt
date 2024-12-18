@@ -15,6 +15,7 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.ContextMenu
 import android.view.KeyEvent
 import android.view.MenuItem
@@ -84,17 +85,29 @@ import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
+import com.micewine.emu.utils.DriveUtils
+import io.ByteWriter
 import com.micewine.emu.utils.FilePathResolver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mslinks.LinkTargetIDList
+import mslinks.ShellLink
+import mslinks.ShellLinkException
+import mslinks.data.ItemID
+import mslinks.data.VolumeID
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+
 
 class MainActivity : AppCompatActivity() {
+    private val EXPORT_LNK_ACTION = 1;
+
     private var binding: ActivityMainBinding? = null
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
@@ -130,7 +143,7 @@ class MainActivity : AppCompatActivity() {
                     val file = File(fileName!!)
 
                     if (file.isFile) {
-                        if (file.name.endsWith(".exe") || file.name.endsWith(".bat") || file.name.endsWith(".msi")) {
+                        if (file.name.endsWith(".exe") || file.name.endsWith(".bat") || file.name.endsWith(".msi") || file.name.endsWith(".lnk")) {
                             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                                 putExtra("exePath", file.path)
                             }
@@ -367,8 +380,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            R.id.createLnk -> {
+                exportLnkAction(selectedFile)
+            }
+
             R.id.executeExe -> {
-                if (selectedFile.endsWith(".exe") || selectedFile.endsWith(".bat") || selectedFile.endsWith(".msi")) {
+                if (selectedFile.endsWith(".exe") || selectedFile.endsWith(".bat") || selectedFile.endsWith(".msi")  || selectedFile.endsWith(".lnk")) {
                     val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                         putExtra("exePath", selectedFile)
                     }
@@ -395,7 +412,71 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(
         requestCode: Int, resultCode: Int, data: Intent?
     ) {
-        if (resultCode == Activity.RESULT_OK) {
+        if (requestCode == EXPORT_LNK_ACTION && resultCode == Activity.RESULT_OK) {
+            data?.data?.let { uri ->
+
+                val driveInfo = DriveUtils.parseUnixPath(selectedFile)
+
+                if (driveInfo != null) {
+                    val shellLink = ShellLink().apply {
+                        header.linkFlags.setHasLinkTargetIDList()
+                    }
+
+                    val target = driveInfo.getWindowsPath()
+
+                    val idList = LinkTargetIDList()
+                    val pathSegments = target.replace('\\', File.separatorChar)
+                        .split(File.separatorChar)
+                        .filter { it.isNotEmpty() }
+
+                    idList.apply {
+                        add(ItemID().setType(ItemID.TYPE_CLSID))
+                        add(ItemID().setType(ItemID.TYPE_DRIVE).setName(pathSegments[0]))
+                        pathSegments.drop(1).forEach { segment ->
+                            add(ItemID().setType(ItemID.TYPE_DIRECTORY).setName(segment))
+                        }
+                        add(ItemID().setType(ItemID.TYPE_FILE).setName(File(driveInfo.getUnixPath()).name))
+                    }
+
+                    shellLink.apply {
+                        createLinkInfo()
+                        linkInfo.apply {
+                            createVolumeID().setDriveType(VolumeID.DRIVE_FIXED)
+                            setLocalBasePath(driveInfo.getUnixPath())
+                        }
+                    }
+
+                    val outputStream = contentResolver.openOutputStream(uri)
+                    outputStream?.use {
+                        val byteWriter = ByteWriter(it)
+
+                        with(shellLink) {
+                            header.serialize(byteWriter)
+
+                            if (header.linkFlags.hasLinkTargetIDList()) {
+                                idList.serialize(byteWriter)
+                            }
+
+                            if (header.linkFlags.hasLinkInfo()) {
+                                linkInfo.serialize(byteWriter)
+                            }
+
+                            if (header.linkFlags.hasName()) {
+                                byteWriter.writeUnicodeString(name ?: "")
+                            }
+
+                            if (header.linkFlags.hasWorkingDir()) {
+                                val workingDir = driveInfo.getWindowsPath() ?: ""
+                                byteWriter.writeUnicodeString(workingDir)
+                            }
+                            byteWriter.write4bytes(0)
+                        }
+                    }
+                }
+            }
+        }
+
+        else if (resultCode == Activity.RESULT_OK) {
             data?.data?.also { uri ->
                 setIconToGame(this, preferences!!, uri, selectedGameArray)
             }
@@ -417,6 +498,17 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(
             Intent.createChooser(intent, ""), 0
         )
+    }
+
+    @Suppress("DEPRECATION")
+    private fun exportLnkAction(exePath: String) {
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/x-ms-shortcut"
+            putExtra(Intent.EXTRA_TITLE, "${File(exePath).nameWithoutExtension}.lnk")
+        }
+
+        startActivityForResult(intent, EXPORT_LNK_ACTION)
     }
 
     private fun fragmentLoader(fragment: Fragment, appInit: Boolean) {
@@ -501,7 +593,24 @@ class MainActivity : AppCompatActivity() {
             if (exePath == "") {
                 WineWrapper.wine("explorer /desktop=shell,$selectedResolution TFM", winePrefix)
             } else {
-                WineWrapper.wine("'$exePath'", winePrefix, "'${File(exePath).parent!!}'")
+                if (exePath.endsWith(".lnk")) {
+                    try {
+                        val shell = ShellLink(exePath)
+                        val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
+                        if (drive != null) {2
+                            WineWrapper.wine("'${drive.getUnixPath()}'", winePrefix, "'${File(drive.getUnixPath()).parent!!}'")
+                        }
+                    }
+                    catch (e: ShellLinkException) {
+                        runOnUiThread {
+                            Toast.makeText(this@MainActivity, getString(R.string.lnkUnsupported), Toast.LENGTH_SHORT).show()
+
+                        }
+                    }
+                }
+                else {
+                    WineWrapper.wine("'$exePath'", winePrefix, "'${File(exePath).parent!!}'")
+                }
             }
 
             runCommand("pkill -9 wineserver")

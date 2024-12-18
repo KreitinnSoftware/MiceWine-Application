@@ -116,4 +116,6 @@
     <string name="enableDRI3">Ativar DRI3</string>
     <string name="enable_mangohud_title">Ativar MangoHud</string>
     <string name="invalid_architecture_rat_file">Invalid Architecture Rat File.</string>
+    <string name="lnkUnsupported">Failed to read .lnk file</string>
+    <string name="createLnk">Save link</string>
 </resources>
