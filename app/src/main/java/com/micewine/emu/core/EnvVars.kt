@@ -52,6 +52,7 @@ object EnvVars {
         putVar("HOME", homeDir.path)
         putVar("XDG_CONFIG_HOME", "$homeDir/.config")
         putVar("DISPLAY", ":0")
+        putVar("PULSE_LATENCY_MSEC", "60")
         putVar("LD_LIBRARY_PATH", "/system/lib64:$usrDir/lib")
         putVar("PATH", "\$PATH:$usrDir/bin:$appRootDir/wine/bin")
         putVar("PREFIX", usrDir.path)
