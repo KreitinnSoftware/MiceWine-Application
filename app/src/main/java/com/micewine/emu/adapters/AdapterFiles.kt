@@ -65,7 +65,9 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
 
             holder.fileDescription.text = formatSize(fileSize)
 
-            if (sList.file.name.endsWith(".exe")) {
+            val fileExtension = sList.file.extension.lowercase()
+
+            if (fileExtension == "exe") {
                 val output = "$usrDir/icons/${sList.file.nameWithoutExtension}-icon.ico"
 
                 extractIcon(sList.file, output)
@@ -75,7 +77,7 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                 } else {
                     holder.icon.setImageResource(R.drawable.ic_log)
                 }
-            } else if (sList.file.name.endsWith(".rat")) {
+            } else if (fileExtension == "rat") {
                 holder.icon.setImageResource(R.drawable.icon_grayscale)
             } else {
                 holder.icon.setImageResource(R.drawable.ic_log)

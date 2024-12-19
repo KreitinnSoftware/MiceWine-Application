@@ -28,7 +28,7 @@ object WineWrapper {
     }
 
     fun extractIcon(exeFile: File, output: String) {
-        if (exeFile.name.endsWith(".exe")) {
+        if (exeFile.extension.lowercase() == "exe") {
             runCommand(
                 getEnv() + "wrestool -x -t 14 '${exeFile.path}' > '$output'"
             )

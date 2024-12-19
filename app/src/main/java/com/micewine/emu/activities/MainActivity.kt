@@ -141,7 +141,9 @@ class MainActivity : AppCompatActivity() {
                     val file = File(fileName!!)
 
                     if (file.isFile) {
-                        if (file.name.endsWith(".exe") || file.name.endsWith(".bat") || file.name.endsWith(".msi") || file.name.endsWith(".lnk")) {
+                        val fileExtension = file.extension.lowercase()
+
+                        if (fileExtension == "exe" || fileExtension == "bat" || fileExtension == "msi" || fileExtension == "lnk") {
                             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                                 putExtra("exePath", file.path)
                             }
@@ -153,7 +155,7 @@ class MainActivity : AppCompatActivity() {
                             }
 
                             startActivityIfNeeded(emulationActivityIntent, 0)
-                        } else if (file.name.endsWith(".rat")) {
+                        } else if (file.name.endsWith("rat")) {
                             ratCandidate = RatPackageManager.RatPackage(file.path)
                             AskInstallRatPackageFragment().show(supportFragmentManager, "")
                         }
@@ -365,7 +367,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.addToHome -> {
-                if (selectedFile.endsWith(".exe")) {
+                if (selectedFile.endsWith("exe")) {
                     val output = "$usrDir/icons/${File(selectedFile).nameWithoutExtension}-icon"
 
                     WineWrapper.extractIcon(File(selectedFile), output)
@@ -383,7 +385,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.executeExe -> {
-                if (selectedFile.endsWith(".exe") || selectedFile.endsWith(".bat") || selectedFile.endsWith(".msi")  || selectedFile.endsWith(".lnk")) {
+                val fileExtension = File(selectedFile).extension.lowercase()
+
+                if (fileExtension  == "exe" || fileExtension == "bat" || fileExtension == "msi"  || fileExtension == "lnk") {
                     val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                         putExtra("exePath", selectedFile)
                     }
