@@ -140,4 +140,7 @@
     <string name="invalid_architecture_rat_file">Invalid Architecture Rat File.</string>
     <string name="lnk_read_fail">Failed to read .lnk file</string>
     <string name="create_lnk">Create .lnk file</string>
+    <string name="item_text">item</string>
+    <string name="items_text">items</string>
+    <string name="empty_text">Empty</string>
 </resources>

@@ -117,7 +117,6 @@ class GeneralSettings : AppCompatActivity() {
 
     companion object {
         const val ACTION_PREFERENCE_SELECT = "com.micewine.emu.ACTION_PREFERENCE_SELECT"
-        const val ACTION_PREFERENCES_CHANGED = "com.micewine.emu.ACTION_PREFERENCES_CHANGED"
         const val SWITCH = 1
         const val SPINNER = 2
         const val CHECKBOX = 3

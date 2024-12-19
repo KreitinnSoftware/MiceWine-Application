@@ -52,7 +52,6 @@ import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
 import com.micewine.emu.ICmdEntryInterface
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettings.Companion.ACTION_PREFERENCES_CHANGED
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_STOP_ALL
 import com.micewine.emu.activities.MainActivity.Companion.enableCpuCounter
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
@@ -72,7 +71,6 @@ import com.micewine.emu.input.TouchInputHandler.RenderStub.NullStub
 import com.micewine.emu.views.OverlayView
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-
 
 class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
     private var mInputHandler: TouchInputHandler? = null
@@ -99,10 +97,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     } catch (e: Exception) {
                         Log.e("MainActivity", "Something went wrong while we extracted connection details from binder.", e)
                     }
-                }
-                ACTION_PREFERENCES_CHANGED -> {
-                    Log.d("MainActivity", "preference: " + intent.getStringExtra("key"))
-                    onPreferencesChanged()
                 }
                 ACTION_STOP_ALL -> {
                     finishAffinity()
@@ -273,7 +267,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                         drawerLayout?.closeDrawers()
                     }
 
-                    lorieView.releasePointerCapture()
                     return@OnKeyListener true
                 }
             } else if (k == KeyEvent.KEYCODE_VOLUME_DOWN) {
@@ -330,7 +323,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         registerReceiver(receiver, object : IntentFilter(ACTION_START) {
             init {
-                addAction(ACTION_PREFERENCES_CHANGED)
                 addAction(ACTION_STOP_ALL)
             }
         })
@@ -347,6 +339,14 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         ) {
             requestPermissions(arrayOf(permission.POST_NOTIFICATIONS), 0)
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        lorieView.requestFocus()
+
+        mLorieKeyListener?.onKey(null, keyCode, event)
+
+        return true
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
@@ -410,7 +410,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
     }
 
-    fun onPreferencesChanged() {
+    private fun onPreferencesChanged() {
         mInputHandler!!.setInputMode(TouchInputHandler.InputMode.TRACKPAD)
         mInputHandler!!.setTapToMove(false)
         mInputHandler!!.setPreferScancodes(isKeyboardConnected())

@@ -121,4 +121,7 @@
     <string name="invalid_architecture_rat_file">Invalid Architecture Rat File.</string>
     <string name="lnk_read_fail">Falha ao ler arquivo .lnk</string>
     <string name="create_lnk">Salvar atalho .lnk</string>
+    <string name="item_text">item</string>
+    <string name="items_text">itens</string>
+    <string name="empty_text">Vazio</string>
 </resources>
