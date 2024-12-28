@@ -143,4 +143,5 @@
     <string name="item_text">item</string>
     <string name="items_text">items</string>
     <string name="empty_text">Empty</string>
+    <string name="enable_wine_services_title">Enable Wine Services</string>
 </resources>

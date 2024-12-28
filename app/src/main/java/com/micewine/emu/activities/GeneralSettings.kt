@@ -148,6 +148,7 @@ class GeneralSettings : AppCompatActivity() {
         const val SELECTED_VKD3D_KEY = "selectedVKD3D"
         const val ENABLE_DRI3 = "enableDRI3"
         const val ENABLE_MANGOHUD = "enableMangoHUD"
+        const val ENABLE_SERVICES = "enableServices"
         const val WINE_ESYNC_KEY = "wineEsync"
         const val WINE_LOG_LEVEL_KEY = "wineLogLevel"
         const val SELECTED_GL_PROFILE_KEY = "selectedGLProfile"

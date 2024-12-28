@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
+import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_SERVICES
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
 import com.micewine.emu.activities.GeneralSettings.Companion.WINE_ESYNC_KEY
@@ -43,6 +44,7 @@ class WineSettingsFragment : Fragment() {
         settingsList.clear()
 
         addToAdapter(R.string.wine_esync_title, R.string.null_description, null, SWITCH, "false", WINE_ESYNC_KEY)
+        addToAdapter(R.string.enable_wine_services_title, R.string.null_description, null, SWITCH, "false", ENABLE_SERVICES)
         addToAdapter(R.string.wine_log_level_title, R.string.null_description, arrayOf("minimal", "default"), SPINNER, "default", WINE_LOG_LEVEL_KEY)
     }
 

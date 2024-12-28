@@ -51,6 +51,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWSEGV_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_DRI3
 import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_MANGOHUD
+import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_SERVICES
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_KEY
@@ -89,6 +90,7 @@ import com.micewine.emu.utils.DriveUtils
 import io.ByteWriter
 import com.micewine.emu.utils.FilePathResolver
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mslinks.LinkTargetIDList
@@ -592,6 +594,15 @@ class MainActivity : AppCompatActivity() {
             runCommand("pkill -9 .exe")
             runCommand(getEnv() + "$usrDir/bin/pulseaudio --start --exit-idle=-1")
 
+            var wineRunning = true
+
+            lifecycleScope.launch {
+                while (!enableServices && wineRunning) {
+                    runCommand("pkill -9 services.exe")
+                    delay(1200)
+                }
+            }
+
             if (exePath == "") {
                 WineWrapper.wine("explorer /desktop=shell,$selectedResolution TFM", winePrefix)
             } else {
@@ -599,14 +610,13 @@ class MainActivity : AppCompatActivity() {
                     try {
                         val shell = ShellLink(exePath)
                         val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
-                        if (drive != null) {2
+                        if (drive != null) {
                             WineWrapper.wine("'${drive.getUnixPath()}'", winePrefix, "'${File(drive.getUnixPath()).parent!!}'")
                         }
                     }
                     catch (e: ShellLinkException) {
                         runOnUiThread {
                             Toast.makeText(this@MainActivity, getString(R.string.lnk_read_fail), Toast.LENGTH_SHORT).show()
-
                         }
                     }
                 }
@@ -617,6 +627,8 @@ class MainActivity : AppCompatActivity() {
 
             runCommand("pkill -9 wineserver")
             runCommand("pkill -9 .exe")
+
+            wineRunning = false
 
             runOnUiThread {
                 Toast.makeText(this@MainActivity, getString(R.string.wine_is_closed), Toast.LENGTH_SHORT).show()
@@ -730,6 +742,7 @@ class MainActivity : AppCompatActivity() {
         var enableDebugInfo: Boolean = false
         var enableDRI3: Boolean = false
         var enableMangoHUD: Boolean = false
+        var enableServices: Boolean = false
         var appLang: String? = null
         var box64LogLevel: String? = null
         var box64Avx: String? = null
@@ -854,6 +867,7 @@ class MainActivity : AppCompatActivity() {
             box64NoSigill = booleanToString(preferences.getBoolean(BOX64_NOSIGILL_KEY, false))
             enableDRI3 = preferences.getBoolean(ENABLE_DRI3, true)
             enableMangoHUD = preferences.getBoolean(ENABLE_MANGOHUD, true)
+            enableServices = preferences.getBoolean(ENABLE_SERVICES, false)
             wineESync = booleanToString(preferences.getBoolean(WINE_ESYNC_KEY, false))
             wineLogLevel = preferences.getString(WINE_LOG_LEVEL_KEY, "default")
             selectedDriver = preferences.getString(SELECTED_DRIVER_KEY, "")

@@ -124,4 +124,5 @@
     <string name="item_text">item</string>
     <string name="items_text">itens</string>
     <string name="empty_text">Vazio</string>
+    <string name="enable_wine_services_title">Ativar Serviços do Wine</string>
 </resources>
