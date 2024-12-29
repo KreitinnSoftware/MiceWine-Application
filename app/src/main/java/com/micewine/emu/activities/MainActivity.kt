@@ -151,6 +151,8 @@ class MainActivity : AppCompatActivity() {
                     tmpDir.deleteRecursively()
                     tmpDir.mkdirs()
 
+                    setSharedVars(this@MainActivity)
+
                     val driverLibPath = File("$ratPackagesDir/$selectedDriver/pkg-header").readLines()[4].substringAfter("=")
 
                     generateICDFile(driverLibPath, File("$appRootDir/vulkan_icd.json"))
@@ -311,8 +313,6 @@ class MainActivity : AppCompatActivity() {
                 flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
             }
 
-            WineWrapper.wineServer("--kill")
-
             sendBroadcast(
                 Intent(ACTION_RUN_WINE).apply {
                     putExtra("exePath", exePath)
@@ -454,7 +454,7 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(
         requestCode: Int, resultCode: Int, data: Intent?
     ) {
-        if (requestCode == Companion.EXPORT_LNK_ACTION && resultCode == Activity.RESULT_OK) {
+        if (requestCode == EXPORT_LNK_ACTION && resultCode == Activity.RESULT_OK) {
             data?.data?.let { uri ->
 
                 val driveInfo = DriveUtils.parseUnixPath(selectedFile)
@@ -550,7 +550,7 @@ class MainActivity : AppCompatActivity() {
             putExtra(Intent.EXTRA_TITLE, "${File(exePath).nameWithoutExtension}.lnk")
         }
 
-        startActivityForResult(intent, Companion.EXPORT_LNK_ACTION)
+        startActivityForResult(intent, EXPORT_LNK_ACTION)
     }
 
     private fun fragmentLoader(fragment: Fragment, appInit: Boolean) {
@@ -761,6 +761,8 @@ class MainActivity : AppCompatActivity() {
 
             fileManagerCwd = fileManagerDefaultDir
             setupDone = true
+
+            setSharedVars(this@MainActivity)
         }
     }
 
