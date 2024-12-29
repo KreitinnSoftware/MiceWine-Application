@@ -631,12 +631,13 @@ class MainActivity : AppCompatActivity() {
             runCommand("pkill -9 wineserver")
             runCommand("pkill -9 .exe")
             runCommand(getEnv() + "$usrDir/bin/pulseaudio --start --exit-idle=-1")
+            WineWrapper.wine("wineboot", winePrefix)
 
             var wineRunning = true
 
             lifecycleScope.launch {
                 while (!enableServices && wineRunning) {
-                    runCommand("pkill -9 services.exe")
+                    runCommand("pkill -9 services.exe", false)
                     delay(1200)
                 }
             }

@@ -57,7 +57,11 @@ object ShellLoader {
     }
 
     fun runCommand(cmd: String) {
-        ShellLoader().runCommand(cmd)
+        ShellLoader().runCommand(cmd, true)
+    }
+
+    fun runCommand(cmd: String, log: Boolean) {
+        ShellLoader().runCommand(cmd, log)
     }
 
     private class ShellLoader {
@@ -100,8 +104,10 @@ object ShellLoader {
             }.start()
         }
 
-        fun runCommand(cmd: String) {
-            Log.v("ShellLoader", "Trying to exec: '$cmd'")
+        fun runCommand(cmd: String, log: Boolean) {
+            if (log) {
+                Log.v("ShellLoader", "Trying to exec: '$cmd'")
+            }
 
             os?.writeBytes("$cmd\nexit\n")
             os?.flush()
