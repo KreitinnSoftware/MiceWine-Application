@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
 import com.micewine.emu.activities.MainActivity.Companion.CPU_COUNTER_KEY
@@ -51,7 +51,7 @@ class DisplaySettingsFragment : Fragment() {
             "1600x900", "1800x900",
             "1080x1920", "2160x1080"
             ),
-            SPINNER, "1280x720", DISPLAY_RESOLUTION_KEY)
+            SPINNER, "1280x720", DISPLAY_RESOLUTION)
         addToAdapter(R.string.enable_ram_counter, R.string.enable_ram_counter_description, null,
             SWITCH, "true", RAM_COUNTER_KEY)
         addToAdapter(R.string.enable_cpu_counter, R.string.enable_cpu_counter_description, null,

@@ -10,15 +10,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettings.Companion.CHECKBOX
 import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_DRI3
+import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_DRI3_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_MANGOHUD
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_GL_PROFILE_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VKD3D_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_MANGOHUD_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_GL_PROFILE
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_GL_PROFILE_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VKD3D
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VKD3D_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
@@ -74,15 +84,15 @@ class DriversSettingsFragment : Fragment() {
             wined3dVersions.add(it.name)
         }
 
-        addToAdapter(R.string.enable_dri3, R.string.null_description, null, SWITCH, "true", ENABLE_DRI3)
-        addToAdapter(R.string.select_d3dx_title, R.string.null_description, arrayOf("DXVK", "WineD3D"), SPINNER, "DXVK", SELECTED_D3DX_RENDERER_KEY)
-        addToAdapter(R.string.select_dxvk_title, R.string.null_description, dxvkVersions.toTypedArray(), SPINNER, "DXVK-1.10.3-async", SELECTED_DXVK_KEY)
-        addToAdapter(R.string.select_vkd3d_title, R.string.null_description, vkd3dVersions.toTypedArray(), SPINNER, "VKD3D-2.13", SELECTED_VKD3D_KEY)
-        addToAdapter(R.string.enable_mangohud_title, R.string.null_description, null, SWITCH, "true", ENABLE_MANGOHUD)
-        addToAdapter(R.string.select_dxvk_hud_preset_title, R.string.null_description, arrayOf("fps", "gpuload", "devinfo", "version", "api"), CHECKBOX, "", SELECTED_DXVK_HUD_PRESET_KEY)
-        addToAdapter(R.string.mesa_vk_wsi_present_mode_title, R.string.null_description, arrayOf("fifo", "relaxed", "mailbox", "immediate"), SPINNER, "mailbox", SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY)
-        addToAdapter(R.string.tu_debug_title, R.string.null_description, arrayOf("noconform", "flushall", "syncdraw", "sysmem", "gmem", "nolrz", "noubwc", "nomultipos", "forcebin"), CHECKBOX, "noconform", SELECTED_TU_DEBUG_PRESET_KEY)
-        addToAdapter(R.string.select_wined3d_title, R.string.null_description, wined3dVersions.toTypedArray(), SPINNER, "WineD3D-(9.3)", SELECTED_WINED3D_KEY)
+        addToAdapter(R.string.enable_dri3, R.string.null_description, null, SWITCH, ENABLE_DRI3_DEFAULT_VALUE, ENABLE_DRI3)
+        addToAdapter(R.string.select_d3dx_title, R.string.null_description, arrayOf("DXVK", "WineD3D"), SPINNER, SELECTED_D3DX_RENDERER_DEFAULT_VALUE, SELECTED_D3DX_RENDERER)
+        addToAdapter(R.string.select_dxvk_title, R.string.null_description, dxvkVersions.toTypedArray(), SPINNER, SELECTED_DXVK_DEFAULT_VALUE, SELECTED_DXVK)
+        addToAdapter(R.string.select_vkd3d_title, R.string.null_description, vkd3dVersions.toTypedArray(), SPINNER, SELECTED_VKD3D_DEFAULT_VALUE, SELECTED_VKD3D)
+        addToAdapter(R.string.enable_mangohud_title, R.string.null_description, null, SWITCH, ENABLE_MANGOHUD_DEFAULT_VALUE, ENABLE_MANGOHUD)
+        addToAdapter(R.string.select_dxvk_hud_preset_title, R.string.null_description, arrayOf("fps", "gpuload", "devinfo", "version", "api"), CHECKBOX, SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE, SELECTED_DXVK_HUD_PRESET)
+        addToAdapter(R.string.mesa_vk_wsi_present_mode_title, R.string.null_description, arrayOf("fifo", "relaxed", "mailbox", "immediate"), SPINNER, SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE, SELECTED_MESA_VK_WSI_PRESENT_MODE)
+        addToAdapter(R.string.tu_debug_title, R.string.null_description, arrayOf("noconform", "flushall", "syncdraw", "sysmem", "gmem", "nolrz", "noubwc", "nomultipos", "forcebin"), CHECKBOX, SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE, SELECTED_TU_DEBUG_PRESET)
+        addToAdapter(R.string.select_wined3d_title, R.string.null_description, wined3dVersions.toTypedArray(), SPINNER, SELECTED_WINED3D_DEFAULT_VALUE, SELECTED_WINED3D)
         addToAdapter(R.string.select_gl_profile_title, R.string.null_description, arrayOf(
             "GL 2.1", "GL 3.0",
             "GL 3.1", "GL 3.2",
@@ -90,10 +100,10 @@ class DriversSettingsFragment : Fragment() {
             "GL 4.1", "GL 4.2",
             "GL 4.3", "GL 4.4",
             "GL 4.5", "GL 4.6"),
-            SPINNER, "GL 4.6", SELECTED_GL_PROFILE_KEY)
+            SPINNER, SELECTED_GL_PROFILE_DEFAULT_VALUE, SELECTED_GL_PROFILE)
     }
 
-    private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>?, type: Int, defaultValue: String, keyId: String) {
-        settingsList.add(SettingsListSpinner(titleId, descriptionId, valuesArray, type, defaultValue, keyId))
+    private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>?, type: Int, defaultValue: Any, keyId: String) {
+        settingsList.add(SettingsListSpinner(titleId, descriptionId, valuesArray, type, "$defaultValue", keyId))
     }
 }

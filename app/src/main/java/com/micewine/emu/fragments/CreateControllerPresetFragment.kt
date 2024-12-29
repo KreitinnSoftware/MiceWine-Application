@@ -17,9 +17,7 @@ class CreateControllerPresetFragment : DialogFragment() {
         val editTextNewName = view.findViewById<EditText>(R.id.editTextNewName)
         val buttonContinue = view.findViewById<Button>(R.id.buttonContinue)
 
-        val dialog = AlertDialog.Builder(requireContext())
-            .setView(view)
-            .create()
+        val dialog = AlertDialog.Builder(requireContext()).setView(view).create()
 
         buttonContinue.setOnClickListener {
             val newName = editTextNewName.text.toString()

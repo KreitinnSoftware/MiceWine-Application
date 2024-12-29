@@ -1,20 +1,16 @@
 package com.micewine.emu.adapters
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
-import com.micewine.emu.activities.MainActivity.Companion.appRootDir
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.selectedDriver
-import java.io.File
 
 class AdapterRatPackage(private val settingsList: List<DriverItem>, context: Context) :
     RecyclerView.Adapter<AdapterRatPackage.ViewHolder>() {
@@ -30,7 +26,7 @@ class AdapterRatPackage(private val settingsList: List<DriverItem>, context: Con
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val sList = settingsList[position]
 
-        selectedDriver = preferences.getString(SELECTED_DRIVER_KEY, "")
+        selectedDriver = preferences.getString(SELECTED_DRIVER, "")
 
         if (sList.driverFolderId == selectedDriver) {
             selectedItem = position
@@ -40,7 +36,7 @@ class AdapterRatPackage(private val settingsList: List<DriverItem>, context: Con
             radioButton.isChecked = position == selectedItem
             radioButton.setOnClickListener {
                 preferences.edit().apply {
-                    putString(SELECTED_DRIVER_KEY, sList.driverFolderId)
+                    putString(SELECTED_DRIVER, sList.driverFolderId)
                     apply()
 
                     selectedItem = position

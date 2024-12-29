@@ -24,9 +24,7 @@ class DeleteGameItemFragment : DialogFragment() {
         val buttonContinue = view.findViewById<Button>(R.id.buttonContinue)
         val buttonCancel = view.findViewById<Button>(R.id.buttonCancel)
 
-        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
-            .setView(view)
-            .create()
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create()
 
         preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 

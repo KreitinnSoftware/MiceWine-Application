@@ -37,7 +37,6 @@ class SettingsFragment : Fragment() {
         addToAdapter(R.string.controller_mapper_title, R.string.controller_mapper_description, R.drawable.ic_joystick)
         addToAdapter(R.string.virtual_controller_mapper_title, R.string.controller_virtual_mapper_description, R.drawable.ic_joystick)
         addToAdapter(R.string.driver_manager_title, R.string.driver_manager_description, R.drawable.ic_gpu)
-        addToAdapter(R.string.about_title, R.string.about_description, R.drawable.ic_info_outline)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, icon: Int) {

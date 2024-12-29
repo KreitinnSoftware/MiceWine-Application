@@ -24,8 +24,8 @@ import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettings.Companion.DEAD_ZONE_KEY
-import com.micewine.emu.activities.GeneralSettings.Companion.MOUSE_SENSIBILITY_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.DEAD_ZONE
+import com.micewine.emu.activities.GeneralSettings.Companion.MOUSE_SENSIBILITY
 import com.micewine.emu.controller.ControllerUtils.getGameControllerNames
 import com.micewine.emu.databinding.ActivityControllerMapperBinding
 import com.micewine.emu.fragments.ControllerMapperFragment
@@ -243,8 +243,8 @@ class ControllerMapper : AppCompatActivity() {
             AXIS_HAT_X_MINUS_KEY to 20,
             AXIS_HAT_Y_PLUS_KEY to 21,
             AXIS_HAT_Y_MINUS_KEY to 22,
-            DEAD_ZONE_KEY to 23,
-            MOUSE_SENSIBILITY_KEY to 24
+            DEAD_ZONE to 23,
+            MOUSE_SENSIBILITY to 24
         )
 
         fun putDeadZone(context: Context, name: String, value: Int) {
@@ -261,7 +261,7 @@ class ControllerMapper : AppCompatActivity() {
                 index = 0
             }
 
-            currentList[index][mappingMap[DEAD_ZONE_KEY]!!] = "$value"
+            currentList[index][mappingMap[DEAD_ZONE]!!] = "$value"
 
             val gson = Gson()
             val json = gson.toJson(currentList)
@@ -284,7 +284,7 @@ class ControllerMapper : AppCompatActivity() {
                 index = 0
             }
 
-            currentList[index][mappingMap[MOUSE_SENSIBILITY_KEY]!!] = "$value"
+            currentList[index][mappingMap[MOUSE_SENSIBILITY]!!] = "$value"
 
             val gson = Gson()
             val json = gson.toJson(currentList)
@@ -302,7 +302,7 @@ class ControllerMapper : AppCompatActivity() {
                 return 25
             }
 
-            return currentList[index][mappingMap[DEAD_ZONE_KEY]!!].toInt()
+            return currentList[index][mappingMap[DEAD_ZONE]!!].toInt()
         }
 
         fun getMouseSensibility(context: Context, name: String): Int {
@@ -314,7 +314,7 @@ class ControllerMapper : AppCompatActivity() {
                 return 100
             }
 
-            return currentList[index][mappingMap[MOUSE_SENSIBILITY_KEY]!!].toInt()
+            return currentList[index][mappingMap[MOUSE_SENSIBILITY]!!].toInt()
         }
 
         fun getMapping(context: Context, name: String, key: String): List<String> {
@@ -360,8 +360,8 @@ class ControllerMapper : AppCompatActivity() {
             val currentList = loadControllerPresets(context)
             val defaultList = ArrayList(Collections.nCopies(25, ":")).apply {
                 this[0] = name
-                this[mappingMap[DEAD_ZONE_KEY]!!] = "25"
-                this[mappingMap[MOUSE_SENSIBILITY_KEY]!!] = "100"
+                this[mappingMap[DEAD_ZONE]!!] = "25"
+                this[mappingMap[MOUSE_SENSIBILITY]!!] = "100"
             }
 
             currentList.add(defaultList)
@@ -411,8 +411,8 @@ class ControllerMapper : AppCompatActivity() {
 
             return Gson().fromJson(json, listType) ?: mutableListOf(ArrayList(Collections.nCopies(25, ":")).apply {
                 this[0] = "default"
-                this[mappingMap[DEAD_ZONE_KEY]!!] = "25"
-                this[mappingMap[MOUSE_SENSIBILITY_KEY]!!] = "100"
+                this[mappingMap[DEAD_ZONE]!!] = "25"
+                this[mappingMap[MOUSE_SENSIBILITY]!!] = "100"
             })
         }
 

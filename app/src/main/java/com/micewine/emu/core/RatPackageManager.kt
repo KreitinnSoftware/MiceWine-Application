@@ -3,7 +3,7 @@ package com.micewine.emu.core
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.preference.PreferenceManager
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_KEY
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
@@ -64,9 +64,9 @@ object RatPackageManager {
                         writeText("name=$name\n\nversion=$version\n\nvkDriverLib=$usrDir/lib/$libPath\n")
                     }
 
-                    if (preferences.getString(SELECTED_DRIVER_KEY, "") == "") {
+                    if (preferences.getString(SELECTED_DRIVER, "") == "") {
                         preferences.edit().apply {
-                            putString(SELECTED_DRIVER_KEY, "$randUUID")
+                            putString(SELECTED_DRIVER, "$randUUID")
                             apply()
                         }
                     }

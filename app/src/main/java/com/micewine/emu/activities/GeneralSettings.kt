@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.ImageButton
@@ -121,41 +122,76 @@ class GeneralSettings : AppCompatActivity() {
         const val SPINNER = 2
         const val CHECKBOX = 3
 
-        const val BOX64_LOG_KEY = "BOX64_LOG"
-        const val BOX64_AVX_KEY = "BOX64_AVX"
-        const val BOX64_DYNAREC_BIGBLOCK_KEY = "BOX64_DYNAREC_BIGBLOCK"
-        const val BOX64_DYNAREC_STRONGMEM_KEY = "BOX64_DYNAREC_STRONGMEM"
-        const val BOX64_DYNAREC_WEAKBARRIER_KEY = "BOX64_DYNAREC_WEAKBARRIER"
-        const val BOX64_DYNAREC_PAUSE_KEY = "BOX64_DYNAREC_PAUSE"
-        const val BOX64_DYNAREC_X87DOUBLE_KEY = "BOX64_DYNAREC_X87DOUBLE"
-        const val BOX64_DYNAREC_FASTNAN_KEY = "BOX64_DYNAREC_FASTNAN"
-        const val BOX64_DYNAREC_FASTROUND_KEY = "BOX64_DYNAREC_FASTROUND"
-        const val BOX64_DYNAREC_SAFEFLAGS_KEY = "BOX64_DYNAREC_SAFEFLAGS"
-        const val BOX64_DYNAREC_CALLRET_KEY = "BOX64_DYNAREC_CALLRET"
-        const val BOX64_DYNAREC_ALIGNED_ATOMICS_KEY = "BOX64_DYNAREC_ALIGNED_ATOMICS"
-        const val BOX64_DYNAREC_NATIVEFLAGS_KEY = "BOX64_DYNAREC_NATIVEFLAGS"
-        const val BOX64_DYNAREC_BLEEDING_EDGE_KEY = "BOX64_DYNAREC_BLEEDING_EDGE"
-        const val BOX64_DYNAREC_WAIT_KEY = "BOX64_DYNAREC_WAIT"
-        const val BOX64_SHOWSEGV_KEY = "BOX64_SHOWSEGV"
-        const val BOX64_SHOWBT_KEY = "BOX64_SHOWBT"
-        const val BOX64_NOSIGSEGV_KEY = "BOX64_NOSIGSEGV"
-        const val BOX64_NOSIGILL_KEY = "BOX64_NOSIGILL"
-        const val SELECTED_TU_DEBUG_PRESET_KEY = "selectedTuDebugPreset"
-        const val SELECTED_DRIVER_KEY = "selectedDriver"
-        const val SELECTED_D3DX_RENDERER_KEY = "d3dxRenderer"
-        const val SELECTED_WINED3D_KEY = "selectedWineD3D"
-        const val SELECTED_DXVK_KEY = "selectedDXVK"
-        const val SELECTED_VKD3D_KEY = "selectedVKD3D"
+        const val BOX64_LOG = "BOX64_LOG"
+        const val BOX64_LOG_DEFAULT_VALUE = "1"
+        const val BOX64_AVX = "BOX64_AVX"
+        const val BOX64_AVX_DEFAULT_VALUE = "2"
+        const val BOX64_DYNAREC_BIGBLOCK = "BOX64_DYNAREC_BIGBLOCK"
+        const val BOX64_DYNAREC_BIGBLOCK_DEFAULT_VALUE = "1"
+        const val BOX64_DYNAREC_STRONGMEM = "BOX64_DYNAREC_STRONGMEM"
+        const val BOX64_DYNAREC_STRONGMEM_DEFAULT_VALUE = "1"
+        const val BOX64_DYNAREC_WEAKBARRIER = "BOX64_DYNAREC_WEAKBARRIER"
+        const val BOX64_DYNAREC_WEAKBARRIER_DEFAULT_VALUE = "1"
+        const val BOX64_DYNAREC_PAUSE = "BOX64_DYNAREC_PAUSE"
+        const val BOX64_DYNAREC_PAUSE_DEFAULT_VALUE = "1"
+        const val BOX64_DYNAREC_X87DOUBLE = "BOX64_DYNAREC_X87DOUBLE"
+        const val BOX64_DYNAREC_X87DOUBLE_DEFAULT_VALUE = false
+        const val BOX64_DYNAREC_FASTNAN = "BOX64_DYNAREC_FASTNAN"
+        const val BOX64_DYNAREC_FASTNAN_DEFAULT_VALUE = true
+        const val BOX64_DYNAREC_FASTROUND = "BOX64_DYNAREC_FASTROUND"
+        const val BOX64_DYNAREC_FASTROUND_DEFAULT_VALUE = true
+        const val BOX64_DYNAREC_SAFEFLAGS = "BOX64_DYNAREC_SAFEFLAGS"
+        const val BOX64_DYNAREC_SAFEFLAGS_DEFAULT_VALUE = "1"
+        const val BOX64_DYNAREC_CALLRET = "BOX64_DYNAREC_CALLRET"
+        const val BOX64_DYNAREC_CALLRET_DEFAULT_VALUE = true
+        const val BOX64_DYNAREC_ALIGNED_ATOMICS = "BOX64_DYNAREC_ALIGNED_ATOMICS"
+        const val BOX64_DYNAREC_ALIGNED_ATOMICS_DEFAULT_VALUE = false
+        const val BOX64_DYNAREC_NATIVEFLAGS = "BOX64_DYNAREC_NATIVEFLAGS"
+        const val BOX64_DYNAREC_NATIVEFLAGS_DEFAULT_VALUE = true
+        const val BOX64_DYNAREC_BLEEDING_EDGE = "BOX64_DYNAREC_BLEEDING_EDGE"
+        const val BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE = true
+        const val BOX64_DYNAREC_WAIT = "BOX64_DYNAREC_WAIT"
+        const val BOX64_DYNAREC_WAIT_DEFAULT_VALUE = true
+        const val BOX64_SHOWSEGV = "BOX64_SHOWSEGV"
+        const val BOX64_SHOWSEGV_DEFAULT_VALUE = false
+        const val BOX64_SHOWBT = "BOX64_SHOWBT"
+        const val BOX64_SHOWBT_DEFAULT_VALUE = false
+        const val BOX64_NOSIGSEGV = "BOX64_NOSIGSEGV"
+        const val BOX64_NOSIGSEGV_DEFAULT_VALUE = false
+        const val BOX64_NOSIGILL = "BOX64_NOSIGILL"
+        const val BOX64_NOSIGILL_DEFAULT_VALUE = false
+
+        const val SELECTED_TU_DEBUG_PRESET = "selectedTuDebugPreset"
+        const val SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE = "noconform"
+        const val SELECTED_DRIVER = "selectedDriver"
+        const val SELECTED_DRIVER_DEFAULT_VALUE = ""
+        const val SELECTED_D3DX_RENDERER = "d3dxRenderer"
+        const val SELECTED_D3DX_RENDERER_DEFAULT_VALUE = "DXVK"
+        const val SELECTED_WINED3D = "selectedWineD3D"
+        const val SELECTED_WINED3D_DEFAULT_VALUE = "WineD3D-9.0"
+        const val SELECTED_DXVK = "selectedDXVK"
+        const val SELECTED_DXVK_DEFAULT_VALUE = "DXVK-1.10.3-async"
+        const val SELECTED_VKD3D = "selectedVKD3D"
+        const val SELECTED_VKD3D_DEFAULT_VALUE = "VKD3D-2.13"
         const val ENABLE_DRI3 = "enableDRI3"
+        const val ENABLE_DRI3_DEFAULT_VALUE = true
         const val ENABLE_MANGOHUD = "enableMangoHUD"
+        const val ENABLE_MANGOHUD_DEFAULT_VALUE = true
         const val ENABLE_SERVICES = "enableServices"
-        const val WINE_ESYNC_KEY = "wineEsync"
-        const val WINE_LOG_LEVEL_KEY = "wineLogLevel"
-        const val SELECTED_GL_PROFILE_KEY = "selectedGLProfile"
-        const val SELECTED_DXVK_HUD_PRESET_KEY = "selectedDXVKHudPreset"
-        const val SELECTED_MESA_VK_WSI_PRESENT_MODE_KEY = "MESA_VK_WSI_PRESENT_MODE"
-        const val DISPLAY_RESOLUTION_KEY = "displayResolution"
-        const val DEAD_ZONE_KEY = "deadZone"
-        const val MOUSE_SENSIBILITY_KEY = "mouseSensibility"
+        const val ENABLE_SERVICES_DEFAULT_VALUE = false
+        const val WINE_ESYNC = "wineEsync"
+        const val WINE_ESYNC_DEFAULT_VALUE = false
+        const val WINE_LOG_LEVEL = "wineLogLevel"
+        const val WINE_LOG_LEVEL_DEFAULT_VALUE = "default"
+        const val SELECTED_GL_PROFILE = "selectedGLProfile"
+        const val SELECTED_GL_PROFILE_DEFAULT_VALUE = "GL 4.6"
+        const val SELECTED_DXVK_HUD_PRESET = "selectedDXVKHudPreset"
+        const val SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE = ""
+        const val SELECTED_MESA_VK_WSI_PRESENT_MODE = "MESA_VK_WSI_PRESENT_MODE"
+        const val SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE = "mailbox"
+        const val DISPLAY_RESOLUTION = "displayResolution"
+        const val DISPLAY_RESOLUTION_DEFAULT_VALUE = "1280x720"
+        const val DEAD_ZONE = "deadZone"
+        const val MOUSE_SENSIBILITY = "mouseSensibility"
     }
 }
