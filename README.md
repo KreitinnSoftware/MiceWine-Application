@@ -14,13 +14,15 @@ Support Android 10+
 
 ### Compatible GPUs
 
-| GPU        | Support             | Driver                      |
-|------------|---------------------|-----------------------------|
-| Adreno 7xx | Supported           | Turnip/Zink                 |
-| Adreno 6xx | Supported           | Turnip/Zink                 |
-| Others     | Parcially Supported | Native/Zink (Experimental)  |
+| GPU        | Support               | Driver                      |
+|------------|-----------------------|-----------------------------|
+| Adreno     | Supported             | Turnip/Native/Zink          |
+| Xclipse    | Supported             | Native/Zink                 |
+| Mali       | Unsupported (For now) | N/A                         |
 
-About Native Vulkan on Non-Adreno GPUs is Experimental, Require Some Testing
+The native driver works well for Xclipse GPUs and Adrenos
+
+Vulkan 1.3 is Recommended for better performance and graphical precision, but 1.1 works with DXVK-Stripped-Requiriments, but will appear various graphical issues
 
 ## Third Party Open Source Applications:
 
