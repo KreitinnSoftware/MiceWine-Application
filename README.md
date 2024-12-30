@@ -20,9 +20,9 @@ Support Android 10+
 | Xclipse    | Supported             | Native/Zink                 |
 | Mali       | Unsupported (For now) | N/A                         |
 
-The native driver works well for Xclipse GPUs and Adrenos
+The native driver works well for Xclipse GPUs and Adrenos.
 
-Vulkan 1.3 is Recommended for better performance and graphical precision, but 1.1 works with DXVK-Stripped-Requiriments, but will appear various graphical issues
+Vulkan 1.3 is Recommended for better performance and graphical precision. 1.1 works with DXVK-Stripped-Requirements, but displays various graphical issues.
 
 ## Third Party Open Source Applications:
 
