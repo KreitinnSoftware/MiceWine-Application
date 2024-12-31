@@ -631,14 +631,17 @@ class MainActivity : AppCompatActivity() {
             runCommand("pkill -9 wineserver")
             runCommand("pkill -9 .exe")
             runCommand(getEnv() + "$usrDir/bin/pulseaudio --start --exit-idle=-1")
-            WineWrapper.wine("wineboot", winePrefix)
 
-            var wineRunning = true
+            if (!enableServices) {
+                lifecycleScope.launch {
+                    val processName = if (exePath == "") "TFM.exe" else File(exePath).name
 
-            lifecycleScope.launch {
-                while (!enableServices && wineRunning) {
+                    // Wait for Wine Successfully Start and Execute Specified Program and Kill Services
+                    while (!WineWrapper.wine("tasklist", winePrefix, true).contains(processName)) {
+                        delay(100)
+                    }
+
                     runCommand("pkill -9 services.exe", false)
-                    delay(1200)
                 }
             }
 
@@ -666,8 +669,6 @@ class MainActivity : AppCompatActivity() {
 
             runCommand("pkill -9 wineserver")
             runCommand("pkill -9 .exe")
-
-            wineRunning = false
 
             runOnUiThread {
                 Toast.makeText(this@MainActivity, getString(R.string.wine_is_closed), Toast.LENGTH_SHORT).show()

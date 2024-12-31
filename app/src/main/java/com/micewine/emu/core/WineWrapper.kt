@@ -3,6 +3,7 @@ package com.micewine.emu.core
 import android.os.Build
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.ShellLoader.runCommand
+import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import java.io.File
 
 object WineWrapper {
@@ -18,6 +19,15 @@ object WineWrapper {
         runCommand(
             getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
         )
+    }
+
+    fun wine(args: String, winePrefix: File, retLog: Boolean): String {
+        if (retLog) {
+            return runCommandWithOutput(
+                getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
+            )
+        }
+        return ""
     }
 
     fun wine(args: String, winePrefix: File, cwd: String) {
