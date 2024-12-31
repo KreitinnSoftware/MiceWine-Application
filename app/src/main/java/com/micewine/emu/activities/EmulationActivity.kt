@@ -207,9 +207,13 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 }
 
                 R.id.openCloseKeyboard -> {
-                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    @Suppress("DEPRECATION")
-                    imm.showSoftInput(lorieView, InputMethodManager.SHOW_FORCED)
+                    (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).apply {
+                        @Suppress("DEPRECATION")
+                        toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
+                    }
+
+                    lorieView.requestFocus()
+
                     drawerLayout?.closeDrawers()
                 }
 
@@ -265,6 +269,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                         drawerLayout?.openDrawer(GravityCompat.START)
                     } else {
                         drawerLayout?.closeDrawers()
+                    }
+
+                    (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).apply {
+                        hideSoftInputFromWindow(window.decorView.windowToken, 0)
                     }
 
                     return@OnKeyListener true
