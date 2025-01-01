@@ -306,37 +306,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        val exePath = intent.getStringExtra("exePath")
-
-        if (exePath != null) {
-            val intent = Intent(this, EmulationActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-            }
-
-            sendBroadcast(
-                Intent(ACTION_RUN_WINE).apply {
-                    putExtra("exePath", exePath)
-                }
-            )
-
-            startActivityIfNeeded(intent, 0)
-        }
-
-        intent?.data?.let { uri ->
-            val filePath = FilePathResolver.resolvePath(this, uri)
-
-            val runWineIntent = Intent(ACTION_RUN_WINE).apply {
-                putExtra("exePath", filePath)
-            }
-
-            sendBroadcast(runWineIntent)
-
-            val emulationActivityIntent = Intent(this@MainActivity, EmulationActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-            }
-
-            startActivityIfNeeded(emulationActivityIntent, 0)
-        }
+        onNewIntent(intent)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -766,6 +736,44 @@ class MainActivity : AppCompatActivity() {
 
             setSharedVars(this@MainActivity)
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        val exePath = intent.getStringExtra("exePath")
+
+        val emulationActivityIntent = Intent(this, EmulationActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+        }
+
+        if (exePath != null) {
+            if (File(exePath).exists()) {
+                sendBroadcast(
+                    Intent(ACTION_RUN_WINE).apply {
+                        putExtra("exePath", exePath)
+                    }
+                )
+
+                startActivityIfNeeded(emulationActivityIntent, 0)
+            }
+        }
+
+        intent.data?.let { uri ->
+            val filePath = FilePathResolver.resolvePath(this, uri)
+
+            if (filePath != null) {
+                if (File(filePath).exists()) {
+                    sendBroadcast(
+                        Intent(ACTION_RUN_WINE).apply {
+                            putExtra("exePath", filePath)
+                        }
+                    )
+                }
+            }
+
+            startActivityIfNeeded(emulationActivityIntent, 0)
+        }
+
+        super.onNewIntent(intent)
     }
 
     companion object {
