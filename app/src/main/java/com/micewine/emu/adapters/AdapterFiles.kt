@@ -19,6 +19,8 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.core.WineWrapper.extractIcon
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.refreshFiles
+import com.micewine.emu.utils.DriveUtils
+import mslinks.ShellLink
 import java.io.File
 import kotlin.math.round
 
@@ -74,6 +76,25 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
 
                 if (File(output).exists()) {
                     holder.icon.setImageBitmap(BitmapFactory.decodeFile(output))
+                } else {
+                    holder.icon.setImageResource(R.drawable.ic_log)
+                }
+            } else if (fileExtension == "lnk") {
+                val shell = ShellLink(sList.file)
+                val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
+
+                if (drive != null) {
+                    val filePath = File(drive.getUnixPath())
+
+                    val output = "$usrDir/icons/${filePath.nameWithoutExtension}-icon.ico"
+
+                    extractIcon(filePath, output)
+
+                    if (File(output).exists()) {
+                        holder.icon.setImageBitmap(BitmapFactory.decodeFile(output))
+                    } else {
+                        holder.icon.setImageResource(R.drawable.ic_log)
+                    }
                 } else {
                     holder.icon.setImageResource(R.drawable.ic_log)
                 }
