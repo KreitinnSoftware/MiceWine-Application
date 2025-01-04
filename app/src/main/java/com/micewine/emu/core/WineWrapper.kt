@@ -4,6 +4,7 @@ import android.os.Build
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
+import kotlinx.coroutines.delay
 import java.io.File
 
 object WineWrapper {
@@ -15,6 +16,12 @@ object WineWrapper {
         )
     }
 
+    fun waitFor(name: String, winePrefix: File) {
+        while (!wine("tasklist", winePrefix, true).contains(name)) {
+            Thread.sleep(100)
+        }
+    }
+
     fun wine(args: String, winePrefix: File) {
         runCommand(
             getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
@@ -24,7 +31,7 @@ object WineWrapper {
     fun wine(args: String, winePrefix: File, retLog: Boolean): String {
         if (retLog) {
             return runCommandWithOutput(
-                getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
+                getEnv() + "BOX64_LOG=0 WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
             )
         }
         return ""

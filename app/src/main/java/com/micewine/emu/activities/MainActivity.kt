@@ -124,7 +124,6 @@ import com.micewine.emu.utils.DriveUtils
 import io.ByteWriter
 import com.micewine.emu.utils.FilePathResolver
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mslinks.LinkTargetIDList
@@ -604,14 +603,24 @@ class MainActivity : AppCompatActivity() {
 
             if (!enableServices) {
                 lifecycleScope.launch {
-                    val processName = if (exePath == "") "TFM.exe" else File(exePath).name
+                    withContext(Dispatchers.IO) {
+                        val processName = if (exePath == "") "TFM.exe" else File(exePath).name
 
-                    // Wait for Wine Successfully Start and Execute Specified Program and Kill Services
-                    while (!WineWrapper.wine("tasklist", winePrefix, true).contains(processName)) {
-                        delay(100)
+                        // Wait for Wine Successfully Start and Execute Specified Program and Kill Services
+                        WineWrapper.waitFor(processName, winePrefix)
+
+                        runCommand("pkill -9 services.exe", false)
                     }
+                }
+            }
 
-                    runCommand("pkill -9 services.exe", false)
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    if (exePath == "") {
+                        WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler", winePrefix)
+                    } else {
+                        WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe", winePrefix)
+                    }
                 }
             }
 
@@ -633,6 +642,9 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 else {
+                    // Wait for window_handler
+                    WineWrapper.waitFor("window_handler.exe", winePrefix)
+
                     WineWrapper.wine("'$exePath'", winePrefix, "'${File(exePath).parent!!}'")
                 }
             }
@@ -878,7 +890,6 @@ class MainActivity : AppCompatActivity() {
                 WineWrapper.wine("regedit $driveC/Addons/Themes/DarkBlue/DarkBlue.reg", winePrefix)
                 WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Decorated /d N /f", winePrefix)
                 WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Managed /d N /f", winePrefix)
-                WineWrapper.wine("reg delete HKCU\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\ThemeManager -v DllName /f", winePrefix)
             }
         }
 
