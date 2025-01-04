@@ -4,7 +4,6 @@ import android.os.Build
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
-import kotlinx.coroutines.delay
 import java.io.File
 
 object WineWrapper {

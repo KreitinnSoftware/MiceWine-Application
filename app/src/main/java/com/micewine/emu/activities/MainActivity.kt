@@ -614,19 +614,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    if (exePath == "") {
-                        WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler", winePrefix)
-                    } else {
-                        WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe", winePrefix)
-                    }
-                }
-            }
-
             if (exePath == "") {
-                WineWrapper.wine("explorer /desktop=shell,$selectedResolution TFM", winePrefix)
+                WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler TFM", winePrefix)
             } else {
+                WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe", winePrefix)
+
                 if (exePath.endsWith(".lnk")) {
                     try {
                         val shell = ShellLink(exePath)
@@ -642,9 +634,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 else {
-                    // Wait for window_handler
-                    WineWrapper.waitFor("window_handler.exe", winePrefix)
-
                     WineWrapper.wine("'$exePath'", winePrefix, "'${File(exePath).parent!!}'")
                 }
             }
