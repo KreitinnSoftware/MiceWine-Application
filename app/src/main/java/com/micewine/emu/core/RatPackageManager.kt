@@ -51,6 +51,7 @@ object RatPackageManager {
             File("$extractDir/pkg-header").renameTo(File("$ratPackagesDir/rootfs-pkg-header"))
 
             val builtInVulkanDrivers = File("$extractDir/builtInVulkanDrivers")
+            val vulkanDriversFolder = File("$extractDir/vulkanDrivers")
 
             if (builtInVulkanDrivers.exists()) {
                 builtInVulkanDrivers.readLines().forEach { line ->
@@ -73,6 +74,12 @@ object RatPackageManager {
                 }
 
                 builtInVulkanDrivers.delete()
+            } else if (vulkanDriversFolder.exists()) {
+                vulkanDriversFolder.listFiles()?.sorted()?.forEach { ratFile ->
+                    installRat(RatPackage(ratFile.path), context)
+                }
+
+                vulkanDriversFolder.deleteRecursively()
             }
         } else if (ratPackage.category == "VulkanDriver") {
             val driverPkgHeader = File("$extractDir/pkg-header")
@@ -83,6 +90,13 @@ object RatPackageManager {
             val architecture = driverPkgHeader.readLines()[3].substringAfter("=")
             val driverLib = driverPkgHeader.readLines()[4].substringAfter("=")
             val driverLibPath = "$extractDir/files/usr/lib/$driverLib"
+
+            if (preferences.getString(SELECTED_DRIVER, "") == "") {
+                preferences.edit().apply {
+                    putString(SELECTED_DRIVER, File(extractDir!!).name)
+                    apply()
+                }
+            }
             
             driverPkgHeader.writeText("name=$name\ncategory=$category\nversion=$version\narchitecture=$architecture\nvkDriverLib=$driverLibPath\n")
         }
