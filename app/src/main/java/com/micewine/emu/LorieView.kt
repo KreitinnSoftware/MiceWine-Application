@@ -17,6 +17,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import androidx.preference.PreferenceManager
 import com.micewine.emu.activities.EmulationActivity
+import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION_DEFAULT_VALUE
 import com.micewine.emu.input.InputStub
 
 @SuppressLint("WrongConstant")
@@ -31,13 +32,17 @@ class LorieView : SurfaceView, InputStub {
 
         override fun surfaceChanged(holder: SurfaceHolder, f: Int, width: Int, height: Int) {
             Log.d("SurfaceChangedListener", "Surface was changed: " + measuredWidth + "x" + measuredHeight)
-            if (mCallback == null) return
+            if (mCallback == null) {
+                return
+            }
             dimensionsFromSettings
             mCallback!!.changed(holder.surface, measuredWidth, measuredHeight, p.x, p.y)
         }
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
-            if (mCallback != null) mCallback!!.changed(holder.surface, 0, 0, 0, 0)
+            if (mCallback != null) {
+                mCallback!!.changed(holder.surface, 0, 0, 0, 0)
+            }
         }
     }
 
@@ -99,12 +104,7 @@ class LorieView : SurfaceView, InputStub {
         }
         val r = holder.surfaceFrame
         activity.runOnUiThread {
-            mSurfaceCallback.surfaceChanged(
-                holder,
-                PixelFormat.BGRA_8888,
-                r.width(),
-                r.height()
-            )
+            mSurfaceCallback.surfaceChanged(holder, PixelFormat.BGRA_8888, r.width(), r.height())
         }
     }
 
@@ -126,7 +126,7 @@ class LorieView : SurfaceView, InputStub {
             val height = measuredHeight
             val w: Int
             val h: Int
-            val resolution = preferences.getString("displayResolution", "1280x720")!!
+            val resolution = preferences.getString("displayResolution", DISPLAY_RESOLUTION_DEFAULT_VALUE)!!
                 .split("x".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             w = resolution[0].toInt()
             h = resolution[1].toInt()
