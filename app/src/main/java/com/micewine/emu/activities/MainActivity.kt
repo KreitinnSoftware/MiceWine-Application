@@ -256,7 +256,7 @@ class MainActivity : AppCompatActivity() {
     private val aboutFragment: AboutFragment = AboutFragment()
     private var preferences: SharedPreferences? = null
 
-    @SuppressLint("UnspecifiedRegisterReceiverFlag", "NewApi")
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -308,12 +308,14 @@ class MainActivity : AppCompatActivity() {
 
         onNewIntent(intent)
 
-        if (winePrefix.exists()) {
-            WineWrapper.clearDrives()
+        if (Build.VERSION.SDK_INT > 30) {
+            if (winePrefix.exists()) {
+                WineWrapper.clearDrives()
 
-            (application.getSystemService(Context.STORAGE_SERVICE) as StorageManager).storageVolumes.forEach { volume ->
-                if (volume.isRemovable) {
-                    WineWrapper.addDrive("${volume.directory}")
+                (application.getSystemService(Context.STORAGE_SERVICE) as StorageManager).storageVolumes.forEach { volume ->
+                    if (volume.isRemovable) {
+                        WineWrapper.addDrive("${volume.directory}")
+                    }
                 }
             }
         }
