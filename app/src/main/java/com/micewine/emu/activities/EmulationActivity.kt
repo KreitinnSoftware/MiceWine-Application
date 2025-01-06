@@ -241,7 +241,11 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     drawerLayout?.closeDrawers()
                 }
 
-                R.id.editControllerPreferences -> {
+                R.id.editVirtualControllerMapping -> {
+                    startActivity(Intent(this, VirtualControllerOverlayMapper::class.java))
+                }
+
+                R.id.editControllerMapping -> {
                     startActivity(Intent(this, ControllerMapper::class.java))
                 }
             }

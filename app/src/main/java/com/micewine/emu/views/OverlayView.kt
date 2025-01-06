@@ -28,7 +28,7 @@ class OverlayView @JvmOverloads constructor(
     }
 
     private val buttonPaint: Paint = Paint().apply {
-        strokeWidth = 10F
+        strokeWidth = 8F
         color = Color.WHITE
         style = Paint.Style.STROKE
     }
@@ -78,6 +78,8 @@ class OverlayView @JvmOverloads constructor(
 
         buttonList.forEach {
             buttonPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
+            buttonPaint.alpha = 220
+
             textPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
 
             canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
@@ -88,6 +90,9 @@ class OverlayView @JvmOverloads constructor(
         analogList.forEach {
             paint.color = if (it.isPressed) Color.GRAY else Color.WHITE
             buttonPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
+
+            paint.alpha = 220
+            buttonPaint.alpha = 220
 
             canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
             canvas.drawCircle(it.x + it.fingerX, it.y + it.fingerY, it.radius / 4 - 10, paint)

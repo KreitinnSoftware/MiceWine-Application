@@ -74,7 +74,8 @@
     <string name="extracting_from_assets">从资源提取…</string>
     <string name="checking_rat_type">检查 Rat 文件类型…</string>
     <string name="invalid_rootfs_rat_file">无效的 RootFS Rat 文件。</string>
-    <string name="edit_controller_preferences">编辑控制器偏好设置</string>
+    <string name="edit_controller_mapping">编辑控制器偏好设置</string>
+    <string name="edit_virtual_controller_mapping">编辑虚拟控制器映射</string>
     <string name="remove_game_item">删除</string>
     <string name="executable_already_added">可执行文件已添加</string>
     <string name="select_executable_file">选择一个 .exe/.bat 文件</string>

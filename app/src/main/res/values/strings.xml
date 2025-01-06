@@ -92,7 +92,8 @@
     <string name="extracting_from_assets">Extracting From Assets…</string>
     <string name="checking_rat_type">Checking Rat File Type…</string>
     <string name="invalid_rootfs_rat_file">Invalid RootFS Rat File.</string>
-    <string name="edit_controller_preferences">Edit Controller Preferences</string>
+    <string name="edit_controller_mapping">Edit Controller Mapping</string>
+    <string name="edit_virtual_controller_mapping">Edit Virtual Controller Mapping</string>
     <string name="remove_game_item">Delete</string>
     <string name="executable_already_added">Executable Already Added</string>
     <string name="select_executable_file">Select a .exe/.bat file</string>

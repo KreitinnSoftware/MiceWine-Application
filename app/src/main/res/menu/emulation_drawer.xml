@@ -37,10 +37,17 @@
         android:title="@string/open_overlay">
     </item>
     <item
-        android:id="@+id/editControllerPreferences"
+        android:id="@+id/editVirtualControllerMapping"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/ic_joystick"
-        android:title="@string/edit_controller_preferences">
+        android:title="@string/edit_virtual_controller_mapping">
+    </item>
+    <item
+        android:id="@+id/editControllerMapping"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/ic_joystick"
+        android:title="@string/edit_controller_mapping">
     </item>
 </menu>

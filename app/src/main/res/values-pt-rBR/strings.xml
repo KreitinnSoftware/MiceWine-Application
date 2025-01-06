@@ -74,7 +74,8 @@
     <string name="extracting_from_assets">Extraindo dos Assets…</string>
     <string name="checking_rat_type">Checando Tipo do Arquivo Rat…</string>
     <string name="invalid_rootfs_rat_file">Arquivo RootFS Rat Inválido.</string>
-    <string name="edit_controller_preferences">Editar Preferencias do Controle</string>
+    <string name="edit_controller_mapping">Editar Mapeamento do Controle</string>
+    <string name="edit_virtual_controller_mapping">Editar Mapeamento do Controle Virtual</string>
     <string name="remove_game_item">Deletar</string>
     <string name="executable_already_added">Executável já adicionado</string>
     <string name="select_executable_file">Selecione um arquivo .exe/.bat</string>

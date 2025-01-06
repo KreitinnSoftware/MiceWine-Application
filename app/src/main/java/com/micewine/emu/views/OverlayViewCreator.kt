@@ -42,7 +42,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     }
 
     private val buttonPaint: Paint = Paint().apply {
-        strokeWidth = 10F
+        strokeWidth = 8F
         color = Color.WHITE
         style = Paint.Style.STROKE
     }
@@ -109,6 +109,8 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
             buttonPaint.color = if (lastSelectedButton == it.id && lastSelectedType == BUTTON) Color.GRAY else Color.WHITE
             textPaint.color = buttonPaint.color
 
+            buttonPaint.alpha = 220
+
             canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
 
             paint.textSize = it.radius / 4
@@ -119,6 +121,9 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
         analogList.forEach {
             buttonPaint.color = if (lastSelectedButton == it.id && lastSelectedType == ANALOG) Color.GRAY else Color.WHITE
             whitePaint.color = buttonPaint.color
+
+            whitePaint.alpha = 220
+            buttonPaint.alpha = 220
 
             canvas.apply {
                 drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
