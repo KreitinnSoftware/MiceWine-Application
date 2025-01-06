@@ -15,6 +15,7 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
+import android.os.storage.StorageManager
 import android.view.ContextMenu
 import android.view.KeyEvent
 import android.view.MenuItem
@@ -159,7 +160,7 @@ class MainActivity : AppCompatActivity() {
                     setSharedVars(this@MainActivity)
 
                     lifecycleScope.launch { runXServer(":0") }
-                    lifecycleScope.launch { runWine(exePath, File("$homeDir/.wine")) }
+                    lifecycleScope.launch { runWine(exePath) }
                 }
 
                 ACTION_SELECT_FILE_MANAGER -> {
@@ -255,7 +256,7 @@ class MainActivity : AppCompatActivity() {
     private val aboutFragment: AboutFragment = AboutFragment()
     private var preferences: SharedPreferences? = null
 
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    @SuppressLint("UnspecifiedRegisterReceiverFlag", "NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -306,6 +307,16 @@ class MainActivity : AppCompatActivity() {
         })
 
         onNewIntent(intent)
+
+        if (winePrefix.exists()) {
+            WineWrapper.clearDrives()
+
+            (application.getSystemService(Context.STORAGE_SERVICE) as StorageManager).storageVolumes.forEach { volume ->
+                if (volume.isRemovable) {
+                    WineWrapper.addDrive("${volume.directory}")
+                }
+            }
+        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -593,7 +604,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun runWine(exePath: String, winePrefix: File) {
+    private suspend fun runWine(exePath: String) {
         withContext(Dispatchers.Default) {
             installDXWrapper(winePrefix)
 
@@ -607,7 +618,7 @@ class MainActivity : AppCompatActivity() {
                         val processName = if (exePath == "") "TFM.exe" else File(exePath).name
 
                         // Wait for Wine Successfully Start and Execute Specified Program and Kill Services
-                        WineWrapper.waitFor(processName, winePrefix)
+                        WineWrapper.waitFor(processName)
 
                         runCommand("pkill -9 services.exe", false)
                     }
@@ -615,16 +626,16 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (exePath == "") {
-                WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler TFM", winePrefix)
+                WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler TFM")
             } else {
-                WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe", winePrefix)
+                WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe")
 
                 if (exePath.endsWith(".lnk")) {
                     try {
                         val shell = ShellLink(exePath)
                         val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
                         if (drive != null) {
-                            WineWrapper.wine("'${drive.getUnixPath()}'", winePrefix, "'${File(drive.getUnixPath()).parent!!}'")
+                            WineWrapper.wine("'${drive.getUnixPath()}'", "'${File(drive.getUnixPath()).parent!!}'")
                         }
                     }
                     catch (e: ShellLinkException) {
@@ -634,7 +645,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 else {
-                    WineWrapper.wine("'$exePath'", winePrefix, "'${File(exePath).parent!!}'")
+                    WineWrapper.wine("'$exePath'", "'${File(exePath).parent!!}'")
                 }
             }
 
@@ -730,7 +741,7 @@ class MainActivity : AppCompatActivity() {
 
             lifecycleScope.launch { runXServer(":0") }
 
-            setupWinePrefix(File("$homeDir/.wine"))
+            setupWinePrefix()
 
             fileManagerCwd = fileManagerDefaultDir
             setupDone = true
@@ -828,7 +839,9 @@ class MainActivity : AppCompatActivity() {
         var selectedGameArray: Array<String> = arrayOf()
         var memoryStats = "??/??"
         var totalCpuUsage = "???%"
-        var fileManagerDefaultDir: String = "$homeDir/.wine/dosdevices"
+        var winePrefix: File = File("$homeDir/.wine")
+        var wineDisksFolder: String = "$homeDir/.wine/dosdevices"
+        var fileManagerDefaultDir: String = wineDisksFolder
         var fileManagerCwd: String = fileManagerDefaultDir
         var selectedFile: String = ""
         var miceWineVersion: String = "MiceWine (git-${BuildConfig.GIT_SHORT_SHA})"
@@ -846,7 +859,7 @@ class MainActivity : AppCompatActivity() {
         const val CPU_COUNTER_KEY = "cpuCounter"
         const val ENABLE_DEBUG_INFO_KEY = "debugInfo"
 
-        fun setupWinePrefix(winePrefix: File) {
+        fun setupWinePrefix() {
             if (!winePrefix.exists()) {
                 val driveC = File("$winePrefix/drive_c")
                 val wineUtils = File("$appRootDir/wine-utils")
@@ -856,7 +869,7 @@ class MainActivity : AppCompatActivity() {
                 val system32 = File("$driveC/windows/system32")
                 val syswow64 = File("$driveC/windows/syswow64")
 
-                WineWrapper.wine("wineboot -i", winePrefix)
+                WineWrapper.wine("wineboot -i")
 
                 localAppData.copyRecursively(File("$userSharedFolder/AppData"))
                 localAppData.deleteRecursively()
@@ -875,10 +888,10 @@ class MainActivity : AppCompatActivity() {
                 File("$wineUtils/OpenAL/x64").copyRecursively(system32, true)
                 File("$wineUtils/OpenAL/x32").copyRecursively(syswow64, true)
 
-                WineWrapper.wine("regedit $driveC/Addons/DefaultDLLsOverrides.reg", winePrefix)
-                WineWrapper.wine("regedit $driveC/Addons/Themes/DarkBlue/DarkBlue.reg", winePrefix)
-                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Decorated /d N /f", winePrefix)
-                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Managed /d N /f", winePrefix)
+                WineWrapper.wine("regedit $driveC/Addons/DefaultDLLsOverrides.reg")
+                WineWrapper.wine("regedit $driveC/Addons/Themes/DarkBlue/DarkBlue.reg")
+                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Decorated /d N /f")
+                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Managed /d N /f")
             }
         }
 

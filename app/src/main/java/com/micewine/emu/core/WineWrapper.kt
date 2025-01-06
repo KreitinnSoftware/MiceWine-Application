@@ -1,6 +1,8 @@
 package com.micewine.emu.core
 
 import android.os.Build
+import com.micewine.emu.activities.MainActivity.Companion.wineDisksFolder
+import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
@@ -15,19 +17,19 @@ object WineWrapper {
         )
     }
 
-    fun waitFor(name: String, winePrefix: File) {
-        while (!wine("tasklist", winePrefix, true).contains(name)) {
+    fun waitFor(name: String) {
+        while (!wine("tasklist", true).contains(name)) {
             Thread.sleep(100)
         }
     }
 
-    fun wine(args: String, winePrefix: File) {
+    fun wine(args: String) {
         runCommand(
             getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
         )
     }
 
-    fun wine(args: String, winePrefix: File, retLog: Boolean): String {
+    fun wine(args: String, retLog: Boolean): String {
         if (retLog) {
             return runCommandWithOutput(
                 getEnv() + "BOX64_LOG=0 WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
@@ -36,11 +38,41 @@ object WineWrapper {
         return ""
     }
 
-    fun wine(args: String, winePrefix: File, cwd: String) {
+    fun wine(args: String, cwd: String) {
         runCommand(
             "cd $cwd;" +
                     getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
         )
+    }
+
+    fun clearDrives() {
+        var letter = 'e'
+
+        while (letter <= 'y') {
+            val disk = File("$wineDisksFolder/$letter:")
+            if (disk.exists()) {
+                disk.delete()
+            }
+            letter++
+        }
+    }
+
+    fun addDrive(path: String) {
+        runCommand("ln -sf $path $wineDisksFolder/${getAvailableDisks()[0]}:")
+    }
+
+    fun getAvailableDisks(): List<String> {
+        var letter = 'c'
+        val availableDisks = mutableListOf<String>()
+
+        while (letter <= 'z') {
+            if (!File("$wineDisksFolder/$letter:").exists()) {
+                availableDisks.add("$letter")
+            }
+            letter++
+        }
+
+        return availableDisks
     }
 
     fun extractIcon(exeFile: File, output: String) {
