@@ -75,8 +75,16 @@ object XKeyCodes {
         "9" to (73 to 153),
     )
 
-    fun getKeyNames(): MutableList<String> {
+    fun getKeyNames(getMouseButtons: Boolean): List<String> {
         val keyNames: MutableList<String> = mutableListOf("Null")
+
+        if (getMouseButtons) {
+            keyNames.plusAssign("M_Left")
+            keyNames.plusAssign("M_Middle")
+            keyNames.plusAssign("M_Right")
+        } else {
+            keyNames.plusAssign("Mouse")
+        }
 
         for (i in scanKeyCodes.keys) {
             keyNames.plusAssign(i)
@@ -85,9 +93,9 @@ object XKeyCodes {
         return keyNames
     }
 
-    fun getXKeyScanCodes(key: String): MutableList<Int> {
+    fun getXKeyScanCodes(key: String): List<Int> {
         val scanCode = scanKeyCodes[key]?.first ?: 0
         val keyCode = scanKeyCodes[key]?.second ?: 0
-        return mutableListOf(scanCode, keyCode, KEYBOARD)
+        return listOf(scanCode, keyCode, KEYBOARD)
     }
 }

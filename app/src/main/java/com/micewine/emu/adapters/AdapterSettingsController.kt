@@ -8,8 +8,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.Spinner
-import android.widget.TextView
-import androidx.appcompat.widget.SwitchCompat
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
@@ -22,8 +20,8 @@ class AdapterSettingsController(private val settingsControllerList: List<Setting
     RecyclerView.Adapter<AdapterSettingsController.ViewHolder>() {
 
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
-    private val keyboardEntries: List<String> = XKeyCodes.getKeyNames()
-    private val mouseEntries: Array<String> = arrayOf("Null", "Left", "Middle", "Right")
+    private val allEntries: List<String> = XKeyCodes.getKeyNames(true)
+    private val keyEntries: List<String> = XKeyCodes.getKeyNames(false)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_settings_controller_item, parent, false)
@@ -35,41 +33,18 @@ class AdapterSettingsController(private val settingsControllerList: List<Setting
 
         holder.image.setImageResource(sList.image)
         
-        var mapping = getMapping(context, preferences.getString(ControllerMapper.SELECTED_CONTROLLER_PRESET_KEY, "default")!!, sList.key)
+        val mapping = getMapping(context, preferences.getString(ControllerMapper.SELECTED_CONTROLLER_PRESET_KEY, "default")!!, sList.key)
 
-        holder.mappingType.isChecked = mapping[1].toBoolean()
-
-        if (mapping[1].toBoolean()) {
-            holder.mappingTypeText.text = context.getString(R.string.mouse_text)
-            holder.keyBindSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, mouseEntries)
-            holder.keyBindSpinner.setSelection(mouseEntries.indexOf(mapping[0]))
-        } else {
-            holder.mappingTypeText.text = context.getString(R.string.keyboard_text)
-            holder.keyBindSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, keyboardEntries)
-            holder.keyBindSpinner.setSelection(keyboardEntries.indexOf(mapping[0]))
-        }
-
-        holder.mappingType.setOnClickListener {
-            val selectedItem = holder.keyBindSpinner.selectedItem.toString()
-
-            val mappingType = if (holder.mappingType.isChecked) {
-                "true"
-            } else {
-                ""
+        when (sList.image) {
+            R.drawable.l_up, R.drawable.l_down, R.drawable.l_left, R.drawable.l_right,
+            R.drawable.r_up, R.drawable.r_down, R.drawable.r_left, R.drawable.r_right -> {
+                holder.keyBindSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, keyEntries)
+                holder.keyBindSpinner.setSelection(keyEntries.indexOf(mapping[0]))
             }
 
-            editControllerPreset(context, preferences.getString(ControllerMapper.SELECTED_CONTROLLER_PRESET_KEY, "default")!!, sList.key, selectedItem, mappingType)
-
-            mapping = getMapping(context, preferences.getString(ControllerMapper.SELECTED_CONTROLLER_PRESET_KEY, "default")!!, sList.key)
-
-            if (mapping[1].toBoolean()) {
-                holder.mappingTypeText.text = context.getString(R.string.mouse_text)
-                holder.keyBindSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, mouseEntries)
-                holder.keyBindSpinner.setSelection(mouseEntries.indexOf(mapping[0]))
-            } else {
-                holder.mappingTypeText.text = context.getString(R.string.keyboard_text)
-                holder.keyBindSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, keyboardEntries)
-                holder.keyBindSpinner.setSelection(keyboardEntries.indexOf(mapping[0]))
+            else -> {
+                holder.keyBindSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, allEntries)
+                holder.keyBindSpinner.setSelection(allEntries.indexOf(mapping[0]))
             }
         }
 
@@ -81,15 +56,7 @@ class AdapterSettingsController(private val settingsControllerList: List<Setting
                     position: Int,
                     id: Long
                 ) {
-                    val selectedItem = parent?.selectedItem.toString()
-
-                    val mappingType = if (holder.mappingType.isChecked) {
-                        "true"
-                    } else {
-                        ""
-                    }
-
-                    editControllerPreset(context, preferences.getString(ControllerMapper.SELECTED_CONTROLLER_PRESET_KEY, "default")!!, sList.key, selectedItem, mappingType)
+                    editControllerPreset(context, preferences.getString(ControllerMapper.SELECTED_CONTROLLER_PRESET_KEY, "default")!!, sList.key, parent?.selectedItem.toString())
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -104,8 +71,6 @@ class AdapterSettingsController(private val settingsControllerList: List<Setting
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         val keyBindSpinner: Spinner = itemView.findViewById(R.id.keyBindSpinner)
         val image: ImageView = itemView.findViewById(R.id.buttonImageView)
-        val mappingType: SwitchCompat = itemView.findViewById(R.id.mappingType)
-        val mappingTypeText: TextView = itemView.findViewById(R.id.mappingTypeText)
 
         init {
             itemView.setOnClickListener(this)

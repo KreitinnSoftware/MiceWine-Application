@@ -1,6 +1,5 @@
 package com.micewine.emu.fragments
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,7 +32,6 @@ import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_Y_KEY
 import com.micewine.emu.adapters.AdapterSettingsController
 import com.micewine.emu.adapters.AdapterSettingsController.SettingsController
-import kotlin.math.max
 
 class ControllerMapperFragment : Fragment() {
     private val settingsList: MutableList<SettingsController> = ArrayList()
@@ -53,17 +51,7 @@ class ControllerMapperFragment : Fragment() {
 
         layoutManager = recyclerView?.layoutManager as GridLayoutManager?
 
-        val spanCount = max(1F,requireActivity().resources.displayMetrics.widthPixels / dpToPx(150, requireContext())).toInt()
-
-        recyclerView?.layoutManager = GridLayoutManager(requireContext(), spanCount)
-        recyclerView?.addItemDecoration(HomeFragment.GridSpacingItemDecoration(spanCount, 40))
-
         return rootView
-    }
-
-    private fun dpToPx(dp: Int, context: Context): Float {
-        val density = context.resources.displayMetrics.density
-        return dp * density
     }
 
     private fun setAdapter() {

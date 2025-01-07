@@ -20,8 +20,6 @@ import android.view.MotionEvent.AXIS_RZ
 import android.view.MotionEvent.AXIS_X
 import android.view.MotionEvent.AXIS_Y
 import android.view.MotionEvent.AXIS_Z
-import android.view.PointerIcon
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.preference.PreferenceManager
 import com.micewine.emu.LorieView
 import com.micewine.emu.activities.ControllerMapper
@@ -50,7 +48,6 @@ import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_Y_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.SELECTED_CONTROLLER_PRESET_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.getDeadZone
 import com.micewine.emu.activities.ControllerMapper.Companion.getMouseSensibility
-import com.micewine.emu.activities.EmulationActivity
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
@@ -102,26 +99,35 @@ object ControllerUtils {
     private const val RIGHT_UP = 7
     private const val RIGHT_DOWN = 8
 
-    private fun detectKey(context: Context, key: String): MutableList<Int> {
+    private fun detectKey(context: Context, key: String): List<Int> {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
         val mapping = ControllerMapper.getMapping(context, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, key)
-        val list = getXKeyScanCodes(mapping[0])
 
-        when (mapping[1].toBoolean()) {
-            false -> list[2] = KEYBOARD
+        val keyList: List<Int>
 
-            true -> {
-                when (mapping[0]) {
-                    "Left" -> list[1] = BUTTON_LEFT
-                    "Right" -> list[1] = BUTTON_RIGHT
-                    "Middle" -> list[1] = BUTTON_MIDDLE
-                }
+        when (mapping[0]) {
+            "M_Left" -> {
+                keyList = listOf(BUTTON_LEFT, BUTTON_LEFT, MOUSE)
+            }
 
-                list[2] = MOUSE
+            "M_Middle" -> {
+                keyList = listOf(BUTTON_MIDDLE, BUTTON_MIDDLE, MOUSE)
+            }
+
+            "M_Right" -> {
+                keyList = listOf(BUTTON_RIGHT, BUTTON_RIGHT, MOUSE)
+            }
+
+            "Mouse" -> {
+                keyList = listOf(MOUSE, MOUSE, MOUSE)
+            }
+
+            else -> {
+                keyList = getXKeyScanCodes(mapping[0])
             }
         }
 
-        return list
+        return keyList
     }
 
     fun prepareButtonsAxisValues(context: Context) {
@@ -196,7 +202,7 @@ object ControllerUtils {
     private fun handleKey(lorieView: LorieView, pressed: Boolean, mapping: List<Int>) {
         when (mapping[2]) {
             KEYBOARD -> lorieView.sendKeyEvent(mapping[0], mapping[1], pressed)
-            MOUSE -> lorieView.sendMouseEvent(0F, 0F, mapping[1], pressed, true)
+            MOUSE -> lorieView.sendMouseEvent(0F, 0F, mapping[0], pressed, true)
         }
     }
 

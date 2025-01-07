@@ -53,25 +53,27 @@ class EditVirtualButtonFragment : DialogFragment() {
             })
         }
 
+        val allKeyNames = getKeyNames(true)
+
         val buttonSpinner = view.findViewById<Spinner>(R.id.buttonSpinner).apply {
-            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, getKeyNames())
-            setSelection(getKeyNames().indexOf(selectedButtonKeyName))
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, allKeyNames)
+            setSelection(allKeyNames.indexOf(selectedButtonKeyName))
         }
         val analogUpKeySpinner = view.findViewById<Spinner>(R.id.analogUpKeySpinner).apply {
-            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, getKeyNames())
-            setSelection(getKeyNames().indexOf(selectedAnalogUpKeyName))
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, allKeyNames)
+            setSelection(allKeyNames.indexOf(selectedAnalogUpKeyName))
         }
         val analogDownKeySpinner = view.findViewById<Spinner>(R.id.analogDownKeySpinner).apply {
-            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, getKeyNames())
-            setSelection(getKeyNames().indexOf(selectedAnalogDownKeyName))
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, allKeyNames)
+            setSelection(allKeyNames.indexOf(selectedAnalogDownKeyName))
         }
         val analogLeftKeySpinner = view.findViewById<Spinner>(R.id.analogLeftKeySpinner).apply {
-            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, getKeyNames())
-            setSelection(getKeyNames().indexOf(selectedAnalogLeftKeyName))
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, allKeyNames)
+            setSelection(allKeyNames.indexOf(selectedAnalogLeftKeyName))
         }
         val analogRightKeySpinner = view.findViewById<Spinner>(R.id.analogRightKeySpinner).apply {
-            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, getKeyNames())
-            setSelection(getKeyNames().indexOf(selectedAnalogRightKeyName))
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, allKeyNames)
+            setSelection(allKeyNames.indexOf(selectedAnalogRightKeyName))
         }
 
         radiusSeekbar.progress = selectedButtonRadius

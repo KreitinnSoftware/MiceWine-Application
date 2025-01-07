@@ -53,7 +53,7 @@ class ControllerMapper : AppCompatActivity() {
                 selectedControllerPresetSpinner?.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, getControllerPresetsName(context))
                 selectedControllerPresetSpinner?.setSelection(getControllerPresetsName(context).indexOf(name))
 
-                fragmentLoader(ControllerMapperFragment(), true)
+                fragmentLoader(ControllerMapperFragment())
             }
         }
     }
@@ -67,7 +67,7 @@ class ControllerMapper : AppCompatActivity() {
         binding = ActivityControllerMapperBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        fragmentLoader(ControllerMapperFragment(), true)
+        fragmentLoader(ControllerMapperFragment())
 
         findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.controller_mapper_title)
 
@@ -147,7 +147,7 @@ class ControllerMapper : AppCompatActivity() {
                         putString(SELECTED_CONTROLLER_PRESET_KEY, parent?.selectedItem.toString())
                         apply()
                     }
-                    fragmentLoader(ControllerMapperFragment(), true)
+                    fragmentLoader(ControllerMapperFragment())
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -176,16 +176,11 @@ class ControllerMapper : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun fragmentLoader(fragment: Fragment, appInit: Boolean) {
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
-
-        fragmentTransaction.replace(R.id.controller_mapper_content, fragment)
-
-        if (!appInit) {
-            fragmentTransaction.addToBackStack(null)
+    private fun fragmentLoader(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.controller_mapper_content, fragment)
+            commit()
         }
-
-        fragmentTransaction.commit()
     }
 
     override fun onDestroy() {
@@ -248,11 +243,7 @@ class ControllerMapper : AppCompatActivity() {
         )
 
         fun putDeadZone(context: Context, name: String, value: Int) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val editor = preferences.edit()
-
             val currentList = loadControllerPresets(context)
-
             var index = currentList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
@@ -263,11 +254,14 @@ class ControllerMapper : AppCompatActivity() {
 
             currentList[index][mappingMap[DEAD_ZONE]!!] = "$value"
 
-            val gson = Gson()
-            val json = gson.toJson(currentList)
+            val json = Gson().toJson(currentList)
 
-            editor.putString("controllerPresetList", json)
-            editor.apply()
+            PreferenceManager.getDefaultSharedPreferences(context).apply {
+                edit().apply {
+                    putString("controllerPresetList", json)
+                    apply()
+                }
+            }
         }
 
         fun putMouseSensibility(context: Context, name: String, value: Int) {
@@ -383,7 +377,7 @@ class ControllerMapper : AppCompatActivity() {
             }
         }
 
-        fun editControllerPreset(context: Context, name: String, key: String, selectedItem: String, mappingType: String) {
+        fun editControllerPreset(context: Context, name: String, key: String, selectedItem: String) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
             val currentList = loadControllerPresets(context)
 
@@ -394,7 +388,7 @@ class ControllerMapper : AppCompatActivity() {
                 index = 0
             }
 
-            currentList[index][mappingMap[key]!!] = "$selectedItem:$mappingType"
+            currentList[index][mappingMap[key]!!] = selectedItem
 
             val json = Gson().toJson(currentList)
 
