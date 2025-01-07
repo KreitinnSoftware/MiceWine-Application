@@ -609,7 +609,7 @@ class MainActivity : AppCompatActivity() {
 
             runCommand("pkill -9 wineserver")
             runCommand("pkill -9 .exe")
-            runCommand(getEnv() + "$usrDir/bin/pulseaudio --start --exit-idle=-1")
+            runCommand(getEnv() + "LD_PRELOAD=/system/lib64/libskcodec.so $usrDir/bin/pulseaudio --start --exit-idle=-1")
 
             if (!enableServices) {
                 lifecycleScope.launch {
