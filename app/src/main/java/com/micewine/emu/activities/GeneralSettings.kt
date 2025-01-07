@@ -28,14 +28,13 @@ class GeneralSettings : AppCompatActivity() {
     private val displaySettingsFragment = DisplaySettingsFragment()
     private val driversSettingsFragment = DriversSettingsFragment()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
-        @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
             val preference = intent.getStringExtra("preference")
 
             if (intent.action == ACTION_PREFERENCE_SELECT) {
                 when (preference) {
                     getString(R.string.box64_settings_title) -> {
-                        generalSettingsToolbar?.title = context.resources.getString(R.string.box64_settings_title)
+                        generalSettingsToolbar?.title = getString(R.string.box64_settings_title)
 
                         fragmentLoader(box64SettingsFragment, false)
                     }
@@ -47,13 +46,13 @@ class GeneralSettings : AppCompatActivity() {
                     }
 
                     getString(R.string.display_settings_title) -> {
-                        generalSettingsToolbar?.title = context.resources.getString(R.string.display_settings_title)
+                        generalSettingsToolbar?.title = getString(R.string.display_settings_title)
 
                         fragmentLoader(displaySettingsFragment, false)
                     }
 
                     context.resources.getString(R.string.driver_settings_title) -> {
-                        generalSettingsToolbar?.title = context.resources.getString(R.string.driver_settings_title)
+                        generalSettingsToolbar?.title = getString(R.string.driver_settings_title)
 
                         fragmentLoader(driversSettingsFragment, false)
                     }
@@ -104,15 +103,15 @@ class GeneralSettings : AppCompatActivity() {
     }
 
     private fun fragmentLoader(fragment: Fragment, appInit: Boolean) {
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.settings_content, fragment)
 
-        fragmentTransaction.replace(R.id.settings_content, fragment)
+            if (!appInit) {
+                addToBackStack(null)
+            }
 
-        if (!appInit) {
-            fragmentTransaction.addToBackStack(null)
+            commit()
         }
-
-        fragmentTransaction.commit()
     }
 
     companion object {

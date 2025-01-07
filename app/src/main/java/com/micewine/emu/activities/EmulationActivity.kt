@@ -77,7 +77,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     private var service: ICmdEntryInterface? = null
     private var mClientConnected = false
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
-        @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 ACTION_START -> {
@@ -107,6 +106,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     private var mLorieKeyListener: View.OnKeyListener? = null
     private var drawerLayout: DrawerLayout? = null
     private var logsNavigationView: NavigationView? = null
+    private var overlayView: OverlayView? = null
 
     init {
         instance = this
@@ -117,9 +117,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        preferences.registerOnSharedPreferenceChangeListener { _: SharedPreferences?, _: String? ->
-            onPreferencesChanged()
+        val preferences = PreferenceManager.getDefaultSharedPreferences(this).apply {
+            registerOnSharedPreferenceChangeListener { _: SharedPreferences?, _: String? ->
+                onPreferencesChanged()
+            }
         }
 
         initSharedLogs(supportFragmentManager)
@@ -137,7 +138,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
 
         prepareButtonsAxisValues(this)
+
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+        val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+
         window.setFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, 0)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_emulation)
@@ -179,16 +183,14 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         val lorieView = findViewById<LorieView>(R.id.lorieView)
         val lorieParent = lorieView.parent as View
 
-        val overlayView: OverlayView = findViewById(R.id.overlayView)
-
-        overlayView.visibility = View.INVISIBLE
+        overlayView = findViewById(R.id.overlayView)
+        overlayView?.visibility = View.INVISIBLE
 
         lifecycleScope.launch {
             controllerMouseEmulation(lorieView)
         }
 
-        val nav = findViewById<NavigationView>(R.id.NavigationView)
-        nav.setNavigationItemSelectedListener { item: MenuItem ->
+        findViewById<NavigationView>(R.id.NavigationView).setNavigationItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
                 R.id.exit -> {
                     drawerLayout?.closeDrawers()
@@ -207,7 +209,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 }
 
                 R.id.openCloseKeyboard -> {
-                    (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).apply {
+                    inputManager.apply {
                         @Suppress("DEPRECATION")
                         toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
                     }
@@ -232,10 +234,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 }
 
                 R.id.openCloseOverlay -> {
-                    if (overlayView.isVisible) {
-                        overlayView.visibility = View.INVISIBLE
+                    if (overlayView?.isVisible!!) {
+                        overlayView?.visibility = View.INVISIBLE
                     } else {
-                        overlayView.visibility = View.VISIBLE
+                        overlayView?.visibility = View.VISIBLE
                     }
 
                     drawerLayout?.closeDrawers()
@@ -275,7 +277,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                         drawerLayout?.closeDrawers()
                     }
 
-                    (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).apply {
+                    inputManager.apply {
                         hideSoftInputFromWindow(window.decorView.windowToken, 0)
                     }
 
@@ -317,10 +319,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 screenWidth: Int,
                 screenHeight: Int
             ) {
-                val framerate = (lorieView.display?.refreshRate ?: 30).toInt()
+                val frameRate = (lorieView.display?.refreshRate ?: 30).toInt()
                 mInputHandler?.handleHostSizeChanged(surfaceWidth, surfaceHeight)
                 mInputHandler?.handleClientSizeChanged(screenWidth, screenHeight)
-                LorieView.sendWindowChange(screenWidth, screenHeight, framerate)
+                LorieView.sendWindowChange(screenWidth, screenHeight, frameRate)
                 service?.let {
                     try {
                         it.windowChanged(sfc)
@@ -345,10 +347,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         setSharedVars(this)
 
-        if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU && checkSelfPermission(permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED && !shouldShowRequestPermissionRationale(
-                permission.POST_NOTIFICATIONS
-            )
-        ) {
+        if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED &&
+            !shouldShowRequestPermissionRationale(permission.POST_NOTIFICATIONS)
+            ) {
             requestPermissions(arrayOf(permission.POST_NOTIFICATIONS), 0)
         }
     }
@@ -443,6 +445,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     public override fun onResume() {
         super.onResume()
         lorieView.requestFocus()
+        overlayView?.loadFromPreferences()
+
         prepareButtonsAxisValues(this)
 
         lifecycleScope.cancel()

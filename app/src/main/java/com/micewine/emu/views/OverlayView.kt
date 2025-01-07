@@ -12,8 +12,13 @@ import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.LorieView
+import com.micewine.emu.controller.ControllerUtils.KEYBOARD
+import com.micewine.emu.controller.ControllerUtils.MOUSE
 import com.micewine.emu.controller.ControllerUtils.handleAxis
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
+import com.micewine.emu.input.InputStub.BUTTON_LEFT
+import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
+import com.micewine.emu.input.InputStub.BUTTON_RIGHT
 import com.micewine.emu.input.InputStub.BUTTON_UNDEFINED
 
 class OverlayView @JvmOverloads constructor(
@@ -47,7 +52,7 @@ class OverlayView @JvmOverloads constructor(
         loadFromPreferences()
     }
 
-    private fun loadFromPreferences() {
+    fun loadFromPreferences() {
         val buttonJson = preferences.getString("overlayButtons", "")
         val axisJson = preferences.getString("overlayAxis", "")
 
@@ -58,7 +63,27 @@ class OverlayView @JvmOverloads constructor(
         val currentVAxis: MutableList<VirtualAnalog> = gson.fromJson(axisJson, virtualAxisListType) ?: mutableListOf()
 
         currentButtons.forEach {
-            it.keyCodes = getXKeyScanCodes(it.keyName)
+            when (it.keyName) {
+                "M_Left" -> {
+                    it.keyCodes = listOf(BUTTON_LEFT, BUTTON_LEFT, MOUSE)
+                }
+
+                "M_Middle" -> {
+                    it.keyCodes = listOf(BUTTON_MIDDLE, BUTTON_MIDDLE, MOUSE)
+                }
+
+                "M_Right" -> {
+                    it.keyCodes = listOf(BUTTON_RIGHT, BUTTON_RIGHT, MOUSE)
+                }
+
+                "Mouse" -> {
+                    it.keyCodes = listOf(MOUSE, MOUSE, MOUSE)
+                }
+
+                else -> {
+                    it.keyCodes = getXKeyScanCodes(it.keyName)
+                }
+            }
 
             buttonList.add(it)
         }
@@ -289,7 +314,10 @@ class OverlayView @JvmOverloads constructor(
     private fun handleButton(button: VirtualButton, pressed: Boolean) {
         button.isPressed = pressed
 
-        lorieView.sendKeyEvent(button.keyCodes!![0], button.keyCodes!![1], pressed)
+        when (button.keyCodes!![2]) {
+            KEYBOARD -> lorieView.sendKeyEvent(button.keyCodes!![0], button.keyCodes!![1], pressed)
+            MOUSE -> lorieView.sendMouseEvent(0F, 0F, button.keyCodes!![0], pressed, true)
+        }
     }
 
     class VirtualButton(

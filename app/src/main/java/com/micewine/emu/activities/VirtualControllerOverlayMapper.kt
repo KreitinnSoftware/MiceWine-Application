@@ -32,7 +32,6 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
     private var virtualControllerMapperDrawerLayout: DrawerLayout? = null
     private var navigationView: NavigationView? = null
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
-        @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == ACTION_EDIT_VIRTUAL_BUTTON) {
                 EditVirtualButtonFragment().show(supportFragmentManager, "")

@@ -138,11 +138,9 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Files
 
-
 class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
-        @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 ACTION_RUN_WINE -> {
@@ -268,7 +266,6 @@ class MainActivity : AppCompatActivity() {
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         bottomNavigation = findViewById(R.id.bottom_navigation)
-
         bottomNavigation?.setOnItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
                 R.id.nav_home -> {
@@ -325,9 +322,9 @@ class MainActivity : AppCompatActivity() {
         super.onPostCreate(savedInstanceState)
 
         if (!usrDir.exists()) {
-            val intent = Intent(this, WelcomeActivity::class.java)
-
-            startActivity(intent)
+            startActivity(
+                Intent(this, WelcomeActivity::class.java)
+            )
         } else {
             setupDone = true
         }
@@ -351,7 +348,9 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
 
-            sendBroadcast(Intent(ACTION_STOP_ALL))
+            sendBroadcast(
+                Intent(ACTION_STOP_ALL)
+            )
         }
 
         return super.onKeyDown(keyCode, event)
@@ -438,7 +437,6 @@ class MainActivity : AppCompatActivity() {
     ) {
         if (requestCode == EXPORT_LNK_ACTION && resultCode == Activity.RESULT_OK) {
             data?.data?.let { uri ->
-
                 val driveInfo = DriveUtils.parseUnixPath(selectedFile)
 
                 if (driveInfo != null) {
@@ -470,8 +468,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                    val outputStream = contentResolver.openOutputStream(uri)
-                    outputStream?.use {
+                    contentResolver.openOutputStream(uri)?.use {
                         val byteWriter = ByteWriter(it)
 
                         with(shellLink) {
@@ -536,15 +533,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fragmentLoader(fragment: Fragment, appInit: Boolean) {
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        supportFragmentManager.beginTransaction().apply {
+            if (appInit) {
+                add(R.id.content, fragment)
+            } else {
+                replace(R.id.content, fragment)
+            }
 
-        if (appInit) {
-            fragmentTransaction.add(R.id.content, fragment)
-        } else {
-            fragmentTransaction.replace(R.id.content, fragment)
+            commit()
         }
-
-        fragmentTransaction.commit()
     }
 
     override fun onDestroy() {
@@ -795,7 +792,7 @@ class MainActivity : AppCompatActivity() {
         val appRootDir = File("/data/data/com.micewine.emu/files")
         var ratPackagesDir = File("$appRootDir/packages")
         var appBuiltinRootfs: Boolean = false
-        private var unixUsername = runCommandWithOutput("whoami").replace("\n", "")
+        private val unixUsername = runCommandWithOutput("whoami").replace("\n", "")
         var customRootFSPath: String? = null
         var usrDir = File("$appRootDir/usr")
         var tmpDir = File("$usrDir/tmp")

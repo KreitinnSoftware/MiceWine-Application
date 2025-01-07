@@ -45,7 +45,6 @@ class ControllerMapper : AppCompatActivity() {
     private var deletePresetButton: ImageButton? = null
     private var preferences: SharedPreferences? = null
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
-        @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
             if (ACTION_UPDATE_CONTROLLER_MAPPER == intent.action) {
                 val name = intent.getStringExtra("name")
@@ -215,6 +214,8 @@ class ControllerMapper : AppCompatActivity() {
         const val SELECTED_CONTROLLER_PRESET_KEY = "selectedControllerPreset"
         const val ACTION_UPDATE_CONTROLLER_MAPPER = "com.micewine.emu.ACTION_UPDATE_CONTROLLER_MAPPER"
 
+        private val gson = Gson()
+
         private val mappingMap = mapOf(
             BUTTON_A_KEY to 1,
             BUTTON_B_KEY to 2,
@@ -254,7 +255,7 @@ class ControllerMapper : AppCompatActivity() {
 
             currentList[index][mappingMap[DEAD_ZONE]!!] = "$value"
 
-            val json = Gson().toJson(currentList)
+            val json = gson.toJson(currentList)
 
             PreferenceManager.getDefaultSharedPreferences(context).apply {
                 edit().apply {
@@ -265,11 +266,7 @@ class ControllerMapper : AppCompatActivity() {
         }
 
         fun putMouseSensibility(context: Context, name: String, value: Int) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val editor = preferences.edit()
-
             val currentList = loadControllerPresets(context)
-
             var index = currentList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
@@ -280,16 +277,18 @@ class ControllerMapper : AppCompatActivity() {
 
             currentList[index][mappingMap[MOUSE_SENSIBILITY]!!] = "$value"
 
-            val gson = Gson()
             val json = gson.toJson(currentList)
 
-            editor.putString("controllerPresetList", json)
-            editor.apply()
+            PreferenceManager.getDefaultSharedPreferences(context).apply {
+                edit().apply {
+                    putString("controllerPresetList", json)
+                    apply()
+                }
+            }
         }
 
         fun getDeadZone(context: Context, name: String): Int {
             val currentList = loadControllerPresets(context)
-
             val index = currentList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
@@ -301,7 +300,6 @@ class ControllerMapper : AppCompatActivity() {
 
         fun getMouseSensibility(context: Context, name: String): Int {
             val currentList = loadControllerPresets(context)
-
             val index = currentList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
@@ -313,7 +311,6 @@ class ControllerMapper : AppCompatActivity() {
 
         fun getMapping(context: Context, name: String, key: String): List<String> {
             val currentList = loadControllerPresets(context)
-
             val index = currentList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
@@ -324,9 +321,6 @@ class ControllerMapper : AppCompatActivity() {
         }
 
         fun deleteControllerPreset(context: Context, name: String) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val editor = preferences.edit()
-
             val currentList = loadControllerPresets(context)
 
             if (currentList.count() == 1) {
@@ -338,11 +332,14 @@ class ControllerMapper : AppCompatActivity() {
 
             currentList.removeIf { it[0] == name }
 
-            val gson = Gson()
             val json = gson.toJson(currentList)
 
-            editor.putString("controllerPresetList", json)
-            editor.apply()
+            PreferenceManager.getDefaultSharedPreferences(context).apply {
+                edit().apply {
+                    putString("controllerPresetList", json)
+                    apply()
+                }
+            }
 
             val intent = Intent(ACTION_UPDATE_CONTROLLER_MAPPER)
             intent.putExtra("name", "default")
@@ -360,7 +357,7 @@ class ControllerMapper : AppCompatActivity() {
 
             currentList.add(defaultList)
 
-            val json = Gson().toJson(currentList)
+            val json = gson.toJson(currentList)
 
             preferences.edit().apply {
                 putString("controllerPresetList", json)
@@ -368,12 +365,12 @@ class ControllerMapper : AppCompatActivity() {
                 apply()
             }
 
-            val intent = Intent(ACTION_UPDATE_CONTROLLER_MAPPER).apply {
-                putExtra("name", name)
-            }
-
             context.apply {
-                sendBroadcast(intent)
+                sendBroadcast(
+                    Intent(ACTION_UPDATE_CONTROLLER_MAPPER).apply {
+                        putExtra("name", name)
+                    }
+                )
             }
         }
 
@@ -390,7 +387,7 @@ class ControllerMapper : AppCompatActivity() {
 
             currentList[index][mappingMap[key]!!] = selectedItem
 
-            val json = Gson().toJson(currentList)
+            val json = gson.toJson(currentList)
 
             preferences.edit().apply {
                 putString("controllerPresetList", json)
@@ -403,7 +400,7 @@ class ControllerMapper : AppCompatActivity() {
             val json = preferences.getString("controllerPresetList", "")
             val listType = object : TypeToken<MutableList<List<String>>>() {}.type
 
-            return Gson().fromJson(json, listType) ?: mutableListOf(ArrayList(Collections.nCopies(25, ":")).apply {
+            return gson.fromJson(json, listType) ?: mutableListOf(ArrayList(Collections.nCopies(25, ":")).apply {
                 this[0] = "default"
                 this[mappingMap[DEAD_ZONE]!!] = "25"
                 this[mappingMap[MOUSE_SENSIBILITY]!!] = "100"

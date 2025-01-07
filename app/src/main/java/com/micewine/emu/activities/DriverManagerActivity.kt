@@ -1,6 +1,5 @@
 package com.micewine.emu.activities
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.ImageButton
@@ -19,7 +18,6 @@ class DriverManagerActivity : AppCompatActivity() {
     private var backButton: ImageButton? = null
     private var ratManagerToolBar: Toolbar? = null
 
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -34,7 +32,7 @@ class DriverManagerActivity : AppCompatActivity() {
         ratManagerToolBar = findViewById(R.id.driverManagerToolbar)
         ratManagerToolBar?.setTitle(R.string.driver_manager_title)
 
-        fragmentLoader(DriverListFragment(), true)
+        fragmentLoader(DriverListFragment())
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -50,16 +48,11 @@ class DriverManagerActivity : AppCompatActivity() {
         setSharedVars(this)
     }
 
-    private fun fragmentLoader(fragment: Fragment, appInit: Boolean) {
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
-
-        fragmentTransaction.replace(R.id.rat_manager_content, fragment)
-
-        if (!appInit) {
-            fragmentTransaction.addToBackStack(null)
+    private fun fragmentLoader(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.rat_manager_content, fragment)
+            commit()
         }
-
-        fragmentTransaction.commit()
     }
 
     companion object {
