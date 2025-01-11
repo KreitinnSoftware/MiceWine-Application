@@ -609,7 +609,12 @@ class MainActivity : AppCompatActivity() {
 
             runCommand("pkill -9 wineserver")
             runCommand("pkill -9 .exe")
-            runCommand(getEnv() + "LD_PRELOAD=/system/lib64/libskcodec.so $usrDir/bin/pulseaudio --start --exit-idle=-1")
+
+            val skCodec = File("/system/lib64/libskcodec.so")
+
+            if (skCodec.exists()) {
+                runCommand(getEnv() + "LD_PRELOAD=$skCodec $usrDir/bin/pulseaudio --start --exit-idle=-1")
+            }
 
             if (!enableServices) {
                 lifecycleScope.launch {
