@@ -25,6 +25,8 @@ import com.micewine.emu.activities.MainActivity.Companion.box64ShowSegv
 import com.micewine.emu.activities.MainActivity.Companion.enableDRI3
 import com.micewine.emu.activities.MainActivity.Companion.enableMangoHUD
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
+import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
+import com.micewine.emu.activities.MainActivity.Companion.selectedBox64
 import com.micewine.emu.activities.MainActivity.Companion.selectedDXVKHud
 import com.micewine.emu.activities.MainActivity.Companion.selectedMesaVkWsiPresentMode
 import com.micewine.emu.activities.MainActivity.Companion.selectedTuDebugPreset
@@ -33,6 +35,7 @@ import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.activities.MainActivity.Companion.wineESync
 import com.micewine.emu.activities.MainActivity.Companion.wineLogLevel
+import java.io.File
 
 object EnvVars {
     private val vars = LinkedHashMap<String, String>()
@@ -54,7 +57,7 @@ object EnvVars {
         putVar("DISPLAY", ":0")
         putVar("PULSE_LATENCY_MSEC", "60")
         putVar("LD_LIBRARY_PATH", "/system/lib64:$usrDir/lib")
-        putVar("PATH", "\$PATH:$usrDir/bin:$appRootDir/wine/bin")
+        putVar("PATH", "\$PATH:$usrDir/bin:$appRootDir/wine/bin:$ratPackagesDir/$selectedBox64/files/usr/bin")
         putVar("PREFIX", usrDir.path)
         putVar("MESA_SHADER_CACHE_DIR", "$homeDir/.cache")
         putVar("MESA_VK_WSI_PRESENT_MODE", selectedMesaVkWsiPresentMode)

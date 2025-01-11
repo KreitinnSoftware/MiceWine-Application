@@ -145,4 +145,6 @@
     <string name="items_text">items</string>
     <string name="empty_text">Empty</string>
     <string name="enable_wine_services_title">Enable Wine Services</string>
+    <string name="box64_manager_title">Box64 Manager</string>
+    <string name="box64_manager_description">Manage Box64 Versions</string>
 </resources>

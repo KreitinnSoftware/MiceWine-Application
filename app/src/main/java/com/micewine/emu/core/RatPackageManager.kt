@@ -3,6 +3,7 @@ package com.micewine.emu.core
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.preference.PreferenceManager
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_BOX64
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
@@ -26,9 +27,15 @@ object RatPackageManager {
         ratPackage.ratFile.use { ratFile ->
             ratFile.isRunInThread = true
 
-            if (ratPackage.category == "VulkanDriver") {
-                extractDir = "$ratPackagesDir/${java.util.UUID.randomUUID()}"
-                File(extractDir!!).mkdirs()
+            when (ratPackage.category) {
+                "VulkanDriver" -> {
+                    extractDir = "$ratPackagesDir/VulkanDriver-${java.util.UUID.randomUUID()}"
+                    File(extractDir!!).mkdirs()
+                }
+                "Box64" -> {
+                    extractDir = "$ratPackagesDir/Box64-${java.util.UUID.randomUUID()}"
+                    File(extractDir!!).mkdirs()
+                }
             }
 
             ratFile.extractAll(extractDir)
@@ -46,59 +53,78 @@ object RatPackageManager {
         runCommand("sh $extractDir/makeSymlinks.sh").also {
             File("$extractDir/makeSymlinks.sh").delete()
         }
-        
-        if (ratPackage.category == "rootfs") {
-            File("$extractDir/pkg-header").renameTo(File("$ratPackagesDir/rootfs-pkg-header"))
 
-            val builtInVulkanDrivers = File("$extractDir/builtInVulkanDrivers")
-            val vulkanDriversFolder = File("$extractDir/vulkanDrivers")
+        when (ratPackage.category) {
+            "rootfs" -> {
+                File("$extractDir/pkg-header").renameTo(File("$ratPackagesDir/rootfs-pkg-header"))
 
-            if (builtInVulkanDrivers.exists()) {
-                builtInVulkanDrivers.readLines().forEach { line ->
-                    val name = line.split(":")[0]
-                    val version = line.split(":")[1]
-                    val libPath = line.split(":")[2]
-                    val randUUID = java.util.UUID.randomUUID()
+                val builtInVulkanDrivers = File("$extractDir/builtInVulkanDrivers")
+                val vulkanDriversFolder = File("$extractDir/vulkanDrivers")
+                val box64Folder = File("$extractDir/box64")
 
-                    File("$ratPackagesDir/$randUUID").mkdirs()
-                    File("$ratPackagesDir/$randUUID/pkg-header").apply {
-                        writeText("name=$name\n\nversion=$version\n\nvkDriverLib=$usrDir/lib/$libPath\n")
+                if (builtInVulkanDrivers.exists()) {
+                    builtInVulkanDrivers.readLines().forEach { line ->
+                        val name = line.split(":")[0]
+                        val version = line.split(":")[1]
+                        val libPath = line.split(":")[2]
+                        val randUUID = java.util.UUID.randomUUID()
+
+                        File("$ratPackagesDir/VulkanDriver-$randUUID").mkdirs()
+                        File("$ratPackagesDir/VulkanDriver-$randUUID/pkg-header").apply {
+                            writeText("name=$name\n\nversion=$version\n\nvkDriverLib=$usrDir/lib/$libPath\n")
+                        }
+
+                        if (preferences.getString(SELECTED_DRIVER, "") == "") {
+                            preferences.edit().apply {
+                                putString(SELECTED_DRIVER, "VulkanDriver-$randUUID")
+                                apply()
+                            }
+                        }
                     }
 
-                    if (preferences.getString(SELECTED_DRIVER, "") == "") {
-                        preferences.edit().apply {
-                            putString(SELECTED_DRIVER, "$randUUID")
+                    builtInVulkanDrivers.delete()
+                } else if (vulkanDriversFolder.exists()) {
+                    vulkanDriversFolder.listFiles()?.sorted()?.forEach { ratFile ->
+                        installRat(RatPackage(ratFile.path), context)
+                    }
+
+                    vulkanDriversFolder.deleteRecursively()
+                }
+
+                if (box64Folder.exists()) {
+                    box64Folder.listFiles()?.sorted()?.forEach { ratFile ->
+                        installRat(RatPackage(ratFile.path), context)
+                    }
+
+                    box64Folder.deleteRecursively()
+                }
+            }
+            "VulkanDriver" -> {
+                preferences.apply {
+                    if (getString(SELECTED_DRIVER, "") == "") {
+                        edit().apply {
+                            putString(SELECTED_DRIVER, File(extractDir!!).name)
                             apply()
                         }
                     }
                 }
 
-                builtInVulkanDrivers.delete()
-            } else if (vulkanDriversFolder.exists()) {
-                vulkanDriversFolder.listFiles()?.sorted()?.forEach { ratFile ->
-                    installRat(RatPackage(ratFile.path), context)
+                val driverLibPath = "$extractDir/files/usr/lib/${ratPackage.driverLib}"
+
+                File("$extractDir/pkg-header").writeText("name=${ratPackage.name}\ncategory=${ratPackage.category}\nversion=${ratPackage.version}\narchitecture=${ratPackage.architecture}\nvkDriverLib=$driverLibPath\n")
+            }
+            "Box64" -> {
+                preferences.apply {
+                    if (getString(SELECTED_BOX64, "") == "") {
+                        edit().apply {
+                            putString(SELECTED_BOX64, File(extractDir!!).name)
+                            apply()
+                        }
+                    }
                 }
 
-                vulkanDriversFolder.deleteRecursively()
+                File("$extractDir/pkg-header").writeText("name=${ratPackage.name}\ncategory=${ratPackage.category}\nversion=${ratPackage.version}\narchitecture=${ratPackage.architecture}\nvkDriverLib=\n")
             }
-        } else if (ratPackage.category == "VulkanDriver") {
-            val driverPkgHeader = File("$extractDir/pkg-header")
-
-            val name = driverPkgHeader.readLines()[0].substringAfter("=")
-            val category = driverPkgHeader.readLines()[1].substringAfter("=")
-            val version = driverPkgHeader.readLines()[2].substringAfter("=")
-            val architecture = driverPkgHeader.readLines()[3].substringAfter("=")
-            val driverLib = driverPkgHeader.readLines()[4].substringAfter("=")
-            val driverLibPath = "$extractDir/files/usr/lib/$driverLib"
-
-            if (preferences.getString(SELECTED_DRIVER, "") == "") {
-                preferences.edit().apply {
-                    putString(SELECTED_DRIVER, File(extractDir!!).name)
-                    apply()
-                }
-            }
-            
-            driverPkgHeader.writeText("name=$name\ncategory=$category\nversion=$version\narchitecture=$architecture\nvkDriverLib=$driverLibPath\n")
         }
     }
 

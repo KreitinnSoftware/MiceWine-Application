@@ -75,6 +75,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_MANGOHUD
 import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_MANGOHUD_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_SERVICES
 import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_SERVICES_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_BOX64
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER
@@ -232,8 +233,8 @@ class MainActivity : AppCompatActivity() {
                             return@launch
                         }
 
-                        if (ratFile.category != "VulkanDriver") {
-                            Toast.makeText(context, "You cannot install other packages than Vulkan Drivers.", Toast.LENGTH_SHORT).show()
+                        if (ratFile.category != "VulkanDriver" && ratFile.category != "Box64") {
+                            Toast.makeText(context, "You cannot install other packages than Vulkan Drivers or Box64.", Toast.LENGTH_SHORT).show()
                             return@launch
                         }
 
@@ -745,12 +746,12 @@ class MainActivity : AppCompatActivity() {
 
             lifecycleScope.launch { runXServer(":0") }
 
+            setSharedVars(this@MainActivity)
+
             setupWinePrefix()
 
             fileManagerCwd = fileManagerDefaultDir
             setupDone = true
-
-            setSharedVars(this@MainActivity)
         }
     }
 
@@ -831,6 +832,7 @@ class MainActivity : AppCompatActivity() {
         var box64NoSigill: String? = null
         var wineESync: String? = null
         var wineLogLevel: String? = null
+        var selectedBox64: String? = null
         var selectedDriver: String? = null
         var d3dxRenderer: String? = null
         var selectedWineD3D: String? = null
@@ -912,6 +914,8 @@ class MainActivity : AppCompatActivity() {
 
             appLang = activity.resources.getString(R.string.app_lang)
             appBuiltinRootfs = activity.assets.list("")?.contains("rootfs.zip")!!
+
+            selectedBox64 = preferences.getString(SELECTED_BOX64, SELECTED_DRIVER_DEFAULT_VALUE)
 
             box64LogLevel = preferences.getString(BOX64_LOG, BOX64_LOG_DEFAULT_VALUE)
             box64Avx = preferences.getString(BOX64_AVX, BOX64_AVX_DEFAULT_VALUE)

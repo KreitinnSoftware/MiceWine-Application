@@ -126,4 +126,6 @@
     <string name="items_text">itens</string>
     <string name="empty_text">Vazio</string>
     <string name="enable_wine_services_title">Ativar Serviços do Wine</string>
+    <string name="box64_manager_title">Gerenciador de Box64</string>
+    <string name="box64_manager_description">Gerenciar Versões do Box64</string>
 </resources>

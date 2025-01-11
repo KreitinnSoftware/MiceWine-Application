@@ -1,5 +1,6 @@
 package com.micewine.emu.fragments
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -36,6 +37,11 @@ class SettingsFragment : Fragment() {
         addToAdapter(R.string.settings_title, R.string.settings_description, R.drawable.ic_settings_outline)
         addToAdapter(R.string.controller_mapper_title, R.string.controller_mapper_description, R.drawable.ic_joystick)
         addToAdapter(R.string.virtual_controller_mapper_title, R.string.controller_virtual_mapper_description, R.drawable.ic_joystick)
+
+        if (Build.SUPPORTED_ABIS[0] != "x86_64") {
+            addToAdapter(R.string.box64_manager_title, R.string.box64_manager_description, R.drawable.ic_box64)
+        }
+
         addToAdapter(R.string.driver_manager_title, R.string.driver_manager_description, R.drawable.ic_gpu)
     }
 

@@ -9,26 +9,31 @@ import android.widget.TextView
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_BOX64
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.selectedDriver
 
-class AdapterRatPackage(private val settingsList: List<DriverItem>, context: Context) :
+class AdapterRatPackage(private val settingsList: List<Item>, context: Context) :
     RecyclerView.Adapter<AdapterRatPackage.ViewHolder>() {
 
     val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
     var selectedItem = -1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_driver_item, parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_selectable_item, parent, false)
         return ViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val sList = settingsList[position]
 
-        selectedDriver = preferences.getString(SELECTED_DRIVER, "")
+        if (sList.type == DRIVER) {
+            selectedDriver = preferences.getString(SELECTED_DRIVER, "")
+        } else if (sList.type == BOX64) {
+            selectedDriver = preferences.getString(SELECTED_BOX64, "")
+        }
 
-        if (sList.driverFolderId == selectedDriver) {
+        if (sList.itemFolderId == selectedDriver) {
             selectedItem = position
         }
 
@@ -36,7 +41,12 @@ class AdapterRatPackage(private val settingsList: List<DriverItem>, context: Con
             radioButton.isChecked = position == selectedItem
             radioButton.setOnClickListener {
                 preferences.edit().apply {
-                    putString(SELECTED_DRIVER, sList.driverFolderId)
+                    if (sList.type == DRIVER) {
+                        putString(SELECTED_DRIVER, sList.itemFolderId)
+                    } else if (sList.type == BOX64) {
+                        putString(SELECTED_BOX64, sList.itemFolderId)
+                    }
+
                     apply()
 
                     selectedItem = position
@@ -67,5 +77,10 @@ class AdapterRatPackage(private val settingsList: List<DriverItem>, context: Con
         }
     }
 
-    class DriverItem(var titleSettings: String, var descriptionSettings: String, var driverFolderId: String)
+    class Item(var titleSettings: String, var descriptionSettings: String, var itemFolderId: String, var type: Int)
+
+    companion object {
+        const val DRIVER = 1
+        const val BOX64 = 2
+    }
 }

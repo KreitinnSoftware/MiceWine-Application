@@ -11,8 +11,11 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.miceWineVersion
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
+import com.micewine.emu.activities.MainActivity.Companion.selectedBox64
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
+import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
+import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.FragmentAboutBinding
 import java.io.File
 
@@ -38,11 +41,11 @@ class AboutFragment: Fragment() {
         }
 
         rootView?.findViewById<TextView>(R.id.Box64Version)?.apply {
-            text = "Box64 Version: ${runCommandWithOutput("$usrDir/bin/box64 -v").replace("\n", "")}"
+            text = "Box64 Version: ${runCommandWithOutput("$ratPackagesDir/$selectedBox64/files/usr/bin/box64 -v").replace("\n", "")}"
         }
 
         rootView?.findViewById<TextView>(R.id.WineVersion)?.apply {
-            text = "Wine Version: ${runCommandWithOutput("$usrDir/bin/box64 $appRootDir/wine/bin/wine --version")}"
+            text = "Wine Version: ${WineWrapper.wine("--version", true)}"
         }
 
         return rootView

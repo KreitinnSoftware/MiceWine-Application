@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
+import com.micewine.emu.activities.Box64ManagerActivity
 import com.micewine.emu.activities.ControllerMapper
 import com.micewine.emu.activities.GeneralSettings
 import com.micewine.emu.activities.GeneralSettings.Companion.ACTION_PREFERENCE_SELECT
@@ -59,6 +60,11 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
 
                 context.getString(R.string.virtual_controller_mapper_title) -> {
                     val intent = Intent(context, VirtualControllerOverlayMapper::class.java)
+                    context.startActivity(intent)
+                }
+
+                context.getString(R.string.box64_manager_title) -> {
+                    val intent = Intent(context, Box64ManagerActivity::class.java)
                     context.startActivity(intent)
                 }
 

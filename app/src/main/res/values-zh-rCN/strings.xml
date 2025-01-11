@@ -126,4 +126,6 @@
     <string name="items_text">项</string>
     <string name="empty_text">空</string>
     <string name="enable_wine_services_title">启用 Wine 服务</string>
+    <string name="box64_manager_title">Box64 管理器</string>
+    <string name="box64_manager_description">管理 Box64 版本</string>
 </resources>

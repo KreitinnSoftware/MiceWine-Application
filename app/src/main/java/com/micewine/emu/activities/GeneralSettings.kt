@@ -159,6 +159,8 @@ class GeneralSettings : AppCompatActivity() {
         const val BOX64_NOSIGILL = "BOX64_NOSIGILL"
         const val BOX64_NOSIGILL_DEFAULT_VALUE = false
 
+        const val SELECTED_BOX64 = "selectedBox64"
+        const val SELECTED_BOX64_DEFAULT_VALUE = ""
         const val SELECTED_TU_DEBUG_PRESET = "selectedTuDebugPreset"
         const val SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE = "noconform"
         const val SELECTED_DRIVER = "selectedDriver"
