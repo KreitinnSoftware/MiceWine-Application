@@ -445,6 +445,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     public override fun onResume() {
         super.onResume()
         lorieView.requestFocus()
+        lorieView.requestLayout()
+
         overlayView?.loadFromPreferences()
 
         prepareButtonsAxisValues(this)
