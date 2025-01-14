@@ -11,12 +11,10 @@ import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.view.Surface
-import java.io.DataInputStream
 import java.net.ConnectException
-import java.net.InetAddress
-import java.net.ServerSocket
 import java.net.Socket
 import kotlin.system.exitProcess
+
 
 @Suppress("DEPRECATION")
 class CmdEntryPoint internal constructor(args: Array<String>?, context: Context) : ICmdEntryInterface.Stub() {
@@ -43,39 +41,7 @@ class CmdEntryPoint internal constructor(args: Array<String>?, context: Context)
     }
 
     private fun spawnListeningThread(context: Context) {
-        Thread {
-            // New thread is needed to avoid android.os.NetworkOnMainThreadException
-            /*
-                The purpose of this function is simple. If the application has not been launched
-                before running micewine-emu, the initial sendBroadcast had no effect because no one
-                received the intent. To allow the application to reconnect freely, we will listen on
-                port `PORT` and when receiving a magic phrase, we will send another intent.
-             */Log.e("CmdEntryPoint", "Listening port $PORT")
-            try {
-                ServerSocket(PORT, 0, InetAddress.getByName("127.0.0.1")).use { listeningSocket ->
-                    listeningSocket.reuseAddress = true
-                    while (true) {
-                        try {
-                            listeningSocket.accept().use { client ->
-                                Log.e("CmdEntryPoint", "Somebody connected!")
-                                // We should ensure that it is some
-                                val b = ByteArray(MAGIC.size)
-                                val reader = DataInputStream(client.getInputStream())
-                                reader.readFully(b)
-                                if (MAGIC.contentEquals(b)) {
-                                    Log.e("CmdEntryPoint", "New client connection!")
-                                    sendBroadcast(context)
-                                }
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace(System.err)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace(System.err)
-            }
-        }.start()
+        Thread { listenForConnections(PORT, MAGIC) }.start()
     }
 
     external override fun windowChanged(surface: Surface)
@@ -166,5 +132,7 @@ class CmdEntryPoint internal constructor(args: Array<String>?, context: Context)
         external fun start(args: Array<String>?): Boolean
         @JvmStatic
         private external fun connected(): Boolean
+        @JvmStatic
+        private external fun listenForConnections(port: Int, bytes: ByteArray)
     }
 }
