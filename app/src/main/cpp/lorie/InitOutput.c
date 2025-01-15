@@ -117,6 +117,7 @@ typedef struct {
         Bool legacyDrawing;
         uint8_t flip;
         uint32_t width, height;
+        uint32_t framerate;
     } root;
 
     JavaVM* vm;
@@ -125,7 +126,7 @@ typedef struct {
 } lorieScreenInfo;
 
 ScreenPtr pScreenPtr;
-static lorieScreenInfo lorieScreen = { .root.width = 1280, .root.height = 1024, .dri3 = TRUE }, *pvfb = &lorieScreen;
+static lorieScreenInfo lorieScreen = { .root.width = 1280, .root.height = 1024, .root.framerate = 30, .dri3 = TRUE }, *pvfb = &lorieScreen;
 static char *xstartup = NULL;
 
 #pragma clang diagnostic push
@@ -606,7 +607,7 @@ lorieRandRInit(ScreenPtr pScreen) {
     RRScreenSetSizeRange(pScreen, 1, 1, 32767, 32767);
 
     if (FALSE
-        || !(mode = lorieCvt(pScreen->width, pScreen->height, 30))
+        || !(mode = lorieCvt(pScreen->width, pScreen->height, pvfb->root.framerate))
         || !(crtc = RRCrtcCreate(pScreen, NULL))
         || !RRCrtcGammaSetSize(crtc, 256)
         || !(output = RROutputCreate(pScreen, "screen", 6, NULL))
@@ -706,10 +707,12 @@ Bool lorieChangeWindow(unused ClientPtr pClient, void *closure) {
 void lorieConfigureNotify(int width, int height, int framerate) {
     ScreenPtr pScreen = pScreenPtr;
     RROutputPtr output = RRFirstOutput(pScreen);
+    framerate = framerate ? framerate : 0;
 
     if (output && width && height && (pScreen->width != width || pScreen->height != height)) {
         CARD32 mmWidth, mmHeight;
         RRModePtr mode = lorieCvt(width, height, framerate);
+        pvfb->root.framerate = framerate;
         mmWidth = ((double) (mode->mode.width)) * 25.4 / monitorResolution;
         mmHeight = ((double) (mode->mode.width)) * 25.4 / monitorResolution;
         RROutputSetModes(output, &mode, 1, 0);
