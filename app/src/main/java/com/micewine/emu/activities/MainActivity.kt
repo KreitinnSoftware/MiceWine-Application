@@ -1042,6 +1042,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+fun getCpuTemperature(context: Context): Float? {
+    val hardwarePropertiesManager = context.getSystemService(Context.HARDWARE_PROPERTIES_SERVICE) as HardwarePropertiesManager
+    val temperatures = hardwarePropertiesManager.getDeviceTemperatures(
+        HardwarePropertiesManager.DEVICE_TEMPERATURE_CPU,
+        HardwarePropertiesManager.TEMPERATURE_CURRENT
+    )
+    
+    return if (temperatures.isNotEmpty()) {
+        temperatures[0]  // Температура процессора в градусах Цельсия
+    } else {
+        null  // Если температура не доступна
+    }
+}
+
         fun addGameToLauncher(context: Context, selectedGameArray: Array<String>) {
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
 
