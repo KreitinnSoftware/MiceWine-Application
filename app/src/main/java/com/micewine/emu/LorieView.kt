@@ -19,6 +19,7 @@ import androidx.preference.PreferenceManager
 import com.micewine.emu.activities.EmulationActivity
 import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION_DEFAULT_VALUE
 import com.micewine.emu.input.InputStub
+import dalvik.annotation.optimization.FastNative
 
 @SuppressLint("WrongConstant")
 class LorieView : SurfaceView, InputStub {
@@ -165,7 +166,9 @@ class LorieView : SurfaceView, InputStub {
         clipboard.setPrimaryClip(ClipData.newPlainText("X11 clipboard", text))
     }
 
+    @FastNative
     external fun handleXEvents()
+    @FastNative
     external override fun sendMouseEvent(
         x: Float,
         y: Float,
@@ -174,9 +177,13 @@ class LorieView : SurfaceView, InputStub {
         relative: Boolean
     )
 
+    @FastNative
     external override fun sendTouchEvent(action: Int, id: Int, x: Int, y: Int)
+    @FastNative
     external override fun sendKeyEvent(scanCode: Int, keyCode: Int, keyDown: Boolean): Boolean
+    @FastNative
     external override fun sendTextEvent(text: ByteArray)
+    @FastNative
     external override fun sendUnicodeEvent(code: Int)
     interface Callback {
         fun changed(
@@ -200,12 +207,16 @@ class LorieView : SurfaceView, InputStub {
         }
 
         @JvmStatic
+        @FastNative
         external fun connect(fd: Int)
         @JvmStatic
+        @FastNative
         external fun startLogcat(fd: Int)
         @JvmStatic
+        @FastNative
         external fun setClipboardSyncEnabled(enabled: Boolean)
         @JvmStatic
+        @FastNative
         external fun sendWindowChange(width: Int, height: Int, framerate: Int)
     }
 }
