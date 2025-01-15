@@ -196,7 +196,7 @@ class LorieView : SurfaceView, InputStub {
 
     companion object {
         init {
-            System.loadLibrary("Xlorie")
+            System.loadLibrary("lorie")
         }
 
         @JvmStatic
