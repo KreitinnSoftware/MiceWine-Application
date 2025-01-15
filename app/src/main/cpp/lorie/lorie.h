@@ -1,5 +1,6 @@
 #pragma once
 
+#include <android/choreographer.h>
 #include <X11/keysymdef.h>
 #include <jni.h>
 #include "linux/input-event-codes.h"
@@ -15,6 +16,8 @@ void lorieRequestClipboard(void);
 void lorieHandleClipboardAnnounce(void);
 void lorieHandleClipboardData(const char* data);
 Bool lorieInitDri3(ScreenPtr pScreen);
+void lorieTriggerWorkingQueue(void);
+void lorieChoreographerFrameCallback(__unused long t, AChoreographer* d);
 
 static int android_to_linux_keycode[304] = {
         [ 4   /* ANDROID_KEYCODE_BACK */] = KEY_ESC,

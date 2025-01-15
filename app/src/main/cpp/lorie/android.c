@@ -223,6 +223,10 @@ Java_com_micewine_emu_CmdEntryPoint_start(JNIEnv *env, unused jclass cls, jobjec
 
     (*env)->GetJavaVM(env, &vm);
 
+    AChoreographer *choreographer = AChoreographer_getInstance();
+    // Trigger it first time
+    AChoreographer_postFrameCallback(choreographer, (AChoreographer_frameCallback) lorieChoreographerFrameCallback, choreographer);
+
     pthread_create(&t, NULL, startServer, vm);
     return JNI_TRUE;
 }
@@ -230,6 +234,7 @@ Java_com_micewine_emu_CmdEntryPoint_start(JNIEnv *env, unused jclass cls, jobjec
 JNIEXPORT void JNICALL
 Java_com_micewine_emu_CmdEntryPoint_windowChanged(JNIEnv *env, unused jobject cls, jobject surface) {
     QueueWorkProc(lorieChangeWindow, NULL, surface ? (*env)->NewGlobalRef(env, surface) : NULL);
+    lorieTriggerWorkingQueue();
 }
 
 static Bool sendConfigureNotify(unused ClientPtr pClient, void *closure) {
@@ -273,6 +278,7 @@ void handleLorieEvents(int fd, __unused int ready, __unused void *ignored) {
                 lorieEvent *copy = calloc(1, sizeof(lorieEvent));
                 *copy = e;
                 QueueWorkProc(sendConfigureNotify, NULL, copy);
+                lorieTriggerWorkingQueue();
                 break;
             }
             case EVENT_TOUCH: {
@@ -355,6 +361,7 @@ void handleLorieEvents(int fd, __unused int ready, __unused void *ignored) {
                 read(conn_fd, data, e.clipboardSend.count);
                 data[e.clipboardSend.count] = 0;
                 QueueWorkProc(handleClipboardData, NULL, data);
+                lorieTriggerWorkingQueue();
             }
         }
 
@@ -394,6 +401,7 @@ Java_com_micewine_emu_CmdEntryPoint_getXConnection(JNIEnv *env, unused jobject c
     socketpair(AF_UNIX, SOCK_STREAM, 0, client);
     fcntl(client[0], F_SETFL, fcntl(client[0], F_GETFL, 0) | O_NONBLOCK);
     QueueWorkProc(addFd, NULL, (void*) (int64_t) client[1]);
+    lorieTriggerWorkingQueue();
 
     return (*env)->CallStaticObjectMethod(env, ParcelFileDescriptorClass, adoptFd, client[0]);
 }
