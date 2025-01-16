@@ -39,6 +39,8 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BLEED
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_DIRTY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_DIRTY_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTROUND
@@ -826,6 +828,7 @@ class MainActivity : AppCompatActivity() {
         var box64DynarecNativeflags: String? = null
         var box64DynarecBleedingEdge: String? = null
         var box64DynarecWait: String? = null
+        var box64DynarecDirty: String? = null
         var box64ShowSegv: String? = null
         var box64ShowBt: String? = null
         var box64NoSigSegv: String? = null
@@ -932,6 +935,7 @@ class MainActivity : AppCompatActivity() {
             box64DynarecNativeflags = booleanToString(preferences.getBoolean(BOX64_DYNAREC_NATIVEFLAGS, BOX64_DYNAREC_NATIVEFLAGS_DEFAULT_VALUE))
             box64DynarecBleedingEdge = booleanToString(preferences.getBoolean(BOX64_DYNAREC_BLEEDING_EDGE, BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE))
             box64DynarecWait = booleanToString(preferences.getBoolean(BOX64_DYNAREC_WAIT, BOX64_DYNAREC_WAIT_DEFAULT_VALUE))
+            box64DynarecDirty = booleanToString(preferences.getBoolean(BOX64_DYNAREC_DIRTY, BOX64_DYNAREC_DIRTY_DEFAULT_VALUE))
             box64ShowSegv = booleanToString(preferences.getBoolean(BOX64_SHOWSEGV, BOX64_SHOWSEGV_DEFAULT_VALUE))
             box64ShowBt = booleanToString(preferences.getBoolean(BOX64_SHOWBT, BOX64_SHOWBT_DEFAULT_VALUE))
             box64NoSigSegv = booleanToString(preferences.getBoolean(BOX64_NOSIGSEGV, BOX64_NOSIGSEGV_DEFAULT_VALUE))

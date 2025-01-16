@@ -15,6 +15,7 @@
     <string name="box64_nativeflags_description">Generate code will use native flags if possible</string>
     <string name="box64_bleeding_edge_description">Detectar MonoBleedingEdge e aplicar configurações conservativas</string>
     <string name="box64_dynarec_wait_description">Comportamento com FillBlock quando não está disponível (FillBlock cria blocos de Dynarec e não é multithreaded)</string>
+    <string name="box64_dynarec_dirty_description">Permitir continuar executando um bloco que está desprotegido e potencialmente comprometido.</string>
     <string name="box64_log_description">Nível de Logs do Box64</string>
     <string name="box64_avx_description">Ativa ou Desativa a Emulação de AVX ou AVX2 do Box64</string>
     <string name="box64_show_segv_description">Exibir o sinal de Segfault mesmo que um manipulador de sinal esteja presente.</string>

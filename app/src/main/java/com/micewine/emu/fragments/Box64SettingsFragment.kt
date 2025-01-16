@@ -18,6 +18,8 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BLEED
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_DIRTY
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_DIRTY_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTROUND
@@ -93,6 +95,7 @@ class Box64SettingsFragment : Fragment() {
         addToAdapter(R.string.box64_nativeflags_title, R.string.box64_nativeflags_description, null, SWITCH, BOX64_DYNAREC_NATIVEFLAGS_DEFAULT_VALUE, BOX64_DYNAREC_NATIVEFLAGS)
         addToAdapter(R.string.box64_bleeding_edge_title, R.string.box64_bleeding_edge_description, null, SWITCH, BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE, BOX64_DYNAREC_BLEEDING_EDGE)
         addToAdapter(R.string.box64_dynarec_wait_title, R.string.box64_dynarec_wait_description, null, SWITCH, BOX64_DYNAREC_WAIT_DEFAULT_VALUE, BOX64_DYNAREC_WAIT)
+        addToAdapter(R.string.box64_dynarec_dirty_title, R.string.box64_dynarec_dirty_description, null, SWITCH, BOX64_DYNAREC_DIRTY_DEFAULT_VALUE, BOX64_DYNAREC_DIRTY)
         addToAdapter(R.string.box64_log_title, R.string.box64_log_description, arrayOf("0", "1"), SPINNER, BOX64_LOG_DEFAULT_VALUE, BOX64_LOG)
         addToAdapter(R.string.box64_avx_title, R.string.box64_avx_description, arrayOf("0", "1", "2"), SPINNER, BOX64_AVX_DEFAULT_VALUE, BOX64_AVX)
 

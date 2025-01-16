@@ -8,6 +8,7 @@ import com.micewine.emu.activities.MainActivity.Companion.box64DynarecAlignedAto
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBigblock
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBleedingEdge
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecCallret
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecDirty
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastnan
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastround
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecNativeflags
@@ -113,6 +114,7 @@ object EnvVars {
             putVar("BOX64_DYNAREC_NATIVEFLAGS", box64DynarecNativeflags)
             putVar("BOX64_DYNAREC_BLEEDING_EDGE", box64DynarecBleedingEdge)
             putVar("BOX64_DYNAREC_WAIT", box64DynarecWait)
+            putVar("BOX64_DYNAREC_DIRTY", box64DynarecDirty)
             putVar("BOX64_SHOWSEGV", box64ShowSegv)
             putVar("BOX64_SHOWBT", box64ShowBt)
             putVar("BOX64_NOSIGSEGV", box64NoSigSegv)

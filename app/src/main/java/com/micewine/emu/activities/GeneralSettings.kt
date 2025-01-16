@@ -150,6 +150,8 @@ class GeneralSettings : AppCompatActivity() {
         const val BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE = true
         const val BOX64_DYNAREC_WAIT = "BOX64_DYNAREC_WAIT"
         const val BOX64_DYNAREC_WAIT_DEFAULT_VALUE = true
+        const val BOX64_DYNAREC_DIRTY = "BOX64_DYNAREC_DIRTY"
+        const val BOX64_DYNAREC_DIRTY_DEFAULT_VALUE = false
         const val BOX64_SHOWSEGV = "BOX64_SHOWSEGV"
         const val BOX64_SHOWSEGV_DEFAULT_VALUE = false
         const val BOX64_SHOWBT = "BOX64_SHOWBT"

@@ -28,6 +28,8 @@
     <string name="box64_bleeding_edge_description">Detect MonoBleedingEdge and apply conservative settings</string>
     <string name="box64_dynarec_wait_title" translatable="false">BOX64_DYNAREC_WAIT</string>
     <string name="box64_dynarec_wait_description">Behavior with FillBlock is not available (FillBlock build Dynarec blocks and is not multithreaded)</string>
+    <string name="box64_dynarec_dirty_title" translatable="false">BOX64_DYNAREC_DIRTY</string>
+    <string name="box64_dynarec_dirty_description">Allow continue running a block that is unprotected and potentially dirty</string>
     <string name="box64_log_title" translatable="false">BOX64_LOG</string>
     <string name="box64_log_description">Box64 Log Level</string>
     <string name="box64_avx_title" translatable="false">BOX64_AVX</string>
