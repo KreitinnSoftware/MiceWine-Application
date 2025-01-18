@@ -124,7 +124,7 @@ object EnvVars {
         putVar("VKD3D_FEATURE_LEVEL", "12_0")
 
         if (wineLogLevel == "minimal") {
-            putVar("WINEDEBUG", "-fixme,-debug")
+            putVar("WINEDEBUG", "-all")
         }
 
         putVar("WINEESYNC", wineESync)
