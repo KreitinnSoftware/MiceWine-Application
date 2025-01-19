@@ -19,14 +19,10 @@ public interface InputStub {
     int BUTTON_RIGHT = 3;
     int BUTTON_SCROLL = 4;
 
-    /**
-     * Sends a mouse event.
-     */
+    /** Sends a mouse event. */
     void sendMouseEvent(float x, float y, int whichButton, boolean buttonDown, boolean relative);
 
-    /**
-     * Sends a mouse wheel event.
-     */
+    /** Sends a mouse wheel event. */
     void sendMouseWheelEvent(float deltaX, float deltaY);
 
     /**
@@ -42,10 +38,8 @@ public interface InputStub {
      */
     void sendTextEvent(byte[] utf8Bytes);
 
-    void sendUnicodeEvent(int code);
-
-    /**
-     * Sends an event, not flushing connection.
-     */
+    /** Sends an event, not flushing connection. */
     void sendTouchEvent(int action, int pointerId, int x, int y);
+
+    void sendStylusEvent(float x, float y, int pressure, int tiltX, int tiltY, int orientation, int buttons, boolean eraser, boolean mouseMode);
 }

@@ -4,22 +4,25 @@
 
 package com.micewine.emu.input;
 
+import android.graphics.Matrix;
 import android.graphics.PointF;
 
 /**
  * This class stores UI configuration that will be used when rendering the remote desktop.
  */
 public class RenderData {
+    public PointF scale = new PointF();
+
+    public int screenWidth;
+    public int screenHeight;
+    public int imageWidth;
+    public int imageHeight;
+
     /**
      * Specifies the position, in image coordinates, at which the cursor image will be drawn.
      * This will normally be at the location of the most recently injected motion event.
      */
     private final PointF mCursorPosition = new PointF();
-    public PointF scale = new PointF();
-    public int screenWidth;
-    public int screenHeight;
-    public int imageWidth;
-    public int imageHeight;
 
     /**
      * Returns the position of the rendered cursor.

@@ -1,6 +1,6 @@
 package com.micewine.emu.activities
 
-import android.Manifest.permission
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.ClipData
@@ -11,15 +11,14 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
-import android.content.res.Configuration.KEYBOARD_QWERTY
-import android.media.AudioManager
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import android.os.RemoteException
+import android.util.DisplayMetrics
 import android.util.Log
+import android.view.Display
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.MenuItem
@@ -31,14 +30,12 @@ import android.view.Window
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.FrameLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager
@@ -47,17 +44,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
-import com.micewine.emu.CmdEntryPoint.Companion.ACTION_START
-import com.micewine.emu.CmdEntryPoint.Companion.requestConnection
+import com.micewine.emu.CmdEntryPoint
 import com.micewine.emu.ICmdEntryInterface
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
-import com.micewine.emu.activities.MainActivity.Companion.ACTION_STOP_ALL
 import com.micewine.emu.activities.MainActivity.Companion.enableCpuCounter
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.activities.MainActivity.Companion.getCpuInfo
 import com.micewine.emu.activities.MainActivity.Companion.getMemoryInfo
-import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
@@ -67,60 +61,55 @@ import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
-import com.micewine.emu.input.TouchInputHandler.RenderStub.NullStub
 import com.micewine.emu.views.OverlayView
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
+
+@SuppressLint("ApplySharedPref")
+@Suppress("deprecation", "unused")
 class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
+    private var frm: FrameLayout? = null
     private var mInputHandler: TouchInputHandler? = null
-    private var service: ICmdEntryInterface? = null
-    private var mClientConnected = false
+    var service: ICmdEntryInterface? = null
+    private var mLorieKeyListener: View.OnKeyListener? = null
+    private var filterOutWinKey = false
+    private var useTermuxEKBarBehaviour = false
+
+    private val preferencesChangedListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences?, _: String? ->
+            onPreferencesChanged()
+        }
+
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                ACTION_START -> {
-                    try {
-                        Log.v("LorieBroadcastReceiver", "Got new ACTION_START intent")
-                        val b = intent.getBundleExtra("")?.getBinder("")
-                        service = ICmdEntryInterface.Stub.asInterface(b)
-                        service?.asBinder()?.linkToDeath(
-                            {
-                                service = null
-                                requestConnection()
-                                Log.v("Lorie", "Disconnected")
-                                runOnUiThread { clientConnectedStateChanged(false) }
-                            }, 0
-                        )
-                        onReceiveConnection()
-                    } catch (e: Exception) {
-                        Log.e("MainActivity", "Something went wrong while we extracted connection details from binder.", e)
-                    }
+            if (CmdEntryPoint.ACTION_START == intent.action) {
+                try {
+                    Log.v("LorieBroadcastReceiver", "Got new ACTION_START intent")
+                    onReceiveConnection(intent)
+                } catch (e: Exception) {
+                    Log.e(
+                        "EmulationActivity",
+                        "Something went wrong while we extracted connection details from binder.",
+                        e
+                    )
                 }
-                ACTION_STOP_ALL -> {
-                    finishAffinity()
-                }
+            } else if (ACTION_STOP == intent.action) {
+                finishAffinity()
             }
         }
     }
-    private var mLorieKeyListener: View.OnKeyListener? = null
+
     private var drawerLayout: DrawerLayout? = null
     private var logsNavigationView: NavigationView? = null
     private var overlayView: OverlayView? = null
 
-    init {
-        instance = this
-    }
-    @SuppressLint(
-        "ClickableViewAccessibility",
-        "UnspecifiedRegisterReceiverFlag"
-    )
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val preferences = PreferenceManager.getDefaultSharedPreferences(this).apply {
-            registerOnSharedPreferenceChangeListener { _: SharedPreferences?, _: String? ->
-                onPreferencesChanged()
-            }
+            registerOnSharedPreferenceChangeListener(preferencesChangedListener)
         }
 
         initSharedLogs(supportFragmentManager)
@@ -139,10 +128,12 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         prepareButtonsAxisValues(this)
 
-        val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
-        window.setFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, 0)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+            0
+        )
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_emulation)
 
@@ -253,10 +244,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
             true
         }
-        mInputHandler = TouchInputHandler(this, object : NullStub() {
-            override fun swipeDown() {}
-        }, InputEventSender(lorieView))
-        mLorieKeyListener = View.OnKeyListener { v: View?, k: Int, e: KeyEvent ->
+
+        mInputHandler = TouchInputHandler(this, InputEventSender(lorieView))
+        mLorieKeyListener = View.OnKeyListener { _: View?, k: Int, e: KeyEvent ->
             if (k == KeyEvent.KEYCODE_BACK) {
                 if (e.isFromSource(InputDevice.SOURCE_MOUSE) || e.isFromSource(InputDevice.SOURCE_MOUSE_RELATIVE)) {
                     if (e.repeatCount != 0) // ignore auto-repeat
@@ -283,35 +273,50 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
                     return@OnKeyListener true
                 }
-            } else if (k == KeyEvent.KEYCODE_VOLUME_DOWN) {
-                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
-                return@OnKeyListener true
-            } else if (k == KeyEvent.KEYCODE_VOLUME_UP) {
-                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
-                return@OnKeyListener true
             }
 
             checkControllerButtons(lorieView, e)
-            mInputHandler!!.sendKeyEvent(v, e)
+            mInputHandler!!.sendKeyEvent(e)
         }
-        lorieParent.setOnTouchListener { _: View?, e: MotionEvent? ->
+
+        lorieParent.setOnTouchListener { _: View?, e: MotionEvent ->
+            // Avoid batched MotionEvent objects and reduce potential latency.
+            // For reference: https://developer.android.com/develop/ui/views/touch-and-input/stylus-input/advanced-stylus-features#rendering.
+            if (e.action == MotionEvent.ACTION_DOWN) lorieParent.requestUnbufferedDispatch(
+                e
+            )
             mInputHandler!!.handleTouchEvent(lorieParent, lorieView, e)
         }
         lorieParent.setOnHoverListener { _: View?, e: MotionEvent? ->
-            mInputHandler!!.handleTouchEvent(lorieParent, lorieView, e)
+            mInputHandler!!.handleTouchEvent(
+                lorieParent,
+                lorieView,
+                e
+            )
         }
         lorieParent.setOnGenericMotionListener { _: View?, e: MotionEvent? ->
-            mInputHandler!!.handleTouchEvent(lorieParent, lorieView, e)
+            mInputHandler!!.handleTouchEvent(
+                lorieParent,
+                lorieView,
+                e
+            )
         }
         lorieView.setOnCapturedPointerListener { _: View?, e: MotionEvent? ->
-            mInputHandler!!.handleTouchEvent(lorieView, lorieView, e)
+            mInputHandler!!.handleTouchEvent(
+                lorieView,
+                lorieView,
+                e
+            )
         }
         lorieParent.setOnCapturedPointerListener { _: View?, e: MotionEvent? ->
-            mInputHandler!!.handleTouchEvent(lorieView, lorieView, e)
+            mInputHandler!!.handleTouchEvent(
+                lorieView,
+                lorieView,
+                e
+            )
         }
         lorieView.setOnKeyListener(mLorieKeyListener)
-
-        val callback = object : LorieView.Callback {
+        lorieView.setCallback(object : LorieView.Callback {
             override fun changed(
                 sfc: Surface?,
                 surfaceWidth: Int,
@@ -319,44 +324,57 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 screenWidth: Int,
                 screenHeight: Int
             ) {
-                val frameRate = (lorieView.display?.refreshRate ?: 30).toInt()
-                mInputHandler?.handleHostSizeChanged(surfaceWidth, surfaceHeight)
-                mInputHandler?.handleClientSizeChanged(screenWidth, screenHeight)
-                LorieView.sendWindowChange(screenWidth, screenHeight, frameRate)
-                service?.let {
+                val frameRate = (if ((lorieView.display != null)) {
+                    lorieView.display.refreshRate
+                } else {
+                    30F
+                }).toInt()
+
+                mInputHandler!!.handleHostSizeChanged(surfaceWidth, surfaceHeight)
+                mInputHandler!!.handleClientSizeChanged(screenWidth, screenHeight)
+
+                val name = if (lorieView.display == null || lorieView.display.displayId == Display.DEFAULT_DISPLAY) {
+                    "Builtin Display"
+                } else {
+                    "External Display"
+                }
+
+                LorieView.sendWindowChange(screenWidth, screenHeight, frameRate, name)
+
+                if (service != null && !LorieView.renderingInActivity()) {
                     try {
-                        it.windowChanged(sfc)
+                        service!!.windowChanged(sfc)
                     } catch (e: RemoteException) {
-                        e.printStackTrace()
+                        Log.e("EmulationActivity", "failed to send windowChanged request", e)
                     }
                 }
             }
-        }
-
-        lorieView.setCallback(callback)
-
-        registerReceiver(receiver, object : IntentFilter(ACTION_START) {
-            init {
-                addAction(ACTION_STOP_ALL)
-            }
         })
 
-        requestConnection()
+        registerReceiver(receiver, object : IntentFilter(CmdEntryPoint.ACTION_START) {
+            init {
+                addAction(ACTION_STOP)
+                addAction(ACTION_CUSTOM)
+            }
+        }, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) RECEIVER_EXPORTED else 0)
+
+        inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+
+        tryConnect()
         onPreferencesChanged()
-        checkXEvents()
 
-        setSharedVars(this)
-
-        if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU &&
-            checkSelfPermission(permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED &&
-            !shouldShowRequestPermissionRationale(permission.POST_NOTIFICATIONS)
-            ) {
-            requestPermissions(arrayOf(permission.POST_NOTIFICATIONS), 0)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED && !shouldShowRequestPermissionRationale(
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
         }
+
+        onReceiveConnection(intent)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        lorieView.requestFocus()
+        lorieView?.requestFocus()
 
         mLorieKeyListener?.onKey(null, keyCode, event)
 
@@ -364,180 +382,262 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
-        checkControllerAxis(lorieView, event!!)
+        checkControllerAxis(lorieView!!, event!!)
 
         return true
     }
+
 
     override fun onDestroy() {
         unregisterReceiver(receiver)
         super.onDestroy()
     }
 
-    fun onReceiveConnection() {
+    private fun setSize(v: View, width: Int, height: Int) {
+        val p = v.layoutParams
+        p.width = (width * resources.displayMetrics.density).toInt()
+        p.height = (height * resources.displayMetrics.density).toInt()
+        v.layoutParams = p
+        v.minimumWidth = (width * resources.displayMetrics.density).toInt()
+        v.minimumHeight = (height * resources.displayMetrics.density).toInt()
+    }
+
+    fun onReceiveConnection(intent: Intent?) {
+        val bundle = intent?.getBundleExtra(null)
+        val ibinder = bundle?.getBinder(null) ?: return
+
+        service = ICmdEntryInterface.Stub.asInterface(ibinder)
+        try {
+            service?.asBinder()?.linkToDeath({
+                service = null
+                Log.v("Lorie", "Disconnected")
+                runOnUiThread {
+                    LorieView.connect(-1)
+                    clientConnectedStateChanged()
+                }
+            }, 0)
+        } catch (ignored: RemoteException) {
+        }
+
         try {
             if (service != null && service!!.asBinder().isBinderAlive) {
                 Log.v("LorieBroadcastReceiver", "Extracting logcat fd.")
-                val logcatOutput = service!!.getLogcatOutput()
-
-                if (logcatOutput != null) {
-                    LorieView.startLogcat(logcatOutput.detachFd())
-                }
+                val logcatOutput = service!!.logcatOutput
+                if (logcatOutput != null) LorieView.startLogcat(logcatOutput.detachFd())
 
                 tryConnect()
+
+                if (intent !== getIntent()) getIntent().putExtra(null, bundle)
             }
         } catch (e: Exception) {
-            Log.e("MainActivity", "Something went wrong while we were establishing connection", e)
+            Log.e("EmulationActivity", "Something went wrong while we were establishing connection", e)
         }
-    }
-
-    private fun isKeyboardConnected(): Boolean {
-        return resources.configuration.keyboard == KEYBOARD_QWERTY
     }
 
     private fun tryConnect() {
-        if (mClientConnected) {
+        if (LorieView.connected()) return
+
+        if (service == null) {
+            LorieView.requestConnection()
+            handler.postDelayed({ this.tryConnect() }, 250)
             return
         }
-        try {
-            Log.v("LorieBroadcastReceiver", "Extracting X connection socket.")
-            val fd = if (service == null) {
-                null
-            } else {
-                service!!.getXConnection()
-            }
 
+        try {
+            val fd = service!!.xConnection
             if (fd != null) {
+                Log.v("EmulationActivity", "Extracting X connection socket.")
                 LorieView.connect(fd.detachFd())
-                lorieView.triggerCallback()
-                clientConnectedStateChanged(true)
-                LorieView.setClipboardSyncEnabled(true)
-            } else {
-                handler.postDelayed({ tryConnect() }, 500)
-            }
+                lorieView!!.triggerCallback()
+                clientConnectedStateChanged()
+                lorieView!!.reloadPreferences()
+            } else handler.postDelayed({ this.tryConnect() }, 250)
         } catch (e: Exception) {
-            Log.e("MainActivity", "Something went wrong while we were establishing connection", e)
+            Log.e("EmulationActivity", "Something went wrong while we were establishing connection", e)
             service = null
 
             // We should reset the View for the case if we have sent it's surface to the client.
-            lorieView.regenerate()
+            lorieView!!.regenerate()
+            handler.postDelayed({ this.tryConnect() }, 250)
         }
     }
 
     private fun onPreferencesChanged() {
-        mInputHandler!!.setInputMode(TouchInputHandler.InputMode.TRACKPAD)
-        mInputHandler!!.setTapToMove(false)
-        mInputHandler!!.setPreferScancodes(isKeyboardConnected())
-        mInputHandler!!.setPointerCaptureEnabled(true)
+        handler.removeCallbacks { this.onPreferencesChangedCallback() }
+        handler.postDelayed({ this.onPreferencesChangedCallback() }, 100)
+    }
 
-        lorieView.releasePointerCapture()
+    @SuppressLint("UnsafeIntentLaunch")
+    fun onPreferencesChangedCallback() {
+        onWindowFocusChanged(hasWindowFocus())
+        val lorieView = lorieView
 
-        onWindowFocusChanged(true)
-        LorieView.setClipboardSyncEnabled(false)
+        lorieView!!.reloadPreferences()
+
         lorieView.triggerCallback()
 
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        filterOutWinKey = false
 
-        //Reset default input back to normal
-        TouchInputHandler.STYLUS_INPUT_HELPER_MODE = 1
+        showIMEWhileExternalConnected = false
+
+        lorieView.requestLayout()
+        lorieView.invalidate()
     }
 
     public override fun onResume() {
         super.onResume()
-        lorieView.requestFocus()
-        lorieView.requestLayout()
+
+        lorieView!!.requestFocus()
+        lorieView!!.requestLayout()
 
         overlayView?.loadFromPreferences()
 
         prepareButtonsAxisValues(this)
-
-        lifecycleScope.cancel()
-
-        if (enableCpuCounter) {
-            lifecycleScope.launch {
-                getCpuInfo()
-            }
-        }
-
-        if (enableRamCounter) {
-            lifecycleScope.launch {
-                getMemoryInfo(this@EmulationActivity)
-            }
-        }
     }
 
     public override fun onPause() {
+        inputMethodManager!!.hideSoftInputFromWindow(window.decorView.rootView.windowToken, 0)
+
         super.onPause()
     }
 
-    private val lorieView: LorieView get() = findViewById(R.id.lorieView)
+    val lorieView: LorieView?
+        get() = findViewById(R.id.lorieView)
 
     fun handleKey(e: KeyEvent): Boolean {
-        mLorieKeyListener!!.onKey(lorieView, e.keyCode, e)
-        return true
+        if (filterOutWinKey && (e.keyCode == KeyEvent.KEYCODE_META_LEFT || e.keyCode == KeyEvent.KEYCODE_META_RIGHT || e.isMetaPressed)) return false
+        return mLorieKeyListener!!.onKey(lorieView, e.keyCode, e)
     }
 
+    var orientation: Int = 0
+
+    init {
+        instance = this
+    }
+
+    @SuppressLint("WrongConstant")
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowInsetsControllerCompat(window, window.decorView).let { controller ->
-            controller.hide(WindowInsetsCompat.Type.systemBars())
-            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        if (hasFocus) {
+            window.attributes.layoutInDisplayCutoutMode = if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)) {
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+            } else {
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
+
+            window.statusBarColor = Color.BLACK
+            window.navigationBarColor = Color.BLACK
         }
 
         window.setFlags(
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+            WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+            0
         )
-
         if (hasFocus) {
-            lorieView.regenerate()
+            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
         }
 
-        lorieView.requestFocus()
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+
+        (findViewById<View>(android.R.id.content) as FrameLayout).getChildAt(
+            0
+        ).fitsSystemWindows = false
     }
 
-    public override fun onUserLeaveHint() {
-        super.onUserLeaveHint()
-        PreferenceManager.getDefaultSharedPreferences(this)
-    }
-
+    /** @noinspection NullableProblems
+     */
+    @SuppressLint("WrongConstant")
     override fun onApplyWindowInsets(v: View, insets: WindowInsets): WindowInsets {
-        handler.postDelayed({ lorieView.triggerCallback() }, 100)
+        handler.postDelayed({ lorieView!!.triggerCallback() }, 100)
         return insets
     }
 
-    fun clientConnectedStateChanged(connected: Boolean) {
+    private fun clientConnectedStateChanged() {
         runOnUiThread {
-            PreferenceManager.getDefaultSharedPreferences(this)
-            mClientConnected = connected
-            lorieView.visibility = if (connected) View.VISIBLE else View.INVISIBLE
-            lorieView.regenerate()
+            val connected = LorieView.connected()
+
+            lorieView!!.visibility = if (connected) View.VISIBLE else View.INVISIBLE
+            lorieView!!.regenerate()
 
             // We should recover connection in the case if file descriptor for some reason was broken...
             if (!connected) {
                 tryConnect()
-            }
-
-            if (connected) {
-                lorieView.pointerIcon = PointerIcon.getSystemIcon(this, PointerIcon.TYPE_NULL)
+            } else {
+                lorieView!!.pointerIcon = PointerIcon.getSystemIcon(this, PointerIcon.TYPE_NULL)
             }
         }
     }
 
-    private fun checkXEvents() {
-        lorieView.handleXEvents()
-        handler.postDelayed({ checkXEvents() }, 300)
+    fun setExternalKeyboardConnected(connected: Boolean) {
+        externalKeyboardConnected = connected
+        lorieView!!.requestFocus()
     }
 
     companion object {
         const val KEY_BACK = 158
-        var handler = Handler(Looper.getMainLooper())
+        const val ACTION_STOP: String = "com.micewine.emu.ACTION_STOP"
+        const val ACTION_CUSTOM: String = "com.micewine.emu.ACTION_CUSTOM"
+
+        @JvmField
+        var handler: Handler = Handler()
+        var inputMethodManager: InputMethodManager? = null
+        private var showIMEWhileExternalConnected = false
+        private var externalKeyboardConnected = false
+
+        private var oldFullscreen = false
+        private var oldHideCutout = false
+
+        @SuppressLint("StaticFieldLeak")
+        private lateinit var instance: EmulationActivity
 
         @JvmStatic
-        @SuppressLint("StaticFieldLeak")
-        lateinit var instance: EmulationActivity private set
+        fun getInstance(): EmulationActivity {
+            return instance
+        }
+
+        @JvmStatic
+        fun toggleKeyboardVisibility() {
+            Log.d("EmulationActivity", "Toggling keyboard visibility")
+            if (inputMethodManager != null) {
+                Log.d(
+                    "toggleKeyboardVisibility",
+                    "externalKeyboardConnected $externalKeyboardConnected showIMEWhileExternalConnected $showIMEWhileExternalConnected"
+                )
+                if (!externalKeyboardConnected || showIMEWhileExternalConnected) {
+                    inputMethodManager!!.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+                } else {
+                    inputMethodManager!!.hideSoftInputFromWindow(getInstance().window.decorView.rootView.windowToken, 0)
+                }
+
+                getInstance().lorieView!!.requestFocus()
+            }
+        }
+
+        @JvmStatic
+        val isConnected: Boolean
+            get() {
+                return LorieView.connected()
+            }
+
+        @JvmStatic
+        fun getRealMetrics(m: DisplayMetrics?) {
+            if (getInstance().lorieView != null && getInstance().lorieView!!.display != null) getInstance().lorieView!!.display.getRealMetrics(m)
+        }
+
+        fun setCapturingEnabled(enabled: Boolean) {
+            if (getInstance().mInputHandler == null) return
+
+            getInstance().mInputHandler!!.setCapturingEnabled(enabled)
+        }
 
         var sharedLogs: ShellLoader.ViewModelAppLogs? = null
 

@@ -15,6 +15,7 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.os.storage.StorageManager
 import android.view.ContextMenu
 import android.view.KeyEvent
@@ -27,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
+import com.micewine.emu.CmdEntryPoint
 import com.micewine.emu.R
 import com.micewine.emu.activities.DriverManagerActivity.Companion.generateICDFile
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_AVX
@@ -674,7 +676,7 @@ class MainActivity : AppCompatActivity() {
             runningXServer = true
 
             runCommand(
-                "env CLASSPATH=${getClassPath(this@MainActivity)} /system/bin/app_process / com.micewine.emu.CmdEntryPoint $display &> /dev/null"
+                "env CLASSPATH=${getClassPath(this@MainActivity)} /system/bin/app_process / com.micewine.emu.CmdEntryPoint $display"
             )
         }
     }

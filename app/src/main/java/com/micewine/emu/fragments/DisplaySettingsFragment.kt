@@ -49,7 +49,7 @@ class DisplaySettingsFragment : Fragment() {
             "960x540", "1024x768",
             "1280x720", "1440x720",
             "1600x900", "1800x900",
-            "1080x1920", "2160x1080"
+            "1920x1080", "2160x1080"
             ),
             SPINNER, "1280x720", DISPLAY_RESOLUTION)
         addToAdapter(R.string.enable_ram_counter, R.string.enable_ram_counter_description, null,

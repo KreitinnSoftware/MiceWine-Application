@@ -49,6 +49,7 @@ set(PIXMAN_SRC
         pixman/pixman/pixman-radial-gradient.c
         pixman/pixman/pixman-region16.c
         pixman/pixman/pixman-region32.c
+        pixman/pixman/pixman-riscv.c
         pixman/pixman/pixman-solid-fill.c
         pixman/pixman/pixman-timer.c
         pixman/pixman/pixman-trap.c
@@ -60,7 +61,8 @@ set(PIXMAN_CFLAGS
         "-DPACKAGE=\"pixman\""
         "-DTLS=__thread"
         "-DSIZEOF_LONG=${SIZEOF_LONG}"
-        "-DUSE_OPENMP=1")
+        "-DUSE_OPENMP=1"
+        "-Wno-unknown-attributes")
 
 if("${CMAKE_ANDROID_ARCH_ABI}" STREQUAL "arm64-v8a")
     set(PIXMAN_SRC ${PIXMAN_SRC}

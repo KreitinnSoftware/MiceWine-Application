@@ -174,12 +174,9 @@ object ControllerUtils {
         val deviceIds = InputDevice.getDeviceIds()
         deviceIds.forEach { deviceId ->
             InputDevice.getDevice(deviceId)?.apply {
-
                 if (sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD
                     || sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK) {
-                    gameControllerDeviceIds
-                        .takeIf { !it.contains(deviceId) }
-                        ?.add(deviceId)
+                    gameControllerDeviceIds.takeIf { !it.contains(deviceId) }?.add(deviceId)
                 }
             }
         }
