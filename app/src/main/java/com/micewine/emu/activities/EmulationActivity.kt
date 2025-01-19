@@ -15,6 +15,7 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.RemoteException
 import android.util.DisplayMetrics
 import android.util.Log
@@ -64,16 +65,12 @@ import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.views.OverlayView
 import kotlinx.coroutines.launch
 
-
 @SuppressLint("ApplySharedPref")
-@Suppress("deprecation", "unused")
 class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
-    private var frm: FrameLayout? = null
     private var mInputHandler: TouchInputHandler? = null
     var service: ICmdEntryInterface? = null
     private var mLorieKeyListener: View.OnKeyListener? = null
     private var filterOutWinKey = false
-    private var useTermuxEKBarBehaviour = false
 
     private val preferencesChangedListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences?, _: String? ->
@@ -393,15 +390,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         super.onDestroy()
     }
 
-    private fun setSize(v: View, width: Int, height: Int) {
-        val p = v.layoutParams
-        p.width = (width * resources.displayMetrics.density).toInt()
-        p.height = (height * resources.displayMetrics.density).toInt()
-        v.layoutParams = p
-        v.minimumWidth = (width * resources.displayMetrics.density).toInt()
-        v.minimumHeight = (height * resources.displayMetrics.density).toInt()
-    }
-
     fun onReceiveConnection(intent: Intent?) {
         val bundle = intent?.getBundleExtra(null)
         val ibinder = bundle?.getBinder(null) ?: return
@@ -587,14 +575,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         const val ACTION_STOP: String = "com.micewine.emu.ACTION_STOP"
         const val ACTION_CUSTOM: String = "com.micewine.emu.ACTION_CUSTOM"
 
-        @JvmField
-        var handler: Handler = Handler()
+        var handler: Handler = Handler(Looper.getMainLooper())
         var inputMethodManager: InputMethodManager? = null
         private var showIMEWhileExternalConnected = false
         private var externalKeyboardConnected = false
-
-        private var oldFullscreen = false
-        private var oldHideCutout = false
 
         @SuppressLint("StaticFieldLeak")
         private lateinit var instance: EmulationActivity
@@ -602,24 +586,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         @JvmStatic
         fun getInstance(): EmulationActivity {
             return instance
-        }
-
-        @JvmStatic
-        fun toggleKeyboardVisibility() {
-            Log.d("EmulationActivity", "Toggling keyboard visibility")
-            if (inputMethodManager != null) {
-                Log.d(
-                    "toggleKeyboardVisibility",
-                    "externalKeyboardConnected $externalKeyboardConnected showIMEWhileExternalConnected $showIMEWhileExternalConnected"
-                )
-                if (!externalKeyboardConnected || showIMEWhileExternalConnected) {
-                    inputMethodManager!!.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-                } else {
-                    inputMethodManager!!.hideSoftInputFromWindow(getInstance().window.decorView.rootView.windowToken, 0)
-                }
-
-                getInstance().lorieView!!.requestFocus()
-            }
         }
 
         @JvmStatic
@@ -631,12 +597,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         @JvmStatic
         fun getRealMetrics(m: DisplayMetrics?) {
             if (getInstance().lorieView != null && getInstance().lorieView!!.display != null) getInstance().lorieView!!.display.getRealMetrics(m)
-        }
-
-        fun setCapturingEnabled(enabled: Boolean) {
-            if (getInstance().mInputHandler == null) return
-
-            getInstance().mInputHandler!!.setCapturingEnabled(enabled)
         }
 
         var sharedLogs: ShellLoader.ViewModelAppLogs? = null
