@@ -11,7 +11,7 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
-import android.graphics.Color
+import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -31,12 +31,14 @@ import android.view.Window
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
-import android.widget.FrameLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager
@@ -70,7 +72,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     private var mInputHandler: TouchInputHandler? = null
     var service: ICmdEntryInterface? = null
     private var mLorieKeyListener: View.OnKeyListener? = null
-    private var filterOutWinKey = false
 
     private val preferencesChangedListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences?, _: String? ->
@@ -125,12 +126,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         prepareButtonsAxisValues(this)
 
+        val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-            0
-        )
+        window.setFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, 0)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_emulation)
 
@@ -270,6 +269,12 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
                     return@OnKeyListener true
                 }
+            } else if (k == KeyEvent.KEYCODE_VOLUME_DOWN) {
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
+                return@OnKeyListener true
+            } else if (k == KeyEvent.KEYCODE_VOLUME_UP) {
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
+                return@OnKeyListener true
             }
 
             checkControllerButtons(lorieView, e)
@@ -279,38 +284,20 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         lorieParent.setOnTouchListener { _: View?, e: MotionEvent ->
             // Avoid batched MotionEvent objects and reduce potential latency.
             // For reference: https://developer.android.com/develop/ui/views/touch-and-input/stylus-input/advanced-stylus-features#rendering.
-            if (e.action == MotionEvent.ACTION_DOWN) lorieParent.requestUnbufferedDispatch(
-                e
-            )
+            if (e.action == MotionEvent.ACTION_DOWN) lorieParent.requestUnbufferedDispatch(e)
             mInputHandler!!.handleTouchEvent(lorieParent, lorieView, e)
         }
         lorieParent.setOnHoverListener { _: View?, e: MotionEvent? ->
-            mInputHandler!!.handleTouchEvent(
-                lorieParent,
-                lorieView,
-                e
-            )
+            mInputHandler!!.handleTouchEvent(lorieParent, lorieView, e)
         }
         lorieParent.setOnGenericMotionListener { _: View?, e: MotionEvent? ->
-            mInputHandler!!.handleTouchEvent(
-                lorieParent,
-                lorieView,
-                e
-            )
+            mInputHandler!!.handleTouchEvent(lorieParent, lorieView, e)
         }
         lorieView.setOnCapturedPointerListener { _: View?, e: MotionEvent? ->
-            mInputHandler!!.handleTouchEvent(
-                lorieView,
-                lorieView,
-                e
-            )
+            mInputHandler!!.handleTouchEvent(lorieView, lorieView, e)
         }
         lorieParent.setOnCapturedPointerListener { _: View?, e: MotionEvent? ->
-            mInputHandler!!.handleTouchEvent(
-                lorieView,
-                lorieView,
-                e
-            )
+            mInputHandler!!.handleTouchEvent(lorieView, lorieView, e)
         }
         lorieView.setOnKeyListener(mLorieKeyListener)
         lorieView.setCallback(object : LorieView.Callback {
@@ -351,7 +338,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         registerReceiver(receiver, object : IntentFilter(CmdEntryPoint.ACTION_START) {
             init {
                 addAction(ACTION_STOP)
-                addAction(ACTION_CUSTOM)
             }
         }, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) RECEIVER_EXPORTED else 0)
 
@@ -464,8 +450,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         lorieView.triggerCallback()
 
-        filterOutWinKey = false
-
         showIMEWhileExternalConnected = false
 
         lorieView.requestLayout()
@@ -493,7 +477,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         get() = findViewById(R.id.lorieView)
 
     fun handleKey(e: KeyEvent): Boolean {
-        if (filterOutWinKey && (e.keyCode == KeyEvent.KEYCODE_META_LEFT || e.keyCode == KeyEvent.KEYCODE_META_RIGHT || e.isMetaPressed)) return false
         return mLorieKeyListener!!.onKey(lorieView, e.keyCode, e)
     }
 
@@ -508,37 +491,22 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         super.onWindowFocusChanged(hasFocus)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-        if (hasFocus) {
-            window.attributes.layoutInDisplayCutoutMode = if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)) {
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
-            } else {
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-            }
-
-            window.statusBarColor = Color.BLACK
-            window.navigationBarColor = Color.BLACK
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, window.decorView).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
         window.setFlags(
-            WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-            0
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
+
         if (hasFocus) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+            lorieView?.regenerate()
         }
 
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
-
-        (findViewById<View>(android.R.id.content) as FrameLayout).getChildAt(
-            0
-        ).fitsSystemWindows = false
+        lorieView?.requestFocus()
     }
 
     /** @noinspection NullableProblems
@@ -573,7 +541,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     companion object {
         const val KEY_BACK = 158
         const val ACTION_STOP: String = "com.micewine.emu.ACTION_STOP"
-        const val ACTION_CUSTOM: String = "com.micewine.emu.ACTION_CUSTOM"
 
         var handler: Handler = Handler(Looper.getMainLooper())
         var inputMethodManager: InputMethodManager? = null
@@ -587,12 +554,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         fun getInstance(): EmulationActivity {
             return instance
         }
-
-        @JvmStatic
-        val isConnected: Boolean
-            get() {
-                return LorieView.connected()
-            }
 
         @JvmStatic
         fun getRealMetrics(m: DisplayMetrics?) {

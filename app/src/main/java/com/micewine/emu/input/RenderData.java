@@ -4,7 +4,6 @@
 
 package com.micewine.emu.input;
 
-import android.graphics.Matrix;
 import android.graphics.PointF;
 
 /**

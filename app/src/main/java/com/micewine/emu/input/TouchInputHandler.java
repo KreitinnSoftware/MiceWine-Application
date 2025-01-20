@@ -4,11 +4,6 @@
 
 package com.micewine.emu.input;
 
-import static android.view.InputDevice.KEYBOARD_TYPE_ALPHABETIC;
-import static android.view.KeyEvent.KEYCODE_BACK;
-import static android.view.KeyEvent.KEYCODE_VOLUME_DOWN;
-import static android.view.KeyEvent.KEYCODE_VOLUME_UP;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PointF;
@@ -85,14 +80,8 @@ public class TouchInputHandler {
     private final DisplayMetrics mMetrics = new DisplayMetrics();
 
     private final BiConsumer<Integer, Boolean> noAction = (key, down) -> {};
-    private BiConsumer<Integer, Boolean> swipeUpAction = noAction, swipeDownAction = noAction,
-            volumeUpAction = noAction, volumeDownAction = noAction, backButtonAction = noAction,
-            mediaKeysAction = noAction;
-
-    private static final int KEY_BACK = 158;
-
-    private boolean keyIntercepting = false;
-
+    private final BiConsumer<Integer, Boolean> swipeUpAction = noAction;
+    private final BiConsumer<Integer, Boolean> swipeDownAction = noAction;
     /**
      * Used for tracking swipe gestures. Only the Y-direction is needed for responding to swipe-up
      * or swipe-down.
@@ -402,27 +391,6 @@ public class TouchInputHandler {
         }
     }
 
-    public void reloadPreferences() {
-        setInputMode(InputMode.TRACKPAD);
-        mInjector.tapToMove = false;
-        mInjector.preferScancodes = true;
-        mInjector.pointerCapture = true;
-        mInjector.scaleTouchpad = false;
-        mInjector.capturedPointerSpeedFactor = 100F;
-
-        capturedPointerTransformation = CapturedPointerTransformation.NONE;
-
-        EmulationActivity.getRealMetrics(mMetrics);
-
-        if (mActivity.getLorieView().hasPointerCapture())
-            mActivity.getLorieView().releasePointerCapture();
-
-        keyIntercepting = mActivity.getLorieView().hasPointerCapture();
-
-        if(mTouchpadHandler != null)
-            mTouchpadHandler.reloadPreferences();
-    }
-
     private void moveCursorByOffset(float deltaX, float deltaY) {
         if (mInputStrategy instanceof InputStrategyInterface.TrackpadInputStrategy)
             mInjector.sendCursorMove(-deltaX, -deltaY, true);
@@ -630,71 +598,7 @@ public class TouchInputHandler {
         }
     }
 
-    /**
-     * It is a copy of {@link android.view.KeyEvent#isMediaSessionKey} to be used on Android 30 and below.
-     * Returns whether this key will be sent to the
-     * {@link android.media.session.MediaSession.Callback} if not handled.
-     */
-    public static boolean isMediaSessionKey(int keyCode) {
-        return switch (keyCode) {
-            case KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PAUSE,
-                 KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK,
-                 KeyEvent.KEYCODE_MEDIA_STOP, KeyEvent.KEYCODE_MEDIA_NEXT,
-                 KeyEvent.KEYCODE_MEDIA_PREVIOUS, KeyEvent.KEYCODE_MEDIA_REWIND,
-                 KeyEvent.KEYCODE_MEDIA_RECORD, KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> true;
-            default -> false;
-        };
-    }
-
     public boolean sendKeyEvent(KeyEvent e) {
-        int k = e.getKeyCode();
-
-        if (!EmulationActivity.isConnected()) {
-            if (e.getKeyCode() == KEYCODE_BACK)
-                mActivity.finish();
-
-            return false;
-        }
-
-        if (isMediaSessionKey(k)) {
-            if (mediaKeysAction == noAction)
-                return false;
-
-            mediaKeysAction.accept(k, e.getAction() == KeyEvent.ACTION_DOWN);
-            return true;
-        }
-
-        if (k == KEYCODE_VOLUME_DOWN) {
-            if (volumeDownAction == noAction)
-                return false;
-
-            volumeDownAction.accept(k, e.getAction() == KeyEvent.ACTION_DOWN);
-            return true;
-        }
-
-        if (k == KEYCODE_VOLUME_UP) {
-            if (volumeUpAction == noAction)
-                return false;
-
-            volumeUpAction.accept(k, e.getAction() == KeyEvent.ACTION_DOWN);
-            return true;
-        }
-
-        if (k == KEYCODE_BACK) {
-            if (e.isFromSource(InputDevice.SOURCE_MOUSE) || e.isFromSource(InputDevice.SOURCE_MOUSE_RELATIVE)) {
-                if (e.getRepeatCount() != 0) // ignore auto-repeat
-                    return true;
-                if (e.getAction() == KeyEvent.ACTION_UP || e.getAction() == KeyEvent.ACTION_DOWN)
-                    mActivity.getLorieView().sendMouseEvent(-1, -1, InputStub.BUTTON_RIGHT, e.getAction() == KeyEvent.ACTION_DOWN, true);
-                return true;
-            }
-
-            if (e.getScanCode() == KEY_BACK && e.getDevice().getKeyboardType() != KEYBOARD_TYPE_ALPHABETIC || e.getScanCode() == 0) {
-                backButtonAction.accept(k, e.getAction() == KeyEvent.ACTION_DOWN);
-                return true;
-            }
-        }
-
         return mInjector.sendKeyEvent(e);
     }
 

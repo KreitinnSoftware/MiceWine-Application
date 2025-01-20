@@ -36,7 +36,6 @@ import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.activities.MainActivity.Companion.wineESync
 import com.micewine.emu.activities.MainActivity.Companion.wineLogLevel
-import java.io.File
 
 object EnvVars {
     private val vars = LinkedHashMap<String, String>()
@@ -45,6 +44,8 @@ object EnvVars {
     }
 
     fun getEnv(): String {
+        vars.clear()
+
         setEnv()
 
         return "env ${vars.values.joinToString(" ")} "
