@@ -404,7 +404,7 @@ class ControllerMapper : AppCompatActivity() {
             val json = preferences.getString("controllerPresetList", "")
             val listType = object : TypeToken<MutableList<List<String>>>() {}.type
 
-            return gson.fromJson(json, listType) ?: mutableListOf(ArrayList(Collections.nCopies(mappingMap.size, ":")).apply {
+            return gson.fromJson(json, listType) ?: mutableListOf(ArrayList(Collections.nCopies(mappingMap.size + 1, ":")).apply {
                 this[0] = "default"
                 this[mappingMap[DEAD_ZONE]!!] = "25"
                 this[mappingMap[MOUSE_SENSIBILITY]!!] = "100"
