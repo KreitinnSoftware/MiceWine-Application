@@ -198,6 +198,8 @@ class ControllerMapper : AppCompatActivity() {
         const val BUTTON_R2_KEY = "buttonR2"
         const val BUTTON_L1_KEY = "buttonL1"
         const val BUTTON_L2_KEY = "buttonL2"
+        const val BUTTON_THUMBL_KEY = "thumbLKey"
+        const val BUTTON_THUMBR_KEY = "thumbRKey"
         const val AXIS_X_PLUS_KEY = "axisX+"
         const val AXIS_X_MINUS_KEY = "axisX-"
         const val AXIS_Y_PLUS_KEY = "axisY+"
@@ -227,20 +229,22 @@ class ControllerMapper : AppCompatActivity() {
             BUTTON_R2_KEY to 8,
             BUTTON_L1_KEY to 9,
             BUTTON_L2_KEY to 10,
-            AXIS_X_PLUS_KEY to 11,
-            AXIS_X_MINUS_KEY to 12,
-            AXIS_Y_PLUS_KEY to 13,
-            AXIS_Y_MINUS_KEY to 14,
-            AXIS_Z_PLUS_KEY to 15,
-            AXIS_Z_MINUS_KEY to 16,
-            AXIS_RZ_PLUS_KEY to 17,
-            AXIS_RZ_MINUS_KEY to 18,
-            AXIS_HAT_X_PLUS_KEY to 19,
-            AXIS_HAT_X_MINUS_KEY to 20,
-            AXIS_HAT_Y_PLUS_KEY to 21,
-            AXIS_HAT_Y_MINUS_KEY to 22,
-            DEAD_ZONE to 23,
-            MOUSE_SENSIBILITY to 24
+            BUTTON_THUMBL_KEY to 11,
+            BUTTON_THUMBR_KEY to 12,
+            AXIS_X_PLUS_KEY to 13,
+            AXIS_X_MINUS_KEY to 14,
+            AXIS_Y_PLUS_KEY to 15,
+            AXIS_Y_MINUS_KEY to 16,
+            AXIS_Z_PLUS_KEY to 17,
+            AXIS_Z_MINUS_KEY to 18,
+            AXIS_RZ_PLUS_KEY to 19,
+            AXIS_RZ_MINUS_KEY to 20,
+            AXIS_HAT_X_PLUS_KEY to 21,
+            AXIS_HAT_X_MINUS_KEY to 22,
+            AXIS_HAT_Y_PLUS_KEY to 23,
+            AXIS_HAT_Y_MINUS_KEY to 24,
+            DEAD_ZONE to 25,
+            MOUSE_SENSIBILITY to 26
         )
 
         fun putDeadZone(context: Context, name: String, value: Int) {
@@ -400,7 +404,7 @@ class ControllerMapper : AppCompatActivity() {
             val json = preferences.getString("controllerPresetList", "")
             val listType = object : TypeToken<MutableList<List<String>>>() {}.type
 
-            return gson.fromJson(json, listType) ?: mutableListOf(ArrayList(Collections.nCopies(25, ":")).apply {
+            return gson.fromJson(json, listType) ?: mutableListOf(ArrayList(Collections.nCopies(mappingMap.size, ":")).apply {
                 this[0] = "default"
                 this[mappingMap[DEAD_ZONE]!!] = "25"
                 this[mappingMap[MOUSE_SENSIBILITY]!!] = "100"

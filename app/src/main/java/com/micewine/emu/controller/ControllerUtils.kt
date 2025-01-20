@@ -11,6 +11,8 @@ import android.view.KeyEvent.KEYCODE_BUTTON_R1
 import android.view.KeyEvent.KEYCODE_BUTTON_R2
 import android.view.KeyEvent.KEYCODE_BUTTON_SELECT
 import android.view.KeyEvent.KEYCODE_BUTTON_START
+import android.view.KeyEvent.KEYCODE_BUTTON_THUMBL
+import android.view.KeyEvent.KEYCODE_BUTTON_THUMBR
 import android.view.KeyEvent.KEYCODE_BUTTON_X
 import android.view.KeyEvent.KEYCODE_BUTTON_Y
 import android.view.MotionEvent
@@ -43,6 +45,8 @@ import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_R1_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_R2_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_SELECT_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_START_KEY
+import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_THUMBL_KEY
+import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_THUMBR_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_Y_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.SELECTED_CONTROLLER_PRESET_KEY
@@ -83,6 +87,8 @@ object ControllerUtils {
     private lateinit var axisHatY_plus_mapping: List<Int>
     private lateinit var axisHatX_minus_mapping: List<Int>
     private lateinit var axisHatY_minus_mapping: List<Int>
+    private lateinit var buttonThumbR_mapping: List<Int>
+    private lateinit var buttonThumbL_mapping: List<Int>
 
     private var deadZone: Float = 0F
     private var moveVMouse: Int? = null
@@ -143,6 +149,9 @@ object ControllerUtils {
 
         buttonL1_mapping = detectKey(context, BUTTON_L1_KEY)
         buttonL2_mapping = detectKey(context, BUTTON_L2_KEY)
+
+        buttonThumbL_mapping = detectKey(context, BUTTON_THUMBL_KEY)
+        buttonThumbR_mapping = detectKey(context, BUTTON_THUMBR_KEY)
 
         buttonStart_mapping = detectKey(context, BUTTON_START_KEY)
         buttonSelect_mapping = detectKey(context, BUTTON_SELECT_KEY)
@@ -263,6 +272,18 @@ object ControllerUtils {
 
             KEYCODE_BUTTON_L2 -> {
                 handleKey(lorieView, pressed, buttonL2_mapping)
+
+                true
+            }
+
+            KEYCODE_BUTTON_THUMBR -> {
+                handleKey(lorieView, pressed, buttonThumbR_mapping)
+
+                true
+            }
+
+            KEYCODE_BUTTON_THUMBL -> {
+                handleKey(lorieView, pressed, buttonThumbL_mapping)
 
                 true
             }

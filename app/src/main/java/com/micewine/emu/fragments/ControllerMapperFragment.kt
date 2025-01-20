@@ -28,6 +28,8 @@ import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_R1_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_R2_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_SELECT_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_START_KEY
+import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_THUMBL_KEY
+import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_THUMBR_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_Y_KEY
 import com.micewine.emu.adapters.AdapterSettingsController
@@ -69,6 +71,8 @@ class ControllerMapperFragment : Fragment() {
         addToAdapter(R.drawable.lt_button, BUTTON_L2_KEY)
         addToAdapter(R.drawable.start_button, BUTTON_START_KEY)
         addToAdapter(R.drawable.select_button, BUTTON_SELECT_KEY)
+        addToAdapter(R.drawable.l_thumb, BUTTON_THUMBL_KEY)
+        addToAdapter(R.drawable.r_thumb, BUTTON_THUMBR_KEY)
         addToAdapter(R.drawable.l_right, AXIS_X_PLUS_KEY)
         addToAdapter(R.drawable.l_left, AXIS_X_MINUS_KEY)
         addToAdapter(R.drawable.l_down, AXIS_Y_PLUS_KEY)
