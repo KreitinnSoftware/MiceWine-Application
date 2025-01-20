@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.micewine.emu.R
 
-class WelcomeFragment : Fragment() {
+class WelcomeFragment(private val fragment: Int) : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_welcome, container, false)
+        val rootView = inflater.inflate(fragment, container, false)
 
         return rootView
     }

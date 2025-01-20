@@ -19,13 +19,12 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SETUP
 import com.micewine.emu.activities.MainActivity.Companion.appBuiltinRootfs
 import com.micewine.emu.databinding.ActivityWelcomeBinding
-import com.micewine.emu.fragments.Welcome2Fragment
 import com.micewine.emu.fragments.WelcomeFragment
 
 class WelcomeActivity : AppCompatActivity() {
     private var binding: ActivityWelcomeBinding? = null
     private var button: Button? = null
-    private val fragmentList: List<Fragment> = listOf(WelcomeFragment(), Welcome2Fragment())
+    private val fragmentList: List<Fragment> = listOf(WelcomeFragment(R.layout.fragment_welcome), WelcomeFragment(R.layout.fragment_welcome_2))
     private var selectedFragment = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
