@@ -321,7 +321,7 @@ class OverlayView @JvmOverloads constructor(
     }
 
     class VirtualButton(
-        val id: Int,
+        var id: Int,
         var x: Float,
         var y: Float,
         var radius: Float,
@@ -332,7 +332,7 @@ class OverlayView @JvmOverloads constructor(
     )
 
     class VirtualAnalog(
-        val id: Int,
+        var id: Int,
         var x: Float,
         var y: Float,
         var fingerX: Float,
