@@ -132,6 +132,7 @@ class OverlayView @JvmOverloads constructor(
                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
                         it.isPressed = true
                         it.fingerId = event.actionIndex
+
                         handleButton(it, true)
 
                         return@forEach
@@ -146,7 +147,7 @@ class OverlayView @JvmOverloads constructor(
                         it.fingerX = posX
                         it.fingerY = posY
                         it.isPressed = true
-                        it.fingerId = event.getPointerId(event.actionIndex)
+                        it.fingerId = event.actionIndex
 
                         val axisX = posX / (it.radius / 4)
                         val axisY = posY / (it.radius / 4)
@@ -174,13 +175,10 @@ class OverlayView @JvmOverloads constructor(
 
                     buttonList.forEach {
                         if (it.fingerId == i) {
-                            val clicked = detectClick(event, i, it.x, it.y, it.radius)
-                            it.isPressed = clicked
-                            handleButton(it, clicked)
+                            it.isPressed = true
+                            handleButton(it, true)
 
-                            if (clicked) {
-                                isFingerPressingButton = true
-                            }
+                            isFingerPressingButton = true
                         }
                     }
 
@@ -230,20 +228,21 @@ class OverlayView @JvmOverloads constructor(
 
             MotionEvent.ACTION_POINTER_UP -> {
                 buttonList.forEach {
+                    if (it.fingerId == event.actionIndex) {
+                        it.fingerId = -1
+                    }
                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
                         handleButton(it, false)
                     }
                 }
 
                 analogList.forEach {
-                    if ((event.getX(event.actionIndex) >= it.x - it.radius / 2 && event.getX(event.actionIndex) <= (it.x + (it.radius / 2))) &&
-                        (event.getY(event.actionIndex) >= it.y - it.radius / 2 && event.getY(event.actionIndex) <= (it.y + (it.radius / 2)))
-                    ) {
+                    if (it.fingerId == event.actionIndex) {
+                        it.fingerId = -1
                         it.fingerX = 0F
                         it.fingerY = 0F
 
                         it.isPressed = false
-                        it.fingerId = -1
 
                         virtualAxis(
                             0F,
@@ -262,6 +261,7 @@ class OverlayView @JvmOverloads constructor(
 
             MotionEvent.ACTION_UP -> {
                 buttonList.forEach {
+                    it.fingerId = -1
                     handleButton(it, false)
                 }
 
