@@ -353,7 +353,7 @@ class ControllerMapper : AppCompatActivity() {
         fun addControllerPreset(context: Context, name: String) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(context)
             val currentList = loadControllerPresets(context)
-            val defaultList = ArrayList(Collections.nCopies(25, ":")).apply {
+            val defaultList = ArrayList(Collections.nCopies(mappingMap.size + 1, ":")).apply {
                 this[0] = name
                 this[mappingMap[DEAD_ZONE]!!] = "25"
                 this[mappingMap[MOUSE_SENSIBILITY]!!] = "100"
