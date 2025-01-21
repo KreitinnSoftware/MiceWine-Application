@@ -133,7 +133,6 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
-        overlayView?.saveOnPreferences()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
