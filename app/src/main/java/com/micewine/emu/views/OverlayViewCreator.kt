@@ -78,6 +78,8 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
         currentVAxis.forEach {
             analogList.add(it)
         }
+
+        reorderButtonsAnalogsIDs()
     }
 
     fun saveOnPreferences() {
