@@ -113,9 +113,16 @@ object ShellLoader {
             os?.flush()
 
             shell?.waitFor()
-            shell?.destroy()
 
+            shell?.destroy()
             os?.close()
+            stdout?.close()
+            stderr?.close()
+
+            shell = null
+            os = null
+            stdout = null
+            stderr = null
         }
     }
 
