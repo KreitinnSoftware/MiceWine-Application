@@ -18,9 +18,11 @@ Support Android 10+
 |------------|-----------------------|-----------------------------|
 | Adreno     | Supported             | Turnip/Native/Zink          |
 | Xclipse    | Supported             | Native/Zink                 |
-| Mali       | Unsupported (For now) | N/A                         |
+| Mali       | Supported             | Native/Zink                 |
 
-The native driver works well for Xclipse GPUs and Adrenos.
+The native driver works well for Xclipse GPUs, Adreno GPUs, Mali GPUs.
+
+About Mali GPUs, Only tested on Mali-G615, Mali-G610, Mali G76 and Mali-G925-Immortalis.
 
 Vulkan 1.3 is Recommended for better performance and graphical precision. 1.1 works with DXVK-Stripped-Requirements, but displays various graphical issues.
 
