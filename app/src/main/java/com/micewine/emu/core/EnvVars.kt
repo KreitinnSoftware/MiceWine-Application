@@ -82,6 +82,7 @@ object EnvVars {
         putVar("GALLIUM_DRIVER", "zink")
         putVar("TU_DEBUG", "$selectedTuDebugPreset")
         putVar("ZINK_DEBUG", "compact")
+        putVar("ZINK_DESCRIPTORS", "lazy")
 
         if (!enableDRI3) {
             putVar("MESA_VK_WSI_DEBUG", "sw")
