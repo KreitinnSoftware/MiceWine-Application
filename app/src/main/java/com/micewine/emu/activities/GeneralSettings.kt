@@ -17,6 +17,7 @@ import com.micewine.emu.databinding.ActivityGeneralSettingsBinding
 import com.micewine.emu.fragments.Box64SettingsFragment
 import com.micewine.emu.fragments.DisplaySettingsFragment
 import com.micewine.emu.fragments.DriversSettingsFragment
+import com.micewine.emu.fragments.EnvironmentVarsSettingsFragment
 import com.micewine.emu.fragments.GeneralSettingsFragment
 import com.micewine.emu.fragments.WineSettingsFragment
 
@@ -27,6 +28,7 @@ class GeneralSettings : AppCompatActivity() {
     private val wineSettingsFragment = WineSettingsFragment()
     private val displaySettingsFragment = DisplaySettingsFragment()
     private val driversSettingsFragment = DriversSettingsFragment()
+    private val environmentVariablesSettings = EnvironmentVarsSettingsFragment()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val preference = intent.getStringExtra("preference")
@@ -55,6 +57,12 @@ class GeneralSettings : AppCompatActivity() {
                         generalSettingsToolbar?.title = getString(R.string.driver_settings_title)
 
                         fragmentLoader(driversSettingsFragment, false)
+                    }
+
+                    context.resources.getString(R.string.env_settings_title) -> {
+                        generalSettingsToolbar?.title = getString(R.string.env_settings_title)
+
+                        fragmentLoader(environmentVariablesSettings, false)
                     }
                 }
             }

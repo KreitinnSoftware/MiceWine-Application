@@ -41,6 +41,7 @@ class GeneralSettingsFragment : Fragment() {
         addToAdapter(R.string.wine_settings_title, R.string.wine_settings_description, R.drawable.ic_wine)
         addToAdapter(R.string.display_settings_title, R.string.display_settings_description, R.drawable.ic_display)
         addToAdapter(R.string.driver_settings_title, R.string.driver_settings_description, R.drawable.ic_gpu)
+        addToAdapter(R.string.env_settings_title, R.string.env_settings_description, R.drawable.ic_settings)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, icon: Int) {
