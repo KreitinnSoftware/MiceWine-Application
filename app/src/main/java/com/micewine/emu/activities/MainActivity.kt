@@ -676,7 +676,7 @@ class MainActivity : AppCompatActivity() {
             runningXServer = true
 
             runCommand(
-                "env CLASSPATH=${getClassPath(this@MainActivity)} /system/bin/app_process / com.micewine.emu.CmdEntryPoint $display"
+                "env CLASSPATH=${getClassPath(this@MainActivity)} /system/bin/app_process / com.micewine.emu.CmdEntryPoint $display &> /dev/null"
             )
         }
     }
