@@ -740,8 +740,6 @@ class MainActivity : AppCompatActivity() {
             tmpDir.mkdirs()
             homeDir.mkdirs()
 
-            File("$appRootDir/wine-utils/CoreFonts").copyRecursively(File("$appRootDir/wine/share/wine/fonts"), true)
-
             runCommand("chmod 700 -R $appRootDir")
 
             File("$usrDir/icons").mkdirs()
@@ -882,6 +880,8 @@ class MainActivity : AppCompatActivity() {
                 val syswow64 = File("$driveC/windows/syswow64")
 
                 WineWrapper.wine("wineboot -i")
+
+                File("$appRootDir/wine-utils/CoreFonts").copyRecursively(File("$winePrefix/drive_c/windows/Fonts"), true)
 
                 localAppData.copyRecursively(File("$userSharedFolder/AppData"))
                 localAppData.deleteRecursively()
