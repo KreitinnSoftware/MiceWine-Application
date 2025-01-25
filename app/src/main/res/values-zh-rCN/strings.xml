@@ -42,6 +42,12 @@
     <string name="display_settings_description">配置显示</string>
     <string name="driver_settings_title">驱动设置</string>
     <string name="driver_settings_description">配置 GPU 驱动</string>
+    <string name="env_settings_title">环境设置</string>
+    <string name="env_settings_description">修改环境变量。</string>
+    <string name="env_add_action">添加环境变量。</string>
+    <string name="env_edit_action">编辑环境变量。</string>
+    <string name="env_key">名称</string>
+    <string name="env_value">值</string>
     <string name="home_title">主页</string>
     <string name="box64_settings_title">Box64 设置</string>
     <string name="box64_settings_description">配置 Box64</string>

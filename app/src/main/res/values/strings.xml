@@ -66,7 +66,6 @@
     <string name="driver_settings_description">Configure GPU Drivers</string>
     <string name="env_settings_title">Environment Settings</string>
     <string name="env_settings_description">Modify Environment Variables.</string>
-
     <string name="env_add_action">Add Environment Variable.</string>
     <string name="env_edit_action">Edit Environment Variable.</string>
     <string name="env_key">Name</string>
@@ -157,18 +156,4 @@
     <string name="box64_manager_title">Box64 Manager</string>
     <string name="box64_manager_description">Manage Box64 Versions</string>
     <string name="mouse_captured">Mouse Captured Press Back or ESC to Release</string>
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>
