@@ -127,8 +127,6 @@ class ShortcutsFragment : Fragment() {
             editor.putString("gameList", gson.toJson(currentList))
             editor.apply()
 
-            addToAdapter(recyclerView!!, path, prettyName, icon)
-
             recyclerView?.adapter?.notifyItemInserted(index + 1)
         }
 

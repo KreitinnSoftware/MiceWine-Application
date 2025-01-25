@@ -4,43 +4,37 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:theme="@style/Theme.MiceWine"
-    android:padding="16dp">
+    android:theme="@style/Theme.MaterialComponents.DayNight"
+    android:padding="24dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/remove_game_item_warning"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:textAlignment="center">
-    </TextView>
+        android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+        android:textAlignment="center"
+        android:layout_marginBottom="16dp"/>
 
     <LinearLayout
-        style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:orientation="horizontal"
-        android:gravity="start">
+        android:gravity="end">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonCancel"
-            android:layout_width="0dp"
+            style="@style/Widget.Material3.Button.ElevatedButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="@string/cancel_text"
-            tools:ignore="ButtonStyle">
-        </Button>
+            android:layout_marginEnd="8dp"
+            android:text="@string/cancel_text"/>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonContinue"
-            android:layout_width="0dp"
+            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="@string/continue_text"
-            tools:ignore="ButtonStyle">
-        </Button>
+            android:text="@string/continue_text"/>
 
     </LinearLayout>
 
