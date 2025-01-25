@@ -12,7 +12,7 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.selectedFragment
 import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
 import com.micewine.emu.fragments.FileManagerFragment.Companion.deleteFile
-import com.micewine.emu.fragments.HomeFragment.Companion.removeGameFromList
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.removeGameFromList
 
 class DeleteGameItemFragment : DialogFragment() {
     private var preferences: SharedPreferences? = null

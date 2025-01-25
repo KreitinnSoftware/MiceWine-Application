@@ -19,14 +19,6 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="140dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/icon_grayscale"
-                android:importantForAccessibility="no">
-            </ImageView>
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewSettings"
                 android:layout_width="match_parent"

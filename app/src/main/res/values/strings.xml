@@ -57,7 +57,7 @@
     <string name="log_description">See MiceWine Logs</string>
     <string name="clear_log">Clear</string>
     <string name="desktop_mode_init">Desktop</string>
-    <string name="about_title">About</string>
+    <string name="home_title">Home</string>
     <string name="about_description">About MiceWine</string>
     <string name="general_settings">General Settings</string>
     <string name="exit">Exit</string>
@@ -76,7 +76,7 @@
     <string name="env_edit_action">Edit Environment Variable.</string>
     <string name="env_key">Name</string>
     <string name="env_value">Value</string>
-    <string name="home_title">Home</string>
+    <string name="shortcuts_title">Shortcuts</string>
     <string name="stretch_display">Stretch Display</string>
     <string name="display_resolution_title">Display Resolution</string>
     <string name="display_resolution_description">Change Virtual Display Resolution</string>

@@ -115,16 +115,16 @@ import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.ActivityMainBinding
-import com.micewine.emu.fragments.AboutFragment
+import com.micewine.emu.fragments.HomeFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ratCandidate
 import com.micewine.emu.fragments.DeleteGameItemFragment
 import com.micewine.emu.fragments.FileManagerFragment
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.fragments.FloatingFileManagerFragment
-import com.micewine.emu.fragments.HomeFragment
-import com.micewine.emu.fragments.HomeFragment.Companion.saveToGameList
-import com.micewine.emu.fragments.HomeFragment.Companion.setIconToGame
+import com.micewine.emu.fragments.ShortcutsFragment
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.saveToGameList
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.RenameGameItemFragment
 import com.micewine.emu.fragments.RenameGameItemFragment.Companion.initialTextRenameGameFragment
 import com.micewine.emu.fragments.SettingsFragment
@@ -260,10 +260,10 @@ class MainActivity : AppCompatActivity() {
 
     private var bottomNavigation: BottomNavigationView? = null
     private var runningXServer = false
-    private val homeFragment: HomeFragment = HomeFragment()
+    private val shortcutsFragment: ShortcutsFragment = ShortcutsFragment()
     private val settingsFragment: SettingsFragment = SettingsFragment()
     private val fileManagerFragment: FileManagerFragment = FileManagerFragment()
-    private val aboutFragment: AboutFragment = AboutFragment()
+    private val homeFragment: HomeFragment = HomeFragment()
     private var preferences: SharedPreferences? = null
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
@@ -282,9 +282,9 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation = findViewById(R.id.bottom_navigation)
         bottomNavigation?.setOnItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    selectedFragment = "HomeFragment"
-                    fragmentLoader(homeFragment, false)
+                R.id.nav_shortcuts -> {
+                    selectedFragment = "ShortcutsFragment"
+                    fragmentLoader(shortcutsFragment, false)
                 }
 
                 R.id.nav_settings -> {
@@ -297,9 +297,9 @@ class MainActivity : AppCompatActivity() {
                     fragmentLoader(fileManagerFragment, false)
                 }
 
-                R.id.nav_about_micewine -> {
+                R.id.nav_home -> {
                     selectedFragment = "AboutFragment"
-                    fragmentLoader(aboutFragment, false)
+                    fragmentLoader(homeFragment, false)
                 }
             }
 
@@ -357,7 +357,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (selectedFragment != "HomeFragment") {
-                bottomNavigation?.selectedItemId = R.id.nav_home
+                bottomNavigation?.selectedItemId = R.id.nav_shortcuts
 
                 return true
             }
