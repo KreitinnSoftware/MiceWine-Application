@@ -102,6 +102,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.WINE_ESYNC
 import com.micewine.emu.activities.GeneralSettings.Companion.WINE_ESYNC_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.WINE_LOG_LEVEL
 import com.micewine.emu.activities.GeneralSettings.Companion.WINE_LOG_LEVEL_DEFAULT_VALUE
+import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.RatPackageManager.installRat
@@ -262,6 +263,8 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        EnvVars.initialize(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)

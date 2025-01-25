@@ -1,6 +1,11 @@
 package com.micewine.emu.core
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
+import androidx.preference.PreferenceManager
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.micewine.emu.activities.MainActivity.Companion.appLang
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.box64Avx
@@ -36,9 +41,16 @@ import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.activities.MainActivity.Companion.wineESync
 import com.micewine.emu.activities.MainActivity.Companion.wineLogLevel
+import com.micewine.emu.fragments.EnvironmentVariable
 
 object EnvVars {
     private val vars = LinkedHashMap<String, String>()
+    private lateinit var sharedPreferences: SharedPreferences
+
+    fun initialize(context: Context) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    }
+
     private fun putVar(name: String, value: String?) {
         vars[name] = "$name=\"$value\""
     }
@@ -47,6 +59,13 @@ object EnvVars {
         vars.clear()
 
         setEnv()
+
+        val savedVarsJson = sharedPreferences.getString("environment_variables", null)
+        if (savedVarsJson != null) {
+            val type = object : TypeToken<List<EnvironmentVariable>>() {}.type
+            val savedVars = Gson().fromJson<List<EnvironmentVariable>>(savedVarsJson, type)
+            savedVars.forEach { putVar(it.key, it.value) }
+        }
 
         return "env ${vars.values.joinToString(" ")} "
     }
