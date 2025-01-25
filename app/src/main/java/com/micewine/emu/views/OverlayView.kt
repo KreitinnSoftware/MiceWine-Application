@@ -20,6 +20,7 @@ import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
 import com.micewine.emu.input.InputStub.BUTTON_UNDEFINED
+import kotlin.math.sqrt
 
 class OverlayView @JvmOverloads constructor(
     context: Context,
@@ -103,7 +104,7 @@ class OverlayView @JvmOverloads constructor(
 
         buttonList.forEach {
             buttonPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
-            buttonPaint.alpha = 220
+            buttonPaint.alpha = 150
 
             textPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
 
@@ -116,11 +117,24 @@ class OverlayView @JvmOverloads constructor(
             paint.color = if (it.isPressed) Color.GRAY else Color.WHITE
             buttonPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
 
-            paint.alpha = 220
-            buttonPaint.alpha = 220
+            paint.alpha = 150
+            buttonPaint.alpha = 150
 
             canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
-            canvas.drawCircle(it.x + it.fingerX, it.y + it.fingerY, it.radius / 4 - 10, paint)
+
+            var analogX = it.x + it.fingerX
+            var analogY = it.y + it.fingerY
+
+            val distanceSquared = (it.fingerX * it.fingerX) + (it.fingerY * it.fingerY)
+            val maxRadiusSquared = (it.radius / 2) * (it.radius / 2)
+
+            if (distanceSquared > maxRadiusSquared) {
+                val scale = (it.radius / 2) / sqrt(distanceSquared)
+                analogX = it.x + (it.fingerX * scale)
+                analogY = it.y + (it.fingerY * scale)
+            }
+
+            canvas.drawCircle(analogX, analogY, it.radius / 4 - 10, paint)
         }
     }
 
