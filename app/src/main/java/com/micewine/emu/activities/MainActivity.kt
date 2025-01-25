@@ -15,7 +15,6 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.os.storage.StorageManager
 import android.view.ContextMenu
 import android.view.KeyEvent
@@ -28,7 +27,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
-import com.micewine.emu.CmdEntryPoint
 import com.micewine.emu.R
 import com.micewine.emu.activities.DriverManagerActivity.Companion.generateICDFile
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_AVX
@@ -84,9 +82,9 @@ import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDE
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_GL_PROFILE
 import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_GL_PROFILE_DEFAULT_VALUE
@@ -128,8 +126,8 @@ import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
 import com.micewine.emu.utils.DriveUtils
-import io.ByteWriter
 import com.micewine.emu.utils.FilePathResolver
+import io.ByteWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -858,7 +856,7 @@ class MainActivity : AppCompatActivity() {
         var fileManagerDefaultDir: String = wineDisksFolder
         var fileManagerCwd: String = fileManagerDefaultDir
         var selectedFile: String = ""
-        var miceWineVersion: String = "MiceWine (git-${BuildConfig.GIT_SHORT_SHA})"
+        var miceWineVersion: String = "MiceWine ${BuildConfig.VERSION_NAME} (git-${BuildConfig.GIT_SHORT_SHA})"
         var vulkanDriverDeviceName: String? = null
         private var selectedResolution: String? = ""
 

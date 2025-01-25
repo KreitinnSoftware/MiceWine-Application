@@ -15,8 +15,10 @@ android {
         minSdk = 28
         //noinspection ExpiredTargetSdkVersion
         targetSdk = 28
-        versionCode = 3
-        versionName = "beta-$versionCode"
+        versionCode = 1
+        versionName = "v0.1.0"
+        signingConfig = signingConfigs.getByName("debug")
+        proguardFiles()
     }
 
     ndkVersion = "26.1.10909125"
@@ -30,6 +32,7 @@ android {
             ndk {
                 abiFilters += listOf("arm64-v8a", "x86_64")
             }
+            buildConfigField("String", "GIT_SHORT_SHA", "\"${getGitShortSHA()}\"")
         }
     }
 
@@ -41,13 +44,6 @@ android {
     packaging {
         jniLibs {
             useLegacyPackaging = true
-        }
-    }
-
-    buildTypes {
-        getByName("debug") {
-            isMinifyEnabled = false
-            buildConfigField("String", "GIT_SHORT_SHA", "\"${getGitShortSHA()}\"")
         }
     }
 
