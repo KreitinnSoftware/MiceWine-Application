@@ -41,5 +41,6 @@ jobs:
       with:
         name: "MiceWine Application (${{ env.SHORT_SHA }})"
         tag_name: ${{ env.SHORT_SHA }}
+        prerelease: true
         files: ./app/build/outputs/apk/debug/app-debug.apk
     
