@@ -4,6 +4,8 @@
 
 package com.micewine.emu.input;
 
+import static com.micewine.emu.activities.EmulationActivity.getDisplayDensity;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PointF;
@@ -11,7 +13,6 @@ import android.hardware.display.DisplayManager;
 import android.hardware.input.InputManager;
 import android.os.Handler;
 import android.os.Build;
-import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.InputDevice;
@@ -53,17 +54,6 @@ public class TouchInputHandler {
         int TOUCH = 3;
     }
 
-    @IntDef({CapturedPointerTransformation.AUTO, CapturedPointerTransformation.NONE, CapturedPointerTransformation.COUNTER_CLOCKWISE, CapturedPointerTransformation.UPSIDE_DOWN, CapturedPointerTransformation.CLOCKWISE})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface CapturedPointerTransformation {
-        // values correspond to transformation needed given getRotation(), e.g. getRotation() = 1 requires counter-clockwise transformation
-        int AUTO = -1;
-        int NONE = 0;
-        int COUNTER_CLOCKWISE = 1;
-        int UPSIDE_DOWN = 2;
-        int CLOCKWISE = 3;
-    }
-
     private final RenderData mRenderData;
     private final GestureDetector mScroller;
     private final TapGestureDetector mTapDetector;
@@ -77,7 +67,7 @@ public class TouchInputHandler {
     private InputStrategyInterface mInputStrategy;
     private final InputEventSender mInjector;
     private final EmulationActivity mActivity;
-    private final DisplayMetrics mMetrics = new DisplayMetrics();
+    private float mDensity;
 
     private final BiConsumer<Integer, Boolean> noAction = (key, down) -> {};
     private final BiConsumer<Integer, Boolean> swipeUpAction = noAction;
@@ -130,7 +120,6 @@ public class TouchInputHandler {
         }
     };
 
-    @CapturedPointerTransformation static int capturedPointerTransformation = CapturedPointerTransformation.NONE;
     private final int[][] buttons = {
             {MotionEvent.BUTTON_PRIMARY, InputStub.BUTTON_LEFT},
             {MotionEvent.BUTTON_TERTIARY, InputStub.BUTTON_MIDDLE},
@@ -237,6 +226,7 @@ public class TouchInputHandler {
                 });
         android.util.Log.d("DEVICES", "requesting stylus " + stylusAvailable.get());
         android.util.Log.d("DEVICES", "external keyboard connected " + externalKeyboardAvailable.get());
+
         LorieView.requestStylusEnabled(stylusAvailable.get());
         EmulationActivity.getInstance().setExternalKeyboardConnected(externalKeyboardAvailable.get());
     }
@@ -268,11 +258,9 @@ public class TouchInputHandler {
             event.offsetLocation(-offsetX, -offsetY);
         }
 
-        if (!view.isFocused() && event.getAction() == MotionEvent.ACTION_DOWN)
+        if (!view.isFocused() && event.getAction() == MotionEvent.ACTION_DOWN) {
             view.requestFocus();
-
-        if (event.getAction() == MotionEvent.ACTION_UP)
-            setCapturingEnabled(true);
+        }
 
         if (!isDexEvent(event) && (event.getToolType(event.getActionIndex()) == MotionEvent.TOOL_TYPE_MOUSE
                 || (event.getSource() & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE)
@@ -357,7 +345,7 @@ public class TouchInputHandler {
             mTouchpadHandler.handleHostSizeChanged(w, h);
 
         resetTransformation();
-        EmulationActivity.getRealMetrics(mMetrics);
+        mDensity = getDisplayDensity();
     }
 
     public void setInputMode(@InputMode int inputMode) {
@@ -369,13 +357,6 @@ public class TouchInputHandler {
             mInputStrategy = new InputStrategyInterface.SimulatedTouchInputStrategy(mRenderData, mInjector, mActivity);
         else
             mInputStrategy = new InputStrategyInterface.TrackpadInputStrategy(mInjector);
-    }
-
-    public void setCapturingEnabled(boolean enabled) {
-        if (mInjector.pointerCapture && enabled)
-            mActivity.getLorieView().requestPointerCapture();
-        else
-            mActivity.getLorieView().releasePointerCapture();
     }
 
     public static boolean isExternal(InputDevice d) {
@@ -442,30 +423,6 @@ public class TouchInputHandler {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             int pointerCount = e2.getPointerCount();
-
-            // For captured touchpad pointer:
-            // Automatic (for touchpad) mode is needed because touchpads ignore screen orientation and report physical X and Y
-            if ((e2.getSource() & InputDevice.SOURCE_TOUCHPAD) == InputDevice.SOURCE_TOUCHPAD
-                    && mInputStrategy instanceof InputStrategyInterface.TrackpadInputStrategy) {
-                float temp;
-                int transform = capturedPointerTransformation == CapturedPointerTransformation.AUTO ?
-                        mDisplayRotation : capturedPointerTransformation;
-                switch (transform) {
-                    case CapturedPointerTransformation.CLOCKWISE:
-                        temp = distanceX; distanceX = -distanceY; distanceY = temp; break;
-                    case CapturedPointerTransformation.COUNTER_CLOCKWISE:
-                        temp = distanceX;
-                        // noinspection SuspiciousNameCombination
-                        distanceX = distanceY; distanceY = -temp; break;
-                    case CapturedPointerTransformation.UPSIDE_DOWN:
-                        distanceX = -distanceX; distanceY = -distanceY; break;
-                    default:
-                        break;
-                }
-                distanceX *= mInjector.capturedPointerSpeedFactor;
-                distanceY *= mInjector.capturedPointerSpeedFactor;
-            }
-
 
             if (pointerCount >= 3 && !mSwipeCompleted) {
                 // Note that distance values are reversed. For example, dragging a finger in the
@@ -620,7 +577,7 @@ public class TouchInputHandler {
                 {MotionEvent.BUTTON_SECONDARY, InputStub.BUTTON_RIGHT}
         };
 
-        /** @noinspection ReassignedVariable, SuspiciousNameCombination*/
+        /** @noinspection ReassignedVariable */
         @SuppressLint("ClickableViewAccessibility")
         boolean onTouch(View v, MotionEvent e) {
             if (e.getAction() == MotionEvent.ACTION_SCROLL) {
@@ -631,35 +588,21 @@ public class TouchInputHandler {
                 return true;
             }
 
-            if (!v.hasPointerCapture()) {
-                float scaledX = e.getX() * mRenderData.scale.x, scaledY = e.getY() * mRenderData.scale.y;
-                if (mRenderData.setCursorPosition(scaledX, scaledY))
-                    mInjector.sendCursorMove(scaledX, scaledY, false);
-            } else if (e.getAction() == MotionEvent.ACTION_MOVE && e.getPointerCount() == 1) {
-                boolean axis_relative_x = e.getDevice().getMotionRange(MotionEvent.AXIS_RELATIVE_X) != null;
-                boolean mouse_relative = (e.getSource() & InputDevice.SOURCE_MOUSE_RELATIVE) == InputDevice.SOURCE_MOUSE_RELATIVE;
-                if (axis_relative_x || mouse_relative) {
-                    float x = axis_relative_x ? e.getAxisValue(MotionEvent.AXIS_RELATIVE_X) : e.getX();
-                    float y = axis_relative_x ? e.getAxisValue(MotionEvent.AXIS_RELATIVE_Y) : e.getY();
-                    float temp;
+            if (v.hasPointerCapture()) {
+                if (e.getAction() == MotionEvent.ACTION_MOVE && e.getPointerCount() == 1) {
+                    boolean axis_relative_x = e.getDevice().getMotionRange(MotionEvent.AXIS_RELATIVE_X) != null;
+                    boolean mouse_relative = (e.getSource() & InputDevice.SOURCE_MOUSE_RELATIVE) == InputDevice.SOURCE_MOUSE_RELATIVE;
+                    if (axis_relative_x || mouse_relative) {
+                        float x = axis_relative_x ? e.getAxisValue(MotionEvent.AXIS_RELATIVE_X) : e.getX();
+                        float y = axis_relative_x ? e.getAxisValue(MotionEvent.AXIS_RELATIVE_Y) : e.getY();
 
-                    switch (capturedPointerTransformation) {
-                        case CapturedPointerTransformation.CLOCKWISE:
-                            temp = x; x = -y; y = temp; break;
-                        case CapturedPointerTransformation.COUNTER_CLOCKWISE:
-                            temp = x; x = y; y = -temp; break;
-                        case CapturedPointerTransformation.UPSIDE_DOWN:
-                            x = -x; y = -y; break;
-                        default:
-                            break;
+                        x *= mDensity;
+                        y *= mDensity;
+
+                        mInjector.sendCursorMove(x, y, true);
+                        if (axis_relative_x && mTouchpadHandler != null)
+                            mTouchpadHandler.mTapDetector.onTouchEvent(e);
                     }
-
-                    x *= mInjector.capturedPointerSpeedFactor * mMetrics.density;
-                    y *= mInjector.capturedPointerSpeedFactor * mMetrics.density;
-
-                    mInjector.sendCursorMove(x, y, true);
-                    if (axis_relative_x && mTouchpadHandler != null)
-                        mTouchpadHandler.mTapDetector.onTouchEvent(e);
                 }
             }
 

@@ -11,20 +11,19 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.RemoteException
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Display
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.MotionEvent
-import android.view.PointerIcon
 import android.view.Surface
 import android.view.View
 import android.view.Window
@@ -33,6 +32,7 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ScrollView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -62,7 +62,6 @@ import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.input.InputEventSender
-import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.views.OverlayView
 import kotlinx.coroutines.launch
@@ -196,10 +195,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 }
 
                 R.id.openCloseKeyboard -> {
-                    inputManager.apply {
-                        @Suppress("DEPRECATION")
-                        toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
-                    }
+                    @Suppress("DEPRECATION")
+                    inputManager.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
 
                     lorieView.requestFocus()
 
@@ -243,32 +240,20 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         mInputHandler = TouchInputHandler(this, InputEventSender(lorieView))
         mLorieKeyListener = View.OnKeyListener { _: View?, k: Int, e: KeyEvent ->
-            if (k == KeyEvent.KEYCODE_BACK) {
-                if (e.isFromSource(InputDevice.SOURCE_MOUSE) || e.isFromSource(InputDevice.SOURCE_MOUSE_RELATIVE)) {
-                    if (e.repeatCount != 0) // ignore auto-repeat
-                        return@OnKeyListener true
-                    if (e.action == KeyEvent.ACTION_UP || e.action == KeyEvent.ACTION_DOWN) lorieView.sendMouseEvent(
-                        -1f,
-                        -1f,
-                        InputStub.BUTTON_RIGHT,
-                        e.action == KeyEvent.ACTION_DOWN,
-                        true
-                    )
-                    return@OnKeyListener true
+            if ((k == KeyEvent.KEYCODE_BACK || k == KeyEvent.KEYCODE_ESCAPE) && e.action == MotionEvent.ACTION_UP) {
+                if (lorieView.hasPointerCapture()) {
+                    lorieView.releasePointerCapture()
                 }
-                if (e.scanCode == KEY_BACK && e.device.keyboardType != InputDevice.KEYBOARD_TYPE_ALPHABETIC || e.scanCode == 0) {
-                    if (e.action == KeyEvent.ACTION_UP) if (!drawerLayout?.isDrawerOpen(GravityCompat.START)!!) {
+
+                if ((e.action == KeyEvent.ACTION_UP && !lorieView.hasPointerCapture()) || (e.scanCode == KEY_BACK && e.device.keyboardType != InputDevice.KEYBOARD_TYPE_ALPHABETIC || e.scanCode == 0)){
+                    if (!drawerLayout?.isDrawerOpen(GravityCompat.START)!!) {
                         drawerLayout?.openDrawer(GravityCompat.START)
                     } else {
                         drawerLayout?.closeDrawers()
                     }
-
-                    inputManager.apply {
-                        hideSoftInputFromWindow(window.decorView.windowToken, 0)
-                    }
-
-                    return@OnKeyListener true
                 }
+
+                inputManager.hideSoftInputFromWindow(window.decorView.windowToken, 0)
             } else if (k == KeyEvent.KEYCODE_VOLUME_DOWN) {
                 audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
                 return@OnKeyListener true
@@ -284,7 +269,30 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         lorieParent.setOnTouchListener { _: View?, e: MotionEvent ->
             // Avoid batched MotionEvent objects and reduce potential latency.
             // For reference: https://developer.android.com/develop/ui/views/touch-and-input/stylus-input/advanced-stylus-features#rendering.
-            if (e.action == MotionEvent.ACTION_DOWN) lorieParent.requestUnbufferedDispatch(e)
+            if (e.action == MotionEvent.ACTION_DOWN) {
+                lorieParent.requestUnbufferedDispatch(e)
+            }
+
+            when (e.buttonState) {
+                MotionEvent.BUTTON_PRIMARY -> {
+                    lorieView.requestPointerCapture()
+                    Toast.makeText(this, getString(R.string.mouse_captured), Toast.LENGTH_SHORT).show()
+                }
+                MotionEvent.BUTTON_SECONDARY -> {
+                    if (!lorieView.hasPointerCapture()) {
+                        if (!drawerLayout?.isDrawerOpen(GravityCompat.START)!!) {
+                            drawerLayout?.openDrawer(GravityCompat.START)
+                        } else {
+                            drawerLayout?.closeDrawers()
+                        }
+
+                        inputManager.hideSoftInputFromWindow(window.decorView.windowToken, 0)
+
+                        return@setOnTouchListener true
+                    }
+                }
+            }
+
             mInputHandler!!.handleTouchEvent(lorieParent, lorieView, e)
         }
         lorieParent.setOnHoverListener { _: View?, e: MotionEvent? ->
@@ -441,8 +449,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         handler.postDelayed({ this.onPreferencesChangedCallback() }, 100)
     }
 
-    @SuppressLint("UnsafeIntentLaunch")
-    fun onPreferencesChangedCallback() {
+    private fun onPreferencesChangedCallback() {
         onWindowFocusChanged(hasWindowFocus())
         val lorieView = lorieView
 
@@ -473,14 +480,12 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         super.onPause()
     }
 
-    val lorieView: LorieView?
+    private val lorieView: LorieView?
         get() = findViewById(R.id.lorieView)
 
     fun handleKey(e: KeyEvent): Boolean {
         return mLorieKeyListener!!.onKey(lorieView, e.keyCode, e)
     }
-
-    var orientation: Int = 0
 
     init {
         instance = this
@@ -527,8 +532,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             // We should recover connection in the case if file descriptor for some reason was broken...
             if (!connected) {
                 tryConnect()
-            } else {
-                lorieView!!.pointerIcon = PointerIcon.getSystemIcon(this, PointerIcon.TYPE_NULL)
             }
         }
     }
@@ -556,8 +559,13 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
 
         @JvmStatic
-        fun getRealMetrics(m: DisplayMetrics?) {
-            if (getInstance().lorieView != null && getInstance().lorieView!!.display != null) getInstance().lorieView!!.display.getRealMetrics(m)
+        fun getKeyboardConnected(): Boolean {
+            return externalKeyboardConnected
+        }
+
+        @JvmStatic
+        fun getDisplayDensity(): Float {
+            return Resources.getSystem().displayMetrics.density
         }
 
         var sharedLogs: ShellLoader.ViewModelAppLogs? = null
