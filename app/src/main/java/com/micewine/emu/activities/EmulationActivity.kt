@@ -240,20 +240,33 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         mInputHandler = TouchInputHandler(this, InputEventSender(lorieView))
         mLorieKeyListener = View.OnKeyListener { _: View?, k: Int, e: KeyEvent ->
-            if ((k == KeyEvent.KEYCODE_BACK || k == KeyEvent.KEYCODE_ESCAPE) && e.action == MotionEvent.ACTION_UP) {
-                if (lorieView.hasPointerCapture()) {
-                    lorieView.releasePointerCapture()
-                }
+            if (k == KeyEvent.KEYCODE_BACK) {
+                if (e.scanCode == KEY_BACK && e.device.keyboardType != InputDevice.KEYBOARD_TYPE_ALPHABETIC || e.scanCode == 0) {
+                    if (e.action == KeyEvent.ACTION_UP) {
+                        if (!drawerLayout?.isDrawerOpen(GravityCompat.START)!!) {
+                            drawerLayout?.openDrawer(GravityCompat.START)
+                        } else {
+                            drawerLayout?.closeDrawers()
+                        }
+                    }
 
-                if ((e.action == KeyEvent.ACTION_UP && !lorieView.hasPointerCapture()) || (e.scanCode == KEY_BACK && e.device.keyboardType != InputDevice.KEYBOARD_TYPE_ALPHABETIC || e.scanCode == 0)){
+                    inputManager.hideSoftInputFromWindow(window.decorView.windowToken, 0)
+
+                    return@OnKeyListener true
+                }
+            } else if (k == KeyEvent.KEYCODE_ESCAPE && e.action == KeyEvent.ACTION_UP) {
+                val pointerCaptured = lorieView.hasPointerCapture()
+                if (pointerCaptured) {
+                    lorieView.releasePointerCapture()
+                } else {
                     if (!drawerLayout?.isDrawerOpen(GravityCompat.START)!!) {
                         drawerLayout?.openDrawer(GravityCompat.START)
                     } else {
                         drawerLayout?.closeDrawers()
                     }
-                }
 
-                inputManager.hideSoftInputFromWindow(window.decorView.windowToken, 0)
+                    inputManager.hideSoftInputFromWindow(window.decorView.windowToken, 0)
+                }
             } else if (k == KeyEvent.KEYCODE_VOLUME_DOWN) {
                 audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
                 return@OnKeyListener true
