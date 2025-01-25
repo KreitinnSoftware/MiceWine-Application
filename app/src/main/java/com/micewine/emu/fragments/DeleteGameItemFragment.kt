@@ -29,7 +29,7 @@ class DeleteGameItemFragment : DialogFragment() {
         preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
         buttonContinue.setOnClickListener {
-            if (selectedFragment == "HomeFragment") {
+            if (selectedFragment == "ShortcutsFragment") {
                 removeGameFromList(preferences!!, selectedGameArray)
             } else if (selectedFragment == "FileManagerFragment") {
                 deleteFile(selectedFile)

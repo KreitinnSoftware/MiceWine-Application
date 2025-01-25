@@ -298,7 +298,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 R.id.nav_home -> {
-                    selectedFragment = "AboutFragment"
+                    selectedFragment = "HomeFragment"
                     fragmentLoader(homeFragment, false)
                 }
             }
@@ -375,7 +375,7 @@ class MainActivity : AppCompatActivity() {
         v: View?,
         menuInfo: ContextMenu.ContextMenuInfo?
     ) {
-        if (selectedFragment == "HomeFragment") {
+        if (selectedFragment == "ShortcutsFragment") {
             menuInflater.inflate(R.menu.game_list_context_menu, menu)
         } else if (selectedFragment == "FileManagerFragment") {
             menuInflater.inflate(R.menu.file_list_context_menu, menu)
