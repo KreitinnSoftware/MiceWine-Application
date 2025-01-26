@@ -14,9 +14,13 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedBox64
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.FragmentHomeBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
-class HomeFragment: Fragment() {
+class HomeFragment : Fragment() {
     private var binding: FragmentHomeBinding? = null
     private var rootView: View? = null
 
@@ -34,23 +38,39 @@ class HomeFragment: Fragment() {
         }
 
         rootView?.findViewById<TextView>(R.id.RootfsVersion)?.apply {
-            val rootFsVersionFile = File("$ratPackagesDir/rootfs-pkg-header")
-            if (rootFsVersionFile.exists())
-                text = rootFsVersionFile.readLines()[2].substringAfter("=").replace("(", "(git-")
-            else
-                text = "???"
+            CoroutineScope(Dispatchers.IO).launch {
+                val rootFsVersionFile = File("$ratPackagesDir/rootfs-pkg-header")
+                val newText = if (rootFsVersionFile.exists())
+                    rootFsVersionFile.readLines()[2].substringAfter("=").replace("(", "(git-")
+                else
+                    "???"
+
+                withContext(Dispatchers.Main) {
+                    text = newText
+                }
+            }
         }
 
         rootView?.findViewById<TextView>(R.id.Box64Version)?.apply {
-            text = "${runCommandWithOutput("$ratPackagesDir/$selectedBox64/files/usr/bin/box64 -v").replace("\n", "")}"
-            if (text.isEmpty())
-                text = "???"
+            CoroutineScope(Dispatchers.IO).launch {
+                val resultText = runCommandWithOutput("$ratPackagesDir/$selectedBox64/files/usr/bin/box64 -v")
+                    .replace("\n", "")
+                    .ifEmpty { "???" }
+
+                withContext(Dispatchers.Main) {
+                    text = resultText
+                }
+            }
         }
 
         rootView?.findViewById<TextView>(R.id.WineVersion)?.apply {
-            text = WineWrapper.wine("--version", true)
-            if (text.isEmpty())
-                text = "???"
+            CoroutineScope(Dispatchers.IO).launch {
+                val resultText = WineWrapper.wine("--version", true).ifEmpty { "???" }
+
+                withContext(Dispatchers.Main) {
+                    text = resultText
+                }
+            }
         }
 
         return rootView
