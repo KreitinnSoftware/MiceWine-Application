@@ -88,6 +88,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.github.vatbub:mslinks:1.0.6.2")
     implementation("com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0")
+    implementation("com.getkeepsafe.taptargetview:taptargetview:1.15.0")
     implementation(project(":app:stub"))
 }
 

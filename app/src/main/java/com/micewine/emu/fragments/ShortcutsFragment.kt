@@ -11,18 +11,22 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.getkeepsafe.taptargetview.TapTarget
+import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.copyFile
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterGame
+import com.micewine.emu.core.HighlightState
 import com.micewine.emu.databinding.FragmentShortcutsBinding
 import java.io.File
 import kotlin.math.max
@@ -54,7 +58,32 @@ class ShortcutsFragment : Fragment() {
         setHasOptionsMenu(true)
         setupDragAndDrop()
 
+        recyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                if (gameList.size > 1 && (recyclerView?.childCount ?: 0) > 1 &&
+                    !preferences!!.getBoolean(
+                        HIGHLIGHT_SHORTCUT_PREFERENCE_KEY, false) &&
+                    HighlightState.fromOrdinal(preferences!!.getInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, 0)) == HighlightState.HIGHLIGHT_DONE) {
+                    val secondItemView = recyclerView?.findViewHolderForAdapterPosition(1)?.itemView
+
+                    secondItemView?.let { view ->
+                        TapTargetView.showFor(requireActivity(),
+                            TapTarget.forView(view.findViewById(R.id.img_game), getString(R.string.highlight_shortcuts))
+                                .transparentTarget(true)
+                                .cancelable(true)
+                        )
+                    }
+                    recyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+
+                    val editor = preferences!!.edit()
+                    editor.putBoolean(HIGHLIGHT_SHORTCUT_PREFERENCE_KEY, true)
+                    editor.apply()
+                }
+            }
+        })
+
         registerForContextMenu(recyclerView!!)
+
         return rootView
     }
 
@@ -182,6 +211,7 @@ class ShortcutsFragment : Fragment() {
         private val listType = object : TypeToken<MutableList<Array<String>>>() {}.type
         private var recyclerView: RecyclerView? = null
         private val gameList: MutableList<AdapterGame.GameList> = ArrayList()
+        const val HIGHLIGHT_SHORTCUT_PREFERENCE_KEY = "highlighted_shortcut"
 
         fun setAdapter(activity: Activity, preferences: SharedPreferences) {
             recyclerView?.adapter = AdapterGame(gameList, activity)

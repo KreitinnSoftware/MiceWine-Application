@@ -165,6 +165,11 @@
     <string name="mouse_captured">Mouse Captured Press Back or ESC to Release</string>
     <string name="cpu_affinity_title">CPU Affinity</string>
     <string name="action_search">Search</string>
+    <string name="highlight_nav_shortcuts">Manage Shortcuts</string>
+    <string name="highlight_nav_settings">Manage Settings</string>
+    <string name="highlight_nav_files">Browse and open files</string>
+    <string name="highlight_nav_files_description">Tap to open executable, hold to create shortcuts</string>
+    <string name="highlight_shortcuts">Tap to open, hold to reorder or access more options</string>
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

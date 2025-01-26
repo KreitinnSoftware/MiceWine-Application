@@ -16,6 +16,7 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
 import android.os.storage.StorageManager
+import android.util.Log
 import android.view.ContextMenu
 import android.view.KeyEvent
 import android.view.Menu
@@ -27,6 +28,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import com.getkeepsafe.taptargetview.TapTarget
+import com.getkeepsafe.taptargetview.TapTargetSequence
+import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
@@ -112,6 +116,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.WINE_LOG_LEVEL
 import com.micewine.emu.activities.GeneralSettings.Companion.WINE_LOG_LEVEL_DEFAULT_VALUE
 import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
+import com.micewine.emu.core.HighlightState
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.RatPackageManager.installRat
 import com.micewine.emu.core.ShellLoader.runCommand
@@ -270,6 +275,8 @@ class MainActivity : AppCompatActivity() {
     private val homeFragment: HomeFragment = HomeFragment()
     private var preferences: SharedPreferences? = null
 
+    private var currentState: HighlightState? = null
+
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -353,6 +360,7 @@ class MainActivity : AppCompatActivity() {
             )
         } else {
             setupDone = true
+            showHighlightSequence()
         }
     }
 
@@ -775,8 +783,11 @@ class MainActivity : AppCompatActivity() {
 
             fileManagerCwd = fileManagerDefaultDir
             setupDone = true
-            supportFragmentManager.beginTransaction().detach(homeFragment).commit()
-            supportFragmentManager.beginTransaction().attach(homeFragment).commit()
+            withContext(Dispatchers.Main) {
+                supportFragmentManager.beginTransaction().detach(homeFragment).commit()
+                supportFragmentManager.beginTransaction().attach(homeFragment).commit()
+                showHighlightSequence()
+            }
         }
     }
 
@@ -816,6 +827,76 @@ class MainActivity : AppCompatActivity() {
         }
 
         super.onNewIntent(intent)
+    }
+
+    private fun showHighlightSequence() {
+        currentState = HighlightState.fromOrdinal(preferences!!.getInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, 0))
+        if (currentState == HighlightState.HIGHLIGHT_DONE)
+            return
+        TapTargetSequence(this)
+            .targets(
+                TapTarget.forView(
+                    findViewById(R.id.nav_shortcuts),
+                    getString(R.string.highlight_nav_shortcuts)
+                ),
+
+                TapTarget.forView(
+                    findViewById(R.id.nav_settings),
+                    getString(R.string.highlight_nav_settings)
+                ),
+
+                TapTarget.forView(
+                    findViewById(R.id.nav_file_manager),
+                    getString(R.string.highlight_nav_files),
+                    getString(R.string.highlight_nav_files_description)
+                )
+            )
+            .listener(object : TapTargetSequence.Listener {
+                override fun onSequenceFinish() {
+
+                }
+
+                override fun onSequenceStep(lastTarget: TapTarget, targetClicked: Boolean) {
+                    if (targetClicked) {
+                        when (currentState) {
+                            HighlightState.HIGHLIGHT_SHORTCUTS -> {
+                                selectedFragment = "ShortcutsFragment"
+                                fragmentLoader(shortcutsFragment, false)
+
+                                val editor = preferences!!.edit()
+                                currentState = HighlightState.HIGHLIGHT_SETTINGS
+                                editor.putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
+                                editor.apply()
+                            }
+                            HighlightState.HIGHLIGHT_SETTINGS -> {
+                                selectedFragment = "SettingsFragment"
+                                fragmentLoader(settingsFragment, false)
+
+                                val editor = preferences!!.edit()
+                                currentState = HighlightState.HIGHLIGHT_FILES
+                                editor.putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
+                                editor.apply()
+                            }
+                            HighlightState.HIGHLIGHT_FILES -> {
+                                selectedFragment = "FileManagerFragment"
+                                fragmentLoader(fileManagerFragment, false)
+
+                                val editor = preferences!!.edit()
+                                currentState = HighlightState.HIGHLIGHT_DONE
+                                editor.putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
+                                editor.apply()
+                            }
+                            else -> {
+                                return
+                            }
+                        }
+                    }
+                }
+
+                override fun onSequenceCanceled(lastTarget: TapTarget) {
+                }
+            })
+            .start()
     }
 
     companion object {
