@@ -163,4 +163,7 @@
     <string name="box64_manager_description">Manage Box64 Versions</string>
     <string name="mouse_captured">Mouse Captured Press Back or ESC to Release</string>
     <string name="cpu_affinity_title">CPU Affinity</string>
+    <string name="action_search">Search</string>
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

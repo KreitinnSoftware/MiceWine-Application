@@ -7,8 +7,11 @@ import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
@@ -48,11 +51,55 @@ class ShortcutsFragment : Fragment() {
         recyclerView?.addItemDecoration(GridSpacingItemDecoration(spanCount, 20))
 
         setAdapter(requireActivity(), preferences!!)
+        setHasOptionsMenu(true)
         setupDragAndDrop()
 
         registerForContextMenu(recyclerView!!)
-
         return rootView
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.toolbar_menu, menu)
+
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                val query = newText.orEmpty()
+                val currentList = loadGameList(preferences!!)
+
+                val filteredList = if (query.isEmpty()) {
+                    currentList.map {
+                        AdapterGame.GameList(File(it[1]), it[0], it[2])
+                    }
+                } else {
+                    currentList.filter {
+                        it[0].contains(query, ignoreCase = true)
+                    }.map {
+                        AdapterGame.GameList(File(it[1]), it[0], it[2])
+                    }
+                }
+
+                val updatedList = listOf(
+                    AdapterGame.GameList(
+                        File(""),
+                        getString(R.string.desktop_mode_init),
+                        ""
+                    )
+                ) + filteredList
+
+                (recyclerView?.adapter as? AdapterGame)?.updateList(updatedList)
+                return true
+            }
+        })
+
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     private fun setupDragAndDrop() {

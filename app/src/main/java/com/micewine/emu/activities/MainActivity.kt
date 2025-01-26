@@ -18,13 +18,16 @@ import android.os.Bundle
 import android.os.storage.StorageManager
 import android.view.ContextMenu
 import android.view.KeyEvent
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
@@ -258,6 +261,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private var appToolbar: MaterialToolbar? = null
     private var bottomNavigation: BottomNavigationView? = null
     private var runningXServer = false
     private val shortcutsFragment: ShortcutsFragment = ShortcutsFragment()
@@ -278,6 +282,10 @@ class MainActivity : AppCompatActivity() {
         setSharedVars(this)
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
+
+        appToolbar = findViewById(R.id.appToolbar)
+        setSupportActionBar(appToolbar)
+
 
         bottomNavigation = findViewById(R.id.bottom_navigation)
         bottomNavigation?.setOnItemSelectedListener { item: MenuItem ->
@@ -330,6 +338,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        return true
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
