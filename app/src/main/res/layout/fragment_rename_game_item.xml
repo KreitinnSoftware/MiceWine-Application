@@ -35,7 +35,7 @@
             android:id="@+id/buttonContinue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/continue_text">
+            android:text="@string/confirm_text">
         </com.google.android.material.button.MaterialButton>
 
     </LinearLayout>

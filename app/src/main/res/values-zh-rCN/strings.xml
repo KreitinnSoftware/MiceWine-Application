@@ -78,6 +78,7 @@
     <string name="open_overlay">打开/关闭覆盖层</string>
     <string name="welcome_text">欢迎使用 MiceWine！</string>
     <string name="continue_text">继续</string>
+    <string name="confirm_text">确认</string>
     <string name="get_file_permission_text">请允许文件管理权限</string>
     <string name="extracting_resources_text">"正在提取文件…\n这可能需要一些时间"</string>
     <string name="extracted_resources_text">提取完成！</string>

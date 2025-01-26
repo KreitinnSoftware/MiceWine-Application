@@ -78,6 +78,7 @@
     <string name="open_overlay">Abrir/Fechar Overlay</string>
     <string name="welcome_text">Bem-vindo(a) ao MiceWine!</string>
     <string name="continue_text">Continuar</string>
+    <string name="confirm_text">Confirmar</string>
     <string name="get_file_permission_text">Permita o Gerenciamento de Arquivos</string>
     <string name="extracting_resources_text">"Extraindo Arquivos…\nPode demorar um pouco"</string>
     <string name="extracted_resources_text">Extração Concluida!</string>

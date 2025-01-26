@@ -38,7 +38,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:text="@string/continue_text"
+            android:text="@string/confirm_text"
             tools:ignore="ButtonStyle">
         </Button>
 
