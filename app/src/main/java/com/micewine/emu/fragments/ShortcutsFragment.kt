@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -28,6 +29,7 @@ class ShortcutsFragment : Fragment() {
     private var rootView: View? = null
     private var layoutManager: GridLayoutManager? = null
     private var preferences: SharedPreferences? = null
+    private var itemTouchHelper: ItemTouchHelper? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -46,10 +48,61 @@ class ShortcutsFragment : Fragment() {
         recyclerView?.addItemDecoration(GridSpacingItemDecoration(spanCount, 20))
 
         setAdapter(requireActivity(), preferences!!)
+        setupDragAndDrop()
 
         registerForContextMenu(recyclerView!!)
 
         return rootView
+    }
+
+    private fun setupDragAndDrop() {
+        val callback = object : ItemTouchHelper.Callback() {
+            override fun getMovementFlags(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or
+                        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+                return makeMovementFlags(dragFlags, 0)
+            }
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                if (target.adapterPosition == 0 || viewHolder.adapterPosition == 0) return false
+
+                val fromPosition = viewHolder.adapterPosition
+                val toPosition = target.adapterPosition
+
+                val currentList = loadGameList(preferences!!)
+                val gameItem = currentList.removeAt(fromPosition - 1)
+                currentList.add(toPosition - 1, gameItem)
+
+                val fromGameListIndex = fromPosition
+                val toGameListIndex = toPosition
+
+                val movedGameItem = gameList.removeAt(fromGameListIndex)
+                gameList.add(toGameListIndex, movedGameItem)
+
+                recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
+
+                val editor = preferences!!.edit()
+                editor.putString("gameList", gson.toJson(currentList))
+                editor.apply()
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            }
+
+            override fun isLongPressDragEnabled(): Boolean = true
+            override fun isItemViewSwipeEnabled(): Boolean = false
+        }
+
+        itemTouchHelper = ItemTouchHelper(callback)
+        itemTouchHelper?.attachToRecyclerView(recyclerView)
     }
 
     private fun dpToPx(dp: Int, context: Context): Float {
