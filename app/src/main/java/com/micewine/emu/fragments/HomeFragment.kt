@@ -34,15 +34,23 @@ class HomeFragment: Fragment() {
         }
 
         rootView?.findViewById<TextView>(R.id.RootfsVersion)?.apply {
-            text = "${File("$ratPackagesDir/rootfs-pkg-header").readLines()[2].substringAfter("=").replace("(", "(git-")}"
+            val rootFsVersionFile = File("$ratPackagesDir/rootfs-pkg-header")
+            if (rootFsVersionFile.exists())
+                text = rootFsVersionFile.readLines()[2].substringAfter("=").replace("(", "(git-")
+            else
+                text = "???"
         }
 
         rootView?.findViewById<TextView>(R.id.Box64Version)?.apply {
             text = "${runCommandWithOutput("$ratPackagesDir/$selectedBox64/files/usr/bin/box64 -v").replace("\n", "")}"
+            if (text.isEmpty())
+                text = "???"
         }
 
         rootView?.findViewById<TextView>(R.id.WineVersion)?.apply {
-            text = "${WineWrapper.wine("--version", true)}"
+            text = WineWrapper.wine("--version", true)
+            if (text.isEmpty())
+                text = "???"
         }
 
         return rootView

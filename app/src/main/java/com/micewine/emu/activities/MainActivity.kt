@@ -763,6 +763,8 @@ class MainActivity : AppCompatActivity() {
 
             fileManagerCwd = fileManagerDefaultDir
             setupDone = true
+            supportFragmentManager.beginTransaction().detach(homeFragment).commit()
+            supportFragmentManager.beginTransaction().attach(homeFragment).commit()
         }
     }
 
