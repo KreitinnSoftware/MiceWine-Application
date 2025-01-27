@@ -21,14 +21,15 @@
         android:orientation="horizontal"
         android:padding="40dp">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/continueButton"
+            style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/continue_text"
             android:fontFamily="@font/quicksand">
-        </Button>
+        </com.google.android.material.button.MaterialButton>
 
     </LinearLayout>
 
