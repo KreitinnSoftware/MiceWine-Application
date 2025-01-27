@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:padding="16dp"
-    android:theme="@style/Theme.MaterialComponents.DayNight">
+    android:theme="@style/Theme.MiceWine">
 
     <TextView
         android:id="@+id/envDialogTitle"
@@ -47,7 +47,6 @@
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:text="@string/cancel_text"/>
 
         <com.google.android.material.button.MaterialButton

@@ -71,9 +71,9 @@
     <string name="driver_settings_title">Drivers Settings</string>
     <string name="driver_settings_description">Configure GPU Drivers</string>
     <string name="env_settings_title">Environment Settings</string>
-    <string name="env_settings_description">Modify Environment Variables.</string>
-    <string name="env_add_action">Add Environment Variable.</string>
-    <string name="env_edit_action">Edit Environment Variable.</string>
+    <string name="env_settings_description">Modify Environment Variables</string>
+    <string name="env_add_action">Add Environment Variable</string>
+    <string name="env_edit_action">Edit Environment Variable</string>
     <string name="env_key">Name</string>
     <string name="env_value">Value</string>
     <string name="shortcuts_title">Shortcuts</string>

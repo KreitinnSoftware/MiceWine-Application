@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:theme="@style/Theme.MaterialComponents.DayNight"
+    android:theme="@style/Theme.MiceWine"
     android:padding="24dp">
 
     <TextView
