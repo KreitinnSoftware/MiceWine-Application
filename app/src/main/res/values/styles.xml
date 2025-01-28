@@ -15,4 +15,10 @@
         <item name="android:windowBackground">@drawable/popup_background</item>
     </style>
 
+    <style name="TextAppearance.Quicksand" parent="TextAppearance.AppCompat.Headline">
+        <item name="fontFamily">@font/quicksand</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
 </resources>

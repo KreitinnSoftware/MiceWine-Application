@@ -15,7 +15,9 @@
         android:fitsSystemWindows="true">
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="wrap_content"
-            android:layout_height="?attr/collapsingToolbarLayoutMediumSize">
+            android:layout_height="?attr/collapsingToolbarLayoutMediumSize"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.Quicksand"
+            app:expandedTitleTextAppearance="@style/TextAppearance.Quicksand">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/appToolbar"
