@@ -16,8 +16,11 @@
     <string name="box64_bleeding_edge_description">检测 MonoBleedingEdge 并应用保守设置</string>
     <string name="box64_dynarec_wait_description">当 FillBlock 不可用时的行为（FillBlock 创建 Dynarec 块并非多线程）</string>
     <string name="box64_dynarec_dirty_description">允许继续运行一个未受保护且可能存在问题的块。</string>
+    <string name="box64_dynarec_forward_description">定义构建块时允许的最大前进值。</string>
     <string name="box64_log_description">Box64 日志级别</string>
     <string name="box64_avx_description">启用或禁用 Box64 的 AVX 或 AVX2 仿真</string>
+    <string name="box64_sse42_description">启用或禁用 SSE4.2 模拟</string>
+    <string name="box64_mmap32_description">启用或禁用针对不支持‘VK_EXT_map_memory_placed’扩展的Vulkan驱动程序的解决方法</string>
     <string name="box64_show_segv_description">即使存在信号处理程序，也显示 Segfault 信号。</string>
     <string name="box64_no_sigsegv_description">禁用 SigSEGV 处理。（非常适合调试）。</string>
     <string name="box64_show_bt_description">捕获信号（SEGV、ILL 或 BUS）时显示回溯（仿真）。</string>

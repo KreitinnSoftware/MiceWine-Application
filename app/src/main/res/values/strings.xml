@@ -30,10 +30,16 @@
     <string name="box64_dynarec_wait_description">Behavior with FillBlock is not available (FillBlock build Dynarec blocks and is not multithreaded)</string>
     <string name="box64_dynarec_dirty_title" translatable="false">BOX64_DYNAREC_DIRTY</string>
     <string name="box64_dynarec_dirty_description">Allow continue running a block that is unprotected and potentially dirty</string>
+    <string name="box64_dynarec_forward_title" translatable="false">BOX64_DYNAREC_FORWARD</string>
+    <string name="box64_dynarec_forward_description">Define max allowed forward value when building block.</string>
     <string name="box64_log_title" translatable="false">BOX64_LOG</string>
     <string name="box64_log_description">Box64 Log Level</string>
     <string name="box64_avx_title" translatable="false">BOX64_AVX</string>
     <string name="box64_avx_description">Enable or Disable Box64 AVX or AVX2 Emulation</string>
+    <string name="box64_sse42_title" translatable="false">BOX64_SSE42</string>
+    <string name="box64_sse42_description">Enable or Disable SSE4.2 capabilities</string>
+    <string name="box64_mmap32_title" translatable="false">BOX64_MMAP32</string>
+    <string name="box64_mmap32_description">Enable or Disable a Workaround for Vulkan Drivers that don\'t support \'VK_EXT_map_memory_placed\' extension</string>
     <string name="box64_show_segv_title" translatable="false">BOX64_SHOWSEGV</string>
     <string name="box64_show_segv_description">Show Segfault signal even if a signal handler is present</string>
     <string name="box64_no_sigsegv_title" translatable="false">BOX64_NOSIGSEGV</string>

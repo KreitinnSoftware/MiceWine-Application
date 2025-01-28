@@ -45,6 +45,8 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTN
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTROUND
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTROUND_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FORWARD
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FORWARD_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_NATIVEFLAGS
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_NATIVEFLAGS_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_PAUSE
@@ -61,6 +63,8 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DO
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_LOG
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_LOG_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_MMAP32
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_MMAP32_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGILL
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGILL_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGSEGV
@@ -69,6 +73,8 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWBT
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWBT_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWSEGV
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWSEGV_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SSE42
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SSE42_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION
 import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_DRI3
@@ -815,7 +821,9 @@ class MainActivity : AppCompatActivity() {
         var enableServices: Boolean = false
         var appLang: String? = null
         var box64LogLevel: String? = null
+        var box64Mmap32: String? = null
         var box64Avx: String? = null
+        var box64Sse42: String? = null
         var box64DynarecBigblock: String? = null
         var box64DynarecStrongmem: String? = null
         var box64DynarecWeakbarrier: String? = null
@@ -830,6 +838,7 @@ class MainActivity : AppCompatActivity() {
         var box64DynarecBleedingEdge: String? = null
         var box64DynarecWait: String? = null
         var box64DynarecDirty: String? = null
+        var box64DynarecForward: String? = null
         var box64ShowSegv: String? = null
         var box64ShowBt: String? = null
         var box64NoSigSegv: String? = null
@@ -924,7 +933,9 @@ class MainActivity : AppCompatActivity() {
             selectedBox64 = preferences.getString(SELECTED_BOX64, SELECTED_DRIVER_DEFAULT_VALUE)
 
             box64LogLevel = preferences.getString(BOX64_LOG, BOX64_LOG_DEFAULT_VALUE)
+            box64Mmap32 = booleanToString(preferences.getBoolean(BOX64_MMAP32, BOX64_MMAP32_DEFAULT_VALUE))
             box64Avx = preferences.getString(BOX64_AVX, BOX64_AVX_DEFAULT_VALUE)
+            box64Sse42 = booleanToString(preferences.getBoolean(BOX64_SSE42, BOX64_SSE42_DEFAULT_VALUE))
             box64DynarecBigblock = preferences.getString(BOX64_DYNAREC_BIGBLOCK, BOX64_DYNAREC_BIGBLOCK_DEFAULT_VALUE)
             box64DynarecStrongmem = preferences.getString(BOX64_DYNAREC_STRONGMEM, BOX64_DYNAREC_STRONGMEM_DEFAULT_VALUE)
             box64DynarecWeakbarrier = preferences.getString(BOX64_DYNAREC_WEAKBARRIER, BOX64_DYNAREC_WEAKBARRIER_DEFAULT_VALUE)
@@ -939,6 +950,7 @@ class MainActivity : AppCompatActivity() {
             box64DynarecBleedingEdge = booleanToString(preferences.getBoolean(BOX64_DYNAREC_BLEEDING_EDGE, BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE))
             box64DynarecWait = booleanToString(preferences.getBoolean(BOX64_DYNAREC_WAIT, BOX64_DYNAREC_WAIT_DEFAULT_VALUE))
             box64DynarecDirty = booleanToString(preferences.getBoolean(BOX64_DYNAREC_DIRTY, BOX64_DYNAREC_DIRTY_DEFAULT_VALUE))
+            box64DynarecForward = preferences.getString(BOX64_DYNAREC_FORWARD, BOX64_DYNAREC_FORWARD_DEFAULT_VALUE)
             box64ShowSegv = booleanToString(preferences.getBoolean(BOX64_SHOWSEGV, BOX64_SHOWSEGV_DEFAULT_VALUE))
             box64ShowBt = booleanToString(preferences.getBoolean(BOX64_SHOWBT, BOX64_SHOWBT_DEFAULT_VALUE))
             box64NoSigSegv = booleanToString(preferences.getBoolean(BOX64_NOSIGSEGV, BOX64_NOSIGSEGV_DEFAULT_VALUE))

@@ -24,6 +24,8 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTN
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTROUND
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTROUND_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FORWARD
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FORWARD_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_NATIVEFLAGS
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_NATIVEFLAGS_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_PAUSE
@@ -40,6 +42,8 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DO
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_LOG
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_LOG_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_MMAP32
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_MMAP32_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGILL
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGILL_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGSEGV
@@ -48,6 +52,8 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWBT
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWBT_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWSEGV
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWSEGV_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SSE42
+import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SSE42_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
 import com.micewine.emu.adapters.AdapterSettingsPreferences
@@ -96,8 +102,11 @@ class Box64SettingsFragment : Fragment() {
         addToAdapter(R.string.box64_bleeding_edge_title, R.string.box64_bleeding_edge_description, null, SWITCH, BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE, BOX64_DYNAREC_BLEEDING_EDGE)
         addToAdapter(R.string.box64_dynarec_wait_title, R.string.box64_dynarec_wait_description, null, SWITCH, BOX64_DYNAREC_WAIT_DEFAULT_VALUE, BOX64_DYNAREC_WAIT)
         addToAdapter(R.string.box64_dynarec_dirty_title, R.string.box64_dynarec_dirty_description, null, SWITCH, BOX64_DYNAREC_DIRTY_DEFAULT_VALUE, BOX64_DYNAREC_DIRTY)
+        addToAdapter(R.string.box64_dynarec_forward_title, R.string.box64_dynarec_forward_description, arrayOf("0", "128", "256", "512", "1024"), SPINNER, BOX64_DYNAREC_FORWARD_DEFAULT_VALUE, BOX64_DYNAREC_FORWARD)
         addToAdapter(R.string.box64_log_title, R.string.box64_log_description, arrayOf("0", "1"), SPINNER, BOX64_LOG_DEFAULT_VALUE, BOX64_LOG)
         addToAdapter(R.string.box64_avx_title, R.string.box64_avx_description, arrayOf("0", "1", "2"), SPINNER, BOX64_AVX_DEFAULT_VALUE, BOX64_AVX)
+        addToAdapter(R.string.box64_sse42_title, R.string.box64_sse42_description, null, SWITCH, BOX64_SSE42_DEFAULT_VALUE, BOX64_SSE42)
+        addToAdapter(R.string.box64_mmap32_title, R.string.box64_mmap32_description, null, SWITCH, BOX64_MMAP32_DEFAULT_VALUE, BOX64_MMAP32)
 
         // Debugging Options
 

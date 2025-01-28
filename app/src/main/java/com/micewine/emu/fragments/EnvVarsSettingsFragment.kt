@@ -17,16 +17,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class EnvironmentVarsSettingsFragment : Fragment() {
-    private lateinit var btnAddEnvVar: Button
+class EnvVarsSettingsFragment : Fragment() {
+    private lateinit var addEnvButton: Button
     private lateinit var rvEnvVars: RecyclerView
 
     private val envVarsList = mutableListOf<EnvironmentVariable>()
     private lateinit var envVarsAdapter: EnvironmentVarsAdapter
 
     companion object {
-        private const val PREFS_NAME = "EnvironmentVariablesPrefs"
-        private const val ENV_VARS_KEY = "environment_variables"
+        const val ENV_VARS_KEY = "environmentVariables"
     }
 
     override fun onCreateView(
@@ -36,7 +35,7 @@ class EnvironmentVarsSettingsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_env_vars_settings, container, false)
 
-        btnAddEnvVar = view.findViewById(R.id.btnAddEnvVar)
+        addEnvButton = view.findViewById(R.id.btnAddEnvVar)
         rvEnvVars = view.findViewById(R.id.rvEnvVars)
 
         loadEnvironmentVariables()
@@ -75,7 +74,7 @@ class EnvironmentVarsSettingsFragment : Fragment() {
     }
 
     private fun setupAddButton() {
-        btnAddEnvVar.setOnClickListener {
+        addEnvButton.setOnClickListener {
             showAddDialog()
         }
     }
@@ -147,8 +146,7 @@ class EnvironmentVarsAdapter(
 ) : RecyclerView.Adapter<EnvironmentVarsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_env_vars, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_env_vars, parent, false)
         return ViewHolder(view, onItemClick, onDeleteClick)
     }
 

@@ -16,6 +16,7 @@ import com.micewine.emu.activities.MainActivity.Companion.box64DynarecCallret
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecDirty
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastnan
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastround
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecForward
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecNativeflags
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecPause
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecSafeflags
@@ -24,10 +25,12 @@ import com.micewine.emu.activities.MainActivity.Companion.box64DynarecWait
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecWeakbarrier
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecX87double
 import com.micewine.emu.activities.MainActivity.Companion.box64LogLevel
+import com.micewine.emu.activities.MainActivity.Companion.box64Mmap32
 import com.micewine.emu.activities.MainActivity.Companion.box64NoSigSegv
 import com.micewine.emu.activities.MainActivity.Companion.box64NoSigill
 import com.micewine.emu.activities.MainActivity.Companion.box64ShowBt
 import com.micewine.emu.activities.MainActivity.Companion.box64ShowSegv
+import com.micewine.emu.activities.MainActivity.Companion.box64Sse42
 import com.micewine.emu.activities.MainActivity.Companion.enableDRI3
 import com.micewine.emu.activities.MainActivity.Companion.enableMangoHUD
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
@@ -41,6 +44,7 @@ import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.activities.MainActivity.Companion.wineESync
 import com.micewine.emu.activities.MainActivity.Companion.wineLogLevel
+import com.micewine.emu.fragments.EnvVarsSettingsFragment.Companion.ENV_VARS_KEY
 import com.micewine.emu.fragments.EnvironmentVariable
 
 object EnvVars {
@@ -60,11 +64,13 @@ object EnvVars {
 
         setEnv()
 
-        val savedVarsJson = sharedPreferences.getString("environment_variables", null)
+        val savedVarsJson = sharedPreferences.getString(ENV_VARS_KEY, null)
         if (savedVarsJson != null) {
             val type = object : TypeToken<List<EnvironmentVariable>>() {}.type
-            val savedVars = Gson().fromJson<List<EnvironmentVariable>>(savedVarsJson, type)
-            savedVars.forEach { putVar(it.key, it.value) }
+
+            Gson().fromJson<List<EnvironmentVariable>>(savedVarsJson, type).forEach {
+                putVar(it.key, it.value)
+            }
         }
 
         return "env ${vars.values.joinToString(" ")} "
@@ -119,8 +125,9 @@ object EnvVars {
         if (Build.SUPPORTED_ABIS[0] != "x86_64") {
             putVar("BOX64_LOG", box64LogLevel)
             putVar("BOX64_CPUNAME", "ARM64 CPU")
-            putVar("BOX64_MMAP32", "1")
+            putVar("BOX64_MMAP32", box64Mmap32)
             putVar("BOX64_AVX", box64Avx)
+            putVar("BOX64_SSE42", box64Sse42)
             putVar("BOX64_RCFILE", "$usrDir/etc/box64.box64rc")
             putVar("BOX64_DYNAREC_BIGBLOCK", box64DynarecBigblock)
             putVar("BOX64_DYNAREC_STRONGMEM", box64DynarecStrongmem)
@@ -136,6 +143,7 @@ object EnvVars {
             putVar("BOX64_DYNAREC_BLEEDING_EDGE", box64DynarecBleedingEdge)
             putVar("BOX64_DYNAREC_WAIT", box64DynarecWait)
             putVar("BOX64_DYNAREC_DIRTY", box64DynarecDirty)
+            putVar("BOX64_DYNAREC_FORWARD", box64DynarecForward)
             putVar("BOX64_SHOWSEGV", box64ShowSegv)
             putVar("BOX64_SHOWBT", box64ShowBt)
             putVar("BOX64_NOSIGSEGV", box64NoSigSegv)

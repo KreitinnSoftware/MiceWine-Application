@@ -16,8 +16,11 @@
     <string name="box64_bleeding_edge_description">Detectar MonoBleedingEdge e aplicar configurações conservativas</string>
     <string name="box64_dynarec_wait_description">Comportamento com FillBlock quando não está disponível (FillBlock cria blocos de Dynarec e não é multithreaded)</string>
     <string name="box64_dynarec_dirty_description">Permitir continuar executando um bloco que está desprotegido e potencialmente comprometido.</string>
+    <string name="box64_dynarec_forward_description">Define o valor máximo de avanço permitido ao construir o bloco.</string>
     <string name="box64_log_description">Nível de Logs do Box64</string>
     <string name="box64_avx_description">Ativa ou Desativa a Emulação de AVX ou AVX2 do Box64</string>
+    <string name="box64_sse42_description">Ativa ou Desativa a Emulação de SSE4.2</string>
+    <string name="box64_mmap32_description">Ativa ou Desativa Solução Alternativa para Drivers Vulkan que não suportam a extensão \'VK_EXT_map_memory_placed\'</string>
     <string name="box64_show_segv_description">Exibir o sinal de Segfault mesmo que um manipulador de sinal esteja presente.</string>
     <string name="box64_no_sigsegv_description">Desabilitar o tratamento de SigSEGV. (Muito útil para depuração).</string>
     <string name="box64_show_bt_description">Exibir Backtrace (Emulado) quando um sinal (SEGV, ILL ou BUS) for capturado.</string>

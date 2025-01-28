@@ -17,7 +17,7 @@ import com.micewine.emu.databinding.ActivityGeneralSettingsBinding
 import com.micewine.emu.fragments.Box64SettingsFragment
 import com.micewine.emu.fragments.DisplaySettingsFragment
 import com.micewine.emu.fragments.DriversSettingsFragment
-import com.micewine.emu.fragments.EnvironmentVarsSettingsFragment
+import com.micewine.emu.fragments.EnvVarsSettingsFragment
 import com.micewine.emu.fragments.GeneralSettingsFragment
 import com.micewine.emu.fragments.WineSettingsFragment
 
@@ -28,7 +28,7 @@ class GeneralSettings : AppCompatActivity() {
     private val wineSettingsFragment = WineSettingsFragment()
     private val displaySettingsFragment = DisplaySettingsFragment()
     private val driversSettingsFragment = DriversSettingsFragment()
-    private val environmentVariablesSettings = EnvironmentVarsSettingsFragment()
+    private val environmentVariablesSettings = EnvVarsSettingsFragment()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val preference = intent.getStringExtra("preference")
@@ -130,8 +130,12 @@ class GeneralSettings : AppCompatActivity() {
 
         const val BOX64_LOG = "BOX64_LOG"
         const val BOX64_LOG_DEFAULT_VALUE = "1"
+        const val BOX64_MMAP32 = "BOX64_MMAP32"
+        const val BOX64_MMAP32_DEFAULT_VALUE = false
         const val BOX64_AVX = "BOX64_AVX"
         const val BOX64_AVX_DEFAULT_VALUE = "2"
+        const val BOX64_SSE42 = "BOX64_SSE42"
+        const val BOX64_SSE42_DEFAULT_VALUE = true
         const val BOX64_DYNAREC_BIGBLOCK = "BOX64_DYNAREC_BIGBLOCK"
         const val BOX64_DYNAREC_BIGBLOCK_DEFAULT_VALUE = "0"
         const val BOX64_DYNAREC_STRONGMEM = "BOX64_DYNAREC_STRONGMEM"
@@ -160,6 +164,8 @@ class GeneralSettings : AppCompatActivity() {
         const val BOX64_DYNAREC_WAIT_DEFAULT_VALUE = true
         const val BOX64_DYNAREC_DIRTY = "BOX64_DYNAREC_DIRTY"
         const val BOX64_DYNAREC_DIRTY_DEFAULT_VALUE = false
+        const val BOX64_DYNAREC_FORWARD = "BOX64_DYNAREC_FORWARD"
+        const val BOX64_DYNAREC_FORWARD_DEFAULT_VALUE = "128"
         const val BOX64_SHOWSEGV = "BOX64_SHOWSEGV"
         const val BOX64_SHOWSEGV_DEFAULT_VALUE = false
         const val BOX64_SHOWBT = "BOX64_SHOWBT"
