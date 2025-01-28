@@ -35,11 +35,14 @@ jobs:
 
     - name: "Get Short SHA"
       run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+    - name: "Get Version"
+      run: echo "VERSION=$(cat app/build.gradle.kts | grep versionName | cut -d "=" -f 2 | sed "s/\"//g")" >> $GITHUB_ENV
           
     - name: "Create Release"
       uses: softprops/action-gh-release@v2
       with:
-        name: "MiceWine Application (${{ env.SHORT_SHA }})"
+        name: "MiceWine Application ${{ env.VERSION }}-(git-${{ env.SHORT_SHA }})"
         tag_name: ${{ env.SHORT_SHA }}
         prerelease: true
         files: ./app/build/outputs/apk/debug/app-debug.apk
