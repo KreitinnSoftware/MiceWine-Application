@@ -75,6 +75,7 @@ import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWSEGV
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWSEGV_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SSE42
 import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SSE42_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettings.Companion.CPU_AFFINITY
 import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION
 import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_DRI3
@@ -131,6 +132,7 @@ import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
+import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.utils.DriveUtils
 import com.micewine.emu.utils.FilePathResolver
 import io.ByteWriter
@@ -865,6 +867,7 @@ class MainActivity : AppCompatActivity() {
         var selectedFile: String = ""
         var miceWineVersion: String = "MiceWine ${BuildConfig.VERSION_NAME} (git-${BuildConfig.GIT_SHORT_SHA})"
         var vulkanDriverDeviceName: String? = null
+        var cpuAffinity: String? = null
         private var selectedResolution: String? = ""
 
         var selectedFragment = "HomeFragment"
@@ -974,6 +977,8 @@ class MainActivity : AppCompatActivity() {
             enableRamCounter = preferences.getBoolean(RAM_COUNTER_KEY, true)
             enableCpuCounter = preferences.getBoolean(CPU_COUNTER_KEY, false)
             enableDebugInfo = preferences.getBoolean(ENABLE_DEBUG_INFO_KEY, true)
+
+            cpuAffinity = preferences.getString(CPU_AFFINITY, availableCPUs.joinToString(","))
 
             vulkanDriverDeviceName = getVulkanDeviceName()
         }

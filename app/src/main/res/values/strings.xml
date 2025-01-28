@@ -162,4 +162,5 @@
     <string name="box64_manager_title">Box64 Manager</string>
     <string name="box64_manager_description">Manage Box64 Versions</string>
     <string name="mouse_captured">Mouse Captured Press Back or ESC to Release</string>
+    <string name="cpu_affinity_title">CPU Affinity</string>
 </resources>

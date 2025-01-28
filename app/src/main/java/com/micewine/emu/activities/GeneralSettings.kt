@@ -209,5 +209,6 @@ class GeneralSettings : AppCompatActivity() {
         const val DISPLAY_RESOLUTION_DEFAULT_VALUE = "1280x720"
         const val DEAD_ZONE = "deadZone"
         const val MOUSE_SENSIBILITY = "mouseSensibility"
+        const val CPU_AFFINITY = "cpuAffinity"
     }
 }

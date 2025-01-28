@@ -1,15 +1,29 @@
 package com.micewine.emu.core
 
 import android.os.Build
+import com.micewine.emu.activities.MainActivity.Companion.cpuAffinity
 import com.micewine.emu.activities.MainActivity.Companion.wineDisksFolder
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import java.io.File
+import kotlin.math.abs
 
 object WineWrapper {
     private var IS_BOX64 = if (Build.SUPPORTED_ABIS[0] == "x86_64") "" else "box64"
+
+    private fun getCpuHexMask(): String {
+        val availCpus = Runtime.getRuntime().availableProcessors()
+        val cpuMask = MutableList(availCpus) { '0' }
+        val cpuAffinity = cpuAffinity?.replace(",", "")
+
+        for (i in 0..<cpuAffinity!!.length) {
+            cpuMask[abs(cpuAffinity[i].toString().toInt() - availCpus) - 1] = '1'
+        }
+
+        return Integer.toHexString(cpuMask.joinToString("").toInt(2))
+    }
 
     fun wineServer(args: String) {
         runCommand(
@@ -25,14 +39,14 @@ object WineWrapper {
 
     fun wine(args: String) {
         runCommand(
-            getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
+            getEnv() + "WINEPREFIX=$winePrefix taskset ${getCpuHexMask()} $IS_BOX64 wine $args"
         )
     }
 
     fun wine(args: String, retLog: Boolean): String {
         if (retLog) {
             return runCommandWithOutput(
-                getEnv() + "BOX64_LOG=0 WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
+                getEnv() + "BOX64_LOG=0 WINEPREFIX=$winePrefix taskset ${getCpuHexMask()} $IS_BOX64 wine $args"
             )
         }
         return ""
@@ -41,7 +55,7 @@ object WineWrapper {
     fun wine(args: String, cwd: String) {
         runCommand(
             "cd $cwd;" +
-                    getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
+                    getEnv() + "WINEPREFIX=$winePrefix taskset ${getCpuHexMask()} $IS_BOX64 wine $args"
         )
     }
 

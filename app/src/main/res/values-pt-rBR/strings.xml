@@ -139,4 +139,5 @@
     <string name="box64_manager_title">Gerenciador de Box64</string>
     <string name="box64_manager_description">Gerenciar Versões do Box64</string>
     <string name="mouse_captured">Mouse Capturado Pressione Voltar ou ESC para Soltar</string>
+    <string name="cpu_affinity_title">Afinidade de CPU</string>
 </resources>

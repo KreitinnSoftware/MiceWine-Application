@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.micewine.emu.activities.EmulationActivity.Companion.handler
 import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
+import com.micewine.emu.activities.MainActivity.Companion.cpuAffinity
 import com.micewine.emu.fragments.InfoDialogFragment
 import com.micewine.emu.fragments.InfoDialogFragment.Companion.descriptionText
 import com.micewine.emu.fragments.InfoDialogFragment.Companion.titleText
