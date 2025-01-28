@@ -43,6 +43,7 @@ class SettingsFragment : Fragment() {
         }
 
         addToAdapter(R.string.driver_manager_title, R.string.driver_manager_description, R.drawable.ic_gpu)
+        recyclerView?.adapter?.notifyDataSetChanged()
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, icon: Int) {
