@@ -16,7 +16,7 @@ import com.micewine.emu.activities.MainActivity.Companion.ACTION_RUN_WINE
 import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
 import java.io.File
 
-class AdapterGame(private val gameList: List<GameList>, private val activity: Activity) : RecyclerView.Adapter<AdapterGame.ViewHolder>() {
+class AdapterGame(private val gameList: MutableList<GameList>, private val activity: Activity) : RecyclerView.Adapter<AdapterGame.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_game_item, parent, false)
         return ViewHolder(itemView)
@@ -45,6 +45,12 @@ class AdapterGame(private val gameList: List<GameList>, private val activity: Ac
 
     override fun getItemCount(): Int {
         return gameList.size
+    }
+
+    fun updateList(newList: List<GameList>) {
+        gameList.clear()
+        gameList.addAll(newList)
+        notifyDataSetChanged()
     }
 
     private fun resizeBitmap(originalBitmap: Bitmap, width: Int, height: Int): Bitmap {

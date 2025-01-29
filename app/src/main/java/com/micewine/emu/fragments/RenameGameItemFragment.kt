@@ -10,7 +10,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.preference.PreferenceManager
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
-import com.micewine.emu.fragments.HomeFragment.Companion.renameGameFromList
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.renameGameFromList
 
 class RenameGameItemFragment : DialogFragment() {
     private var preferences: SharedPreferences? = null

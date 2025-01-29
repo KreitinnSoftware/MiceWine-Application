@@ -9,21 +9,27 @@
     android:theme="@style/Theme.MiceWine"
     tools:context=".activities.MainActivity">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:fitsSystemWindows="true">
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="wrap_content"
+            android:layout_height="?attr/collapsingToolbarLayoutMediumSize"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.Quicksand"
+            app:expandedTitleTextAppearance="@style/TextAppearance.Quicksand">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/app_name"
-            android:textSize="26sp"
-            android:fontFamily="@font/quicksand"
-            android:padding="16dp">
-        </TextView>
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/appToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:elevation="0dp"
+                app:title="@string/app_name">
 
-    </LinearLayout>
+            </com.google.android.material.appbar.MaterialToolbar>
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <FrameLayout
         android:id="@+id/content"
@@ -35,7 +41,6 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
-        style="@style/RoundTopCorners"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"

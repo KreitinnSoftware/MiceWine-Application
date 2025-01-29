@@ -7,11 +7,12 @@
     android:padding="16dp"
     tools:context=".fragments.EnvVarsSettingsFragment">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnAddEnvVar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Environment Variable"/>
+        android:text="@string/env_add_action"
+        style="@style/Widget.Material3.Button.ElevatedButton"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvEnvVars"

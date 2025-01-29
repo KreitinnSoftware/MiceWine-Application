@@ -57,7 +57,7 @@
     <string name="log_description">See MiceWine Logs</string>
     <string name="clear_log">Clear</string>
     <string name="desktop_mode_init">Desktop</string>
-    <string name="about_title">About</string>
+    <string name="home_title">Home</string>
     <string name="about_description">About MiceWine</string>
     <string name="general_settings">General Settings</string>
     <string name="exit">Exit</string>
@@ -71,12 +71,12 @@
     <string name="driver_settings_title">Drivers Settings</string>
     <string name="driver_settings_description">Configure GPU Drivers</string>
     <string name="env_settings_title">Environment Settings</string>
-    <string name="env_settings_description">Modify Environment Variables.</string>
-    <string name="env_add_action">Add Environment Variable.</string>
-    <string name="env_edit_action">Edit Environment Variable.</string>
+    <string name="env_settings_description">Modify Environment Variables</string>
+    <string name="env_add_action">Add Environment Variable</string>
+    <string name="env_edit_action">Edit Environment Variable</string>
     <string name="env_key">Name</string>
     <string name="env_value">Value</string>
-    <string name="home_title">Home</string>
+    <string name="shortcuts_title">Shortcuts</string>
     <string name="stretch_display">Stretch Display</string>
     <string name="display_resolution_title">Display Resolution</string>
     <string name="display_resolution_description">Change Virtual Display Resolution</string>
@@ -100,6 +100,7 @@
     <string name="open_overlay">Open/Close Overlay</string>
     <string name="welcome_text">Welcome to MiceWine!</string>
     <string name="continue_text">Continue</string>
+    <string name="confirm_text">Confirm</string>
     <string name="get_file_permission_text">Allow File Management Permission</string>
     <string name="extracting_resources_text">"Extracting Files…\nIt may take a while"</string>
     <string name="extracted_resources_text">Extraction Done!</string>
@@ -163,4 +164,12 @@
     <string name="box64_manager_description">Manage Box64 Versions</string>
     <string name="mouse_captured">Mouse Captured Press Back or ESC to Release</string>
     <string name="cpu_affinity_title">CPU Affinity</string>
+    <string name="action_search">Search</string>
+    <string name="highlight_nav_shortcuts">Manage Shortcuts</string>
+    <string name="highlight_nav_settings">Manage Settings</string>
+    <string name="highlight_nav_files">Browse and open files</string>
+    <string name="highlight_nav_files_description">Tap to open executable, hold to create shortcuts</string>
+    <string name="highlight_shortcuts">Tap to open, hold to reorder or access more options</string>
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -66,7 +66,7 @@ class EnvVarsSettingsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         envVarsAdapter = EnvironmentVarsAdapter(envVarsList,
-            onItemClick = { position -> showEditDialog(position) },
+            onItemClick = { position -> showDialog(position) },
             onDeleteClick = { position -> deleteEnvironmentVar(position) }
         )
         rvEnvVars.layoutManager = LinearLayoutManager(context)
@@ -75,59 +75,54 @@ class EnvVarsSettingsFragment : Fragment() {
 
     private fun setupAddButton() {
         addEnvButton.setOnClickListener {
-            showAddDialog()
+            showDialog(null)
         }
     }
 
-    private fun showAddDialog() {
+    private fun showDialog(position: Int?) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_env_var, null)
+
+        val envDialogTitle = dialogView.findViewById<TextView>(R.id.envDialogTitle)
+
+        if (position == null)
+            envDialogTitle.text = getString(R.string.env_add_action)
+        else
+            envDialogTitle.text = getString(R.string.env_edit_action)
+
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(dialogView).create()
+
         val keyInput = dialogView.findViewById<EditText>(R.id.etDialogKey)
         val valueInput = dialogView.findViewById<EditText>(R.id.etDialogValue)
 
-        AlertDialog.Builder(context)
-            .setTitle(getString(R.string.env_add_action))
-            .setView(dialogView)
-            .setPositiveButton(getString(R.string.save_text)) { _, _ ->
-                val key = keyInput.text.toString().trim()
-                val value = valueInput.text.toString().trim()
+        if (position != null) {
+            keyInput.setText(envVarsList[position].key)
+            valueInput.setText(envVarsList[position].value)
+        }
 
-                if (key.isNotEmpty() && value.isNotEmpty()) {
-                    val envVar = EnvironmentVariable(key, value)
+        val buttonCancel = dialogView.findViewById<Button>(R.id.buttonCancel)
+        val buttonSave = dialogView.findViewById<Button>(R.id.buttonSave)
+
+        buttonCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        buttonSave.setOnClickListener {
+            val key = keyInput.text.toString().trim()
+            val value = valueInput.text.toString().trim()
+
+            if (key.isNotEmpty() && value.isNotEmpty()) {
+                val envVar = EnvironmentVariable(key, value)
+                if (position == null) {
                     envVarsList.add(envVar)
                     envVarsAdapter.notifyItemInserted(envVarsList.size - 1)
-                    saveEnvironmentVariables()
-                }
-            }
-            .setNegativeButton(getString(R.string.cancel_text), null)
-            .create()
-            .show()
-    }
-
-    private fun showEditDialog(position: Int) {
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_env_var, null)
-        val keyInput = dialogView.findViewById<EditText>(R.id.etDialogKey)
-        val valueInput = dialogView.findViewById<EditText>(R.id.etDialogValue)
-
-        val currentVar = envVarsList[position]
-        keyInput.setText(currentVar.key)
-        valueInput.setText(currentVar.value)
-
-        AlertDialog.Builder(context)
-            .setTitle(getString(R.string.env_edit_action))
-            .setView(dialogView)
-            .setPositiveButton("Save") { _, _ ->
-                val key = keyInput.text.toString().trim()
-                val value = valueInput.text.toString().trim()
-
-                if (key.isNotEmpty()) {
-                    envVarsList[position] = EnvironmentVariable(key, value)
+                } else {
+                    envVarsList[position] = envVar
                     envVarsAdapter.notifyItemChanged(position)
-                    saveEnvironmentVariables()
                 }
+                saveEnvironmentVariables()
             }
-            .setNegativeButton("Cancel", null)
-            .create()
-            .show()
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
     private fun deleteEnvironmentVar(position: Int) {

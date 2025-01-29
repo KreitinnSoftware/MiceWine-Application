@@ -16,15 +16,22 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
 import android.os.storage.StorageManager
+import android.util.Log
 import android.view.ContextMenu
 import android.view.KeyEvent
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import com.getkeepsafe.taptargetview.TapTarget
+import com.getkeepsafe.taptargetview.TapTargetSequence
+import com.getkeepsafe.taptargetview.TapTargetView
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
@@ -109,22 +116,23 @@ import com.micewine.emu.activities.GeneralSettings.Companion.WINE_LOG_LEVEL
 import com.micewine.emu.activities.GeneralSettings.Companion.WINE_LOG_LEVEL_DEFAULT_VALUE
 import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
+import com.micewine.emu.core.HighlightState
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.RatPackageManager.installRat
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.ActivityMainBinding
-import com.micewine.emu.fragments.AboutFragment
+import com.micewine.emu.fragments.HomeFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ratCandidate
 import com.micewine.emu.fragments.DeleteGameItemFragment
 import com.micewine.emu.fragments.FileManagerFragment
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.fragments.FloatingFileManagerFragment
-import com.micewine.emu.fragments.HomeFragment
-import com.micewine.emu.fragments.HomeFragment.Companion.saveToGameList
-import com.micewine.emu.fragments.HomeFragment.Companion.setIconToGame
+import com.micewine.emu.fragments.ShortcutsFragment
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.saveToGameList
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.RenameGameItemFragment
 import com.micewine.emu.fragments.RenameGameItemFragment.Companion.initialTextRenameGameFragment
 import com.micewine.emu.fragments.SettingsFragment
@@ -258,13 +266,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private var appToolbar: MaterialToolbar? = null
     private var bottomNavigation: BottomNavigationView? = null
     private var runningXServer = false
-    private val homeFragment: HomeFragment = HomeFragment()
+    private val shortcutsFragment: ShortcutsFragment = ShortcutsFragment()
     private val settingsFragment: SettingsFragment = SettingsFragment()
     private val fileManagerFragment: FileManagerFragment = FileManagerFragment()
-    private val aboutFragment: AboutFragment = AboutFragment()
+    private val homeFragment: HomeFragment = HomeFragment()
     private var preferences: SharedPreferences? = null
+
+    private var currentState: HighlightState? = null
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -279,12 +290,16 @@ class MainActivity : AppCompatActivity() {
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
 
+        appToolbar = findViewById(R.id.appToolbar)
+        setSupportActionBar(appToolbar)
+
+
         bottomNavigation = findViewById(R.id.bottom_navigation)
         bottomNavigation?.setOnItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    selectedFragment = "HomeFragment"
-                    fragmentLoader(homeFragment, false)
+                R.id.nav_shortcuts -> {
+                    selectedFragment = "ShortcutsFragment"
+                    fragmentLoader(shortcutsFragment, false)
                 }
 
                 R.id.nav_settings -> {
@@ -297,9 +312,9 @@ class MainActivity : AppCompatActivity() {
                     fragmentLoader(fileManagerFragment, false)
                 }
 
-                R.id.nav_about_micewine -> {
-                    selectedFragment = "AboutFragment"
-                    fragmentLoader(aboutFragment, false)
+                R.id.nav_home -> {
+                    selectedFragment = "HomeFragment"
+                    fragmentLoader(homeFragment, false)
                 }
             }
 
@@ -332,6 +347,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        return true
+    }
+
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
 
@@ -341,6 +360,7 @@ class MainActivity : AppCompatActivity() {
             )
         } else {
             setupDone = true
+            showHighlightSequence()
         }
     }
 
@@ -357,7 +377,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (selectedFragment != "HomeFragment") {
-                bottomNavigation?.selectedItemId = R.id.nav_home
+                bottomNavigation?.selectedItemId = R.id.nav_shortcuts
 
                 return true
             }
@@ -375,7 +395,7 @@ class MainActivity : AppCompatActivity() {
         v: View?,
         menuInfo: ContextMenu.ContextMenuInfo?
     ) {
-        if (selectedFragment == "HomeFragment") {
+        if (selectedFragment == "ShortcutsFragment") {
             menuInflater.inflate(R.menu.game_list_context_menu, menu)
         } else if (selectedFragment == "FileManagerFragment") {
             menuInflater.inflate(R.menu.file_list_context_menu, menu)
@@ -653,7 +673,7 @@ class MainActivity : AppCompatActivity() {
                         val shell = ShellLink(exePath)
                         val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
                         if (drive != null) {
-                            WineWrapper.wine("'${drive.getUnixPath()}'", "'${File(drive.getUnixPath()).parent!!}'")
+                            WineWrapper.wine("'${WineWrapper.getSanatizedPath(drive.getUnixPath())}'", "'${WineWrapper.getSanatizedPath(File(drive.getUnixPath()).parent!!)}'")
                         }
                     }
                     catch (e: ShellLinkException) {
@@ -663,7 +683,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 else {
-                    WineWrapper.wine("'$exePath'", "'${File(exePath).parent!!}'")
+                    WineWrapper.wine("'${WineWrapper.getSanatizedPath(exePath)}'", "'${File(WineWrapper.getSanatizedPath(exePath)).parent!!}'")
                 }
             }
 
@@ -763,6 +783,11 @@ class MainActivity : AppCompatActivity() {
 
             fileManagerCwd = fileManagerDefaultDir
             setupDone = true
+            withContext(Dispatchers.Main) {
+                supportFragmentManager.beginTransaction().detach(homeFragment).commit()
+                supportFragmentManager.beginTransaction().attach(homeFragment).commit()
+                showHighlightSequence()
+            }
         }
     }
 
@@ -802,6 +827,76 @@ class MainActivity : AppCompatActivity() {
         }
 
         super.onNewIntent(intent)
+    }
+
+    private fun showHighlightSequence() {
+        currentState = HighlightState.fromOrdinal(preferences!!.getInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, 0))
+        if (currentState == HighlightState.HIGHLIGHT_DONE)
+            return
+        TapTargetSequence(this)
+            .targets(
+                TapTarget.forView(
+                    findViewById(R.id.nav_shortcuts),
+                    getString(R.string.highlight_nav_shortcuts)
+                ),
+
+                TapTarget.forView(
+                    findViewById(R.id.nav_settings),
+                    getString(R.string.highlight_nav_settings)
+                ),
+
+                TapTarget.forView(
+                    findViewById(R.id.nav_file_manager),
+                    getString(R.string.highlight_nav_files),
+                    getString(R.string.highlight_nav_files_description)
+                )
+            )
+            .listener(object : TapTargetSequence.Listener {
+                override fun onSequenceFinish() {
+
+                }
+
+                override fun onSequenceStep(lastTarget: TapTarget, targetClicked: Boolean) {
+                    if (targetClicked) {
+                        when (currentState) {
+                            HighlightState.HIGHLIGHT_SHORTCUTS -> {
+                                selectedFragment = "ShortcutsFragment"
+                                fragmentLoader(shortcutsFragment, false)
+
+                                val editor = preferences!!.edit()
+                                currentState = HighlightState.HIGHLIGHT_SETTINGS
+                                editor.putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
+                                editor.apply()
+                            }
+                            HighlightState.HIGHLIGHT_SETTINGS -> {
+                                selectedFragment = "SettingsFragment"
+                                fragmentLoader(settingsFragment, false)
+
+                                val editor = preferences!!.edit()
+                                currentState = HighlightState.HIGHLIGHT_FILES
+                                editor.putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
+                                editor.apply()
+                            }
+                            HighlightState.HIGHLIGHT_FILES -> {
+                                selectedFragment = "FileManagerFragment"
+                                fragmentLoader(fileManagerFragment, false)
+
+                                val editor = preferences!!.edit()
+                                currentState = HighlightState.HIGHLIGHT_DONE
+                                editor.putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
+                                editor.apply()
+                            }
+                            else -> {
+                                return
+                            }
+                        }
+                    }
+                }
+
+                override fun onSequenceCanceled(lastTarget: TapTarget) {
+                }
+            })
+            .start()
     }
 
     companion object {
