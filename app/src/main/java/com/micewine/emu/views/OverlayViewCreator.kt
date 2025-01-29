@@ -129,7 +129,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
             canvas.apply {
                 drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
-                drawCircle(it.x, it.y, it.radius / 4 - 10, whitePaint)
+                drawCircle(it.x, it.y, it.radius / 4, whitePaint)
             }
         }
 

@@ -126,15 +126,15 @@ class OverlayView @JvmOverloads constructor(
             var analogY = it.y + it.fingerY
 
             val distanceSquared = (it.fingerX * it.fingerX) + (it.fingerY * it.fingerY)
-            val maxRadiusSquared = (it.radius / 2) * (it.radius / 2)
+            val maxRadiusSquared = (it.radius / 4) * (it.radius / 4)
 
             if (distanceSquared > maxRadiusSquared) {
-                val scale = (it.radius / 2) / sqrt(distanceSquared)
+                val scale = (it.radius / 4) / sqrt(distanceSquared)
                 analogX = it.x + (it.fingerX * scale)
                 analogY = it.y + (it.fingerY * scale)
             }
 
-            canvas.drawCircle(analogX, analogY, it.radius / 4 - 10, paint)
+            canvas.drawCircle(analogX, analogY, it.radius / 4, paint)
         }
     }
 
@@ -155,26 +155,18 @@ class OverlayView @JvmOverloads constructor(
 
                 analogList.forEach {
                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
-                        val posX = (event.getX(event.actionIndex) - it.x).coerceIn(-it.radius / 4, it.radius / 4)
-                        val posY = (event.getY(event.actionIndex) - it.y).coerceIn(-it.radius / 4, it.radius / 4)
+                        val posX = event.getX(event.actionIndex) - it.x
+                        val posY = event.getY(event.actionIndex) - it.y
 
                         it.fingerX = posX
                         it.fingerY = posY
                         it.isPressed = true
                         it.fingerId = event.actionIndex
 
-                        val axisX = posX / (it.radius / 4)
-                        val axisY = posY / (it.radius / 4)
+                        it.fingerX = posX
+                        it.fingerY = posY
 
-                        virtualAxis(
-                            axisX,
-                            axisY,
-                            it.upKeyCodes!!,
-                            it.downKeyCodes!!,
-                            it.leftKeyCodes!!,
-                            it.rightKeyCodes!!,
-                            it.deadZone
-                        )
+                        virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), it.upKeyCodes!!, it.downKeyCodes!!, it.leftKeyCodes!!, it.rightKeyCodes!!, it.deadZone)
 
                         return@forEach
                     }
@@ -198,24 +190,13 @@ class OverlayView @JvmOverloads constructor(
 
                     analogList.forEach {
                         if (it.isPressed && it.fingerId == i) {
-                            val posX = (event.getX(i) - it.x).coerceIn(-it.radius / 4, it.radius / 4)
-                            val posY = (event.getY(i) - it.y).coerceIn(-it.radius / 4, it.radius / 4)
+                            val posX = event.getX(i) - it.x
+                            val posY = event.getY(i) - it.y
 
                             it.fingerX = posX
                             it.fingerY = posY
 
-                            val axisX = posX / (it.radius / 4)
-                            val axisY = posY / (it.radius / 4)
-
-                            virtualAxis(
-                                axisX,
-                                axisY,
-                                it.upKeyCodes!!,
-                                it.downKeyCodes!!,
-                                it.leftKeyCodes!!,
-                                it.rightKeyCodes!!,
-                                it.deadZone
-                            )
+                            virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), it.upKeyCodes!!, it.downKeyCodes!!, it.leftKeyCodes!!, it.rightKeyCodes!!, it.deadZone)
 
                             isFingerPressingButton = true
                         }
@@ -226,13 +207,9 @@ class OverlayView @JvmOverloads constructor(
                             val deltaX = event.getX(i) - event.getHistoricalX(i, 0)
                             val deltaY = event.getY(i) - event.getHistoricalY(i, 0)
 
-                            lorieView.sendMouseEvent(
-                                deltaX,
-                                deltaY,
-                                BUTTON_UNDEFINED,
-                                false,
-                                relative = true
-                            )
+                            if ((deltaX > 0.08 || deltaX < -0.08) && (deltaY > 0.08 || deltaY < -0.08)) {
+                                lorieView.sendMouseEvent(deltaX, deltaY, BUTTON_UNDEFINED, false, true)
+                            }
                         }
                     }
                 }
@@ -258,15 +235,7 @@ class OverlayView @JvmOverloads constructor(
 
                         it.isPressed = false
 
-                        virtualAxis(
-                            0F,
-                            0F,
-                            it.upKeyCodes!!,
-                            it.downKeyCodes!!,
-                            it.leftKeyCodes!!,
-                            it.rightKeyCodes!!,
-                            it.deadZone
-                        )
+                        virtualAxis(0F, 0F, it.upKeyCodes!!, it.downKeyCodes!!, it.leftKeyCodes!!, it.rightKeyCodes!!, it.deadZone)
                     }
                 }
 
@@ -284,15 +253,7 @@ class OverlayView @JvmOverloads constructor(
                     it.fingerY = 0F
                     it.isPressed = false
 
-                    virtualAxis(
-                        0F,
-                        0F,
-                        it.upKeyCodes!!,
-                        it.downKeyCodes!!,
-                        it.leftKeyCodes!!,
-                        it.rightKeyCodes!!,
-                        it.deadZone
-                    )
+                    virtualAxis(0F, 0F, it.upKeyCodes!!, it.downKeyCodes!!, it.leftKeyCodes!!, it.rightKeyCodes!!, it.deadZone)
                 }
 
                 invalidate()
@@ -302,27 +263,8 @@ class OverlayView @JvmOverloads constructor(
         return true
     }
 
-    private fun virtualAxis(
-        axisX: Float,
-        axisY: Float,
-        upKeyCodes: List<Int>,
-        downKeyCodes: List<Int>,
-        leftKeyCodes: List<Int>,
-        rightKeyCodes: List<Int>,
-        deadZone: Float
-    ) {
-        handleAxis(
-            lorieView,
-            axisX,
-            axisY,
-            axisX < deadZone && axisX > -deadZone,
-            axisY < deadZone && axisY > -deadZone,
-            rightKeyCodes,
-            leftKeyCodes,
-            downKeyCodes,
-            upKeyCodes,
-            deadZone
-        )
+    private fun virtualAxis(axisX: Float, axisY: Float, upKeyCodes: List<Int>, downKeyCodes: List<Int>, leftKeyCodes: List<Int>, rightKeyCodes: List<Int>, deadZone: Float) {
+        handleAxis(lorieView, axisX, axisY, axisX < deadZone && axisX > -deadZone, axisY < deadZone && axisY > -deadZone, rightKeyCodes, leftKeyCodes, downKeyCodes, upKeyCodes, deadZone)
     }
 
     private fun handleButton(button: VirtualButton, pressed: Boolean) {

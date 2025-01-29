@@ -66,8 +66,13 @@ public final class InputEventSender {
     public void sendMouseClick(int button, boolean relative) {
         if (!buttons.contains(button))
             return;
-        mInjector.sendMouseEvent(0, 0, button, true, relative);
-        mInjector.sendMouseEvent(0, 0, button, false, relative);
+
+        try {
+            mInjector.sendMouseEvent(0, 0, button, true, relative);
+            Thread.sleep(20);
+            mInjector.sendMouseEvent(0, 0, button, false, relative);
+        } catch (InterruptedException ignored) {
+        }
     }
 
     public void sendCursorMove(float x, float y, boolean relative) {
