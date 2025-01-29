@@ -92,8 +92,12 @@ object WineWrapper {
     fun extractIcon(exeFile: File, output: String) {
         if (exeFile.extension.lowercase() == "exe") {
             runCommand(
-                getEnv() + "wrestool -x -t 14 '${exeFile.path}' > '$output'"
+                getEnv() + "wrestool -x -t 14 '${getSanatizedPath(exeFile.path)}' > '$output'"
             )
         }
+    }
+
+    fun getSanatizedPath(filePath: String) : String {
+       return filePath.replace("'", "'\\''")
     }
 }

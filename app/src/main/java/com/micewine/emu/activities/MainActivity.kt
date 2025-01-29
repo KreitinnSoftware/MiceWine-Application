@@ -673,7 +673,7 @@ class MainActivity : AppCompatActivity() {
                         val shell = ShellLink(exePath)
                         val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
                         if (drive != null) {
-                            WineWrapper.wine("'${drive.getUnixPath()}'", "'${File(drive.getUnixPath()).parent!!}'")
+                            WineWrapper.wine("'${WineWrapper.getSanatizedPath(drive.getUnixPath())}'", "'${WineWrapper.getSanatizedPath(File(drive.getUnixPath()).parent!!)}'")
                         }
                     }
                     catch (e: ShellLinkException) {
@@ -683,7 +683,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 else {
-                    WineWrapper.wine("'$exePath'", "'${File(exePath).parent!!}'")
+                    WineWrapper.wine("'${WineWrapper.getSanatizedPath(exePath)}'", "'${File(WineWrapper.getSanatizedPath(exePath)).parent!!}'")
                 }
             }
 
