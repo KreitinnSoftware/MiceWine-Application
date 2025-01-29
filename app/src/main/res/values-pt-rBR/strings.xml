@@ -34,7 +34,7 @@
     <string name="log_description">Ver Logs do MiceWine</string>
     <string name="clear_log">Limpar</string>
     <string name="desktop_mode_init">Área de Trabalho</string>
-    <string name="home_title">Sobre</string>
+    <string name="home_title">Início</string>
     <string name="about_description">Sobre o MiceWine</string>
     <string name="general_settings">Configurações Gerais</string>
     <string name="exit">Sair</string>
@@ -51,7 +51,7 @@
     <string name="env_edit_action">Editar Variavel de Ambiente.</string>
     <string name="env_key">Nome</string>
     <string name="env_value">Valor</string>
-    <string name="shortcuts_title">Início</string>
+    <string name="shortcuts_title">Atalhos</string>
     <string name="box64_settings_title">Configurações do Box64</string>
     <string name="box64_settings_description">Configurar Box64</string>
 
