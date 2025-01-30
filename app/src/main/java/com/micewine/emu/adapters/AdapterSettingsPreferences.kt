@@ -17,9 +17,9 @@ import androidx.fragment.app.FragmentActivity
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettings.Companion.CHECKBOX
-import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
-import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CHECKBOX
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SWITCH
 import com.micewine.emu.fragments.InfoDialogFragment
 
 class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpinner>, private val activity: FragmentActivity) :

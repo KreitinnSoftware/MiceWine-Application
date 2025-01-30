@@ -13,15 +13,15 @@ import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedBox64
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
-import com.micewine.emu.databinding.FragmentHomeBinding
+import com.micewine.emu.databinding.FragmentAboutBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class HomeFragment : Fragment() {
-    private var binding: FragmentHomeBinding? = null
+class AboutFragment : Fragment() {
+    private var binding: FragmentAboutBinding? = null
     private var rootView: View? = null
 
     @SuppressLint("SetTextI18n")
@@ -30,11 +30,11 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        binding = FragmentAboutBinding.inflate(inflater, container, false)
         rootView = binding!!.root
 
         rootView?.findViewById<TextView>(R.id.ApplicationVersion)?.apply {
-            text = "$miceWineVersion"
+            text = miceWineVersion
         }
 
         rootView?.findViewById<TextView>(R.id.RootfsVersion)?.apply {

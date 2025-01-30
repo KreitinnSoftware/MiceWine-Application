@@ -1,5 +1,6 @@
 package com.micewine.emu.adapters
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
@@ -47,6 +48,7 @@ class AdapterGame(private val gameList: MutableList<GameList>, private val activ
         return gameList.size
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateList(newList: List<GameList>) {
         gameList.clear()
         gameList.addAll(newList)

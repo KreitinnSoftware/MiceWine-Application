@@ -9,27 +9,21 @@
     android:theme="@style/Theme.MiceWine"
     tools:context=".activities.MainActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:layout_width="wrap_content"
-            android:layout_height="?attr/collapsingToolbarLayoutMediumSize"
-            app:collapsedTitleTextAppearance="@style/TextAppearance.Quicksand"
-            app:expandedTitleTextAppearance="@style/TextAppearance.Quicksand">
+        android:orientation="horizontal">
 
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/appToolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:elevation="0dp"
-                app:title="@string/app_name">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/appToolbar"
+            app:titleTextAppearance="@style/TextAppearance.Quicksand"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </com.google.android.material.appbar.MaterialToolbar>
 
-            </com.google.android.material.appbar.MaterialToolbar>
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-    </com.google.android.material.appbar.AppBarLayout>
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/content"

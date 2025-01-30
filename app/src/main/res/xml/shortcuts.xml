@@ -9,7 +9,7 @@
         tools:ignore="UnusedAttribute">
         <intent
             android:action="android.intent.action.MAIN"
-            android:targetClass="com.micewine.emu.activities.GeneralSettings"
+            android:targetClass="com.micewine.emu.activities.GeneralSettingsActivity"
             android:targetPackage="com.micewine.emu" />
     </shortcut>
 </shortcuts>

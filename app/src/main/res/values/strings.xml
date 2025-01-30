@@ -57,6 +57,7 @@
     <string name="log_description">See MiceWine Logs</string>
     <string name="clear_log">Clear</string>
     <string name="desktop_mode_init">Desktop</string>
+    <string name="about_title">About</string>
     <string name="home_title">Home</string>
     <string name="about_description">About MiceWine</string>
     <string name="general_settings">General Settings</string>
@@ -172,4 +173,8 @@
     <string name="highlight_shortcuts">Tap to open, hold to reorder or access more options</string>
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="box64_version">Box64 Version</string>
+    <string name="application_version">Application Version</string>
+    <string name="rootfs_version">RootFS Version</string>
+    <string name="wine_version">Wine Version</string>
 </resources>

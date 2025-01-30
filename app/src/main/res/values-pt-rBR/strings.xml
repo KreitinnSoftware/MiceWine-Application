@@ -34,6 +34,7 @@
     <string name="log_description">Ver Logs do MiceWine</string>
     <string name="clear_log">Limpar</string>
     <string name="desktop_mode_init">Área de Trabalho</string>
+    <string name="about_title">Sobre</string>
     <string name="home_title">Início</string>
     <string name="about_description">Sobre o MiceWine</string>
     <string name="general_settings">Configurações Gerais</string>
@@ -141,4 +142,8 @@
     <string name="box64_manager_description">Gerenciar Versões do Box64</string>
     <string name="mouse_captured">Mouse Capturado Pressione Voltar ou ESC para Soltar</string>
     <string name="cpu_affinity_title">Afinidade de CPU</string>
+    <string name="box64_version">Versão do Box64</string>
+    <string name="application_version">Versão do Aplicativo</string>
+    <string name="rootfs_version">Versão do RootFS</string>
+    <string name="wine_version">Versão do Wine</string>
 </resources>

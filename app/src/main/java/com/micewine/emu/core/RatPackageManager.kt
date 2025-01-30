@@ -3,8 +3,8 @@ package com.micewine.emu.core
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.preference.PreferenceManager
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_BOX64
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir

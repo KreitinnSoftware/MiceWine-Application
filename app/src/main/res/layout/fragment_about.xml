@@ -24,20 +24,21 @@
             android:padding="20dp">
 
             <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="128dp"
+                android:layout_height="128dp"
                 android:layout_gravity="center"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="30dp"
                 android:contentDescription="@null"
                 android:scaleType="centerInside"
-                android:src="@drawable/icon_grayscale" />
+                android:src="@drawable/icon_grayscale">
+            </ImageView>
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/ApplicationVersionTitle"
                 style="@style/TextAppearance.Material3.TitleSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Application Version"
+                android:text="@string/application_version"
                 android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -46,7 +47,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="1.0.0"
                 android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -55,7 +55,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="RootFS Version"
+                android:text="@string/rootfs_version"
                 android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -64,7 +64,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="RootFS 1.1.0"
                 android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -73,7 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Box64 Version"
+                android:text="@string/box64_version"
                 android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -82,7 +81,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="1.2.3"
                 android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -91,7 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Wine Version"
+                android:text="@string/wine_version"
                 android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -100,7 +98,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="7.8"
                 android:textColor="?attr/colorOnBackground" />
 
         </LinearLayout>

@@ -8,9 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION
-import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
-import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SWITCH
 import com.micewine.emu.activities.MainActivity.Companion.CPU_COUNTER_KEY
 import com.micewine.emu.activities.MainActivity.Companion.ENABLE_DEBUG_INFO_KEY
 import com.micewine.emu.activities.MainActivity.Companion.RAM_COUNTER_KEY

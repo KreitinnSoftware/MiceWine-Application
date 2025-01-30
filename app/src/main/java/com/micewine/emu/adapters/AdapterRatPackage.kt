@@ -9,8 +9,8 @@ import android.widget.TextView
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_BOX64
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.selectedDriver
 
 class AdapterRatPackage(private val settingsList: List<Item>, context: Context) :

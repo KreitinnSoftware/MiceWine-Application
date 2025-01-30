@@ -34,7 +34,7 @@
             android:exported="false">
         </activity>
         <activity
-            android:name=".activities.GeneralSettings"
+            android:name=".activities.GeneralSettingsActivity"
             android:theme="@style/Theme.MiceWine"
             android:exported="false">
         </activity>

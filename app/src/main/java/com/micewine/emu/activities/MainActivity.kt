@@ -16,7 +16,6 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
 import android.os.storage.StorageManager
-import android.util.Log
 import android.view.ContextMenu
 import android.view.KeyEvent
 import android.view.Menu
@@ -24,96 +23,94 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.getkeepsafe.taptargetview.TapTarget
 import com.getkeepsafe.taptargetview.TapTargetSequence
-import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
 import com.micewine.emu.activities.DriverManagerActivity.Companion.generateICDFile
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_AVX
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_AVX_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BIGBLOCK_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BLEEDING_EDGE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_CALLRET_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_DIRTY
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_DIRTY_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTNAN_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTROUND
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FASTROUND_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FORWARD
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_FORWARD_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_NATIVEFLAGS
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_NATIVEFLAGS_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_PAUSE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_PAUSE_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_SAFEFLAGS
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_SAFEFLAGS_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_STRONGMEM
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_STRONGMEM_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_WAIT
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_WAIT_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_WEAKBARRIER
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_WEAKBARRIER_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_DYNAREC_X87DOUBLE_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_LOG
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_LOG_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_MMAP32
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_MMAP32_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGILL
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGILL_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGSEGV
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_NOSIGSEGV_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWBT
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWBT_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWSEGV
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SHOWSEGV_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SSE42
-import com.micewine.emu.activities.GeneralSettings.Companion.BOX64_SSE42_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.CPU_AFFINITY
-import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION
-import com.micewine.emu.activities.GeneralSettings.Companion.DISPLAY_RESOLUTION_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_DRI3
-import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_DRI3_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_MANGOHUD
-import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_MANGOHUD_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_SERVICES
-import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_SERVICES_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_BOX64
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_D3DX_RENDERER_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DRIVER_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_GL_PROFILE
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_GL_PROFILE_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VKD3D
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_VKD3D_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D
-import com.micewine.emu.activities.GeneralSettings.Companion.SELECTED_WINED3D_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.WINE_ESYNC
-import com.micewine.emu.activities.GeneralSettings.Companion.WINE_ESYNC_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.WINE_LOG_LEVEL
-import com.micewine.emu.activities.GeneralSettings.Companion.WINE_LOG_LEVEL_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_AVX
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_AVX_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BIGBLOCK
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BIGBLOCK_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BLEEDING_EDGE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_CALLRET
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_CALLRET_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_DIRTY
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_DIRTY_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FASTNAN
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FASTNAN_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FASTROUND
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FASTROUND_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FORWARD
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FORWARD_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_NATIVEFLAGS
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_NATIVEFLAGS_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_PAUSE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_PAUSE_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_SAFEFLAGS
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_SAFEFLAGS_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_STRONGMEM
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_STRONGMEM_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_WAIT
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_WAIT_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_WEAKBARRIER
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_WEAKBARRIER_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_X87DOUBLE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_X87DOUBLE_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGSEGV
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGSEGV_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWBT
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWBT_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CPU_AFFINITY
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_SERVICES
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_SERVICES_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_D3DX_RENDERER
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_D3DX_RENDERER_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DRIVER
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DRIVER_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DXVK
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DXVK_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DXVK_HUD_PRESET
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_GL_PROFILE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_GL_PROFILE_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_TU_DEBUG_PRESET
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VKD3D
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VKD3D_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINED3D
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINED3D_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL_DEFAULT_VALUE
 import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.HighlightState
@@ -123,16 +120,13 @@ import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.ActivityMainBinding
-import com.micewine.emu.fragments.HomeFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ratCandidate
 import com.micewine.emu.fragments.DeleteGameItemFragment
 import com.micewine.emu.fragments.FileManagerFragment
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.fragments.FloatingFileManagerFragment
-import com.micewine.emu.fragments.ShortcutsFragment
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.saveToGameList
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
+import com.micewine.emu.fragments.AboutFragment
 import com.micewine.emu.fragments.RenameGameItemFragment
 import com.micewine.emu.fragments.RenameGameItemFragment.Companion.initialTextRenameGameFragment
 import com.micewine.emu.fragments.SettingsFragment
@@ -140,6 +134,9 @@ import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
+import com.micewine.emu.fragments.ShortcutsFragment
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.saveToGameList
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.utils.DriveUtils
 import com.micewine.emu.utils.FilePathResolver
@@ -272,9 +269,8 @@ class MainActivity : AppCompatActivity() {
     private val shortcutsFragment: ShortcutsFragment = ShortcutsFragment()
     private val settingsFragment: SettingsFragment = SettingsFragment()
     private val fileManagerFragment: FileManagerFragment = FileManagerFragment()
-    private val homeFragment: HomeFragment = HomeFragment()
+    private val aboutFragment: AboutFragment = AboutFragment()
     private var preferences: SharedPreferences? = null
-
     private var currentState: HighlightState? = null
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
@@ -286,13 +282,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        setSharedVars(this)
-
-        preferences = PreferenceManager.getDefaultSharedPreferences(this)
-
         appToolbar = findViewById(R.id.appToolbar)
         setSupportActionBar(appToolbar)
 
+        setSharedVars(this)
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         bottomNavigation = findViewById(R.id.bottom_navigation)
         bottomNavigation?.setOnItemSelectedListener { item: MenuItem ->
@@ -312,17 +307,17 @@ class MainActivity : AppCompatActivity() {
                     fragmentLoader(fileManagerFragment, false)
                 }
 
-                R.id.nav_home -> {
-                    selectedFragment = "HomeFragment"
-                    fragmentLoader(homeFragment, false)
+                R.id.nav_about -> {
+                    selectedFragment = "AboutFragment"
+                    fragmentLoader(aboutFragment, false)
                 }
             }
 
             true
         }
 
-        selectedFragment = "HomeFragment"
-        fragmentLoader(homeFragment, true)
+        selectedFragment = "ShortcutsFragment"
+        fragmentLoader(shortcutsFragment, true)
 
         registerReceiver(receiver, object : IntentFilter(ACTION_RUN_WINE) {
             init {
@@ -376,7 +371,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            if (selectedFragment != "HomeFragment") {
+            if (selectedFragment != "ShortcutsFragment") {
                 bottomNavigation?.selectedItemId = R.id.nav_shortcuts
 
                 return true
@@ -784,8 +779,8 @@ class MainActivity : AppCompatActivity() {
             fileManagerCwd = fileManagerDefaultDir
             setupDone = true
             withContext(Dispatchers.Main) {
-                supportFragmentManager.beginTransaction().detach(homeFragment).commit()
-                supportFragmentManager.beginTransaction().attach(homeFragment).commit()
+                supportFragmentManager.beginTransaction().detach(aboutFragment).commit()
+                supportFragmentManager.beginTransaction().attach(aboutFragment).commit()
                 showHighlightSequence()
             }
         }
@@ -965,7 +960,7 @@ class MainActivity : AppCompatActivity() {
         var cpuAffinity: String? = null
         private var selectedResolution: String? = ""
 
-        var selectedFragment = "HomeFragment"
+        var selectedFragment = "ShortcutsFragment"
 
         const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
         const val ACTION_SETUP = "com.micewine.emu.ACTION_SETUP"

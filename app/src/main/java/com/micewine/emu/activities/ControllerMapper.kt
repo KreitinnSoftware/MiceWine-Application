@@ -24,8 +24,8 @@ import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettings.Companion.DEAD_ZONE
-import com.micewine.emu.activities.GeneralSettings.Companion.MOUSE_SENSIBILITY
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DEAD_ZONE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.MOUSE_SENSIBILITY
 import com.micewine.emu.controller.ControllerUtils.getGameControllerNames
 import com.micewine.emu.databinding.ActivityControllerMapperBinding
 import com.micewine.emu.fragments.ControllerMapperFragment

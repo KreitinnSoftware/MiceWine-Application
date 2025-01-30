@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.Box64ManagerActivity
 import com.micewine.emu.activities.ControllerMapper
-import com.micewine.emu.activities.GeneralSettings
-import com.micewine.emu.activities.GeneralSettings.Companion.ACTION_PREFERENCE_SELECT
+import com.micewine.emu.activities.GeneralSettingsActivity
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ACTION_PREFERENCE_SELECT
 import com.micewine.emu.activities.DriverManagerActivity
 import com.micewine.emu.activities.VirtualControllerOverlayMapper
 
@@ -49,7 +49,7 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
 
             when (settingsModel.titleSettings) {
                 context.getString(R.string.settings_title) -> {
-                    val intent = Intent(context, GeneralSettings::class.java)
+                    val intent = Intent(context, GeneralSettingsActivity::class.java)
                     context.startActivity(intent)
                 }
 

@@ -8,16 +8,16 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettings.Companion.CHECKBOX
-import com.micewine.emu.activities.GeneralSettings.Companion.CPU_AFFINITY
-import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_SERVICES
-import com.micewine.emu.activities.GeneralSettings.Companion.ENABLE_SERVICES_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.SPINNER
-import com.micewine.emu.activities.GeneralSettings.Companion.SWITCH
-import com.micewine.emu.activities.GeneralSettings.Companion.WINE_ESYNC
-import com.micewine.emu.activities.GeneralSettings.Companion.WINE_ESYNC_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettings.Companion.WINE_LOG_LEVEL
-import com.micewine.emu.activities.GeneralSettings.Companion.WINE_LOG_LEVEL_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CHECKBOX
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CPU_AFFINITY
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_SERVICES
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_SERVICES_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SWITCH
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL_DEFAULT_VALUE
 import com.micewine.emu.adapters.AdapterSettingsPreferences
 import com.micewine.emu.adapters.AdapterSettingsPreferences.SettingsListSpinner
 

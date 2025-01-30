@@ -9,10 +9,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
@@ -49,20 +51,66 @@ class ShortcutsFragment : Fragment() {
 
         layoutManager = recyclerView?.layoutManager as GridLayoutManager?
 
-        val spanCount = max(1F,requireActivity().resources.displayMetrics.widthPixels / dpToPx(150, requireContext())).toInt()
+        val spanCount = max(1F, requireActivity().resources.displayMetrics.widthPixels / dpToPx(150, requireContext())).toInt()
 
         recyclerView?.layoutManager = GridLayoutManager(requireContext(), spanCount)
         recyclerView?.addItemDecoration(GridSpacingItemDecoration(spanCount, 20))
 
         setAdapter(requireActivity(), preferences!!)
-        setHasOptionsMenu(true)
+
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+                inflater.inflate(R.menu.toolbar_menu, menu)
+
+                val searchItem = menu.findItem(R.id.action_search)
+                val searchView = searchItem.actionView as SearchView
+
+                searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        return true
+                    }
+
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        val query = newText.orEmpty()
+                        val currentList = loadGameList(preferences!!)
+
+                        val filteredList = if (query.isEmpty()) {
+                            currentList.map {
+                                AdapterGame.GameList(File(it[1]), it[0], it[2])
+                            }
+                        } else {
+                            currentList.filter {
+                                it[0].contains(query, ignoreCase = true)
+                            }.map {
+                                AdapterGame.GameList(File(it[1]), it[0], it[2])
+                            }
+                        }
+
+                        val updatedList = listOf(
+                            AdapterGame.GameList(
+                                File(""),
+                                getString(R.string.desktop_mode_init),
+                                ""
+                            )
+                        ) + filteredList
+
+                        (recyclerView?.adapter as? AdapterGame)?.updateList(updatedList)
+                        return true
+                    }
+                })
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return true
+            }
+        }, viewLifecycleOwner)
+
         setupDragAndDrop()
 
         recyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 if (gameList.size > 1 && (recyclerView?.childCount ?: 0) > 1 &&
-                    !preferences!!.getBoolean(
-                        HIGHLIGHT_SHORTCUT_PREFERENCE_KEY, false) &&
+                    !preferences!!.getBoolean(HIGHLIGHT_SHORTCUT_PREFERENCE_KEY, false) &&
                     HighlightState.fromOrdinal(preferences!!.getInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, 0)) == HighlightState.HIGHLIGHT_DONE) {
                     val secondItemView = recyclerView?.findViewHolderForAdapterPosition(1)?.itemView
 
@@ -85,50 +133,6 @@ class ShortcutsFragment : Fragment() {
         registerForContextMenu(recyclerView!!)
 
         return rootView
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.toolbar_menu, menu)
-
-        val searchItem = menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
-
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                val query = newText.orEmpty()
-                val currentList = loadGameList(preferences!!)
-
-                val filteredList = if (query.isEmpty()) {
-                    currentList.map {
-                        AdapterGame.GameList(File(it[1]), it[0], it[2])
-                    }
-                } else {
-                    currentList.filter {
-                        it[0].contains(query, ignoreCase = true)
-                    }.map {
-                        AdapterGame.GameList(File(it[1]), it[0], it[2])
-                    }
-                }
-
-                val updatedList = listOf(
-                    AdapterGame.GameList(
-                        File(""),
-                        getString(R.string.desktop_mode_init),
-                        ""
-                    )
-                ) + filteredList
-
-                (recyclerView?.adapter as? AdapterGame)?.updateList(updatedList)
-                return true
-            }
-        })
-
-        super.onCreateOptionsMenu(menu, inflater)
     }
 
     private fun setupDragAndDrop() {
@@ -156,17 +160,16 @@ class ShortcutsFragment : Fragment() {
                 val gameItem = currentList.removeAt(fromPosition - 1)
                 currentList.add(toPosition - 1, gameItem)
 
-                val fromGameListIndex = fromPosition
-                val toGameListIndex = toPosition
-
-                val movedGameItem = gameList.removeAt(fromGameListIndex)
-                gameList.add(toGameListIndex, movedGameItem)
+                val movedGameItem = gameList.removeAt(fromPosition)
+                gameList.add(toPosition, movedGameItem)
 
                 recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
 
-                val editor = preferences!!.edit()
-                editor.putString("gameList", gson.toJson(currentList))
-                editor.apply()
+                preferences!!.edit().apply {
+                    putString("gameList", gson.toJson(currentList))
+                    apply()
+                }
+
                 return true
             }
 
@@ -211,7 +214,7 @@ class ShortcutsFragment : Fragment() {
         private val listType = object : TypeToken<MutableList<Array<String>>>() {}.type
         private var recyclerView: RecyclerView? = null
         private val gameList: MutableList<AdapterGame.GameList> = ArrayList()
-        const val HIGHLIGHT_SHORTCUT_PREFERENCE_KEY = "highlighted_shortcut"
+        const val HIGHLIGHT_SHORTCUT_PREFERENCE_KEY = "highlightedShortcut"
 
         fun setAdapter(activity: Activity, preferences: SharedPreferences) {
             recyclerView?.adapter = AdapterGame(gameList, activity)
