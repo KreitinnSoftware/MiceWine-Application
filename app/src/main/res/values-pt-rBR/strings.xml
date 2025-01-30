@@ -142,6 +142,12 @@
     <string name="box64_manager_description">Gerenciar Versões do Box64</string>
     <string name="mouse_captured">Mouse Capturado Pressione Voltar ou ESC para Soltar</string>
     <string name="cpu_affinity_title">Afinidade de CPU</string>
+    <string name="action_search">Pesquisar</string>
+    <string name="highlight_nav_shortcuts">Gerenciar Atalhos</string>
+    <string name="highlight_nav_settings">Gerenciar Configurações</string>
+    <string name="highlight_nav_files">Navegar e abrir arquivos</string>
+    <string name="highlight_nav_files_description">Toque para abrir o executável, segure para criar atalhos</string>
+    <string name="highlight_shortcuts">Toque para abrir, segure para reorganizar ou acessar mais opções</string>
     <string name="box64_version">Versão do Box64</string>
     <string name="application_version">Versão do Aplicativo</string>
     <string name="rootfs_version">Versão do RootFS</string>

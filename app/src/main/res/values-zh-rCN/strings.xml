@@ -142,6 +142,12 @@
     <string name="box64_manager_description">管理 Box64 版本</string>
     <string name="mouse_captured">鼠标已捕获，按下返回键或ESC键释放</string>
     <string name="cpu_affinity_title">CPU 关联性</string>
+    <string name="action_search">搜索</string>
+    <string name="highlight_nav_shortcuts">管理快捷方式</string>
+    <string name="highlight_nav_settings">管理设置</string>
+    <string name="highlight_nav_files">浏览并打开文件</string>
+    <string name="highlight_nav_files_description">点击打开可执行文件，长按以创建快捷方式</string>
+    <string name="highlight_shortcuts">点击打开，长按以重新排序或访问更多选项</string>
     <string name="box64_version">Box64 版本</string>
     <string name="application_version">应用程序版本</string>
     <string name="rootfs_version">RootFS 版本</string>

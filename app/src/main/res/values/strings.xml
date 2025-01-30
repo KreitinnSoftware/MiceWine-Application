@@ -171,8 +171,6 @@
     <string name="highlight_nav_files">Browse and open files</string>
     <string name="highlight_nav_files_description">Tap to open executable, hold to create shortcuts</string>
     <string name="highlight_shortcuts">Tap to open, hold to reorder or access more options</string>
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="box64_version">Box64 Version</string>
     <string name="application_version">Application Version</string>
     <string name="rootfs_version">RootFS Version</string>
