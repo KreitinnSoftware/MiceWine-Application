@@ -152,4 +152,6 @@
     <string name="application_version">应用程序版本</string>
     <string name="rootfs_version">RootFS 版本</string>
     <string name="wine_version">Wine 版本</string>
+    <string name="display_mode_title">显示模式</string>
+    <string name="display_mode_description">更改显示比例模式</string>
 </resources>

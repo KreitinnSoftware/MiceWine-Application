@@ -65,7 +65,7 @@ class DriversSettingsFragment : Fragment() {
     }
 
     private fun setAdapter() {
-        recyclerView?.setAdapter(AdapterSettingsPreferences(settingsList, requireActivity()))
+        recyclerView?.setAdapter(AdapterSettingsPreferences(settingsList, requireActivity(), recyclerView!!))
 
         settingsList.clear()
         dxvkVersions.clear()

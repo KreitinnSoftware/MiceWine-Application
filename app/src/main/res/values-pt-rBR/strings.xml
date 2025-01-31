@@ -152,4 +152,6 @@
     <string name="application_version">Versão do Aplicativo</string>
     <string name="rootfs_version">Versão do RootFS</string>
     <string name="wine_version">Versão do Wine</string>
+    <string name="display_mode_title">Modo do Display</string>
+    <string name="display_mode_description">Alterar o Modo de Proporção de Tela</string>
 </resources>

@@ -967,9 +967,12 @@ class MainActivity : AppCompatActivity() {
         const val ACTION_INSTALL_RAT = "com.micewine.emu.ACTION_INSTALL_RAT"
         const val ACTION_STOP_ALL = "com.micewine.emu.ACTION_STOP_ALL"
         const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
-        const val RAM_COUNTER_KEY = "ramCounter"
-        const val CPU_COUNTER_KEY = "cpuCounter"
-        const val ENABLE_DEBUG_INFO_KEY = "debugInfo"
+        const val RAM_COUNTER = "ramCounter"
+        const val RAM_COUNTER_DEFAULT_VALUE = true
+        const val CPU_COUNTER = "cpuCounter"
+        const val CPU_COUNTER_DEFAULT_VALUE = false
+        const val ENABLE_DEBUG_INFO = "debugInfo"
+        const val ENABLE_DEBUG_INFO_DEFAULT_VALUE = true
 
         fun setupWinePrefix() {
             if (!winePrefix.exists()) {
@@ -1064,9 +1067,9 @@ class MainActivity : AppCompatActivity() {
             selectedMesaVkWsiPresentMode = preferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE, SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE)
             selectedTuDebugPreset = preferences.getString(SELECTED_TU_DEBUG_PRESET, SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE)
             selectedResolution = preferences.getString(DISPLAY_RESOLUTION, DISPLAY_RESOLUTION_DEFAULT_VALUE)
-            enableRamCounter = preferences.getBoolean(RAM_COUNTER_KEY, true)
-            enableCpuCounter = preferences.getBoolean(CPU_COUNTER_KEY, false)
-            enableDebugInfo = preferences.getBoolean(ENABLE_DEBUG_INFO_KEY, true)
+            enableRamCounter = preferences.getBoolean(RAM_COUNTER, RAM_COUNTER_DEFAULT_VALUE)
+            enableCpuCounter = preferences.getBoolean(CPU_COUNTER, CPU_COUNTER_DEFAULT_VALUE)
+            enableDebugInfo = preferences.getBoolean(ENABLE_DEBUG_INFO, ENABLE_DEBUG_INFO_DEFAULT_VALUE)
 
             cpuAffinity = preferences.getString(CPU_AFFINITY, availableCPUs.joinToString(","))
 

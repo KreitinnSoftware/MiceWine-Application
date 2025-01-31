@@ -18,11 +18,21 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CHECKBOX
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_MODE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_MODE_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SWITCH
+import com.micewine.emu.fragments.DisplaySettingsFragment.Companion.getNativeResolutions
+import com.micewine.emu.fragments.DisplaySettingsFragment.Companion.resolutions16_9
+import com.micewine.emu.fragments.DisplaySettingsFragment.Companion.resolutions4_3
 import com.micewine.emu.fragments.InfoDialogFragment
 
-class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpinner>, private val activity: FragmentActivity) :
+class AdapterSettingsPreferences(
+    private val settingsList: List<SettingsListSpinner>,
+    private val activity: FragmentActivity,
+    private val recyclerView: RecyclerView
+) :
     RecyclerView.Adapter<AdapterSettingsPreferences.ViewHolder>() {
 
     val preferences = PreferenceManager.getDefaultSharedPreferences(activity)!!
@@ -39,6 +49,22 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
 
         if (activity.getString(sList.descriptionSettings) == " ") {
             holder.settingsDescription.visibility = View.GONE
+        }
+
+        if (sList.key == DISPLAY_RESOLUTION) {
+            val aspectRatio = preferences.getString(DISPLAY_MODE, DISPLAY_MODE_DEFAULT_VALUE)
+
+            when (aspectRatio) {
+                "4:3" -> {
+                    sList.spinnerOptions = resolutions4_3
+                }
+                "16:9" -> {
+                    sList.spinnerOptions = resolutions16_9
+                }
+                "Native" -> {
+                    sList.spinnerOptions = getNativeResolutions(activity).toTypedArray()
+                }
+            }
         }
 
         when (sList.type) {
@@ -86,6 +112,12 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
                             preferences.edit().apply {
                                 putString(sList.key, selectedItem)
                                 apply()
+                            }
+
+                            if (sList.key == DISPLAY_MODE) {
+                                activity.runOnUiThread {
+                                    recyclerView.adapter?.notifyItemRangeChanged(holder.adapterPosition + 1, recyclerView.adapter?.itemCount!!)
+                                }
                             }
                         }
 

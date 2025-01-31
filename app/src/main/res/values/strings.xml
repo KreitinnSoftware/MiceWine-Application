@@ -175,4 +175,6 @@
     <string name="application_version">Application Version</string>
     <string name="rootfs_version">RootFS Version</string>
     <string name="wine_version">Wine Version</string>
+    <string name="display_mode_title">Display Mode</string>
+    <string name="display_mode_description">Change Display Aspect Ratio Mode</string>
 </resources>

@@ -204,6 +204,8 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE = ""
         const val SELECTED_MESA_VK_WSI_PRESENT_MODE = "MESA_VK_WSI_PRESENT_MODE"
         const val SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE = "mailbox"
+        const val DISPLAY_MODE = "displayMode"
+        const val DISPLAY_MODE_DEFAULT_VALUE = "16:9"
         const val DISPLAY_RESOLUTION = "displayResolution"
         const val DISPLAY_RESOLUTION_DEFAULT_VALUE = "1280x720"
         const val DEAD_ZONE = "deadZone"

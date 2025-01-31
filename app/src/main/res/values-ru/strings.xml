@@ -148,4 +148,6 @@
     <string name="application_version">Версия приложения</string>
     <string name="rootfs_version">Версия RootFS</string>
     <string name="wine_version">Версия Wine</string>
+    <string name="display_mode_title">Режим отображения</string>
+    <string name="display_mode_description">Изменить режим соотношения сторон экрана</string>
 </resources>
