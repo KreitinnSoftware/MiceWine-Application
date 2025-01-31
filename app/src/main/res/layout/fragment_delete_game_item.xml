@@ -5,14 +5,15 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:theme="@style/Theme.MiceWine"
-    android:padding="24dp">
+    android:padding="16dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/remove_game_item_warning"
-        android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
         android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
         android:layout_marginBottom="16dp"/>
 
     <LinearLayout
@@ -31,7 +32,6 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonContinue"
-            style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/confirm_text"/>

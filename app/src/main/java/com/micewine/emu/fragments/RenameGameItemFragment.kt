@@ -21,6 +21,7 @@ class RenameGameItemFragment : DialogFragment() {
 
         val editTextNewName = view.findViewById<EditText>(R.id.editTextNewName)
         val buttonContinue = view.findViewById<Button>(R.id.buttonContinue)
+        val buttonCancel = view.findViewById<Button>(R.id.buttonCancel)
 
         val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create()
 
@@ -32,12 +33,17 @@ class RenameGameItemFragment : DialogFragment() {
             val newName = editTextNewName.text.toString()
 
             if (newName == "") {
-                dialog.dismiss()
+                dismiss()
             }
 
             renameGameFromList(preferences!!, selectedGameArray, newName)
 
-            dialog.dismiss()
+
+            dismiss()
+        }
+
+        buttonCancel.setOnClickListener {
+            dismiss()
         }
 
         return dialog

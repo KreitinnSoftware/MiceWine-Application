@@ -31,6 +31,7 @@ class EditVirtualButtonFragment : DialogFragment() {
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.fragment_edit_virtual_button, null)
         val saveButton = view.findViewById<Button>(R.id.saveButton)
+        val cancelButton = view.findViewById<Button>(R.id.cancelButton)
         val radiusSeekbarValue = view.findViewById<TextView>(R.id.radiusSeekbarValue).apply {
             text = "$selectedButtonRadius%"
         }
@@ -115,6 +116,10 @@ class EditVirtualButtonFragment : DialogFragment() {
                 Intent(ACTION_INVALIDATE)
             )
 
+            dismiss()
+        }
+
+        cancelButton.setOnClickListener {
             dismiss()
         }
 

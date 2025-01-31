@@ -12,12 +12,12 @@
         android:layout_height="wrap_content"
         android:text="@string/new_name_text"
         android:textStyle="bold"
-        android:textSize="16sp"
-        >
+        android:textSize="16sp">
     </TextView>
 
     <EditText
         android:id="@+id/editTextNewName"
+        android:layout_marginTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:importantForAutofill="no"
@@ -29,12 +29,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:gravity="start">
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonCancel"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel_text">
+        </com.google.android.material.button.MaterialButton>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonContinue"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/confirm_text">
         </com.google.android.material.button.MaterialButton>

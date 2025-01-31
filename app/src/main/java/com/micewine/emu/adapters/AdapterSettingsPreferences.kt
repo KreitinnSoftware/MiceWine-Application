@@ -39,7 +39,6 @@ class AdapterSettingsPreferences(private val settingsList: List<SettingsListSpin
 
         if (activity.getString(sList.descriptionSettings) == " ") {
             holder.settingsDescription.visibility = View.GONE
-            holder.settingsName.gravity = com.google.android.material.R.id.center
         }
 
         when (sList.type) {
