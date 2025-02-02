@@ -127,8 +127,7 @@ import com.micewine.emu.fragments.FileManagerFragment
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.fragments.FloatingFileManagerFragment
 import com.micewine.emu.fragments.AboutFragment
-import com.micewine.emu.fragments.RenameGameItemFragment
-import com.micewine.emu.fragments.RenameGameItemFragment.Companion.initialTextRenameGameFragment
+import com.micewine.emu.fragments.EditGamePreferencesFragment
 import com.micewine.emu.fragments.SettingsFragment
 import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
@@ -259,6 +258,10 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(context, "Rat Package Installed!", Toast.LENGTH_LONG).show()
                     }
                 }
+
+                ACTION_SELECT_ICON -> {
+                    openFilePicker()
+                }
             }
         }
     }
@@ -324,6 +327,7 @@ class MainActivity : AppCompatActivity() {
                 addAction(ACTION_SETUP)
                 addAction(ACTION_INSTALL_RAT)
                 addAction(ACTION_SELECT_FILE_MANAGER)
+                addAction(ACTION_SELECT_ICON)
             }
         })
 
@@ -403,17 +407,12 @@ class MainActivity : AppCompatActivity() {
                 addGameToLauncher(this, selectedGameArray)
             }
 
-            R.id.editGameIcon -> {
-                openFilePicker()
-            }
-
             R.id.removeGameItem -> {
                 DeleteGameItemFragment().show(supportFragmentManager, "")
             }
 
-            R.id.renameGameItem -> {
-                initialTextRenameGameFragment = selectedGameArray[0]
-                RenameGameItemFragment().show(supportFragmentManager, "")
+            R.id.editGameItem -> {
+                EditGamePreferencesFragment().show(supportFragmentManager, "")
             }
 
             R.id.addToHome -> {
@@ -967,6 +966,7 @@ class MainActivity : AppCompatActivity() {
         const val ACTION_INSTALL_RAT = "com.micewine.emu.ACTION_INSTALL_RAT"
         const val ACTION_STOP_ALL = "com.micewine.emu.ACTION_STOP_ALL"
         const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
+        const val ACTION_SELECT_ICON = "com.micewine.emu.ACTION_SELECT_ICON"
         const val RAM_COUNTER = "ramCounter"
         const val RAM_COUNTER_DEFAULT_VALUE = true
         const val CPU_COUNTER = "cpuCounter"

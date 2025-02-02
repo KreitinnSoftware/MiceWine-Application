@@ -150,4 +150,6 @@
     <string name="wine_version">Версия Wine</string>
     <string name="display_mode_title">Режим отображения</string>
     <string name="display_mode_description">Изменить режим соотношения сторон экрана</string>
+    <string name="name">Имя</string>
+    <string name="edit_game">Редактировать ярлык</string>
 </resources>

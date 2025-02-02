@@ -154,4 +154,6 @@
     <string name="wine_version">Versão do Wine</string>
     <string name="display_mode_title">Modo do Display</string>
     <string name="display_mode_description">Alterar o Modo de Proporção de Tela</string>
+    <string name="name">Nome</string>
+    <string name="edit_game">Editar Atalho</string>
 </resources>

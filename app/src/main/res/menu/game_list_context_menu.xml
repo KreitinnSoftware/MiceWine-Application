@@ -7,16 +7,10 @@
         android:title="@string/add_game_to_home">
     </item>
     <item
-        android:id="@+id/editGameIcon"
+        android:id="@+id/editGameItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="@string/edit_game_icon">
-    </item>
-    <item
-        android:id="@+id/renameGameItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:title="@string/rename_game_item">
+        android:title="@string/edit_game">
     </item>
     <item
         android:id="@+id/removeGameItem"

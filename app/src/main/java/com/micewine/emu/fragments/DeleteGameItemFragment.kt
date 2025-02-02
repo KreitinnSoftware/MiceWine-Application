@@ -35,11 +35,11 @@ class DeleteGameItemFragment : DialogFragment() {
                 deleteFile(selectedFile)
             }
 
-            dialog.dismiss()
+            dismiss()
         }
 
         buttonCancel.setOnClickListener {
-            dialog.dismiss()
+            dismiss()
         }
 
         return dialog

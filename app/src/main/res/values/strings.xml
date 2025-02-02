@@ -83,7 +83,7 @@
     <string name="display_resolution_description">Change Virtual Display Resolution</string>
     <string name="select_driver_title">Select Driver</string>
     <string name="select_driver_description">Select Driver to use</string>
-    <string name="null_description">" "</string>
+    <string name="null_description" translatable="false">" "</string>
     <string name="select_dxvk_title">Select DXVK Version</string>
     <string name="select_wined3d_title">Select WineD3D Version</string>
     <string name="select_d3dx_title">Select DirectX 9, 10, 11 Renderer</string>
@@ -177,4 +177,6 @@
     <string name="wine_version">Wine Version</string>
     <string name="display_mode_title">Display Mode</string>
     <string name="display_mode_description">Change Display Aspect Ratio Mode</string>
+    <string name="name">Name</string>
+    <string name="edit_game">Edit Shortcut</string>
 </resources>

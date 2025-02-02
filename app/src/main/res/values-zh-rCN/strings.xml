@@ -154,4 +154,6 @@
     <string name="wine_version">Wine 版本</string>
     <string name="display_mode_title">显示模式</string>
     <string name="display_mode_description">更改显示比例模式</string>
+    <string name="name">名稱</string>
+    <string name="edit_game">編輯快捷方式</string>
 </resources>
