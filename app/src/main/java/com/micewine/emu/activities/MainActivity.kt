@@ -119,6 +119,7 @@ import com.micewine.emu.core.RatPackageManager.installRat
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
+import com.micewine.emu.core.WineWrapper.getCpuHexMask
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.AskInstallRatPackageFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ratCandidate
@@ -658,9 +659,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (exePath == "") {
-                WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler TFM")
+                WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler ${getCpuHexMask()} TFM")
             } else {
-                WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe")
+                WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe ${getCpuHexMask()}")
 
                 if (exePath.endsWith(".lnk")) {
                     try {

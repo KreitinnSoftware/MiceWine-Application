@@ -13,7 +13,7 @@ import kotlin.math.abs
 object WineWrapper {
     private var IS_BOX64 = if (Build.SUPPORTED_ABIS[0] == "x86_64") "" else "box64"
 
-    private fun getCpuHexMask(): String {
+    fun getCpuHexMask(): String {
         val availCpus = Runtime.getRuntime().availableProcessors()
         val cpuMask = MutableList(availCpus) { '0' }
         val cpuAffinity = cpuAffinity?.replace(",", "")
@@ -39,14 +39,14 @@ object WineWrapper {
 
     fun wine(args: String) {
         runCommand(
-            getEnv() + "WINEPREFIX=$winePrefix taskset ${getCpuHexMask()} $IS_BOX64 wine $args"
+            getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
         )
     }
 
     fun wine(args: String, retLog: Boolean): String {
         if (retLog) {
             return runCommandWithOutput(
-                getEnv() + "BOX64_LOG=0 WINEPREFIX=$winePrefix taskset ${getCpuHexMask()} $IS_BOX64 wine $args"
+                getEnv() + "BOX64_LOG=0 WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
             )
         }
         return ""
@@ -75,7 +75,7 @@ object WineWrapper {
         runCommand("ln -sf $path $wineDisksFolder/${getAvailableDisks()[0]}:")
     }
 
-    fun getAvailableDisks(): List<String> {
+    private fun getAvailableDisks(): List<String> {
         var letter = 'c'
         val availableDisks = mutableListOf<String>()
 
