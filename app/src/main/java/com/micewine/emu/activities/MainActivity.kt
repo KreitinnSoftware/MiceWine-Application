@@ -202,6 +202,7 @@ class MainActivity : AppCompatActivity() {
                         if (fileExtension == "exe" || fileExtension == "bat" || fileExtension == "msi" || fileExtension == "lnk") {
                             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                                 putExtra("exePath", file.path)
+                                putExtra("exeArguments", "")
                             }
 
                             sendBroadcast(runWineIntent)
