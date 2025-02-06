@@ -825,7 +825,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showHighlightSequence() {
-        currentState = HighlightState.HIGHLIGHT_SHORTCUTS
+        currentState = HighlightState.fromOrdinal(preferences!!.getInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, 0))
         if (currentState == HighlightState.HIGHLIGHT_DONE) {
             return
         }
