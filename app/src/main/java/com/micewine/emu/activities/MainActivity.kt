@@ -1175,6 +1175,7 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(context, MainActivity::class.java).apply {
                     action = Intent.ACTION_VIEW
                     putExtra("exePath", selectedGameArray[1])
+                    putExtra("exeArguments", selectedGameArray[3])
                 }
 
                 val pinShortcutInfo = ShortcutInfo.Builder(context, selectedGameArray[0])
