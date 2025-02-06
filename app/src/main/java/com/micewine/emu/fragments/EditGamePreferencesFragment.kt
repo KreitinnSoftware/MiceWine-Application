@@ -15,7 +15,7 @@ import androidx.preference.PreferenceManager
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_ICON
 import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.renameGameFromList
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.editGameFromList
 
 class EditGamePreferencesFragment : DialogFragment() {
     private var preferences: SharedPreferences? = null
@@ -26,6 +26,7 @@ class EditGamePreferencesFragment : DialogFragment() {
         val view = inflater.inflate(R.layout.fragment_edit_game_preferences, null)
 
         val editTextNewName = view.findViewById<EditText>(R.id.editTextNewName)
+        val editTextArguments = view.findViewById<EditText>(R.id.appArgumentsEditText)
         val buttonContinue = view.findViewById<Button>(R.id.buttonContinue)
         val buttonCancel = view.findViewById<Button>(R.id.buttonCancel)
 
@@ -46,6 +47,7 @@ class EditGamePreferencesFragment : DialogFragment() {
         preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
         editTextNewName.setText(selectedGameArray[0])
+        editTextArguments.setText(selectedGameArray[3])
 
         imageView?.setOnClickListener {
             requireActivity().sendBroadcast(
@@ -55,12 +57,13 @@ class EditGamePreferencesFragment : DialogFragment() {
 
         buttonContinue.setOnClickListener {
             val newName = editTextNewName.text.toString()
+            val newArguments = editTextArguments.text.toString()
 
             if (newName == "") {
                 return@setOnClickListener
             }
 
-            renameGameFromList(preferences!!, selectedGameArray, newName)
+            editGameFromList(preferences!!, selectedGameArray, newName, newArguments)
 
             dismiss()
         }

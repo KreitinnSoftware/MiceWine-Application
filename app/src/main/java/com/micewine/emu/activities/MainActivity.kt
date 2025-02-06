@@ -165,6 +165,7 @@ class MainActivity : AppCompatActivity() {
             when (intent.action) {
                 ACTION_RUN_WINE -> {
                     val exePath = intent.getStringExtra("exePath")!!
+                    val exeArguments = intent.getStringExtra("exeArguments")!!
 
                     tmpDir.deleteRecursively()
                     tmpDir.mkdirs()
@@ -179,7 +180,7 @@ class MainActivity : AppCompatActivity() {
                     setSharedVars(this@MainActivity)
 
                     lifecycleScope.launch { runXServer(":0") }
-                    lifecycleScope.launch { runWine(exePath) }
+                    lifecycleScope.launch { runWine(exePath, exeArguments) }
                 }
 
                 ACTION_SELECT_FILE_MANAGER -> {
@@ -636,7 +637,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun runWine(exePath: String) {
+    private suspend fun runWine(exePath: String, exeArguments: String) {
         withContext(Dispatchers.Default) {
             installDXWrapper(winePrefix)
 
@@ -672,7 +673,7 @@ class MainActivity : AppCompatActivity() {
                         val shell = ShellLink(exePath)
                         val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
                         if (drive != null) {
-                            WineWrapper.wine("'${WineWrapper.getSanatizedPath(drive.getUnixPath())}'", "'${WineWrapper.getSanatizedPath(File(drive.getUnixPath()).parent!!)}'")
+                            WineWrapper.wine("'${drive.getUnixPath()}' $exeArguments", "'${File(drive.getUnixPath()).parent!!}'")
                         }
                     }
                     catch (e: ShellLinkException) {
@@ -680,9 +681,8 @@ class MainActivity : AppCompatActivity() {
                             Toast.makeText(this@MainActivity, getString(R.string.lnk_read_fail), Toast.LENGTH_SHORT).show()
                         }
                     }
-                }
-                else {
-                    WineWrapper.wine("'${WineWrapper.getSanatizedPath(exePath)}'", "'${File(WineWrapper.getSanatizedPath(exePath)).parent!!}'")
+                } else {
+                    WineWrapper.wine("'${exePath}' $exeArguments", "'${File(exePath).parent!!}'")
                 }
             }
 
@@ -792,6 +792,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         val exePath = intent.getStringExtra("exePath")
+        val exeArguments = intent.getStringExtra("exeArguments")
 
         val emulationActivityIntent = Intent(this, EmulationActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
@@ -802,6 +803,7 @@ class MainActivity : AppCompatActivity() {
                 sendBroadcast(
                     Intent(ACTION_RUN_WINE).apply {
                         putExtra("exePath", exePath)
+                        putExtra("exeArguments", exeArguments)
                     }
                 )
 
@@ -817,6 +819,7 @@ class MainActivity : AppCompatActivity() {
                     sendBroadcast(
                         Intent(ACTION_RUN_WINE).apply {
                             putExtra("exePath", filePath)
+                            putExtra("exeArguments", exeArguments)
                         }
                     )
                 }

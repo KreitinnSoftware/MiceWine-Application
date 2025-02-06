@@ -78,8 +78,10 @@ class AdapterGame(private val gameList: MutableList<GameList>, private val activ
             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                 if (gameModel.exeFile.path == activity.getString(R.string.desktop_mode_init)) {
                     putExtra("exePath", "")
+                    putExtra("exeArguments", "")
                 } else {
                     putExtra("exePath", gameModel.exeFile.toString())
+                    putExtra("exeArguments", gameModel.exeArguments)
                 }
             }
 
@@ -94,11 +96,11 @@ class AdapterGame(private val gameList: MutableList<GameList>, private val activ
 
             val gameModel = gameList[adapterPosition]
 
-            selectedGameArray = arrayOf(gameModel.name, gameModel.exeFile.path, gameModel.imageGame)
+            selectedGameArray = arrayOf(gameModel.name, gameModel.exeFile.path, gameModel.imageGame, gameModel.exeArguments)
 
             return false
         }
     }
 
-    class GameList(var exeFile: File, var name: String, var imageGame: String)
+    class GameList(var exeFile: File, var name: String, var imageGame: String, var exeArguments: String)
 }

@@ -158,4 +158,5 @@
     <string name="edit_game">Editar Atalho</string>
     <string name="unlimited">Ilimitado</string>
     <string name="fps_limit_title">Limite de FPS</string>
+    <string name="app_arguments">Argumentos de Inicialização</string>
 </resources>

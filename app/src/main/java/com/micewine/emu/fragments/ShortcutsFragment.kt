@@ -76,13 +76,13 @@ class ShortcutsFragment : Fragment() {
 
                         val filteredList = if (query.isEmpty()) {
                             currentList.map {
-                                AdapterGame.GameList(File(it[1]), it[0], it[2])
+                                AdapterGame.GameList(File(it[1]), it[0], it[2], it[3])
                             }
                         } else {
                             currentList.filter {
                                 it[0].contains(query, ignoreCase = true)
                             }.map {
-                                AdapterGame.GameList(File(it[1]), it[0], it[2])
+                                AdapterGame.GameList(File(it[1]), it[0], it[2], it[3])
                             }
                         }
 
@@ -90,6 +90,7 @@ class ShortcutsFragment : Fragment() {
                             AdapterGame.GameList(
                                 File(""),
                                 getString(R.string.desktop_mode_init),
+                                "",
                                 ""
                             )
                         ) + filteredList
@@ -123,9 +124,10 @@ class ShortcutsFragment : Fragment() {
                     }
                     recyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
 
-                    val editor = preferences!!.edit()
-                    editor.putBoolean(HIGHLIGHT_SHORTCUT_PREFERENCE_KEY, true)
-                    editor.apply()
+                    preferences!!.edit().apply {
+                        putBoolean(HIGHLIGHT_SHORTCUT_PREFERENCE_KEY, true)
+                        apply()
+                    }
                 }
             }
         })
@@ -221,21 +223,22 @@ class ShortcutsFragment : Fragment() {
 
             gameList.clear()
 
-            addToAdapter(recyclerView!!, activity.getString(R.string.desktop_mode_init), activity.getString(R.string.desktop_mode_init), "")
+            addToAdapter(recyclerView!!, activity.getString(R.string.desktop_mode_init), activity.getString(R.string.desktop_mode_init), "", "")
 
             for (game in loadGameList(preferences)) {
                 val name = game[0]
                 val exePath = game[1]
                 val icon = game[2]
+                val exeArguments = game[3]
 
-                addToAdapter(recyclerView!!, exePath, name, icon)
+                addToAdapter(recyclerView!!, exePath, name, icon, exeArguments)
             }
         }
 
-        private fun addToAdapter(recyclerView: RecyclerView, exeFile: String, name: String, icon: String) {
+        private fun addToAdapter(recyclerView: RecyclerView, exeFile: String, name: String, icon: String, exeArguments: String) {
             val pos = recyclerView.adapter?.itemCount!!
 
-            gameList.add(pos, AdapterGame.GameList(File(exeFile), name, icon))
+            gameList.add(pos, AdapterGame.GameList(File(exeFile), name, icon, exeArguments))
 
             recyclerView.adapter?.notifyItemInserted(pos)
         }
@@ -247,7 +250,7 @@ class ShortcutsFragment : Fragment() {
         fun saveToGameList(preferences: SharedPreferences, path: String, prettyName: String, icon: String) {
             val editor = preferences.edit()
             val currentList = loadGameList(preferences)
-            val game = arrayOf(prettyName, path, icon)
+            val game = arrayOf(prettyName, path, icon, "")
             val gameExists = currentList.any { it[0] == game[0] }
             val index = currentList.count()
 
@@ -278,17 +281,19 @@ class ShortcutsFragment : Fragment() {
             recyclerView?.adapter?.notifyItemRemoved(index + 1)
         }
 
-        fun renameGameFromList(preferences: SharedPreferences, gameArray: Array<String>, newName: String) {
+        fun editGameFromList(preferences: SharedPreferences, gameArray: Array<String>, newName: String, newArguments: String) {
             val editor = preferences.edit()
             val currentList = loadGameList(preferences)
-            val index = currentList.indexOfFirst { it[0] == gameArray[0] && it[1] == gameArray[1] }
+            val index = currentList.indexOfFirst { it[0] == gameArray[0] && it[1] == gameArray[1] && it[3] == gameArray[3] }
 
             currentList[index][0] = newName
+            currentList[index][3] = newArguments
 
             editor.putString("gameList", gson.toJson(currentList))
             editor.apply()
 
             gameList[index + 1].name = newName
+            gameList[index + 1].exeArguments = newArguments
 
             recyclerView?.adapter?.notifyItemChanged(index + 1)
         }

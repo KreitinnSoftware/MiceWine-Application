@@ -158,4 +158,5 @@
     <string name="edit_game">編輯快捷方式</string>
     <string name="unlimited">无限</string>
     <string name="fps_limit_title">FPS 限制</string>
+    <string name="app_arguments">启动参数</string>
 </resources>

@@ -55,7 +55,7 @@ object WineWrapper {
     fun wine(args: String, cwd: String) {
         runCommand(
             "cd $cwd;" +
-                    getEnv() + "WINEPREFIX=$winePrefix taskset ${getCpuHexMask()} $IS_BOX64 wine $args"
+                    getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
         )
     }
 
@@ -92,12 +92,8 @@ object WineWrapper {
     fun extractIcon(exeFile: File, output: String) {
         if (exeFile.extension.lowercase() == "exe") {
             runCommand(
-                getEnv() + "wrestool -x -t 14 '${getSanatizedPath(exeFile.path)}' > '$output'"
+                getEnv() + "wrestool -x -t 14 '${exeFile.path}' > '$output'"
             )
         }
-    }
-
-    fun getSanatizedPath(filePath: String) : String {
-       return filePath.replace("'", "'\\''")
     }
 }

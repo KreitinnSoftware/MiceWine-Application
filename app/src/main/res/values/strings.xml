@@ -181,4 +181,5 @@
     <string name="edit_game">Edit Shortcut</string>
     <string name="unlimited">Unlimited</string>
     <string name="fps_limit_title">FPS Limit</string>
+    <string name="app_arguments">Launch Arguments</string>
 </resources>

@@ -154,4 +154,5 @@
     <string name="edit_game">Редактировать ярлык</string>
     <string name="unlimited">Неограниченно</string>
     <string name="fps_limit_title">Ограничение FPS</string>
+    <string name="app_arguments">Аргументы запуска</string>
 </resources>

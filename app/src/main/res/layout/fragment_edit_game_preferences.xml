@@ -52,6 +52,27 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/appArgumentsText"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:text="@string/app_arguments">
+    </TextView>
+
+    <EditText
+        android:id="@+id/appArgumentsEditText"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        tools:ignore="LabelFor">
+    </EditText>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
