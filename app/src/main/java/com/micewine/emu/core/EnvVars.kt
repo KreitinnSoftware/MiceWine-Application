@@ -147,8 +147,8 @@ object EnvVars {
 
         vars.add("VKD3D_FEATURE_LEVEL=12_0")
 
-        if (wineLogLevel == "minimal") {
-            vars.add("WINEDEBUG=-fixme,-debug,-keyboard")
+        if (wineLogLevel == "disabled") {
+            vars.add("WINEDEBUG=-all")
         }
 
         vars.add("WINEESYNC=$wineESync")

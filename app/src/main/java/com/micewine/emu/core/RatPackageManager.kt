@@ -27,16 +27,8 @@ object RatPackageManager {
         ratPackage.ratFile.use { ratFile ->
             ratFile.isRunInThread = true
 
-            when (ratPackage.category) {
-                "VulkanDriver" -> {
-                    extractDir = "$ratPackagesDir/VulkanDriver-${java.util.UUID.randomUUID()}"
-                    File(extractDir!!).mkdirs()
-                }
-                "Box64" -> {
-                    extractDir = "$ratPackagesDir/Box64-${java.util.UUID.randomUUID()}"
-                    File(extractDir!!).mkdirs()
-                }
-            }
+            extractDir = "$ratPackagesDir/${ratPackage.category}-${java.util.UUID.randomUUID()}"
+            File(extractDir!!).mkdirs()
 
             ratFile.extractAll(extractDir)
 
@@ -58,32 +50,10 @@ object RatPackageManager {
             "rootfs" -> {
                 File("$extractDir/pkg-header").renameTo(File("$ratPackagesDir/rootfs-pkg-header"))
 
-                val builtInVulkanDrivers = File("$extractDir/builtInVulkanDrivers")
                 val vulkanDriversFolder = File("$extractDir/vulkanDrivers")
                 val box64Folder = File("$extractDir/box64")
 
-                if (builtInVulkanDrivers.exists()) {
-                    builtInVulkanDrivers.readLines().forEach { line ->
-                        val name = line.split(":")[0]
-                        val version = line.split(":")[1]
-                        val libPath = line.split(":")[2]
-                        val randUUID = java.util.UUID.randomUUID()
-
-                        File("$ratPackagesDir/VulkanDriver-$randUUID").mkdirs()
-                        File("$ratPackagesDir/VulkanDriver-$randUUID/pkg-header").apply {
-                            writeText("name=$name\n\nversion=$version\n\nvkDriverLib=$usrDir/lib/$libPath\n")
-                        }
-
-                        if (preferences.getString(SELECTED_DRIVER, "") == "") {
-                            preferences.edit().apply {
-                                putString(SELECTED_DRIVER, "VulkanDriver-$randUUID")
-                                apply()
-                            }
-                        }
-                    }
-
-                    builtInVulkanDrivers.delete()
-                } else if (vulkanDriversFolder.exists()) {
+                if (vulkanDriversFolder.exists()) {
                     vulkanDriversFolder.listFiles()?.sorted()?.forEach { ratFile ->
                         installRat(RatPackage(ratFile.path), context)
                     }
