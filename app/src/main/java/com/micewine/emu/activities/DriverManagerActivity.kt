@@ -8,7 +8,10 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.google.gson.Gson
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.enableMangoHUD
+import com.micewine.emu.activities.MainActivity.Companion.fpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
+import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.databinding.ActivityDriverManagerBinding
 import com.micewine.emu.fragments.DriverListFragment
 import java.io.File
@@ -68,6 +71,19 @@ class DriverManagerActivity : AppCompatActivity() {
             ))
 
             destIcd.writeText(json)
+        }
+
+        fun generateMangoHUDConfFile() {
+            val mangoHudConfFile = File("$usrDir/etc/MangoHud.conf")
+            val options = StringBuilder()
+
+            options.append("fps_limit=$fpsLimit\n")
+
+            if (!enableMangoHUD) {
+                options.append("no_display\n")
+            }
+
+            mangoHudConfFile.writeText(options.toString())
         }
     }
 }

@@ -111,11 +111,8 @@ object EnvVars {
         vars.add("DXVK_ASYNC=1")
         vars.add("DXVK_STATE_CACHE_PATH=$homeDir/.cache/dxvk-shader-cache")
         vars.add("DXVK_HUD=$selectedDXVKHud")
-
-        if (enableMangoHUD) {
-            vars.add("MANGOHUD=1")
-            vars.add("MANGOHUD_CONFIGFILE=$usrDir/etc/MangoHud.conf")
-        }
+        vars.add("MANGOHUD=1")
+        vars.add("MANGOHUD_CONFIGFILE=$usrDir/etc/MangoHud.conf")
 
         if (Build.SUPPORTED_ABIS[0] != "x86_64") {
             vars.add("BOX64_LOG=$box64LogLevel")

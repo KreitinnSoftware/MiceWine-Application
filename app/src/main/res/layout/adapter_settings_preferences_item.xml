@@ -17,57 +17,79 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:padding="10dp">
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/title_preferences_model"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:ellipsize="marquee"
-                android:text="Title Settings"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                tools:ignore="HardcodedText">
-            </TextView>
-
-            <TextView
-                android:id="@+id/description_preferences_model"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:ellipsize="marquee"
-                android:text="Description Settings"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textSize="15sp"
-                tools:ignore="HardcodedText">
-            </TextView>
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/title_preferences_model"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:ellipsize="marquee"
+                    android:text="Title Settings"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/description_preferences_model"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="marquee"
+                    android:text="Description Settings"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textSize="15sp"
+                    tools:ignore="HardcodedText">
+                </TextView>
+
+            </LinearLayout>
+
+            <Spinner
+                android:id="@+id/keyBindSpinner"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:dropDownWidth="wrap_content">
+            </Spinner>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/optionSwitch"
+                android:theme="@style/Theme.MiceWine"
+                android:padding="16dp"
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+            </com.google.android.material.materialswitch.MaterialSwitch>
 
         </LinearLayout>
 
-        <Spinner
-            android:id="@+id/keyBindSpinner"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:dropDownWidth="wrap_content">
-        </Spinner>
+        <TextView
+            android:id="@+id/seekBarValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:padding="8dp">
+        </TextView>
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/optionSwitch"
-            android:theme="@style/Theme.MiceWine"
-            android:padding="16dp"
-            android:gravity="center_vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-        </com.google.android.material.materialswitch.MaterialSwitch>
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+        </SeekBar>
 
     </LinearLayout>
 

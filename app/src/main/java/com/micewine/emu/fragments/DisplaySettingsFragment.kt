@@ -67,7 +67,7 @@ class DisplaySettingsFragment : Fragment() {
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>?, type: Int, defaultValue: Any, keyId: String) {
-        settingsList.add(SettingsListSpinner(titleId, descriptionId, valuesArray, type, defaultValue.toString(), keyId))
+        settingsList.add(SettingsListSpinner(titleId, descriptionId, valuesArray, null, type, defaultValue.toString(), keyId))
     }
 
     companion object {

@@ -13,6 +13,8 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.FPS_LIMIT
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SEEKBAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_D3DX_RENDERER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_D3DX_RENDERER_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DXVK_HUD_PRESET
@@ -32,6 +34,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WI
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SWITCH
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
+import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
 import com.micewine.emu.adapters.AdapterSettingsPreferences
 import com.micewine.emu.adapters.AdapterSettingsPreferences.SettingsListSpinner
 import java.io.File
@@ -89,6 +92,7 @@ class DriversSettingsFragment : Fragment() {
         addToAdapter(R.string.select_dxvk_title, R.string.null_description, dxvkVersions.toTypedArray(), SPINNER, SELECTED_DXVK_DEFAULT_VALUE, SELECTED_DXVK)
         addToAdapter(R.string.select_vkd3d_title, R.string.null_description, vkd3dVersions.toTypedArray(), SPINNER, SELECTED_VKD3D_DEFAULT_VALUE, SELECTED_VKD3D)
         addToAdapter(R.string.enable_mangohud_title, R.string.null_description, null, SWITCH, ENABLE_MANGOHUD_DEFAULT_VALUE, ENABLE_MANGOHUD)
+        addToAdapter(R.string.fps_limit_title, R.string.null_description, null, arrayOf(0, screenFpsLimit), SEEKBAR, screenFpsLimit, FPS_LIMIT)
         addToAdapter(R.string.select_dxvk_hud_preset_title, R.string.null_description, arrayOf("fps", "gpuload", "devinfo", "version", "api"), CHECKBOX, SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE, SELECTED_DXVK_HUD_PRESET)
         addToAdapter(R.string.mesa_vk_wsi_present_mode_title, R.string.null_description, arrayOf("fifo", "relaxed", "mailbox", "immediate"), SPINNER, SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE, SELECTED_MESA_VK_WSI_PRESENT_MODE)
         addToAdapter(R.string.tu_debug_title, R.string.null_description, arrayOf("noconform", "flushall", "syncdraw", "sysmem", "gmem", "nolrz", "noubwc", "nomultipos", "forcebin"), CHECKBOX, SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE, SELECTED_TU_DEBUG_PRESET)
@@ -104,6 +108,10 @@ class DriversSettingsFragment : Fragment() {
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>?, type: Int, defaultValue: Any, keyId: String) {
-        settingsList.add(SettingsListSpinner(titleId, descriptionId, valuesArray, type, "$defaultValue", keyId))
+        settingsList.add(SettingsListSpinner(titleId, descriptionId, valuesArray, null, type, "$defaultValue", keyId))
+    }
+
+    private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>?, seekBarMaxMinValues: Array<Int>, type: Int, defaultValue: Any, keyId: String) {
+        settingsList.add(SettingsListSpinner(titleId, descriptionId, valuesArray, seekBarMaxMinValues, type, "$defaultValue", keyId))
     }
 }

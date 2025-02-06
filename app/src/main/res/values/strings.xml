@@ -179,4 +179,6 @@
     <string name="display_mode_description">Change Display Aspect Ratio Mode</string>
     <string name="name">Name</string>
     <string name="edit_game">Edit Shortcut</string>
+    <string name="unlimited">Unlimited</string>
+    <string name="fps_limit_title">FPS Limit</string>
 </resources>

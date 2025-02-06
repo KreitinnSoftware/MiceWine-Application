@@ -21,6 +21,7 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -33,6 +34,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
 import com.micewine.emu.activities.DriverManagerActivity.Companion.generateICDFile
+import com.micewine.emu.activities.DriverManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_AVX
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_AVX_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS
@@ -88,6 +90,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANG
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_SERVICES
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_SERVICES_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.FPS_LIMIT
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_D3DX_RENDERER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_D3DX_RENDERER_DEFAULT_VALUE
@@ -121,14 +124,14 @@ import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.core.WineWrapper.getCpuHexMask
 import com.micewine.emu.databinding.ActivityMainBinding
+import com.micewine.emu.fragments.AboutFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ratCandidate
 import com.micewine.emu.fragments.DeleteGameItemFragment
+import com.micewine.emu.fragments.EditGamePreferencesFragment
 import com.micewine.emu.fragments.FileManagerFragment
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.fragments.FloatingFileManagerFragment
-import com.micewine.emu.fragments.AboutFragment
-import com.micewine.emu.fragments.EditGamePreferencesFragment
 import com.micewine.emu.fragments.SettingsFragment
 import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
@@ -171,6 +174,7 @@ class MainActivity : AppCompatActivity() {
                     val driverLibPath = File("$ratPackagesDir/$selectedDriver/pkg-header").readLines()[4].substringAfter("=")
 
                     generateICDFile(driverLibPath, File("$appRootDir/vulkan_icd.json"))
+                    generateMangoHUDConfFile()
 
                     setSharedVars(this@MainActivity)
 
@@ -953,6 +957,8 @@ class MainActivity : AppCompatActivity() {
         var miceWineVersion: String = "MiceWine ${BuildConfig.VERSION_NAME} (git-${BuildConfig.GIT_SHORT_SHA})"
         var vulkanDriverDeviceName: String? = null
         var cpuAffinity: String? = null
+        var screenFpsLimit: Int = 60
+        var fpsLimit: Int = 0
         private var selectedResolution: String? = ""
 
         var selectedFragment = "ShortcutsFragment"
@@ -1068,6 +1074,9 @@ class MainActivity : AppCompatActivity() {
             enableDebugInfo = preferences.getBoolean(ENABLE_DEBUG_INFO, ENABLE_DEBUG_INFO_DEFAULT_VALUE)
 
             cpuAffinity = preferences.getString(CPU_AFFINITY, availableCPUs.joinToString(","))
+
+            screenFpsLimit = (activity.getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay.refreshRate.toInt()
+            fpsLimit = preferences.getInt(FPS_LIMIT, screenFpsLimit)
 
             vulkanDriverDeviceName = getVulkanDeviceName()
         }

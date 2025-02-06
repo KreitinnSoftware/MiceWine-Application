@@ -1,5 +1,6 @@
 package com.micewine.emu.adapters
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.SharedPreferences
 import android.database.DataSetObserver
@@ -9,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Spinner
 import android.widget.SpinnerAdapter
 import android.widget.TextView
@@ -21,6 +24,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CHECKBOX
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_MODE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_MODE_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SEEKBAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SWITCH
 import com.micewine.emu.fragments.DisplaySettingsFragment.Companion.getNativeResolutions
@@ -42,6 +46,7 @@ class AdapterSettingsPreferences(
         return ViewHolder(itemView)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val sList = settingsList[position]
         holder.settingsName.setText(sList.titleSettings)
@@ -71,6 +76,8 @@ class AdapterSettingsPreferences(
             SWITCH -> {
                 holder.spinnerOptions.visibility = View.GONE
                 holder.settingsSwitch.visibility = View.VISIBLE
+                holder.seekBar.visibility = View.GONE
+                holder.seekBarValue.visibility = View.GONE
 
                 holder.settingsSwitch.isChecked = preferences.getBoolean(sList.key, sList.defaultValue.toBoolean())
                 holder.settingsSwitch.setOnClickListener {
@@ -83,6 +90,8 @@ class AdapterSettingsPreferences(
             SPINNER -> {
                 holder.settingsSwitch.visibility = View.GONE
                 holder.spinnerOptions.visibility = View.VISIBLE
+                holder.seekBar.visibility = View.GONE
+                holder.seekBarValue.visibility = View.GONE
 
                 holder.spinnerOptions.adapter = ArrayAdapter(
                     activity,
@@ -128,6 +137,8 @@ class AdapterSettingsPreferences(
             CHECKBOX -> {
                 holder.settingsSwitch.visibility = View.GONE
                 holder.spinnerOptions.visibility = View.VISIBLE
+                holder.seekBar.visibility = View.GONE
+                holder.seekBarValue.visibility = View.GONE
 
                 holder.spinnerOptions.adapter = CheckableAdapter(
                     activity,
@@ -137,6 +148,48 @@ class AdapterSettingsPreferences(
                     holder.spinnerOptions
                 )
             }
+            SEEKBAR -> {
+                holder.settingsSwitch.visibility = View.GONE
+                holder.spinnerOptions.visibility = View.GONE
+                holder.seekBar.visibility = View.VISIBLE
+                holder.seekBarValue.visibility = View.VISIBLE
+
+                holder.seekBar.min = sList.seekBarMaxMinValues!![0]
+                holder.seekBar.max = sList.seekBarMaxMinValues!![1]
+
+                holder.seekBar.progress = preferences.getInt(sList.key, sList.defaultValue.toInt())
+
+                if (holder.seekBar.progress == 0) {
+                    holder.seekBarValue.text = activity.getString(R.string.unlimited)
+                } else {
+                    holder.seekBarValue.text = "${holder.seekBar.progress} FPS"
+                }
+
+                holder.seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                    override fun onProgressChanged(
+                        seekBar: SeekBar?,
+                        progress: Int,
+                        fromUser: Boolean
+                    ) {
+                        if (progress == 0) {
+                            holder.seekBarValue.text = activity.getString(R.string.unlimited)
+                        } else {
+                            holder.seekBarValue.text = "$progress FPS"
+                        }
+
+                        preferences.edit().apply {
+                            putInt(sList.key, progress)
+                            apply()
+                        }
+                    }
+
+                    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                    }
+
+                    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                    }
+                })
+            }
         }
     }
 
@@ -144,12 +197,13 @@ class AdapterSettingsPreferences(
         return settingsList.size
     }
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
-        View.OnClickListener {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         val settingsName: TextView = itemView.findViewById(R.id.title_preferences_model)
         val settingsDescription: TextView = itemView.findViewById(R.id.description_preferences_model)
         val spinnerOptions: Spinner = itemView.findViewById(R.id.keyBindSpinner)
         val settingsSwitch: SwitchCompat = itemView.findViewById(R.id.optionSwitch)
+        val seekBar: SeekBar = itemView.findViewById(R.id.seekBar)
+        val seekBarValue: TextView = itemView.findViewById(R.id.seekBarValue)
 
         init {
             itemView.setOnClickListener(this)
@@ -165,7 +219,7 @@ class AdapterSettingsPreferences(
         }
     }
 
-    class SettingsListSpinner(var titleSettings: Int, var descriptionSettings: Int, var spinnerOptions: Array<String>?, var type: Int, var defaultValue: String, var key: String)
+    class SettingsListSpinner(var titleSettings: Int, var descriptionSettings: Int, var spinnerOptions: Array<String>?, var seekBarMaxMinValues: Array<Int>?, var type: Int, var defaultValue: String, var key: String)
 
     class CheckableAdapter(
         val activity: Activity,

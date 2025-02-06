@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.databinding.ActivityGeneralSettingsBinding
 import com.micewine.emu.fragments.Box64SettingsFragment
@@ -127,11 +128,12 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val SWITCH = 1
         const val SPINNER = 2
         const val CHECKBOX = 3
+        const val SEEKBAR = 4
 
         const val BOX64_LOG = "BOX64_LOG"
         const val BOX64_LOG_DEFAULT_VALUE = "1"
         const val BOX64_MMAP32 = "BOX64_MMAP32"
-        const val BOX64_MMAP32_DEFAULT_VALUE = false
+        const val BOX64_MMAP32_DEFAULT_VALUE = true
         const val BOX64_AVX = "BOX64_AVX"
         const val BOX64_AVX_DEFAULT_VALUE = "2"
         const val BOX64_SSE42 = "BOX64_SSE42"
@@ -211,5 +213,6 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val DEAD_ZONE = "deadZone"
         const val MOUSE_SENSIBILITY = "mouseSensibility"
         const val CPU_AFFINITY = "cpuAffinity"
+        const val FPS_LIMIT = "fpsLimit"
     }
 }

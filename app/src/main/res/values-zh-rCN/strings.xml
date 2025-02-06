@@ -156,4 +156,6 @@
     <string name="display_mode_description">更改显示比例模式</string>
     <string name="name">名稱</string>
     <string name="edit_game">編輯快捷方式</string>
+    <string name="unlimited">无限</string>
+    <string name="fps_limit_title">FPS 限制</string>
 </resources>

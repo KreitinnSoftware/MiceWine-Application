@@ -152,4 +152,6 @@
     <string name="display_mode_description">Изменить режим соотношения сторон экрана</string>
     <string name="name">Имя</string>
     <string name="edit_game">Редактировать ярлык</string>
+    <string name="unlimited">Неограниченно</string>
+    <string name="fps_limit_title">Ограничение FPS</string>
 </resources>

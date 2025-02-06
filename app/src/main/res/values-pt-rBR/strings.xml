@@ -156,4 +156,6 @@
     <string name="display_mode_description">Alterar o Modo de Proporção de Tela</string>
     <string name="name">Nome</string>
     <string name="edit_game">Editar Atalho</string>
+    <string name="unlimited">Ilimitado</string>
+    <string name="fps_limit_title">Limite de FPS</string>
 </resources>
