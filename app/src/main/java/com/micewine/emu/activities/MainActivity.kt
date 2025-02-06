@@ -825,11 +825,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showHighlightSequence() {
-        currentState = HighlightState.fromOrdinal(preferences!!.getInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, 0))
-        if (currentState == HighlightState.HIGHLIGHT_DONE)
+        currentState = HighlightState.HIGHLIGHT_SHORTCUTS
+        if (currentState == HighlightState.HIGHLIGHT_DONE) {
             return
-        TapTargetSequence(this)
-            .targets(
+        }
+        TapTargetSequence(this).targets(
                 TapTarget.forView(
                     findViewById(R.id.nav_shortcuts),
                     getString(R.string.highlight_nav_shortcuts)
@@ -845,41 +845,36 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.highlight_nav_files),
                     getString(R.string.highlight_nav_files_description)
                 )
-            )
-            .listener(object : TapTargetSequence.Listener {
+            ).listener(object : TapTargetSequence.Listener {
                 override fun onSequenceFinish() {
-
                 }
 
                 override fun onSequenceStep(lastTarget: TapTarget, targetClicked: Boolean) {
                     if (targetClicked) {
                         when (currentState) {
                             HighlightState.HIGHLIGHT_SHORTCUTS -> {
-                                selectedFragment = "ShortcutsFragment"
-                                fragmentLoader(shortcutsFragment, false)
-
-                                val editor = preferences!!.edit()
+                                bottomNavigation?.selectedItemId = R.id.nav_shortcuts
                                 currentState = HighlightState.HIGHLIGHT_SETTINGS
-                                editor.putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
-                                editor.apply()
+                                preferences!!.edit().apply {
+                                    putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
+                                    apply()
+                                }
                             }
                             HighlightState.HIGHLIGHT_SETTINGS -> {
-                                selectedFragment = "SettingsFragment"
-                                fragmentLoader(settingsFragment, false)
-
-                                val editor = preferences!!.edit()
+                                bottomNavigation?.selectedItemId = R.id.nav_settings
                                 currentState = HighlightState.HIGHLIGHT_FILES
-                                editor.putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
-                                editor.apply()
+                                preferences!!.edit().apply {
+                                    putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
+                                    apply()
+                                }
                             }
                             HighlightState.HIGHLIGHT_FILES -> {
-                                selectedFragment = "FileManagerFragment"
-                                fragmentLoader(fileManagerFragment, false)
-
-                                val editor = preferences!!.edit()
+                                bottomNavigation?.selectedItemId = R.id.nav_file_manager
                                 currentState = HighlightState.HIGHLIGHT_DONE
-                                editor.putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
-                                editor.apply()
+                                preferences!!.edit().apply {
+                                    putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
+                                    apply()
+                                }
                             }
                             else -> {
                                 return
