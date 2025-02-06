@@ -27,8 +27,10 @@ object RatPackageManager {
         ratPackage.ratFile.use { ratFile ->
             ratFile.isRunInThread = true
 
-            extractDir = "$ratPackagesDir/${ratPackage.category}-${java.util.UUID.randomUUID()}"
-            File(extractDir!!).mkdirs()
+            if (ratPackage.category != "rootfs") {
+                extractDir = "$ratPackagesDir/${ratPackage.category}-${java.util.UUID.randomUUID()}"
+                File(extractDir!!).mkdirs()
+            }
 
             ratFile.extractAll(extractDir)
 
