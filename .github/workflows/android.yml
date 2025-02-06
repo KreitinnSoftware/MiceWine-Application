@@ -37,7 +37,7 @@ jobs:
       run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - name: "Get Version"
-      run: echo "VERSION=$(cat app/build.gradle.kts | grep versionName | cut -d "=" -f 2 | sed "s/\"//g")" >> $GITHUB_ENV
+      run: echo "VERSION=$(echo $(cat app/build.gradle.kts | grep versionName | cut -d "=" -f 2 | sed "s/\"//g"))" >> $GITHUB_ENV
           
     - name: "Create Release"
       uses: softprops/action-gh-release@v2
