@@ -123,6 +123,7 @@ import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.core.WineWrapper.getCpuHexMask
+import com.micewine.emu.core.WineWrapper.getSanitizedPath
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.AboutFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment
@@ -674,7 +675,7 @@ class MainActivity : AppCompatActivity() {
                         val shell = ShellLink(exePath)
                         val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
                         if (drive != null) {
-                            WineWrapper.wine("'${drive.getUnixPath()}' $exeArguments", "'${File(drive.getUnixPath()).parent!!}'")
+                            WineWrapper.wine("'${getSanitizedPath(drive.getUnixPath())}' $exeArguments", "'${getSanitizedPath(File(drive.getUnixPath()).parent!!)}'")
                         }
                     }
                     catch (e: ShellLinkException) {
@@ -683,7 +684,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 } else {
-                    WineWrapper.wine("'${exePath}' $exeArguments", "'${File(exePath).parent!!}'")
+                    WineWrapper.wine("'${getSanitizedPath(exePath)}' $exeArguments", "'${getSanitizedPath(File(exePath).parent!!)}'")
                 }
             }
 
