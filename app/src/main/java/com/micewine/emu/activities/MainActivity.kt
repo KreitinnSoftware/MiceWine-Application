@@ -643,7 +643,8 @@ class MainActivity : AppCompatActivity() {
         withContext(Dispatchers.Default) {
             installDXWrapper(winePrefix)
 
-            runCommand("pkill -9 wineserver")
+            WineWrapper.wineServer("-k")
+
             runCommand("pkill -9 .exe")
 
             val skCodec = File("/system/lib64/libskcodec.so")
@@ -688,7 +689,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            runCommand("pkill -9 wineserver")
+            WineWrapper.wineServer("-k")
+
             runCommand("pkill -9 .exe")
 
             runOnUiThread {
@@ -796,9 +798,7 @@ class MainActivity : AppCompatActivity() {
         val exePath = intent.getStringExtra("exePath")
         val exeArguments = intent.getStringExtra("exeArguments")
 
-        val emulationActivityIntent = Intent(this, EmulationActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-        }
+        val emulationActivityIntent = Intent(this, EmulationActivity::class.java)
 
         if (exePath != null) {
             if (File(exePath).exists()) {
@@ -809,7 +809,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 )
 
-                startActivityIfNeeded(emulationActivityIntent, 0)
+                startActivity(emulationActivityIntent)
             }
         }
 
@@ -827,7 +827,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            startActivityIfNeeded(emulationActivityIntent, 0)
+            startActivity(emulationActivityIntent)
         }
 
         super.onNewIntent(intent)

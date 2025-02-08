@@ -22,7 +22,6 @@ import android.util.Log
 import android.view.Display
 import android.view.InputDevice
 import android.view.KeyEvent
-import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.Surface
 import android.view.View
@@ -33,7 +32,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -71,6 +69,7 @@ import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
+import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.views.OverlayView
@@ -188,19 +187,13 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         val headerViewMain: View = findViewById<NavigationView>(R.id.NavigationView).getHeaderView(0).apply {
             findViewById<MaterialButton>(R.id.exitButton).setOnClickListener {
-                drawerLayout?.closeDrawers()
+                WineWrapper.wineServer("-k")
 
-                runCommand("pkill -9 wineserver")
                 runCommand("pkill -9 .exe")
-                runCommand("pkill -9 pulseaudio")
 
                 logTextView.text = ""
 
-                val intent = Intent(this@EmulationActivity, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-                }
-
-                startActivityIfNeeded(intent, 0)
+                finishAffinity()
             }
 
             findViewById<MaterialButton>(R.id.openKeyboardButton).setOnClickListener {
