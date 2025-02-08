@@ -34,8 +34,7 @@ import com.micewine.emu.fragments.InfoDialogFragment
 
 class AdapterSettingsPreferences(
     private val settingsList: List<SettingsListSpinner>,
-    private val activity: FragmentActivity,
-    private val recyclerView: RecyclerView
+    private val activity: FragmentActivity
 ) :
     RecyclerView.Adapter<AdapterSettingsPreferences.ViewHolder>() {
 
@@ -125,7 +124,7 @@ class AdapterSettingsPreferences(
 
                             if (sList.key == DISPLAY_MODE) {
                                 activity.runOnUiThread {
-                                    recyclerView.adapter?.notifyItemRangeChanged(holder.adapterPosition + 1, recyclerView.adapter?.itemCount!!)
+                                    notifyItemRangeChanged(holder.adapterPosition + 1, itemCount)
                                 }
                             }
                         }

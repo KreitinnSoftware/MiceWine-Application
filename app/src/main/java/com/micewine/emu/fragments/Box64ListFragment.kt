@@ -13,7 +13,7 @@ import com.micewine.emu.adapters.AdapterRatPackage.Companion.BOX64
 import java.io.File
 
 class Box64ListFragment : Fragment() {
-    private val ratList: MutableList<AdapterRatPackage.Item> = ArrayList()
+    private val ratList: MutableList<AdapterRatPackage.Item> = mutableListOf()
     private var rootView: View? = null
     private var recyclerView: RecyclerView? = null
 
@@ -41,13 +41,14 @@ class Box64ListFragment : Fragment() {
 
                 val name = lines[0].substringAfter("=")
                 val version = lines[2].substringAfter("=")
+                val canDelete = !File("$file/pkg-no-remove").exists()
 
-                addToAdapter(name, version, file.name)
+                addToAdapter(name, version, file.name, canDelete)
             }
         }
     }
 
-    private fun addToAdapter(title: String, description: String, driverFolderId: String) {
-        ratList.add(AdapterRatPackage.Item(title, description, driverFolderId, BOX64))
+    private fun addToAdapter(title: String, description: String, driverFolderId: String, canDelete: Boolean) {
+        ratList.add(AdapterRatPackage.Item(title, description, driverFolderId, BOX64, canDelete))
     }
 }

@@ -7,7 +7,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BO
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
-import com.micewine.emu.activities.MainActivity.Companion.usrDir
+import com.micewine.emu.activities.MainActivity.Companion.setupDone
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarValue
@@ -84,6 +84,10 @@ object RatPackageManager {
                 val driverLibPath = "$extractDir/files/usr/lib/${ratPackage.driverLib}"
 
                 File("$extractDir/pkg-header").writeText("name=${ratPackage.name}\ncategory=${ratPackage.category}\nversion=${ratPackage.version}\narchitecture=${ratPackage.architecture}\nvkDriverLib=$driverLibPath\n")
+
+                if (setupDone) {
+                    File("$extractDir/pkg-external").writeText("")
+                }
             }
             "Box64" -> {
                 preferences.apply {
@@ -96,6 +100,10 @@ object RatPackageManager {
                 }
 
                 File("$extractDir/pkg-header").writeText("name=${ratPackage.name}\ncategory=${ratPackage.category}\nversion=${ratPackage.version}\narchitecture=${ratPackage.architecture}\nvkDriverLib=\n")
+
+                if (setupDone) {
+                    File("$extractDir/pkg-external").writeText("")
+                }
             }
         }
     }

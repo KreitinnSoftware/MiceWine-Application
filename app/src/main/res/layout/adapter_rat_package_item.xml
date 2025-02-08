@@ -28,7 +28,8 @@
         </RadioButton>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
@@ -53,6 +54,15 @@
                 android:textSize="15sp"
                 tools:ignore="HardcodedText" />
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/rat_package_delete"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:src="@android:drawable/ic_menu_delete">
+        </ImageButton>
 
     </LinearLayout>
 
