@@ -201,7 +201,7 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val WINE_LOG_LEVEL = "wineLogLevel"
         const val WINE_LOG_LEVEL_DEFAULT_VALUE = "default"
         const val SELECTED_GL_PROFILE = "selectedGLProfile"
-        const val SELECTED_GL_PROFILE_DEFAULT_VALUE = "GL 4.6"
+        const val SELECTED_GL_PROFILE_DEFAULT_VALUE = "GL 3.2"
         const val SELECTED_DXVK_HUD_PRESET = "selectedDXVKHudPreset"
         const val SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE = ""
         const val SELECTED_MESA_VK_WSI_PRESENT_MODE = "MESA_VK_WSI_PRESENT_MODE"
