@@ -176,17 +176,16 @@ class AdapterSettingsPreferences(
                         } else {
                             holder.seekBarValue.text = "$progress FPS"
                         }
-
-                        preferences.edit().apply {
-                            putInt(sList.key, progress)
-                            apply()
-                        }
                     }
 
                     override fun onStartTrackingTouch(seekBar: SeekBar?) {
                     }
 
                     override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                        preferences.edit().apply {
+                            putInt(sList.key, seekBar?.progress!!)
+                            apply()
+                        }
                     }
                 })
             }
@@ -212,10 +211,10 @@ class AdapterSettingsPreferences(
         override fun onClick(v: View) {
             val settingsModel = settingsList[getAdapterPosition()]
 
-            InfoDialogFragment.titleText = settingsName.text.toString()
-            InfoDialogFragment.descriptionText = activity.getString(settingsModel.descriptionSettings)
-
-            InfoDialogFragment().show(activity.supportFragmentManager, "")
+            InfoDialogFragment(
+                settingsName.text.toString(),
+                activity.getString(settingsModel.descriptionSettings)
+            ).show(activity.supportFragmentManager, "")
         }
     }
 

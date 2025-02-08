@@ -23,12 +23,12 @@ class CreateControllerPresetFragment : DialogFragment() {
             val newName = editTextNewName.text.toString()
 
             if (newName == "") {
-                dialog.dismiss()
+                dismiss()
             }
 
             addControllerPreset(requireContext(), newName)
 
-            dialog.dismiss()
+            dismiss()
         }
 
         return dialog

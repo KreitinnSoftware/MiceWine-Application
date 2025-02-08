@@ -8,7 +8,7 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.material.button.MaterialButton
 import com.micewine.emu.R
 
-class InfoDialogFragment : DialogFragment() {
+class InfoDialogFragment(private val titleText: String, private val descriptionText: String) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.fragment_info, null)
@@ -24,10 +24,5 @@ class InfoDialogFragment : DialogFragment() {
         }
 
         return AlertDialog.Builder(requireActivity(), R.style.CustomAlertDialog).setView(view).create()
-    }
-
-    companion object {
-        var titleText = ""
-        var descriptionText = ""
     }
 }

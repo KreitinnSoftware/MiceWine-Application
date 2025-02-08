@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.micewine.emu.R
 
 class WelcomeFragment(private val fragment: Int) : Fragment() {
     override fun onCreateView(

@@ -6,10 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.micewine.emu.activities.EmulationActivity.Companion.handler
 import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
-import com.micewine.emu.activities.MainActivity.Companion.cpuAffinity
 import com.micewine.emu.fragments.InfoDialogFragment
-import com.micewine.emu.fragments.InfoDialogFragment.Companion.descriptionText
-import com.micewine.emu.fragments.InfoDialogFragment.Companion.titleText
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.IOException
@@ -139,19 +136,25 @@ object ShellLoader {
                     val missingDllName = "${text.split("Library ")[1].split(".dll")[0]}.dll"
 
                     Log.v("DLL Import", "Error loading '$missingDllName'")
-                    titleText = "Missing DLL"
-                    descriptionText = "Error loading '$missingDllName'"
-                    InfoDialogFragment().show(supportFragmentManager, "")
+
+                    InfoDialogFragment(
+                        "Missing DLL",
+                        "Error loading '$missingDllName'"
+                    ).show(supportFragmentManager, "")
                 } else if (text.contains("VK_ERROR_DEVICE_LOST")) {
                     Log.v("VK Driver", "VK_ERROR_DEVICE_LOST")
-                    titleText = "VK_ERROR_DEVICE_LOST"
-                    descriptionText = "Error on Vulkan Graphics Driver 'VK_ERROR_DEVICE_LOST'"
-                    InfoDialogFragment().show(supportFragmentManager, "")
+
+                    InfoDialogFragment(
+                        "VK_ERROR_DEVICE_LOST",
+                        "Error on Vulkan Graphics Driver 'VK_ERROR_DEVICE_LOST'"
+                    ).show(supportFragmentManager, "")
                 } else if (text.contains("X_CreateWindow")) {
                     Log.v("X11 Driver", "BadWindow: X_CreateWindow")
-                    titleText = "X_CreateWindow"
-                    descriptionText = "Error on Creating X Window 'X_CreateWindow'"
-                    InfoDialogFragment().show(supportFragmentManager, "")
+
+                    InfoDialogFragment(
+                        "X_CreateWindow",
+                        "Error on Creating X Window 'X_CreateWindow'"
+                    ).show(supportFragmentManager, "")
                 }
             }
         }

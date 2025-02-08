@@ -340,7 +340,7 @@ class MainActivity : AppCompatActivity() {
 
         onNewIntent(intent)
 
-        if (Build.VERSION.SDK_INT > 30) {
+        if (Build.VERSION.SDK_INT >= 30) {
             if (winePrefix.exists()) {
                 WineWrapper.clearDrives()
 

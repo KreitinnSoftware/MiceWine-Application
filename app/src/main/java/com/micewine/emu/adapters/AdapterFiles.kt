@@ -1,19 +1,15 @@
 package com.micewine.emu.adapters
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.getkeepsafe.taptargetview.TapTarget
-import com.getkeepsafe.taptargetview.TapTargetView
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_FILE_MANAGER
 import com.micewine.emu.activities.MainActivity.Companion.customRootFSPath
@@ -74,12 +70,12 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
             val fileExtension = sList.file.extension.lowercase()
 
             if (fileExtension == "exe") {
-                val output = "$usrDir/icons/${sList.file.nameWithoutExtension}-icon.ico"
+                val output = File("$usrDir/icons/${sList.file.nameWithoutExtension}-icon")
 
-                extractIcon(sList.file, output)
+                extractIcon(sList.file, output.path)
 
-                if (File(output).exists()) {
-                    holder.icon.setImageBitmap(BitmapFactory.decodeFile(output))
+                if (output.exists() && output.length() > 0) {
+                    holder.icon.setImageBitmap(BitmapFactory.decodeFile(output.path))
                 } else {
                     holder.icon.setImageResource(R.drawable.ic_log)
                 }
@@ -90,12 +86,12 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                 if (drive != null) {
                     val filePath = File(drive.getUnixPath())
 
-                    val output = "$usrDir/icons/${filePath.nameWithoutExtension}-icon.ico"
+                    val output = File("$usrDir/icons/${filePath.nameWithoutExtension}-icon")
 
-                    extractIcon(filePath, output)
+                    extractIcon(filePath, output.path)
 
-                    if (File(output).exists()) {
-                        holder.icon.setImageBitmap(BitmapFactory.decodeFile(output))
+                    if (output.exists() && output.length() > 0) {
+                        holder.icon.setImageBitmap(BitmapFactory.decodeFile(output.path))
                     } else {
                         holder.icon.setImageResource(R.drawable.ic_log)
                     }

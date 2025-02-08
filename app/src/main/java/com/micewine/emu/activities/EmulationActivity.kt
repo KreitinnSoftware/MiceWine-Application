@@ -31,6 +31,9 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ScrollView
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -46,15 +49,22 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.navigation.NavigationView
 import com.micewine.emu.CmdEntryPoint
 import com.micewine.emu.ICmdEntryInterface
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
+import com.micewine.emu.activities.DriverManagerActivity.Companion.generateMangoHUDConfFile
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.FPS_LIMIT
 import com.micewine.emu.activities.MainActivity.Companion.enableCpuCounter
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.activities.MainActivity.Companion.getCpuInfo
 import com.micewine.emu.activities.MainActivity.Companion.getMemoryInfo
+import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
+import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
@@ -101,7 +111,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     private var logsNavigationView: NavigationView? = null
     private var overlayView: OverlayView? = null
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -176,34 +186,50 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             controllerMouseEmulation(lorieView)
         }
 
-        findViewById<NavigationView>(R.id.NavigationView).setNavigationItemSelectedListener { item: MenuItem ->
-            when (item.itemId) {
-                R.id.exit -> {
-                    drawerLayout?.closeDrawers()
+        val headerViewMain: View = findViewById<NavigationView>(R.id.NavigationView).getHeaderView(0).apply {
+            findViewById<MaterialButton>(R.id.exitButton).setOnClickListener {
+                drawerLayout?.closeDrawers()
 
-                    runCommand("pkill -9 wineserver")
-                    runCommand("pkill -9 .exe")
-                    runCommand("pkill -9 pulseaudio")
+                runCommand("pkill -9 wineserver")
+                runCommand("pkill -9 .exe")
+                runCommand("pkill -9 pulseaudio")
 
-                    logTextView.text = ""
+                logTextView.text = ""
 
-                    val intent = Intent(this, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                val intent = Intent(this@EmulationActivity, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                }
+
+                startActivityIfNeeded(intent, 0)
+            }
+
+            findViewById<MaterialButton>(R.id.openKeyboardButton).setOnClickListener {
+                @Suppress("DEPRECATION")
+                inputManager.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
+
+                lorieView.requestFocus()
+
+                drawerLayout?.closeDrawers()
+            }
+
+            findViewById<MaterialSwitch>(R.id.enableMangoHudSwitch).apply {
+                isChecked = preferences.getBoolean(ENABLE_MANGOHUD, ENABLE_MANGOHUD_DEFAULT_VALUE)
+
+                setOnClickListener {
+                    preferences.edit().apply {
+                        putBoolean(ENABLE_MANGOHUD, isChecked)
+                        apply()
                     }
 
-                    startActivityIfNeeded(intent, 0)
+                    setSharedVars(this@EmulationActivity)
+                    generateMangoHUDConfFile()
                 }
+            }
 
-                R.id.openCloseKeyboard -> {
-                    @Suppress("DEPRECATION")
-                    inputManager.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
+            findViewById<MaterialSwitch>(R.id.stretchDisplaySwitch).apply {
+                isChecked = preferences.getBoolean("displayStretch", false)
 
-                    lorieView.requestFocus()
-
-                    drawerLayout?.closeDrawers()
-                }
-
-                R.id.setScreenStretch -> {
+                setOnClickListener {
                     preferences.edit().apply {
                         putBoolean("displayStretch", !preferences.getBoolean("displayStretch", false))
                         apply()
@@ -211,32 +237,70 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
                     lorieView.requestLayout()
                 }
+            }
 
-                R.id.openLogViewer -> {
-                    drawerLayout?.openDrawer(GravityCompat.END)
-                    drawerLayout?.closeDrawer(GravityCompat.START)
-                }
+            findViewById<MaterialSwitch>(R.id.openCloseOverlaySwitch).apply {
+                isChecked = overlayView?.isVisible!!
 
-                R.id.openCloseOverlay -> {
+                setOnClickListener {
                     if (overlayView?.isVisible!!) {
                         overlayView?.visibility = View.INVISIBLE
                     } else {
                         overlayView?.visibility = View.VISIBLE
                     }
-
-                    drawerLayout?.closeDrawers()
-                }
-
-                R.id.editVirtualControllerMapping -> {
-                    startActivity(Intent(this, VirtualControllerOverlayMapper::class.java))
-                }
-
-                R.id.editControllerMapping -> {
-                    startActivity(Intent(this, ControllerMapper::class.java))
                 }
             }
-            true
+
+            findViewById<MaterialButton>(R.id.openLogViewer).setOnClickListener {
+                drawerLayout?.openDrawer(GravityCompat.END)
+                drawerLayout?.closeDrawer(GravityCompat.START)
+            }
+
+            findViewById<MaterialButton>(R.id.editVirtualControllerMapping).setOnClickListener {
+                startActivity(Intent(this@EmulationActivity, VirtualControllerOverlayMapper::class.java))
+            }
+
+            findViewById<MaterialButton>(R.id.editControllerMapping).setOnClickListener {
+                startActivity(Intent(this@EmulationActivity, ControllerMapper::class.java))
+            }
         }
+
+        val fpsLimitText = headerViewMain.findViewById<TextView>(R.id.fpsLimitText)
+        val fpsLimitSeekbar = headerViewMain.findViewById<SeekBar>(R.id.fpsLimitSeekbar)
+
+        fpsLimitSeekbar.min = 0
+        fpsLimitSeekbar.max = screenFpsLimit
+        fpsLimitSeekbar.progress = preferences.getInt(FPS_LIMIT, screenFpsLimit)
+
+        if (fpsLimitSeekbar.progress == 0) {
+            fpsLimitText.text = getString(R.string.unlimited)
+        } else {
+            fpsLimitText.text = "${fpsLimitSeekbar.progress} FPS"
+        }
+
+        fpsLimitSeekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (progress == 0) {
+                    fpsLimitText.text = getString(R.string.unlimited)
+                } else {
+                    fpsLimitText.text = "$progress FPS"
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                preferences.edit().apply {
+                    putInt(FPS_LIMIT, seekBar?.progress!!)
+                    apply()
+                }
+
+                setSharedVars(this@EmulationActivity)
+                generateMangoHUDConfFile()
+            }
+
+        })
 
         mInputHandler = TouchInputHandler(this, InputEventSender(lorieView))
         mLorieKeyListener = View.OnKeyListener { _: View?, k: Int, e: KeyEvent ->

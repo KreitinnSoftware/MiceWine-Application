@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.EmulationActivity
@@ -27,11 +28,9 @@ class AdapterGame(private val gameList: MutableList<GameList>, private val activ
         val sList = gameList[position]
         holder.titleGame.text = sList.name
 
-        if (sList.imageGame == "") {
-            holder.gameImage.setImageBitmap(resizeBitmap(
-                BitmapFactory.decodeResource(activity.resources, R.drawable.default_icon), holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height)
-            )
-        } else if (File(sList.imageGame).exists()) {
+        val imageFile = File(sList.imageGame)
+
+        if (imageFile.exists() && imageFile.length() > 0) {
             val imageBitmap = BitmapFactory.decodeFile(sList.imageGame)
 
             if (imageBitmap != null) {
@@ -41,6 +40,14 @@ class AdapterGame(private val gameList: MutableList<GameList>, private val activ
                     )
                 )
             }
+        } else if (sList.imageGame == "") {
+            holder.gameImage.setImageBitmap(resizeBitmap(
+                BitmapFactory.decodeResource(activity.resources, R.drawable.default_icon), holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height)
+            )
+        } else {
+            holder.gameImage.setImageBitmap(
+                Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888),
+            )
         }
     }
 
@@ -71,18 +78,28 @@ class AdapterGame(private val gameList: MutableList<GameList>, private val activ
         override fun onClick(v: View) {
             val gameModel = gameList[adapterPosition]
 
+            var exePath = gameModel.exeFile.path
+            var exeArguments = gameModel.exeArguments
+
+            if (!gameModel.exeFile.exists()) {
+                if (gameModel.exeFile.path == activity.getString(R.string.desktop_mode_init)) {
+                    exePath = ""
+                    exeArguments = ""
+                } else {
+                    activity.runOnUiThread {
+                        Toast.makeText(activity, "", Toast.LENGTH_SHORT).show()
+                    }
+                    return
+                }
+            }
+
             val intent = Intent(activity, EmulationActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
             }
 
             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
-                if (gameModel.exeFile.path == activity.getString(R.string.desktop_mode_init)) {
-                    putExtra("exePath", "")
-                    putExtra("exeArguments", "")
-                } else {
-                    putExtra("exePath", gameModel.exeFile.toString())
-                    putExtra("exeArguments", gameModel.exeArguments)
-                }
+                putExtra("exePath", exePath)
+                putExtra("exeArguments", exeArguments)
             }
 
             activity.sendBroadcast(runWineIntent)
