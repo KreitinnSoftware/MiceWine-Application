@@ -159,4 +159,6 @@
     <string name="unlimited">无限</string>
     <string name="fps_limit_title">FPS 限制</string>
     <string name="app_arguments">启动参数</string>
+    <string name="deleting_wine_prefix">正在删除 Wine 前缀…</string>
+    <string name="remove_last_wine_prefix_error">您无法删除最后一个前缀</string>
 </resources>

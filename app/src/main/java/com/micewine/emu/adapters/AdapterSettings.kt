@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.Box64ManagerActivity
-import com.micewine.emu.activities.ControllerMapper
+import com.micewine.emu.activities.ControllerMapperActivity
 import com.micewine.emu.activities.GeneralSettingsActivity
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ACTION_PREFERENCE_SELECT
 import com.micewine.emu.activities.DriverManagerActivity
@@ -54,7 +54,7 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
                 }
 
                 context.getString(R.string.controller_mapper_title) -> {
-                    val intent = Intent(context, ControllerMapper::class.java)
+                    val intent = Intent(context, ControllerMapperActivity::class.java)
                     context.startActivity(intent)
                 }
 

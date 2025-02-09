@@ -254,7 +254,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
 
             findViewById<MaterialButton>(R.id.editControllerMapping).setOnClickListener {
-                startActivity(Intent(this@EmulationActivity, ControllerMapper::class.java))
+                startActivity(Intent(this@EmulationActivity, ControllerMapperActivity::class.java))
             }
         }
 

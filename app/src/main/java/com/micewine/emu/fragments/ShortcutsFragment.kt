@@ -1,7 +1,11 @@
 package com.micewine.emu.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.graphics.Rect
 import android.net.Uri
@@ -13,9 +17,14 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ImageButton
+import android.widget.Spinner
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -25,11 +34,18 @@ import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_PREFIX
 import com.micewine.emu.activities.MainActivity.Companion.copyFile
+import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
+import com.micewine.emu.activities.MainActivity.Companion.winePrefix
+import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
 import com.micewine.emu.adapters.AdapterGame
 import com.micewine.emu.core.HighlightState
 import com.micewine.emu.databinding.FragmentShortcutsBinding
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
+import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_WINE_PREFIX
+import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.max
 
@@ -39,7 +55,29 @@ class ShortcutsFragment : Fragment() {
     private var layoutManager: GridLayoutManager? = null
     private var preferences: SharedPreferences? = null
     private var itemTouchHelper: ItemTouchHelper? = null
+    private var selectedWinePrefixSpinner: Spinner? = null
+    private var createWinePrefixButton: ImageButton? = null
+    private var deleteWinePrefixButton: ImageButton? = null
+    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                ACTION_UPDATE_WINE_PREFIX_SPINNER -> {
+                    val prefixName = intent.getStringExtra("prefixName")
+                    val winePrefixes = winePrefixesDir.listFiles()?.map { it.name }?.toTypedArray() ?: emptyArray()
 
+                    selectedWinePrefixSpinner?.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, winePrefixes)
+
+                    if (prefixName == null) {
+                        selectedWinePrefixSpinner?.setSelection(0)
+                    } else {
+                        selectedWinePrefixSpinner?.setSelection(winePrefixes.indexOf(prefixName))
+                    }
+                }
+            }
+        }
+    }
+
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -134,6 +172,47 @@ class ShortcutsFragment : Fragment() {
 
         registerForContextMenu(recyclerView!!)
 
+        selectedWinePrefixSpinner = rootView?.findViewById(R.id.selectedWinePrefixSpinner)
+
+        val winePrefixes = winePrefixesDir.listFiles()?.map { it.name }?.toTypedArray() ?: emptyArray()
+
+        selectedWinePrefixSpinner?.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, winePrefixes)
+        selectedWinePrefixSpinner?.setSelection(winePrefixes.indexOf(winePrefix?.name))
+        selectedWinePrefixSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                preferences!!.edit().apply {
+                    putString(WINE_PREFIX, parent?.selectedItem.toString())
+                    apply()
+                }
+
+                recyclerView?.adapter?.notifyDataSetChanged()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
+        createWinePrefixButton = rootView?.findViewById(R.id.createWinePrefix)
+        createWinePrefixButton?.setOnClickListener {
+            lifecycleScope.launch {
+                setSharedVars(requireActivity())
+                CreatePresetFragment(WINEPREFIX_PRESET).show(requireActivity().supportFragmentManager, "")
+            }
+        }
+
+        deleteWinePrefixButton = rootView?.findViewById(R.id.deleteWinePrefix)
+        deleteWinePrefixButton?.setOnClickListener {
+            DeleteItemFragment(DELETE_WINE_PREFIX, requireContext()).show(requireActivity().supportFragmentManager, "")
+        }
+
+        activity?.registerReceiver(receiver, object : IntentFilter(ACTION_UPDATE_WINE_PREFIX_SPINNER) {})
+
         return rootView
     }
 
@@ -216,7 +295,9 @@ class ShortcutsFragment : Fragment() {
         private val listType = object : TypeToken<MutableList<Array<String>>>() {}.type
         private var recyclerView: RecyclerView? = null
         private val gameList: MutableList<AdapterGame.GameList> = ArrayList()
+
         const val HIGHLIGHT_SHORTCUT_PREFERENCE_KEY = "highlightedShortcut"
+        const val ACTION_UPDATE_WINE_PREFIX_SPINNER = "com.micewine.emu.ACTION_UPDATE_WINEPREFIX_SPINNER"
 
         fun setAdapter(activity: Activity, preferences: SharedPreferences) {
             recyclerView?.adapter = AdapterGame(gameList, activity)

@@ -110,6 +110,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VK
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VKD3D_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINED3D
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINED3D_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_PREFIX
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL
@@ -128,7 +129,8 @@ import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.AboutFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ratCandidate
-import com.micewine.emu.fragments.DeleteGameItemFragment
+import com.micewine.emu.fragments.DeleteItemFragment
+import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_GAME_ITEM
 import com.micewine.emu.fragments.EditGamePreferencesFragment
 import com.micewine.emu.fragments.FileManagerFragment
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
@@ -139,6 +141,7 @@ import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
 import com.micewine.emu.fragments.ShortcutsFragment
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.ACTION_UPDATE_WINE_PREFIX_SPINNER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.saveToGameList
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
@@ -188,7 +191,7 @@ class MainActivity : AppCompatActivity() {
                     val fileName = intent.getStringExtra("selectedFile")
 
                     if (fileName == "..") {
-                        fileManagerCwd = File(fileManagerCwd).parent!!
+                        fileManagerCwd = File(fileManagerCwd!!).parent!!
 
                         refreshFiles()
 
@@ -270,6 +273,43 @@ class MainActivity : AppCompatActivity() {
                 ACTION_SELECT_ICON -> {
                     openFilePicker()
                 }
+
+                ACTION_CREATE_WINEPREFIX -> {
+                    val winePrefix = intent.getStringExtra("winePrefix")!!
+
+                    lifecycleScope.launch { runXServer(":0") }
+                    lifecycleScope.launch {
+                        setupDone = false
+
+                        SetupFragment().show(supportFragmentManager, "")
+
+                        dialogTitleText = getString(R.string.creating_wine_prefix)
+                        progressBarIsIndeterminate = true
+
+                        withContext(Dispatchers.IO) {
+                            setupWinePrefix(
+                                File(winePrefix)
+                            )
+
+                            fileManagerCwd = fileManagerDefaultDir
+                            setupDone = true
+
+                            val updateWinePrefixSpinnerIntent = Intent(ACTION_UPDATE_WINE_PREFIX_SPINNER).apply {
+                                putExtra("prefixName", File(winePrefix).name)
+                            }
+
+                            sendBroadcast(
+                                updateWinePrefixSpinnerIntent
+                            )
+
+                            withContext(Dispatchers.Main) {
+                                runOnUiThread {
+                                    showHighlightSequence()
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -336,13 +376,14 @@ class MainActivity : AppCompatActivity() {
                 addAction(ACTION_INSTALL_RAT)
                 addAction(ACTION_SELECT_FILE_MANAGER)
                 addAction(ACTION_SELECT_ICON)
+                addAction(ACTION_CREATE_WINEPREFIX)
             }
         })
 
         onNewIntent(intent)
 
-        if (Build.VERSION.SDK_INT >= 30) {
-            if (winePrefix.exists()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (winePrefix!!.exists()) {
                 WineWrapper.clearDrives()
 
                 (application.getSystemService(Context.STORAGE_SERVICE) as StorageManager).storageVolumes.forEach { volume ->
@@ -375,7 +416,7 @@ class MainActivity : AppCompatActivity() {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (selectedFragment == "FileManagerFragment") {
                 if (fileManagerCwd != fileManagerDefaultDir) {
-                    fileManagerCwd = File(fileManagerCwd).parent!!
+                    fileManagerCwd = File(fileManagerCwd!!).parent!!
 
                     refreshFiles()
 
@@ -416,7 +457,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.removeGameItem -> {
-                DeleteGameItemFragment().show(supportFragmentManager, "")
+                DeleteItemFragment(DELETE_GAME_ITEM, this).show(supportFragmentManager, "")
             }
 
             R.id.editGameItem -> {
@@ -460,7 +501,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.deleteFile -> {
-                DeleteGameItemFragment().show(supportFragmentManager, "")
+                DeleteItemFragment(DELETE_GAME_ITEM, this).show(supportFragmentManager, "")
             }
         }
 
@@ -641,7 +682,7 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun runWine(exePath: String, exeArguments: String) {
         withContext(Dispatchers.Default) {
-            installDXWrapper(winePrefix)
+            installDXWrapper(winePrefix!!)
 
             WineWrapper.wineServer("-k")
 
@@ -770,6 +811,7 @@ class MainActivity : AppCompatActivity() {
 
             tmpDir.mkdirs()
             homeDir.mkdirs()
+            winePrefixesDir.mkdirs()
 
             runCommand("chmod 700 -R $appRootDir")
 
@@ -782,15 +824,11 @@ class MainActivity : AppCompatActivity() {
 
             setSharedVars(this@MainActivity)
 
-            setupWinePrefix()
-
-            fileManagerCwd = fileManagerDefaultDir
-            setupDone = true
-            withContext(Dispatchers.Main) {
-                supportFragmentManager.beginTransaction().detach(aboutFragment).commit()
-                supportFragmentManager.beginTransaction().attach(aboutFragment).commit()
-                showHighlightSequence()
+            val createWinePrefixIntent = Intent(ACTION_CREATE_WINEPREFIX).apply {
+                putExtra("winePrefix", winePrefix?.path)
             }
+
+            sendBroadcast(createWinePrefixIntent)
         }
     }
 
@@ -954,10 +992,11 @@ class MainActivity : AppCompatActivity() {
         var selectedGameArray: Array<String> = arrayOf()
         var memoryStats = "??/??"
         var totalCpuUsage = "???%"
-        var winePrefix: File = File("$homeDir/.wine")
-        var wineDisksFolder: String = "$homeDir/.wine/dosdevices"
-        var fileManagerDefaultDir: String = wineDisksFolder
-        var fileManagerCwd: String = fileManagerDefaultDir
+        var winePrefixesDir: File = File("$appRootDir/winePrefixes")
+        var wineDisksFolder: File? = null
+        var winePrefix: File? = null
+        var fileManagerDefaultDir: String = ""
+        var fileManagerCwd: String? = null
         var selectedFile: String = ""
         var miceWineVersion: String = "MiceWine ${BuildConfig.VERSION_NAME} (git-${BuildConfig.GIT_SHORT_SHA})"
         var vulkanDriverDeviceName: String? = null
@@ -974,6 +1013,7 @@ class MainActivity : AppCompatActivity() {
         const val ACTION_STOP_ALL = "com.micewine.emu.ACTION_STOP_ALL"
         const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
         const val ACTION_SELECT_ICON = "com.micewine.emu.ACTION_SELECT_ICON"
+        const val ACTION_CREATE_WINEPREFIX = "com.micewine.emu.ACTION_CREATE_WINEPREFIX"
         const val RAM_COUNTER = "ramCounter"
         const val RAM_COUNTER_DEFAULT_VALUE = true
         const val CPU_COUNTER = "cpuCounter"
@@ -981,7 +1021,7 @@ class MainActivity : AppCompatActivity() {
         const val ENABLE_DEBUG_INFO = "debugInfo"
         const val ENABLE_DEBUG_INFO_DEFAULT_VALUE = true
 
-        fun setupWinePrefix() {
+        fun setupWinePrefix(winePrefix: File) {
             if (!winePrefix.exists()) {
                 val driveC = File("$winePrefix/drive_c")
                 val wineUtils = File("$appRootDir/wine-utils")
@@ -1027,6 +1067,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        @Suppress("DEPRECATION")
         fun setSharedVars(activity: Activity) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
 
@@ -1084,6 +1125,10 @@ class MainActivity : AppCompatActivity() {
             fpsLimit = preferences.getInt(FPS_LIMIT, screenFpsLimit)
 
             vulkanDriverDeviceName = getVulkanDeviceName()
+
+            winePrefix = File("$winePrefixesDir/${preferences.getString(WINE_PREFIX, "default")}")
+            wineDisksFolder = File("$winePrefix/dosdevices/")
+            fileManagerDefaultDir = wineDisksFolder!!.path
         }
 
         fun copyAssets(activity: Activity, filename: String, outputPath: String) {

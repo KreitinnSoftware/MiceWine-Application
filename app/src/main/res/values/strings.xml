@@ -182,4 +182,6 @@
     <string name="unlimited">Unlimited</string>
     <string name="fps_limit_title">FPS Limit</string>
     <string name="app_arguments">Launch Arguments</string>
+    <string name="deleting_wine_prefix">Deleting Wine Prefix…</string>
+    <string name="remove_last_wine_prefix_error">You cannot remove last prefix</string>
 </resources>

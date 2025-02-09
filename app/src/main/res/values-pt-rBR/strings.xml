@@ -159,4 +159,6 @@
     <string name="unlimited">Ilimitado</string>
     <string name="fps_limit_title">Limite de FPS</string>
     <string name="app_arguments">Argumentos de Inicialização</string>
+    <string name="deleting_wine_prefix">Apagando Prefixo Wine…</string>
+    <string name="remove_last_wine_prefix_error">Você não pode remover o último prefixo</string>
 </resources>

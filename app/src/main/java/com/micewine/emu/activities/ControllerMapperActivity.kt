@@ -29,10 +29,13 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.MOUSE_SENSI
 import com.micewine.emu.controller.ControllerUtils.getGameControllerNames
 import com.micewine.emu.databinding.ActivityControllerMapperBinding
 import com.micewine.emu.fragments.ControllerMapperFragment
-import com.micewine.emu.fragments.CreateControllerPresetFragment
+import com.micewine.emu.fragments.CreatePresetFragment
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
+import com.micewine.emu.fragments.DeleteItemFragment
+import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_CONTROLLER_PRESET
 import java.util.Collections
 
-class ControllerMapper : AppCompatActivity() {
+class ControllerMapperActivity : AppCompatActivity() {
     private var binding: ActivityControllerMapperBinding? = null
     private var backButton: ImageButton? = null
     private var controllerConnected: TextView? = null
@@ -46,13 +49,15 @@ class ControllerMapper : AppCompatActivity() {
     private var preferences: SharedPreferences? = null
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (ACTION_UPDATE_CONTROLLER_MAPPER == intent.action) {
-                val name = intent.getStringExtra("name")
+            when (intent.action) {
+                ACTION_UPDATE_CONTROLLER_MAPPER -> {
+                    val name = intent.getStringExtra("name")
 
-                selectedControllerPresetSpinner?.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, getControllerPresetsName(context))
-                selectedControllerPresetSpinner?.setSelection(getControllerPresetsName(context).indexOf(name))
+                    selectedControllerPresetSpinner?.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, getControllerPresetsName(context))
+                    selectedControllerPresetSpinner?.setSelection(getControllerPresetsName(context).indexOf(name))
 
-                fragmentLoader(ControllerMapperFragment())
+                    fragmentLoader(ControllerMapperFragment())
+                }
             }
         }
     }
@@ -155,12 +160,12 @@ class ControllerMapper : AppCompatActivity() {
 
         addNewPresetButton = findViewById(R.id.addNewPreset)
         addNewPresetButton?.setOnClickListener {
-            CreateControllerPresetFragment().show(supportFragmentManager, "")
+            CreatePresetFragment(CONTROLLER_PRESET).show(supportFragmentManager, "")
         }
 
         deletePresetButton = findViewById(R.id.deletePreset)
         deletePresetButton?.setOnClickListener {
-            deleteControllerPreset(this, preferences?.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!)
+            DeleteItemFragment(DELETE_CONTROLLER_PRESET, this).show(supportFragmentManager, "")
         }
 
         registerReceiver(receiver, object : IntentFilter(ACTION_UPDATE_CONTROLLER_MAPPER) {})
@@ -328,8 +333,7 @@ class ControllerMapper : AppCompatActivity() {
             val currentList = loadControllerPresets(context)
 
             if (currentList.count() == 1) {
-                Toast.makeText(context,
-                    context.getString(R.string.remove_last_preset_error), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.remove_last_preset_error), Toast.LENGTH_SHORT).show()
 
                 return
             }

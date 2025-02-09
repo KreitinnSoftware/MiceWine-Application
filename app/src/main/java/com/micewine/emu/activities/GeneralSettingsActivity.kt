@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.micewine.emu.R
-import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.databinding.ActivityGeneralSettingsBinding
 import com.micewine.emu.fragments.Box64SettingsFragment
@@ -214,5 +213,6 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val MOUSE_SENSIBILITY = "mouseSensibility"
         const val CPU_AFFINITY = "cpuAffinity"
         const val FPS_LIMIT = "fpsLimit"
+        const val WINE_PREFIX = "winePrefix"
     }
 }

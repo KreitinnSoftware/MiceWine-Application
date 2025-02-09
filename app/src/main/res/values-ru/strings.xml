@@ -155,4 +155,6 @@
     <string name="unlimited">Неограниченно</string>
     <string name="fps_limit_title">Ограничение FPS</string>
     <string name="app_arguments">Аргументы запуска</string>
+    <string name="deleting_wine_prefix">Удаление префикса Wine…</string>
+    <string name="remove_last_wine_prefix_error">Вы не можете удалить последний префикс</string>
 </resources>

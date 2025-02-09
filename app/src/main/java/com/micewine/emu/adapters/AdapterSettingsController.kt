@@ -11,9 +11,9 @@ import android.widget.Spinner
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.ControllerMapper
-import com.micewine.emu.activities.ControllerMapper.Companion.editControllerPreset
-import com.micewine.emu.activities.ControllerMapper.Companion.getMapping
+import com.micewine.emu.activities.ControllerMapperActivity
+import com.micewine.emu.activities.ControllerMapperActivity.Companion.editControllerPreset
+import com.micewine.emu.activities.ControllerMapperActivity.Companion.getMapping
 import com.micewine.emu.controller.XKeyCodes
 
 class AdapterSettingsController(private val settingsControllerList: List<SettingsController>, private val context: Context) :
@@ -33,7 +33,7 @@ class AdapterSettingsController(private val settingsControllerList: List<Setting
 
         holder.image.setImageResource(sList.image)
         
-        val mapping = getMapping(context, preferences.getString(ControllerMapper.SELECTED_CONTROLLER_PRESET_KEY, "default")!!, sList.key)
+        val mapping = getMapping(context, preferences.getString(ControllerMapperActivity.SELECTED_CONTROLLER_PRESET_KEY, "default")!!, sList.key)
 
         when (sList.image) {
             R.drawable.l_up, R.drawable.l_down, R.drawable.l_left, R.drawable.l_right,
@@ -56,7 +56,7 @@ class AdapterSettingsController(private val settingsControllerList: List<Setting
                     position: Int,
                     id: Long
                 ) {
-                    editControllerPreset(context, preferences.getString(ControllerMapper.SELECTED_CONTROLLER_PRESET_KEY, "default")!!, sList.key, parent?.selectedItem.toString())
+                    editControllerPreset(context, preferences.getString(ControllerMapperActivity.SELECTED_CONTROLLER_PRESET_KEY, "default")!!, sList.key, parent?.selectedItem.toString())
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {

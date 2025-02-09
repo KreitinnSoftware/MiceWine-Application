@@ -56,7 +56,7 @@ class FloatingFileManagerFragment: DialogFragment() {
     companion object {
         private var recyclerView: RecyclerView? = null
         var calledSetup: Boolean = false
-        private val fileList: MutableList<AdapterFiles.FileList> = ArrayList()
+        private val fileList: MutableList<AdapterFiles.FileList> = mutableListOf()
 
         fun refreshFiles() {
             recyclerView?.adapter?.notifyItemRangeRemoved(0, fileList.count())
@@ -67,13 +67,13 @@ class FloatingFileManagerFragment: DialogFragment() {
                 addToAdapter(File(".."))
             }
 
-            File(fileManagerCwd).listFiles()?.sorted()?.forEach {
+            File(fileManagerCwd!!).listFiles()?.sorted()?.forEach {
                 if (it.isDirectory) {
                     addToAdapter(it)
                 }
             }
 
-            File(fileManagerCwd).listFiles()?.sorted()?.forEach {
+            File(fileManagerCwd!!).listFiles()?.sorted()?.forEach {
                 if (it.isFile && it.name.endsWith(".rat")) {
                     addToAdapter(it)
                 }
