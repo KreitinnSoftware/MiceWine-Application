@@ -33,8 +33,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
-import com.micewine.emu.activities.DriverManagerActivity.Companion.generateICDFile
-import com.micewine.emu.activities.DriverManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_AVX
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_AVX_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS
@@ -110,11 +108,13 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VK
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VKD3D_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINED3D
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINED3D_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_PREFIX
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL_DEFAULT_VALUE
+import com.micewine.emu.activities.RatManagerActivity.Companion.generateICDFile
+import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.HighlightState
@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
                             RatPackageManager.RatPackage(intent.getStringExtra("ratFile")!!)
                         }
 
-                        if (ratFile.architecture != Build.SUPPORTED_ABIS[0].replace("arm64-v8a", "aarch64")) {
+                        if (ratFile.architecture != Build.SUPPORTED_ABIS[0].replace("arm64-v8a", "aarch64") && ratFile.category != "Wine") {
                             Toast.makeText(context, R.string.invalid_architecture_rat_file, Toast.LENGTH_SHORT).show()
                             return@launch
                         }
@@ -259,14 +259,23 @@ class MainActivity : AppCompatActivity() {
                             return@launch
                         }
 
-                        if (ratFile.category != "VulkanDriver" && ratFile.category != "Box64") {
-                            Toast.makeText(context, "You cannot install other packages than Vulkan Drivers or Box64.", Toast.LENGTH_SHORT).show()
+                        if (ratFile.category != "VulkanDriver" && ratFile.category != "Box64" && ratFile.category != "Wine") {
+                            Toast.makeText(context, "You cannot install other packages than Vulkan Drivers Box64 or Wine.", Toast.LENGTH_SHORT).show()
                             return@launch
                         }
 
-                        installRat(ratFile, context)
+                        withContext(Dispatchers.Default) {
+                            setupDone = false
 
-                        Toast.makeText(context, "Rat Package Installed!", Toast.LENGTH_LONG).show()
+                            SetupFragment().show(supportFragmentManager, "")
+
+                            dialogTitleText = "Installing ${ratFile.name} (${ratFile.version})..."
+                            progressBarIsIndeterminate = true
+
+                            installRat(ratFile, context)
+
+                            setupDone = true
+                        }
                     }
                 }
 
@@ -274,8 +283,9 @@ class MainActivity : AppCompatActivity() {
                     openFilePicker()
                 }
 
-                ACTION_CREATE_WINEPREFIX -> {
+                ACTION_CREATE_WINE_PREFIX -> {
                     val winePrefix = intent.getStringExtra("winePrefix")!!
+                    val wine = intent.getStringExtra("wine")!!
 
                     lifecycleScope.launch { runXServer(":0") }
                     lifecycleScope.launch {
@@ -288,7 +298,7 @@ class MainActivity : AppCompatActivity() {
 
                         withContext(Dispatchers.IO) {
                             setupWinePrefix(
-                                File(winePrefix)
+                                File(winePrefix), wine
                             )
 
                             fileManagerCwd = fileManagerDefaultDir
@@ -376,14 +386,14 @@ class MainActivity : AppCompatActivity() {
                 addAction(ACTION_INSTALL_RAT)
                 addAction(ACTION_SELECT_FILE_MANAGER)
                 addAction(ACTION_SELECT_ICON)
-                addAction(ACTION_CREATE_WINEPREFIX)
+                addAction(ACTION_CREATE_WINE_PREFIX)
             }
         })
 
         onNewIntent(intent)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (winePrefix!!.exists()) {
+            if (winePrefix?.exists() == true) {
                 WineWrapper.clearDrives()
 
                 (application.getSystemService(Context.STORAGE_SERVICE) as StorageManager).storageVolumes.forEach { volume ->
@@ -824,8 +834,11 @@ class MainActivity : AppCompatActivity() {
 
             setSharedVars(this@MainActivity)
 
-            val createWinePrefixIntent = Intent(ACTION_CREATE_WINEPREFIX).apply {
+            val wine = File("$ratPackagesDir").listFiles()?.first { it.isDirectory && it.name.startsWith("Wine-") }?.name
+
+            val createWinePrefixIntent = Intent(ACTION_CREATE_WINE_PREFIX).apply {
                 putExtra("winePrefix", winePrefix?.path)
+                putExtra("wine", wine!!)
             }
 
             sendBroadcast(createWinePrefixIntent)
@@ -995,6 +1008,7 @@ class MainActivity : AppCompatActivity() {
         var winePrefixesDir: File = File("$appRootDir/winePrefixes")
         var wineDisksFolder: File? = null
         var winePrefix: File? = null
+        var selectedWine: String? = null
         var fileManagerDefaultDir: String = ""
         var fileManagerCwd: String? = null
         var selectedFile: String = ""
@@ -1013,7 +1027,7 @@ class MainActivity : AppCompatActivity() {
         const val ACTION_STOP_ALL = "com.micewine.emu.ACTION_STOP_ALL"
         const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
         const val ACTION_SELECT_ICON = "com.micewine.emu.ACTION_SELECT_ICON"
-        const val ACTION_CREATE_WINEPREFIX = "com.micewine.emu.ACTION_CREATE_WINEPREFIX"
+        const val ACTION_CREATE_WINE_PREFIX = "com.micewine.emu.ACTION_CREATE_WINE_PREFIX"
         const val RAM_COUNTER = "ramCounter"
         const val RAM_COUNTER_DEFAULT_VALUE = true
         const val CPU_COUNTER = "cpuCounter"
@@ -1021,7 +1035,7 @@ class MainActivity : AppCompatActivity() {
         const val ENABLE_DEBUG_INFO = "debugInfo"
         const val ENABLE_DEBUG_INFO_DEFAULT_VALUE = true
 
-        fun setupWinePrefix(winePrefix: File) {
+        fun setupWinePrefix(winePrefix: File, wine: String) {
             if (!winePrefix.exists()) {
                 val driveC = File("$winePrefix/drive_c")
                 val wineUtils = File("$appRootDir/wine-utils")
@@ -1030,6 +1044,12 @@ class MainActivity : AppCompatActivity() {
                 val localAppData = File("$driveC/users/$unixUsername/AppData")
                 val system32 = File("$driveC/windows/system32")
                 val syswow64 = File("$driveC/windows/syswow64")
+                val winePrefixConfigFile = File("$winePrefix/config")
+
+                winePrefix.mkdirs()
+                winePrefixConfigFile.writeText(wine + "\n")
+
+                selectedWine = wine
 
                 WineWrapper.wine("wineboot -i")
 
@@ -1074,7 +1094,7 @@ class MainActivity : AppCompatActivity() {
             appLang = activity.resources.getString(R.string.app_lang)
             appBuiltinRootfs = activity.assets.list("")?.contains("rootfs.zip")!!
 
-            selectedBox64 = preferences.getString(SELECTED_BOX64, SELECTED_DRIVER_DEFAULT_VALUE)
+            selectedBox64 = preferences.getString(SELECTED_BOX64, "")
 
             box64LogLevel = preferences.getString(BOX64_LOG, BOX64_LOG_DEFAULT_VALUE)
             box64Mmap32 = booleanToString(preferences.getBoolean(BOX64_MMAP32, BOX64_MMAP32_DEFAULT_VALUE))
@@ -1126,8 +1146,14 @@ class MainActivity : AppCompatActivity() {
 
             vulkanDriverDeviceName = getVulkanDeviceName()
 
-            winePrefix = File("$winePrefixesDir/${preferences.getString(WINE_PREFIX, "default")}")
+            winePrefix = File("$winePrefixesDir/${preferences.getString(SELECTED_WINE_PREFIX, "default")}")
             wineDisksFolder = File("$winePrefix/dosdevices/")
+
+            val winePrefixConfigFile = File("$winePrefix/config")
+            if (winePrefixConfigFile.exists()) {
+                selectedWine = winePrefixConfigFile.readLines()[0]
+            }
+
             fileManagerDefaultDir = wineDisksFolder!!.path
         }
 

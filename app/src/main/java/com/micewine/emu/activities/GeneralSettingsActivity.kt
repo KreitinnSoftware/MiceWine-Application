@@ -177,6 +177,7 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val BOX64_NOSIGILL_DEFAULT_VALUE = false
 
         const val SELECTED_BOX64 = "selectedBox64"
+        const val SELECTED_WINE_PREFIX = "selectedWinePrefix"
         const val SELECTED_TU_DEBUG_PRESET = "selectedTuDebugPreset"
         const val SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE = "noconform"
         const val SELECTED_DRIVER = "selectedDriver"
@@ -213,6 +214,5 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val MOUSE_SENSIBILITY = "mouseSensibility"
         const val CPU_AFFINITY = "cpuAffinity"
         const val FPS_LIMIT = "fpsLimit"
-        const val WINE_PREFIX = "winePrefix"
     }
 }

@@ -34,7 +34,7 @@ import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_PREFIX
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
 import com.micewine.emu.activities.MainActivity.Companion.copyFile
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
@@ -187,7 +187,7 @@ class ShortcutsFragment : Fragment() {
                 id: Long
             ) {
                 preferences!!.edit().apply {
-                    putString(WINE_PREFIX, parent?.selectedItem.toString())
+                    putString(SELECTED_WINE_PREFIX, parent?.selectedItem.toString())
                     apply()
                 }
 

@@ -53,7 +53,6 @@ import com.micewine.emu.CmdEntryPoint
 import com.micewine.emu.ICmdEntryInterface
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
-import com.micewine.emu.activities.DriverManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.FPS_LIMIT
@@ -63,6 +62,7 @@ import com.micewine.emu.activities.MainActivity.Companion.getCpuInfo
 import com.micewine.emu.activities.MainActivity.Companion.getMemoryInfo
 import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
+import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation

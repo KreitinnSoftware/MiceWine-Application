@@ -23,7 +23,7 @@
         </ImageButton>
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/box64ManagerToolbar"
+            android:id="@+id/ratManagerToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:titleTextColor="@color/white">

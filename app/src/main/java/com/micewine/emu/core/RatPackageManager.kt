@@ -3,12 +3,14 @@ package com.micewine.emu.core
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.preference.PreferenceManager
+import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.setupDone
 import com.micewine.emu.core.ShellLoader.runCommand
+import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarValue
 import net.lingala.zip4j.ZipFile
@@ -27,7 +29,9 @@ object RatPackageManager {
         ratPackage.ratFile.use { ratFile ->
             ratFile.isRunInThread = true
 
-            if (ratPackage.category != "rootfs") {
+            if (ratPackage.category == "rootfs") {
+                installingRootFS = true
+            } else {
                 extractDir = "$ratPackagesDir/${ratPackage.category}-${java.util.UUID.randomUUID()}"
                 File(extractDir!!).mkdirs()
             }
@@ -54,6 +58,9 @@ object RatPackageManager {
 
                 val vulkanDriversFolder = File("$extractDir/vulkanDrivers")
                 val box64Folder = File("$extractDir/box64")
+                val wineFolder = File("$extractDir/wine")
+
+                dialogTitleText = context.getString(R.string.installing_drivers)
 
                 if (vulkanDriversFolder.exists()) {
                     vulkanDriversFolder.listFiles()?.sorted()?.forEach { ratFile ->
@@ -63,6 +70,8 @@ object RatPackageManager {
                     vulkanDriversFolder.deleteRecursively()
                 }
 
+                dialogTitleText = context.getString(R.string.installing_box64)
+
                 if (box64Folder.exists()) {
                     box64Folder.listFiles()?.sorted()?.forEach { ratFile ->
                         installRat(RatPackage(ratFile.path), context)
@@ -70,6 +79,18 @@ object RatPackageManager {
 
                     box64Folder.deleteRecursively()
                 }
+
+                dialogTitleText = context.getString(R.string.installing_wine)
+
+                if (wineFolder.exists()) {
+                    wineFolder.listFiles()?.sorted()?.forEach { ratFile ->
+                        installRat(RatPackage(ratFile.path), context)
+                    }
+
+                    wineFolder.deleteRecursively()
+                }
+
+                installingRootFS = false
             }
             "VulkanDriver" -> {
                 preferences.apply {
@@ -85,7 +106,7 @@ object RatPackageManager {
 
                 File("$extractDir/pkg-header").writeText("name=${ratPackage.name}\ncategory=${ratPackage.category}\nversion=${ratPackage.version}\narchitecture=${ratPackage.architecture}\nvkDriverLib=$driverLibPath\n")
 
-                if (setupDone) {
+                if (!installingRootFS) {
                     File("$extractDir/pkg-external").writeText("")
                 }
             }
@@ -101,7 +122,14 @@ object RatPackageManager {
 
                 File("$extractDir/pkg-header").writeText("name=${ratPackage.name}\ncategory=${ratPackage.category}\nversion=${ratPackage.version}\narchitecture=${ratPackage.architecture}\nvkDriverLib=\n")
 
-                if (setupDone) {
+                if (!installingRootFS) {
+                    File("$extractDir/pkg-external").writeText("")
+                }
+            }
+            "Wine" -> {
+                File("$extractDir/pkg-header").writeText("name=${ratPackage.name}\ncategory=${ratPackage.category}\nversion=${ratPackage.version}\narchitecture=${ratPackage.architecture}\nvkDriverLib=\n")
+
+                if (!installingRootFS) {
                     File("$extractDir/pkg-external").writeText("")
                 }
             }
@@ -128,4 +156,6 @@ object RatPackageManager {
             }
         }
     }
+
+    private var installingRootFS: Boolean = false
 }

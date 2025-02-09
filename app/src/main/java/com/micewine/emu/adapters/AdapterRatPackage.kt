@@ -40,6 +40,9 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, context: Co
                 selectedItem = preferences.getString(SELECTED_BOX64, "")
                 packagePrefix = "Box64-"
             }
+            WINE -> {
+                holder.radioButton.visibility = View.GONE
+            }
         }
 
         if (sList.externalPackage) {
@@ -53,6 +56,9 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, context: Co
         }
 
         holder.apply {
+            settingsName.text = sList.titleSettings
+            settingsDescription.text = sList.descriptionSettings
+
             radioButton.isChecked = position == selectedItemId
             radioButton.setOnClickListener {
                 preferences.edit().apply {
@@ -60,6 +66,7 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, context: Co
                         VK_DRIVER -> {
                             putString(SELECTED_DRIVER, sList.itemFolderId)
                         }
+
                         BOX64 -> {
                             putString(SELECTED_BOX64, sList.itemFolderId)
                         }
@@ -83,6 +90,7 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, context: Co
                             VK_DRIVER -> {
                                 putString(SELECTED_DRIVER, firstPackage)
                             }
+
                             BOX64 -> {
                                 putString(SELECTED_BOX64, firstPackage)
                             }
@@ -99,9 +107,6 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, context: Co
                 settingsList.removeAt(holder.adapterPosition)
                 notifyItemRemoved(holder.adapterPosition)
             }
-
-            settingsName.text = sList.titleSettings
-            settingsDescription.text = sList.descriptionSettings
         }
     }
 
@@ -128,5 +133,6 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, context: Co
     companion object {
         const val VK_DRIVER = 1
         const val BOX64 = 2
+        const val WINE = 3
     }
 }

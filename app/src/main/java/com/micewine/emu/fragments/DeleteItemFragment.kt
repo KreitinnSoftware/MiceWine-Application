@@ -13,7 +13,7 @@ import androidx.preference.PreferenceManager
 import com.micewine.emu.R
 import com.micewine.emu.activities.ControllerMapperActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
 import com.micewine.emu.activities.ControllerMapperActivity.Companion.deleteControllerPreset
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_PREFIX
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
 import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.selectedFragment
 import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
@@ -63,7 +63,7 @@ class DeleteItemFragment(private val deleteType: Int, private val context: Conte
                     val firstPrefix = winePrefixesDir.listFiles()!!.first()
 
                     preferences!!.edit().apply {
-                        putString(WINE_PREFIX, firstPrefix.name)
+                        putString(SELECTED_WINE_PREFIX, firstPrefix.name)
                         apply()
                     }
 

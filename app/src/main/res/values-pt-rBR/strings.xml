@@ -161,4 +161,9 @@
     <string name="app_arguments">Argumentos de Inicialização</string>
     <string name="deleting_wine_prefix">Apagando Prefixo Wine…</string>
     <string name="remove_last_wine_prefix_error">Você não pode remover o último prefixo</string>
+    <string name="wine_manager_title">Gerenciador de Wine</string>
+    <string name="wine_manager_description">Gerenciar Versões do Wine</string>
+    <string name="installing_drivers">Instalando Drivers…</string>
+    <string name="installing_box64">Instalando Box64…</string>
+    <string name="installing_wine">Instalando Wine…</string>
 </resources>

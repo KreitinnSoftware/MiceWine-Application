@@ -45,7 +45,7 @@
             android:exported="false">
         </activity>
         <activity
-            android:name=".activities.Box64ManagerActivity"
+            android:name=".activities.RatManagerActivity"
             android:theme="@style/Theme.MiceWine"
             android:exported="false">
         </activity>
