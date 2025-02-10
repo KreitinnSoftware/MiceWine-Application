@@ -179,7 +179,6 @@ class ShortcutsFragment : Fragment() {
         selectedWinePrefixSpinner?.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, winePrefixes)
         selectedWinePrefixSpinner?.setSelection(winePrefixes.indexOf(winePrefix?.name))
         selectedWinePrefixSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            @SuppressLint("NotifyDataSetChanged")
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -192,8 +191,6 @@ class ShortcutsFragment : Fragment() {
                 }
 
                 setSharedVars(requireActivity())
-
-                recyclerView?.adapter?.notifyDataSetChanged()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
