@@ -191,6 +191,8 @@ class ShortcutsFragment : Fragment() {
                     apply()
                 }
 
+                setSharedVars(requireActivity())
+
                 recyclerView?.adapter?.notifyDataSetChanged()
             }
 
