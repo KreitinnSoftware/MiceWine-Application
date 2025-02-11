@@ -116,7 +116,7 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, context: Co
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         val radioButton: RadioButton = itemView.findViewById(R.id.radio_button)
-        val settingsName: TextView = itemView.findViewById(R.id.rat_package_title)
+        val settingsName: TextView = itemView.findViewById(R.id.preset_title)
         val settingsDescription: TextView = itemView.findViewById(R.id.rat_package_description)
         val deleteRatPackageButton: ImageButton = itemView.findViewById(R.id.rat_package_delete)
 

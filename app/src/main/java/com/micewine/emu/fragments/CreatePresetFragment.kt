@@ -14,12 +14,12 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.preference.PreferenceManager
 import com.micewine.emu.R
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.addControllerPreset
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_CREATE_WINE_PREFIX
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.addControllerPreset
 import java.io.File
 
 class CreatePresetFragment(private val presetType: Int) : DialogFragment() {

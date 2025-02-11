@@ -1,6 +1,7 @@
 package com.micewine.emu.controller
 
 import android.content.Context
+import android.util.Log
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_BUTTON_A
@@ -24,7 +25,6 @@ import android.view.MotionEvent.AXIS_Y
 import android.view.MotionEvent.AXIS_Z
 import androidx.preference.PreferenceManager
 import com.micewine.emu.LorieView
-import com.micewine.emu.activities.ControllerMapperActivity
 import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_HAT_X_MINUS_KEY
 import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_HAT_X_PLUS_KEY
 import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_HAT_Y_MINUS_KEY
@@ -50,9 +50,10 @@ import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_THU
 import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_Y_KEY
 import com.micewine.emu.activities.ControllerMapperActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.getDeadZone
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.getMouseSensibility
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getDeadZone
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMapping
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMouseSensibility
 import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
@@ -107,9 +108,10 @@ object ControllerUtils {
 
     private fun detectKey(context: Context, key: String): List<Int> {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
-        val mapping = ControllerMapperActivity.getMapping(context, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, key)
-
+        val mapping =  getMapping(preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, key)
         val keyList: List<Int>
+
+        Log.v("AAAAA", mapping[0])
 
         when (mapping[0]) {
             "M_Left" -> {
@@ -174,8 +176,8 @@ object ControllerUtils {
         axisHatY_plus_mapping = detectKey(context, AXIS_HAT_Y_PLUS_KEY)
         axisHatY_minus_mapping = detectKey(context, AXIS_HAT_Y_MINUS_KEY)
 
-        deadZone = getDeadZone(context, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
-        mouseSensibility = getMouseSensibility(context, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
+        deadZone = getDeadZone(preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
+        mouseSensibility = getMouseSensibility(preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
     }
 
     private fun getGameControllerIds(): List<Int> {

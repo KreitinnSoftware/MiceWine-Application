@@ -187,8 +187,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         val headerViewMain: View = findViewById<NavigationView>(R.id.NavigationView).getHeaderView(0).apply {
             findViewById<MaterialButton>(R.id.exitButton).setOnClickListener {
-                WineWrapper.wineServer("-k")
-
+                runCommand("pkill -9 wine")
                 runCommand("pkill -9 .exe")
 
                 logTextView.text = ""

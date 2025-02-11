@@ -40,131 +40,22 @@
         android:padding="8dp">
     </TextView>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:baselineAligned="false">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:text="@string/dead_zone_title"
-                android:padding="8dp">
-            </TextView>
-
-            <TextView
-                android:id="@+id/seekBarDeadZoneValue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:padding="8dp">
-            </TextView>
-
-            <SeekBar
-                android:id="@+id/deadZoneSeekBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-            </SeekBar>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:text="@string/mouse_sensibility_title"
-                android:padding="8dp">
-            </TextView>
-
-            <TextView
-                android:id="@+id/mouseSensibilityValue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:padding="8dp">
-            </TextView>
-
-            <SeekBar
-                android:id="@+id/mouseSensibilitySeekBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-            </SeekBar>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:text="@string/selected_controller_preset"
-        android:textAlignment="center"
-        android:padding="8dp">
-    </TextView>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Spinner
-            android:id="@+id/selectedControllerPresetSpinner"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="8dp">
-        </Spinner>
-
-        <ImageButton
-            android:id="@+id/deletePreset"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.1"
-            android:background="@android:color/transparent"
-            android:src="@android:drawable/ic_menu_delete"
-            android:importantForAccessibility="no">
-        </ImageButton>
-
-        <ImageButton
-            android:id="@+id/addNewPreset"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.1"
-            android:background="@android:color/transparent"
-            android:src="@android:drawable/ic_menu_add"
-            android:importantForAccessibility="no">
-        </ImageButton>
-
-    </LinearLayout>
-
     <FrameLayout
         android:id="@+id/controller_mapper_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="10dp">
     </FrameLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addPresetFAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:importantForAccessibility="no"
+        android:layout_margin="10dp"
+        android:src="@android:drawable/ic_menu_add">
+    </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
 </LinearLayout>

@@ -25,12 +25,6 @@ object WineWrapper {
         return Integer.toHexString(cpuMask.joinToString("").toInt(2))
     }
 
-    fun wineServer(args: String) {
-        runCommand(
-            getEnv() + "$IS_BOX64 wineserver $args"
-        )
-    }
-
     fun waitFor(name: String) {
         while (!wine("tasklist", true).contains(name)) {
             Thread.sleep(100)

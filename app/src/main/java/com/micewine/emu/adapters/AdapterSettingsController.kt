@@ -8,18 +8,16 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.Spinner
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.ControllerMapperActivity
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.editControllerPreset
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.getMapping
+import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.controller.XKeyCodes
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.editControllerPreset
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMapping
 
 class AdapterSettingsController(private val settingsControllerList: List<SettingsController>, private val context: Context) :
     RecyclerView.Adapter<AdapterSettingsController.ViewHolder>() {
 
-    private val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
     private val allEntries: List<String> = XKeyCodes.getKeyNames(true)
     private val keyEntries: List<String> = XKeyCodes.getKeyNames(false)
 
@@ -33,7 +31,7 @@ class AdapterSettingsController(private val settingsControllerList: List<Setting
 
         holder.image.setImageResource(sList.image)
         
-        val mapping = getMapping(context, preferences.getString(ControllerMapperActivity.SELECTED_CONTROLLER_PRESET_KEY, "default")!!, sList.key)
+        val mapping = getMapping(clickedPresetName, sList.key)
 
         when (sList.image) {
             R.drawable.l_up, R.drawable.l_down, R.drawable.l_left, R.drawable.l_right,
@@ -56,7 +54,11 @@ class AdapterSettingsController(private val settingsControllerList: List<Setting
                     position: Int,
                     id: Long
                 ) {
-                    editControllerPreset(context, preferences.getString(ControllerMapperActivity.SELECTED_CONTROLLER_PRESET_KEY, "default")!!, sList.key, parent?.selectedItem.toString())
+                    editControllerPreset(
+                        clickedPresetName,
+                        sList.key,
+                        parent?.selectedItem.toString()
+                    )
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {

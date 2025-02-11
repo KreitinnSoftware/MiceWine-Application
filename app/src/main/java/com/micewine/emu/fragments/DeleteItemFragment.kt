@@ -11,8 +11,6 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.preference.PreferenceManager
 import com.micewine.emu.R
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.deleteControllerPreset
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
 import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.selectedFragment
@@ -20,7 +18,9 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
 import com.micewine.emu.activities.MainActivity.Companion.setupDone
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
+import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.core.ShellLoader.runCommand
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.deleteControllerPreset
 import com.micewine.emu.fragments.FileManagerFragment.Companion.deleteFile
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
@@ -51,7 +51,7 @@ class DeleteItemFragment(private val deleteType: Int, private val context: Conte
                     }
                 }
                 DELETE_CONTROLLER_PRESET -> {
-                    deleteControllerPreset(context, preferences?.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!)
+                    deleteControllerPreset(context, clickedPresetName)
                 }
                 DELETE_WINE_PREFIX -> {
                     if (winePrefixesDir.listFiles()!!.count() == 1) {

@@ -66,7 +66,7 @@ class RatManagerActivity : AppCompatActivity() {
 
     private fun fragmentLoader(fragment: Fragment) {
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.box64_manager_content, fragment)
+            replace(R.id.rat_manager_content, fragment)
             commit()
         }
     }

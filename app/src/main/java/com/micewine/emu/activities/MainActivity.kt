@@ -129,6 +129,7 @@ import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.AboutFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ratCandidate
+import com.micewine.emu.fragments.ControllerPresetManagerFragment
 import com.micewine.emu.fragments.DeleteItemFragment
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_GAME_ITEM
 import com.micewine.emu.fragments.EditGamePreferencesFragment
@@ -339,13 +340,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         EnvVars.initialize(this)
+        ControllerPresetManagerFragment.initialize(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
         appToolbar = findViewById(R.id.appToolbar)
-        setSupportActionBar(appToolbar)
 
+        setSupportActionBar(appToolbar)
         setSharedVars(this)
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -380,8 +382,9 @@ class MainActivity : AppCompatActivity() {
         selectedFragment = "ShortcutsFragment"
         fragmentLoader(shortcutsFragment, true)
 
-        registerReceiver(receiver, object : IntentFilter(ACTION_RUN_WINE) {
+        registerReceiver(receiver, object : IntentFilter() {
             init {
+                addAction(ACTION_RUN_WINE)
                 addAction(ACTION_SETUP)
                 addAction(ACTION_INSTALL_RAT)
                 addAction(ACTION_SELECT_FILE_MANAGER)
@@ -694,8 +697,7 @@ class MainActivity : AppCompatActivity() {
         withContext(Dispatchers.Default) {
             installDXWrapper(winePrefix!!)
 
-            WineWrapper.wineServer("-k")
-
+            runCommand("pkill -9 wineserver")
             runCommand("pkill -9 .exe")
 
             val skCodec = File("/system/lib64/libskcodec.so")
@@ -740,8 +742,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            WineWrapper.wineServer("-k")
-
+            runCommand("pkill -9 wineserver")
             runCommand("pkill -9 .exe")
 
             runOnUiThread {
