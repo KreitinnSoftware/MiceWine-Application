@@ -9,13 +9,13 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.preference.PreferenceManager
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.micewine.emu.LorieView
+import com.micewine.emu.activities.ControllerMapperActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY
 import com.micewine.emu.controller.ControllerUtils.KEYBOARD
 import com.micewine.emu.controller.ControllerUtils.MOUSE
 import com.micewine.emu.controller.ControllerUtils.handleAxis
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
+import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getMapping
 import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
@@ -47,23 +47,18 @@ class OverlayView @JvmOverloads constructor(
 
     private var lorieView: LorieView = LorieView(context)
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-    private val gson = Gson()
 
     init {
         loadFromPreferences()
     }
 
     fun loadFromPreferences() {
-        val buttonJson = preferences.getString("overlayButtons", "")
-        val axisJson = preferences.getString("overlayAxis", "")
+        val mapping = getMapping(preferences.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, "default")!!)
 
-        val virtualButtonListType = object : TypeToken<MutableList<VirtualButton>>() {}.type
-        val virtualAxisListType = object : TypeToken<MutableList<VirtualAnalog>>() {}.type
+        buttonList.clear()
+        analogList.clear()
 
-        val currentButtons: MutableList<VirtualButton> = gson.fromJson(buttonJson, virtualButtonListType) ?: mutableListOf()
-        val currentVAxis: MutableList<VirtualAnalog> = gson.fromJson(axisJson, virtualAxisListType) ?: mutableListOf()
-
-        currentButtons.forEach {
+        mapping?.buttons?.forEach {
             when (it.keyName) {
                 "M_Left" -> {
                     it.keyCodes = listOf(BUTTON_LEFT, BUTTON_LEFT, MOUSE)
@@ -89,7 +84,7 @@ class OverlayView @JvmOverloads constructor(
             buttonList.add(it)
         }
 
-        currentVAxis.forEach {
+        mapping?.analogs?.forEach {
             it.upKeyCodes = getXKeyScanCodes(it.upKeyName)
             it.downKeyCodes = getXKeyScanCodes(it.downKeyName)
             it.leftKeyCodes = getXKeyScanCodes(it.leftKeyName)

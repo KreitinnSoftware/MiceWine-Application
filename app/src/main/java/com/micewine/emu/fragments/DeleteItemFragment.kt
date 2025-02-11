@@ -26,6 +26,7 @@ import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.ACTION_UPDATE_WINE_PREFIX_SPINNER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.removeGameFromList
+import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.deleteVirtualControllerPreset
 
 class DeleteItemFragment(private val deleteType: Int, private val context: Context) : DialogFragment() {
     private var preferences: SharedPreferences? = null
@@ -52,6 +53,9 @@ class DeleteItemFragment(private val deleteType: Int, private val context: Conte
                 }
                 DELETE_CONTROLLER_PRESET -> {
                     deleteControllerPreset(context, clickedPresetName)
+                }
+                DELETE_VIRTUAL_CONTROLLER_PRESET -> {
+                    deleteVirtualControllerPreset(context, clickedPresetName)
                 }
                 DELETE_WINE_PREFIX -> {
                     if (winePrefixesDir.listFiles()!!.count() == 1) {
@@ -99,6 +103,7 @@ class DeleteItemFragment(private val deleteType: Int, private val context: Conte
     companion object {
         const val DELETE_GAME_ITEM = 0
         const val DELETE_CONTROLLER_PRESET = 1
-        const val DELETE_WINE_PREFIX = 2
+        const val DELETE_VIRTUAL_CONTROLLER_PRESET = 2
+        const val DELETE_WINE_PREFIX = 3
     }
 }

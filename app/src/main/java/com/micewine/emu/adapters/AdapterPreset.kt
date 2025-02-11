@@ -14,8 +14,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.ControllerMapperActivity.Companion.ACTION_EDIT_CONTROLLER_MAPPING
 import com.micewine.emu.activities.ControllerMapperActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
+import com.micewine.emu.activities.ControllerMapperActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY
+import com.micewine.emu.activities.VirtualControllerOverlayMapper
 import com.micewine.emu.fragments.DeleteItemFragment
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_CONTROLLER_PRESET
+import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_VIRTUAL_CONTROLLER_PRESET
 
 class AdapterPreset(private val settingsList: MutableList<Item>, private val context: Context, private val supportFragmentManager: FragmentManager) :
     RecyclerView.Adapter<AdapterPreset.ViewHolder>() {
@@ -40,31 +43,57 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
             holder.deletePresetButton.visibility = View.GONE
         }
 
-        if (sList.titleSettings == preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")) {
-            selectedPresetId = position
+
+        when (sList.type) {
+            PHYSICAL_CONTROLLER -> {
+                if (sList.titleSettings == preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")) {
+                    selectedPresetId = position
+                }
+            }
+            VIRTUAL_CONTROLLER -> {
+                if (sList.titleSettings == preferences.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, "default")) {
+                    selectedPresetId = position
+                }
+                holder.radioButton.setOnClickListener {
+                    preferences.edit().apply {
+                        putString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, holder.settingsName.text.toString())
+                        apply()
+                    }
+                    selectedPresetId = holder.adapterPosition
+                    notifyItemRangeChanged(0, settingsList.size)
+                }
+            }
         }
 
         holder.radioButton.isChecked = position == selectedPresetId
-        holder.radioButton.setOnClickListener {
-            preferences.edit().apply {
-                putString(SELECTED_CONTROLLER_PRESET_KEY, holder.settingsName.text.toString())
-                apply()
-            }
-
-            selectedPresetId = holder.adapterPosition
-            notifyItemRangeChanged(0, settingsList.size)
-        }
 
         holder.deletePresetButton.setOnClickListener {
             clickedPresetName = sList.titleSettings
-            DeleteItemFragment(DELETE_CONTROLLER_PRESET, context).show(supportFragmentManager, "")
+
+            when (sList.type) {
+                PHYSICAL_CONTROLLER -> {
+                    DeleteItemFragment(DELETE_CONTROLLER_PRESET, context).show(supportFragmentManager, "")
+                }
+                VIRTUAL_CONTROLLER -> {
+                    DeleteItemFragment(DELETE_VIRTUAL_CONTROLLER_PRESET, context).show(supportFragmentManager, "")
+                }
+            }
         }
 
         holder.editPresetButton.setOnClickListener {
             clickedPresetName = sList.titleSettings
-            context.sendBroadcast(
-                Intent(ACTION_EDIT_CONTROLLER_MAPPING)
-            )
+
+            when (sList.type) {
+                PHYSICAL_CONTROLLER -> {
+                    context.sendBroadcast(
+                        Intent(ACTION_EDIT_CONTROLLER_MAPPING)
+                    )
+                }
+                VIRTUAL_CONTROLLER -> {
+                    val intent = Intent(context, VirtualControllerOverlayMapper::class.java)
+                    context.startActivity(intent)
+                }
+            }
         }
     }
 

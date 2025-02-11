@@ -63,13 +63,14 @@ import com.micewine.emu.activities.MainActivity.Companion.getMemoryInfo
 import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
+import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
+import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
-import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.views.OverlayView
@@ -249,11 +250,17 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
 
             findViewById<MaterialButton>(R.id.editVirtualControllerMapping).setOnClickListener {
-                startActivity(Intent(this@EmulationActivity, VirtualControllerOverlayMapper::class.java))
+                val intent = Intent(context, ControllerMapperActivity::class.java).apply {
+                    putExtra("controllerMapperType", VIRTUAL_CONTROLLER)
+                }
+                startActivity(intent)
             }
 
             findViewById<MaterialButton>(R.id.editControllerMapping).setOnClickListener {
-                startActivity(Intent(this@EmulationActivity, ControllerMapperActivity::class.java))
+                val intent = Intent(context, ControllerMapperActivity::class.java).apply {
+                    putExtra("controllerMapperType", PHYSICAL_CONTROLLER)
+                }
+                startActivity(intent)
             }
         }
 

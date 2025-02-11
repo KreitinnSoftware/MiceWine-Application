@@ -11,16 +11,16 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import androidx.preference.PreferenceManager
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.micewine.emu.activities.VirtualControllerOverlayMapper.Companion.ACTION_EDIT_VIRTUAL_BUTTON
+import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogDownKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogLeftKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogRightKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogUpKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonRadius
+import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getMapping
+import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.putMapping
 import com.micewine.emu.views.OverlayView.Companion.analogList
 import com.micewine.emu.views.OverlayView.Companion.buttonList
 import com.micewine.emu.views.OverlayView.Companion.detectClick
@@ -55,27 +55,18 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
     private var selectedButton = 0
     private var selectedVAxis = 0
-    private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-    private val gson = Gson()
 
     private fun loadFromPreferences() {
-        val buttonJson = preferences.getString("overlayButtons", "")
-        val axisJson = preferences.getString("overlayAxis", "")
-
-        val virtualButtonListType = object : TypeToken<MutableList<OverlayView.VirtualButton>>() {}.type
-        val virtualAxisListType = object : TypeToken<MutableList<OverlayView.VirtualAnalog>>() {}.type
-
-        val currentButtons: MutableList<OverlayView.VirtualButton> = gson.fromJson(buttonJson, virtualButtonListType) ?: mutableListOf()
-        val currentVAxis: MutableList<OverlayView.VirtualAnalog> = gson.fromJson(axisJson, virtualAxisListType) ?: mutableListOf()
+        val mapping = getMapping(clickedPresetName)
 
         buttonList.clear()
         analogList.clear()
 
-        currentButtons.forEach {
+        mapping?.buttons?.forEach {
             buttonList.add(it)
         }
 
-        currentVAxis.forEach {
+        mapping?.analogs?.forEach {
             analogList.add(it)
         }
 
@@ -83,14 +74,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     }
 
     fun saveOnPreferences() {
-        val buttonJson = gson.toJson(buttonList)
-        val axisJson = gson.toJson(analogList)
-
-        preferences.edit().apply {
-            putString("overlayButtons", buttonJson)
-            putString("overlayAxis", axisJson)
-            apply()
-        }
+        putMapping(clickedPresetName, buttonList, analogList)
     }
 
     init {

@@ -20,6 +20,7 @@ import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.addControllerPreset
+import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.addVirtualControllerPreset
 import java.io.File
 
 class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
@@ -89,6 +90,9 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
                 CONTROLLER_PRESET -> {
                     addControllerPreset(requireContext(), newName)
                 }
+                VIRTUAL_CONTROLLER_PRESET -> {
+                    addVirtualControllerPreset(requireContext(), newName)
+                }
             }
 
             dismiss()
@@ -104,5 +108,6 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
     companion object {
         const val WINEPREFIX_PRESET = 1
         const val CONTROLLER_PRESET = 2
+        const val VIRTUAL_CONTROLLER_PRESET = 3
     }
 }

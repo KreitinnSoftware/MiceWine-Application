@@ -145,6 +145,7 @@ import com.micewine.emu.fragments.ShortcutsFragment
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.ACTION_UPDATE_WINE_PREFIX_SPINNER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.saveToGameList
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
+import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
 import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.utils.DriveUtils
 import com.micewine.emu.utils.FilePathResolver
@@ -341,6 +342,7 @@ class MainActivity : AppCompatActivity() {
 
         EnvVars.initialize(this)
         ControllerPresetManagerFragment.initialize(this)
+        VirtualControllerPresetManagerFragment.initialize(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)

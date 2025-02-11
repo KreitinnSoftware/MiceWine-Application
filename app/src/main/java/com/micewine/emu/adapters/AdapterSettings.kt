@@ -14,6 +14,8 @@ import com.micewine.emu.activities.ControllerMapperActivity
 import com.micewine.emu.activities.GeneralSettingsActivity
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ACTION_PREFERENCE_SELECT
 import com.micewine.emu.activities.VirtualControllerOverlayMapper
+import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
+import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterRatPackage.Companion.BOX64
 import com.micewine.emu.adapters.AdapterRatPackage.Companion.VK_DRIVER
 import com.micewine.emu.adapters.AdapterRatPackage.Companion.WINE
@@ -56,12 +58,16 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
                 }
 
                 context.getString(R.string.controller_mapper_title) -> {
-                    val intent = Intent(context, ControllerMapperActivity::class.java)
+                    val intent = Intent(context, ControllerMapperActivity::class.java).apply {
+                        putExtra("controllerMapperType", PHYSICAL_CONTROLLER)
+                    }
                     context.startActivity(intent)
                 }
 
                 context.getString(R.string.virtual_controller_mapper_title) -> {
-                    val intent = Intent(context, VirtualControllerOverlayMapper::class.java)
+                    val intent = Intent(context, ControllerMapperActivity::class.java).apply {
+                        putExtra("controllerMapperType", VIRTUAL_CONTROLLER)
+                    }
                     context.startActivity(intent)
                 }
 
