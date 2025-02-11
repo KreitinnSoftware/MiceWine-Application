@@ -58,7 +58,7 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
 
                 wineVersionSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, wineVersionsNames)
             }
-            CONTROLLER_PRESET -> {
+            CONTROLLER_PRESET, VIRTUAL_CONTROLLER_PRESET -> {
                 wineVersionText.visibility = View.GONE
                 wineVersionSpinner.visibility = View.GONE
             }
