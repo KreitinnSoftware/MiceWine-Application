@@ -107,38 +107,27 @@ object ControllerUtils {
 
     private fun detectKey(context: Context, key: String): List<Int> {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
-        val mapping = ControllerMapper.getMapping(context, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, key)
-
-        val keyList: List<Int>
-
-        when (mapping[0]) {
-            "M_Left" -> {
-                keyList = listOf(BUTTON_LEFT, BUTTON_LEFT, MOUSE)
-            }
-
-            "M_Middle" -> {
-                keyList = listOf(BUTTON_MIDDLE, BUTTON_MIDDLE, MOUSE)
-            }
-
-            "M_Right" -> {
-                keyList = listOf(BUTTON_RIGHT, BUTTON_RIGHT, MOUSE)
-            }
-
-            "Mouse" -> {
-                keyList = listOf(MOUSE, MOUSE, MOUSE)
-            }
-
-            else -> {
-                keyList = getXKeyScanCodes(mapping[0])
-            }
+        val mapping = ControllerMapper.getMapping(
+            context,
+            preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!,
+            key
+        )
+        return when (mapping[0]) {
+            "M_Left" -> listOf(BUTTON_LEFT, BUTTON_LEFT, MOUSE)
+            "M_Middle" -> listOf(BUTTON_MIDDLE, BUTTON_MIDDLE, MOUSE)
+            "M_Right" -> listOf(BUTTON_RIGHT, BUTTON_RIGHT, MOUSE)
+            "Mouse" -> listOf(MOUSE, MOUSE, MOUSE)
+            else -> getXKeyScanCodes(mapping[0])
         }
-
-        return keyList
     }
 
     fun prepareButtonsAxisValues(context: Context) {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
-
+        val editor = preferences.edit()
+        // Se houver algum controle conectado, força o preset para "xinput"
+        if (getGameControllerNames().isNotEmpty()) {
+            editor.putString(SELECTED_CONTROLLER_PRESET_KEY, "xinput").apply()
+        }
         buttonA_mapping = detectKey(context, BUTTON_A_KEY)
         buttonX_mapping = detectKey(context, BUTTON_X_KEY)
         buttonB_mapping = detectKey(context, BUTTON_B_KEY)
@@ -183,9 +172,11 @@ object ControllerUtils {
         val deviceIds = InputDevice.getDeviceIds()
         deviceIds.forEach { deviceId ->
             InputDevice.getDevice(deviceId)?.apply {
-                if (sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD
-                    || sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK) {
-                    gameControllerDeviceIds.takeIf { !it.contains(deviceId) }?.add(deviceId)
+                if (sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD ||
+                    sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK) {
+                    if (!gameControllerDeviceIds.contains(deviceId)) {
+                        gameControllerDeviceIds.add(deviceId)
+                    }
                 }
             }
         }
@@ -195,13 +186,10 @@ object ControllerUtils {
     fun getGameControllerNames(): List<String> {
         val deviceIds = getGameControllerIds()
         val deviceNames = mutableListOf<String>()
-
         for (id in deviceIds) {
             val inputDevice = InputDevice.getDevice(id)
-
             deviceNames.add(inputDevice?.name.toString())
         }
-
         return deviceNames
     }
 
@@ -214,80 +202,19 @@ object ControllerUtils {
 
     fun checkControllerButtons(lorieView: LorieView, e: KeyEvent): Boolean {
         val pressed = e.action == KeyEvent.ACTION_DOWN
-
         return when (e.keyCode) {
-            KEYCODE_BUTTON_Y -> {
-                handleKey(lorieView, pressed, buttonY_mapping)
-
-                true
-            }
-
-            KEYCODE_BUTTON_A -> {
-                handleKey(lorieView, pressed, buttonA_mapping)
-
-                true
-            }
-
-            KEYCODE_BUTTON_B -> {
-                handleKey(lorieView, pressed, buttonB_mapping)
-
-                true
-            }
-
-            KEYCODE_BUTTON_X -> {
-                handleKey(lorieView, pressed, buttonX_mapping)
-
-                true
-            }
-
-            KEYCODE_BUTTON_START -> {
-                handleKey(lorieView, pressed, buttonStart_mapping)
-
-                true
-            }
-
-            KEYCODE_BUTTON_SELECT -> {
-                handleKey(lorieView, pressed, buttonSelect_mapping)
-
-                true
-            }
-
-            KEYCODE_BUTTON_R1 -> {
-                handleKey(lorieView, pressed, buttonR1_mapping)
-
-                true
-            }
-
-            KEYCODE_BUTTON_R2 -> {
-                handleKey(lorieView, pressed, buttonR2_mapping)
-
-                true
-            }
-
-            KEYCODE_BUTTON_L1 -> {
-                handleKey(lorieView, pressed, buttonL1_mapping)
-
-                true
-            }
-
-            KEYCODE_BUTTON_L2 -> {
-                handleKey(lorieView, pressed, buttonL2_mapping)
-
-                true
-            }
-
-            KEYCODE_BUTTON_THUMBR -> {
-                handleKey(lorieView, pressed, buttonThumbR_mapping)
-
-                true
-            }
-
-            KEYCODE_BUTTON_THUMBL -> {
-                handleKey(lorieView, pressed, buttonThumbL_mapping)
-
-                true
-            }
-
+            KEYCODE_BUTTON_Y -> { handleKey(lorieView, pressed, buttonY_mapping); true }
+            KEYCODE_BUTTON_A -> { handleKey(lorieView, pressed, buttonA_mapping); true }
+            KEYCODE_BUTTON_B -> { handleKey(lorieView, pressed, buttonB_mapping); true }
+            KEYCODE_BUTTON_X -> { handleKey(lorieView, pressed, buttonX_mapping); true }
+            KEYCODE_BUTTON_START -> { handleKey(lorieView, pressed, buttonStart_mapping); true }
+            KEYCODE_BUTTON_SELECT -> { handleKey(lorieView, pressed, buttonSelect_mapping); true }
+            KEYCODE_BUTTON_R1 -> { handleKey(lorieView, pressed, buttonR1_mapping); true }
+            KEYCODE_BUTTON_R2 -> { handleKey(lorieView, pressed, buttonR2_mapping); true }
+            KEYCODE_BUTTON_L1 -> { handleKey(lorieView, pressed, buttonL1_mapping); true }
+            KEYCODE_BUTTON_L2 -> { handleKey(lorieView, pressed, buttonL2_mapping); true }
+            KEYCODE_BUTTON_THUMBR -> { handleKey(lorieView, pressed, buttonThumbR_mapping); true }
+            KEYCODE_BUTTON_THUMBL -> { handleKey(lorieView, pressed, buttonThumbL_mapping); true }
             else -> false
         }
     }
@@ -305,7 +232,6 @@ object ControllerUtils {
                             true
                         )
                     }
-
                     RIGHT -> {
                         lorieView.sendMouseEvent(
                             10F * (axisXVelocity * mouseSensibility),
@@ -315,7 +241,6 @@ object ControllerUtils {
                             true
                         )
                     }
-
                     UP -> {
                         lorieView.sendMouseEvent(
                             0F,
@@ -325,7 +250,6 @@ object ControllerUtils {
                             true
                         )
                     }
-
                     DOWN -> {
                         lorieView.sendMouseEvent(
                             0F,
@@ -335,7 +259,6 @@ object ControllerUtils {
                             true
                         )
                     }
-
                     LEFT_UP -> {
                         lorieView.sendMouseEvent(
                             -10F * (axisXVelocity * mouseSensibility),
@@ -345,7 +268,6 @@ object ControllerUtils {
                             true
                         )
                     }
-
                     LEFT_DOWN -> {
                         lorieView.sendMouseEvent(
                             -10F * (axisXVelocity * mouseSensibility),
@@ -355,7 +277,6 @@ object ControllerUtils {
                             true
                         )
                     }
-
                     RIGHT_UP -> {
                         lorieView.sendMouseEvent(
                             10F * (axisXVelocity * mouseSensibility),
@@ -365,7 +286,6 @@ object ControllerUtils {
                             true
                         )
                     }
-
                     RIGHT_DOWN -> {
                         lorieView.sendMouseEvent(
                             10F * (axisXVelocity * mouseSensibility),
@@ -376,7 +296,6 @@ object ControllerUtils {
                         )
                     }
                 }
-
                 Thread.sleep(16)
             }
         }
@@ -384,130 +303,109 @@ object ControllerUtils {
 
     private fun checkMouse(axisX: Float, axisY: Float, orientation: Int) {
         moveVMouse = orientation
-
         axisXVelocity = axisX.absoluteValue
         axisYVelocity = axisY.absoluteValue
     }
 
-    fun handleAxis(lorieView: LorieView, axisX: Float, axisY: Float, axisXNeutral: Boolean, axisYNeutral: Boolean, axisXPlusMapping: List<Int>, axisXMinusMapping: List<Int>, axisYPlusMapping: List<Int>, axisYMinusMapping: List<Int>, deadZone: Float): Boolean {
+    fun handleAxis(
+        lorieView: LorieView,
+        axisX: Float,
+        axisY: Float,
+        axisXNeutral: Boolean,
+        axisYNeutral: Boolean,
+        axisXPlusMapping: List<Int>,
+        axisXMinusMapping: List<Int>,
+        axisYPlusMapping: List<Int>,
+        axisYMinusMapping: List<Int>,
+        deadZone: Float
+    ): Boolean {
         return when {
-            // Left
             axisX < -deadZone && axisYNeutral -> {
                 if (axisXMinusMapping[2] == KEYBOARD) {
                     lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], false)
                     lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], true)
-
                     lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], false)
                     lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], false)
                 } else {
                     checkMouse(axisX, axisY, LEFT)
                 }
-
                 true
             }
-
-            // Right
             axisX > deadZone && axisYNeutral -> {
                 if (axisXPlusMapping[2] == KEYBOARD) {
                     lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], true)
                     lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], false)
-
                     lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], false)
                     lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], false)
                 } else {
                     checkMouse(axisX, axisY, RIGHT)
                 }
-
                 true
             }
-
-            // Up
             axisY < -deadZone && axisXNeutral -> {
                 if (axisYMinusMapping[2] == KEYBOARD) {
                     lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], false)
                     lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], false)
-
                     lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], false)
                     lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], true)
                 } else {
                     checkMouse(axisX, axisY, UP)
                 }
-
                 true
             }
-
-            // Down
             axisY > deadZone && axisXNeutral -> {
                 if (axisYPlusMapping[2] == KEYBOARD) {
                     lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], false)
                     lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], false)
-
                     lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], true)
                     lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], false)
                 } else {
                     checkMouse(axisX, axisY, DOWN)
                 }
-
                 true
             }
-
-            // Left/Up
             axisX < -deadZone && axisY < -deadZone -> {
                 if (axisXPlusMapping[2] == KEYBOARD && axisYMinusMapping[2] == KEYBOARD) {
                     lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], false)
                     lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], true)
-
                     lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], false)
                     lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], true)
                 } else {
                     checkMouse(axisX, axisY, LEFT_UP)
                 }
-
                 true
             }
-
-            // Left/Down
             axisX < -deadZone && axisY > deadZone -> {
                 if (axisXPlusMapping[2] == KEYBOARD && axisYMinusMapping[2] == KEYBOARD) {
                     lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], false)
                     lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], true)
-
                     lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], true)
                     lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], false)
                 } else {
                     checkMouse(axisX, axisY, LEFT_DOWN)
                 }
-
                 true
             }
-
-            // Right/Up
             axisX > deadZone && axisY < -deadZone -> {
                 if (axisXPlusMapping[2] == KEYBOARD && axisYMinusMapping[2] == KEYBOARD) {
                     lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], true)
                     lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], false)
-
                     lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], false)
                     lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], true)
                 } else {
                     checkMouse(axisX, axisY, RIGHT_UP)
                 }
-
                 true
             }
-
-            // Right/Down
             axisX > deadZone && axisY > deadZone -> {
                 if (axisXPlusMapping[2] == KEYBOARD && axisYMinusMapping[2] == KEYBOARD) {
                     lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], true)
                     lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], false)
-
                     lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], true)
                     lorieView.sendKeyEvent(axisYMinusMapping[0], axisYMinusMapping[1], false)
                 } else {
                     checkMouse(axisX, axisY, RIGHT_DOWN)
                 }
-
                 true
             }
             else -> {
@@ -515,7 +413,6 @@ object ControllerUtils {
                     axisXMinusMapping[2] == KEYBOARD &&
                     axisYPlusMapping[2] == KEYBOARD &&
                     axisYMinusMapping[2] == KEYBOARD) {
-
                     lorieView.sendKeyEvent(axisXPlusMapping[0], axisXPlusMapping[1], false)
                     lorieView.sendKeyEvent(axisXMinusMapping[0], axisXMinusMapping[1], false)
                     lorieView.sendKeyEvent(axisYPlusMapping[0], axisYPlusMapping[1], false)
@@ -523,7 +420,6 @@ object ControllerUtils {
                 } else {
                     moveVMouse = null
                 }
-
                 false
             }
         }
@@ -547,5 +443,6 @@ object ControllerUtils {
 
         handleAxis(lorieView, axisX, axisY, axisXNeutral, axisYNeutral, axisX_plus_mapping, axisX_minus_mapping, axisY_plus_mapping, axisY_minus_mapping, deadZone)
         handleAxis(lorieView, axisZ, axisRZ, axisZNeutral, axisRZNeutral, axisZ_plus_mapping, axisZ_minus_mapping, axisRZ_plus_mapping, axisRZ_minus_mapping, deadZone)
-        handleAxis(lorieView, axisHatX, axisHatY, axisHatXNeutral, axisHatYNeutral, axisHatX_plus_mapping, axisHatX_minus_mapping, axisHatY_plus_mapping, axisHatY_minus_mapping, deadZone)    }
+        handleAxis(lorieView, axisHatX, axisHatY, axisHatXNeutral, axisHatYNeutral, axisHatX_plus_mapping, axisHatX_minus_mapping, axisHatY_plus_mapping, axisHatY_minus_mapping, deadZone)
+    }
 }
