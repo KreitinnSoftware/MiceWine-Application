@@ -166,4 +166,9 @@
     <string name="installing_drivers">Instalando Drivers…</string>
     <string name="installing_box64">Instalando Box64…</string>
     <string name="installing_wine">Instalando Wine…</string>
+    <string name="box64_preset_manager_title">Gerenciador de Perfis do Box64</string>
+    <string name="box64_preset_manager_description">Gerenciar Perfis do Box64</string>
+    <string name="selected_box64_profile">Perfil do Box64 Selecionado</string>
+    <string name="selected_virtual_controller_profile">Perfil do Controle Virtual Selecionado</string>
+    <string name="selected_controller_profile">Perfil do Controle Selecionado</string>
 </resources>

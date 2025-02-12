@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activities.ControllerMapperActivity">
+    tools:context=".activities.PresetManagerActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,7 +41,7 @@
     </TextView>
 
     <FrameLayout
-        android:id="@+id/controller_mapper_content"
+        android:id="@+id/presetManagerContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

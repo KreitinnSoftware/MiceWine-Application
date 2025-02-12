@@ -12,11 +12,15 @@ import androidx.fragment.app.FragmentManager
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.ACTION_EDIT_CONTROLLER_MAPPING
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.ACTION_EDIT_BOX64_PRESET
+import com.micewine.emu.activities.PresetManagerActivity.Companion.ACTION_EDIT_CONTROLLER_MAPPING
+import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY
 import com.micewine.emu.activities.VirtualControllerOverlayMapper
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.DeleteItemFragment
+import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_BOX64_PRESET
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_CONTROLLER_PRESET
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_VIRTUAL_CONTROLLER_PRESET
 
@@ -43,11 +47,18 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
             holder.deletePresetButton.visibility = View.GONE
         }
 
-
         when (sList.type) {
             PHYSICAL_CONTROLLER -> {
                 if (sList.titleSettings == preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")) {
                     selectedPresetId = position
+                }
+                holder.radioButton.setOnClickListener {
+                    preferences.edit().apply {
+                        putString(SELECTED_CONTROLLER_PRESET_KEY, holder.settingsName.text.toString())
+                        apply()
+                    }
+                    selectedPresetId = holder.adapterPosition
+                    notifyItemRangeChanged(0, settingsList.size)
                 }
             }
             VIRTUAL_CONTROLLER -> {
@@ -57,6 +68,19 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
                 holder.radioButton.setOnClickListener {
                     preferences.edit().apply {
                         putString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, holder.settingsName.text.toString())
+                        apply()
+                    }
+                    selectedPresetId = holder.adapterPosition
+                    notifyItemRangeChanged(0, settingsList.size)
+                }
+            }
+            BOX64_PRESET -> {
+                if (sList.titleSettings == preferences.getString(SELECTED_BOX64_PRESET_KEY, "default")) {
+                    selectedPresetId = position
+                }
+                holder.radioButton.setOnClickListener {
+                    preferences.edit().apply {
+                        putString(SELECTED_BOX64_PRESET_KEY, holder.settingsName.text.toString())
                         apply()
                     }
                     selectedPresetId = holder.adapterPosition
@@ -77,6 +101,9 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
                 VIRTUAL_CONTROLLER -> {
                     DeleteItemFragment(DELETE_VIRTUAL_CONTROLLER_PRESET, context).show(supportFragmentManager, "")
                 }
+                BOX64_PRESET -> {
+                    DeleteItemFragment(DELETE_BOX64_PRESET, context).show(supportFragmentManager, "")
+                }
             }
         }
 
@@ -92,6 +119,11 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
                 VIRTUAL_CONTROLLER -> {
                     val intent = Intent(context, VirtualControllerOverlayMapper::class.java)
                     context.startActivity(intent)
+                }
+                BOX64_PRESET -> {
+                    context.sendBroadcast(
+                        Intent(ACTION_EDIT_BOX64_PRESET)
+                    )
                 }
             }
         }

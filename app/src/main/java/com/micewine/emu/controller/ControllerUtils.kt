@@ -25,31 +25,31 @@ import android.view.MotionEvent.AXIS_Y
 import android.view.MotionEvent.AXIS_Z
 import androidx.preference.PreferenceManager
 import com.micewine.emu.LorieView
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_HAT_X_MINUS_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_HAT_X_PLUS_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_HAT_Y_MINUS_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_HAT_Y_PLUS_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_RZ_MINUS_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_RZ_PLUS_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_X_MINUS_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_X_PLUS_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_Y_MINUS_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_Y_PLUS_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_Z_MINUS_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.AXIS_Z_PLUS_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_A_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_B_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_L1_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_L2_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_R1_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_R2_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_SELECT_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_START_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_THUMBL_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_THUMBR_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_X_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.BUTTON_Y_KEY
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_MINUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_PLUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_Y_MINUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_Y_PLUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_RZ_MINUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_RZ_PLUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_X_MINUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_X_PLUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_Y_MINUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_Y_PLUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_Z_MINUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_Z_PLUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_A_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_B_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_L1_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_L2_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_R1_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_R2_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_SELECT_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_START_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_THUMBL_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_THUMBR_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_X_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_Y_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getDeadZone
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMapping
@@ -110,8 +110,6 @@ object ControllerUtils {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
         val mapping =  getMapping(preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, key)
         val keyList: List<Int>
-
-        Log.v("AAAAA", mapping[0])
 
         when (mapping[0]) {
             "M_Left" -> {

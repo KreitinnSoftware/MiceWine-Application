@@ -29,7 +29,7 @@
             android:exported="false">
         </activity>
         <activity
-            android:name=".activities.ControllerMapperActivity"
+            android:name=".activities.PresetManagerActivity"
             android:theme="@style/Theme.MiceWine"
             android:exported="false">
         </activity>

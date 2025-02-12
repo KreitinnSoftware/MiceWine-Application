@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY
 import com.micewine.emu.adapters.AdapterPreset
 import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId

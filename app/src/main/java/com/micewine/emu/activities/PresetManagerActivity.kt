@@ -21,16 +21,19 @@ import com.micewine.emu.R
 import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.controller.ControllerUtils.getGameControllerNames
-import com.micewine.emu.databinding.ActivityControllerMapperBinding
+import com.micewine.emu.databinding.ActivityPresetManagerBinding
+import com.micewine.emu.fragments.Box64PresetManagerFragment
+import com.micewine.emu.fragments.Box64SettingsFragment
 import com.micewine.emu.fragments.ControllerMapperFragment
 import com.micewine.emu.fragments.ControllerPresetManagerFragment
 import com.micewine.emu.fragments.CreatePresetFragment
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
 
-class ControllerMapperActivity : AppCompatActivity() {
-    private var binding: ActivityControllerMapperBinding? = null
+class PresetManagerActivity : AppCompatActivity() {
+    private var binding: ActivityPresetManagerBinding? = null
     private var backButton: ImageButton? = null
     private var controllerConnected: TextView? = null
     private var addPresetFAB: FloatingActionButton? = null
@@ -38,11 +41,18 @@ class ControllerMapperActivity : AppCompatActivity() {
     private val controllerPresetFragment = ControllerPresetManagerFragment()
     private val controllerMapperFragment = ControllerMapperFragment()
     private val virtualControllerMapperFragment = VirtualControllerPresetManagerFragment()
+    private val box64PresetManagerFragment = Box64PresetManagerFragment()
+    private val box64SettingsFragment = Box64SettingsFragment()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 ACTION_EDIT_CONTROLLER_MAPPING -> {
                     fragmentLoader(controllerMapperFragment, false)
+
+                    addPresetFAB?.visibility = View.GONE
+                }
+                ACTION_EDIT_BOX64_PRESET -> {
+                    fragmentLoader(box64SettingsFragment, false)
 
                     addPresetFAB?.visibility = View.GONE
                 }
@@ -56,7 +66,7 @@ class ControllerMapperActivity : AppCompatActivity() {
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this)!!
 
-        binding = ActivityControllerMapperBinding.inflate(layoutInflater)
+        binding = ActivityPresetManagerBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
         controllerConnected = findViewById(R.id.controllerConnected)
@@ -68,39 +78,54 @@ class ControllerMapperActivity : AppCompatActivity() {
 
         addPresetFAB = findViewById(R.id.addPresetFAB)
 
-        val intent = intent?.getIntExtra("controllerMapperType", -1)
+        val intent = intent?.getIntExtra("presetType", -1)
 
-        if (intent == PHYSICAL_CONTROLLER) {
-            fragmentLoader(controllerPresetFragment, true)
+        when (intent) {
+            PHYSICAL_CONTROLLER -> {
+                fragmentLoader(controllerPresetFragment, true)
 
-            findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.controller_mapper_title)
+                findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.controller_mapper_title)
 
-            val connectedControllers = getGameControllerNames()
+                val connectedControllers = getGameControllerNames()
 
-            if (connectedControllers.isNotEmpty()) {
-                controllerConnected?.text = getString(R.string.connected_controller, connectedControllers[0])
-            } else {
-                controllerConnected?.text = getString(R.string.no_controllers_connected)
+                if (connectedControllers.isNotEmpty()) {
+                    controllerConnected?.text = getString(R.string.connected_controller, connectedControllers[0])
+                } else {
+                    controllerConnected?.text = getString(R.string.no_controllers_connected)
+                }
+
+                addPresetFAB?.setOnClickListener {
+                    CreatePresetFragment(CONTROLLER_PRESET).show(supportFragmentManager, "")
+                }
             }
+            VIRTUAL_CONTROLLER -> {
+                fragmentLoader(virtualControllerMapperFragment, true)
 
-            addPresetFAB?.setOnClickListener {
-                CreatePresetFragment(CONTROLLER_PRESET).show(supportFragmentManager, "")
+                findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.virtual_controller_mapper_title)
+
+                controllerConnected?.visibility = View.GONE
+
+                addPresetFAB?.setOnClickListener {
+                    CreatePresetFragment(VIRTUAL_CONTROLLER_PRESET).show(supportFragmentManager, "")
+                }
             }
-        } else if (intent == VIRTUAL_CONTROLLER) {
-            fragmentLoader(virtualControllerMapperFragment, true)
+            BOX64_PRESET -> {
+                fragmentLoader(box64PresetManagerFragment, true)
 
-            findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.virtual_controller_mapper_title)
+                findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.box64_preset_manager_title)
 
-            controllerConnected?.visibility = View.GONE
+                controllerConnected?.visibility = View.GONE
 
-            addPresetFAB?.setOnClickListener {
-                CreatePresetFragment(VIRTUAL_CONTROLLER_PRESET).show(supportFragmentManager, "")
+                addPresetFAB?.setOnClickListener {
+                    CreatePresetFragment(BOX64_PRESET).show(supportFragmentManager, "")
+                }
             }
         }
 
         registerReceiver(receiver, object : IntentFilter() {
             init {
                 addAction(ACTION_EDIT_CONTROLLER_MAPPING)
+                addAction(ACTION_EDIT_BOX64_PRESET)
             }
         })
     }
@@ -134,7 +159,7 @@ class ControllerMapperActivity : AppCompatActivity() {
 
     private fun fragmentLoader(fragment: Fragment, init: Boolean) {
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.controller_mapper_content, fragment)
+            replace(R.id.presetManagerContent, fragment)
 
             if (!init) {
                 addToBackStack(null)
@@ -172,7 +197,9 @@ class ControllerMapperActivity : AppCompatActivity() {
 
         const val SELECTED_CONTROLLER_PRESET_KEY = "selectedControllerPreset"
         const val SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY = "selectedVirtualControllerPreset"
+        const val SELECTED_BOX64_PRESET_KEY = "selectedBox64Preset"
 
         const val ACTION_EDIT_CONTROLLER_MAPPING = "com.micewine.emu.ACTION_EDIT_CONTROLLER_MAPPING"
+        const val ACTION_EDIT_BOX64_PRESET = "com.micewine.emu.ACTION_EDIT_BOX64_PRESET"
     }
 }

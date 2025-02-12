@@ -40,6 +40,7 @@ class SettingsFragment : Fragment() {
 
         if (Build.SUPPORTED_ABIS[0] != "x86_64") {
             addToAdapter(R.string.box64_manager_title, R.string.box64_manager_description, R.drawable.ic_box64)
+            addToAdapter(R.string.box64_preset_manager_title, R.string.box64_preset_manager_description, R.drawable.ic_box64)
         }
 
         addToAdapter(R.string.driver_manager_title, R.string.driver_manager_description, R.drawable.ic_gpu)

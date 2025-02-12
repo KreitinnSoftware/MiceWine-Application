@@ -166,4 +166,9 @@
     <string name="installing_drivers">正在安装驱动程序…</string>
     <string name="installing_box64">正在安装 Box64…</string>
     <string name="installing_wine">正在安装 Wine…</string>
+    <string name="box64_preset_manager_title">Box64 预设管理器</string>
+    <string name="box64_preset_manager_description">管理 Box64 预设</string>
+    <string name="selected_box64_profile">已选择 Box64 配置文件</string>
+    <string name="selected_virtual_controller_profile">已选择虚拟控制器配置文件</string>
+    <string name="selected_controller_profile">已选择控制器配置文件</string>
 </resources>

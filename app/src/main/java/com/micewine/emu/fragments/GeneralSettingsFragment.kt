@@ -34,10 +34,6 @@ class GeneralSettingsFragment : Fragment() {
 
         settingsList.clear()
 
-        if (Build.SUPPORTED_ABIS[0] != "x86_64") {
-            addToAdapter(R.string.box64_settings_title, R.string.box64_settings_description, R.drawable.ic_box64)
-        }
-
         addToAdapter(R.string.wine_settings_title, R.string.wine_settings_description, R.drawable.ic_wine)
         addToAdapter(R.string.display_settings_title, R.string.display_settings_description, R.drawable.ic_display)
         addToAdapter(R.string.driver_settings_title, R.string.driver_settings_description, R.drawable.ic_gpu)

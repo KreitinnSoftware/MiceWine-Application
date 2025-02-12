@@ -19,6 +19,7 @@ import com.micewine.emu.activities.MainActivity.Companion.ACTION_CREATE_WINE_PRE
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.addBox64Preset
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.addControllerPreset
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.addVirtualControllerPreset
 import java.io.File
@@ -47,7 +48,7 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
                 wineVersionText.visibility = View.VISIBLE
                 wineVersionSpinner.visibility = View.VISIBLE
 
-                ratPackagesDir.listFiles()?.sorted()?.forEach { it ->
+                ratPackagesDir.listFiles()?.sorted()?.forEach {
                     if (it.isDirectory && it.name.startsWith("Wine-")) {
                         val wineName = File("$it/pkg-header").readLines()[0].substringAfter("=")
 
@@ -58,7 +59,7 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
 
                 wineVersionSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, wineVersionsNames)
             }
-            CONTROLLER_PRESET, VIRTUAL_CONTROLLER_PRESET -> {
+            CONTROLLER_PRESET, VIRTUAL_CONTROLLER_PRESET, BOX64_PRESET -> {
                 wineVersionText.visibility = View.GONE
                 wineVersionSpinner.visibility = View.GONE
             }
@@ -93,6 +94,9 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
                 VIRTUAL_CONTROLLER_PRESET -> {
                     addVirtualControllerPreset(requireContext(), newName)
                 }
+                BOX64_PRESET -> {
+                    addBox64Preset(requireContext(), newName)
+                }
             }
 
             dismiss()
@@ -109,5 +113,6 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
         const val WINEPREFIX_PRESET = 1
         const val CONTROLLER_PRESET = 2
         const val VIRTUAL_CONTROLLER_PRESET = 3
+        const val BOX64_PRESET = 4
     }
 }

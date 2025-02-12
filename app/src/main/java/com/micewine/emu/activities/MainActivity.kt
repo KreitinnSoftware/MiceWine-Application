@@ -34,41 +34,23 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_AVX
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_AVX_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BIGBLOCK
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BIGBLOCK_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BLEEDING_EDGE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_CALLRET
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_CALLRET_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_DIRTY
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_DIRTY_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FASTNAN
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FASTNAN_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FASTROUND
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FASTROUND_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FORWARD
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FORWARD_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_NATIVEFLAGS
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_NATIVEFLAGS_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_PAUSE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_PAUSE_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_SAFEFLAGS
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_SAFEFLAGS_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_STRONGMEM
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_STRONGMEM_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_WAIT
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_WAIT_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_WEAKBARRIER
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_WEAKBARRIER_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_X87DOUBLE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_X87DOUBLE_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGSEGV
@@ -78,7 +60,6 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWB
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CPU_AFFINITY
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION_DEFAULT_VALUE
@@ -113,6 +94,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL_DEFAULT_VALUE
+import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET_KEY
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateICDFile
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.core.EnvVars
@@ -129,6 +111,8 @@ import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.AboutFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ratCandidate
+import com.micewine.emu.fragments.Box64PresetManagerFragment
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Mapping
 import com.micewine.emu.fragments.ControllerPresetManagerFragment
 import com.micewine.emu.fragments.DeleteItemFragment
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_GAME_ITEM
@@ -343,6 +327,7 @@ class MainActivity : AppCompatActivity() {
         EnvVars.initialize(this)
         ControllerPresetManagerFragment.initialize(this)
         VirtualControllerPresetManagerFragment.initialize(this)
+        Box64PresetManagerFragment.initialize(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
@@ -1082,8 +1067,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        private fun booleanToString(boolean: Boolean): String {
-            return if (boolean) {
+        private fun strBoolToNumStr(strBool: String): String {
+            return if (strBool.toBoolean()) {
+                "1"
+            } else {
+                "0"
+            }
+        }
+
+        private fun strBoolToNumStr(strBool: Boolean): String {
+            return if (strBool) {
                 "1"
             } else {
                 "0"
@@ -1100,33 +1093,31 @@ class MainActivity : AppCompatActivity() {
             selectedBox64 = preferences.getString(SELECTED_BOX64, "")
 
             box64LogLevel = preferences.getString(BOX64_LOG, BOX64_LOG_DEFAULT_VALUE)
-            box64Mmap32 = booleanToString(preferences.getBoolean(BOX64_MMAP32, BOX64_MMAP32_DEFAULT_VALUE))
-            box64Avx = preferences.getString(BOX64_AVX, BOX64_AVX_DEFAULT_VALUE)
-            box64Sse42 = booleanToString(preferences.getBoolean(BOX64_SSE42, BOX64_SSE42_DEFAULT_VALUE))
-            box64DynarecBigblock = preferences.getString(BOX64_DYNAREC_BIGBLOCK, BOX64_DYNAREC_BIGBLOCK_DEFAULT_VALUE)
-            box64DynarecStrongmem = preferences.getString(BOX64_DYNAREC_STRONGMEM, BOX64_DYNAREC_STRONGMEM_DEFAULT_VALUE)
-            box64DynarecWeakbarrier = preferences.getString(BOX64_DYNAREC_WEAKBARRIER, BOX64_DYNAREC_WEAKBARRIER_DEFAULT_VALUE)
-            box64DynarecPause = preferences.getString(BOX64_DYNAREC_PAUSE, BOX64_DYNAREC_PAUSE_DEFAULT_VALUE)
-            box64DynarecX87double = booleanToString(preferences.getBoolean(BOX64_DYNAREC_X87DOUBLE, BOX64_DYNAREC_X87DOUBLE_DEFAULT_VALUE))
-            box64DynarecFastnan = booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTNAN, BOX64_DYNAREC_FASTNAN_DEFAULT_VALUE))
-            box64DynarecFastround = booleanToString(preferences.getBoolean(BOX64_DYNAREC_FASTROUND, BOX64_DYNAREC_FASTROUND_DEFAULT_VALUE))
-            box64DynarecSafeflags = preferences.getString(BOX64_DYNAREC_SAFEFLAGS, BOX64_DYNAREC_SAFEFLAGS_DEFAULT_VALUE)
-            box64DynarecCallret = booleanToString(preferences.getBoolean(BOX64_DYNAREC_CALLRET, BOX64_DYNAREC_CALLRET_DEFAULT_VALUE))
-            box64DynarecAlignedAtomics = booleanToString(preferences.getBoolean(BOX64_DYNAREC_ALIGNED_ATOMICS, BOX64_DYNAREC_ALIGNED_ATOMICS_DEFAULT_VALUE))
-            box64DynarecNativeflags = booleanToString(preferences.getBoolean(BOX64_DYNAREC_NATIVEFLAGS, BOX64_DYNAREC_NATIVEFLAGS_DEFAULT_VALUE))
-            box64DynarecBleedingEdge = booleanToString(preferences.getBoolean(BOX64_DYNAREC_BLEEDING_EDGE, BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE))
-            box64DynarecWait = booleanToString(preferences.getBoolean(BOX64_DYNAREC_WAIT, BOX64_DYNAREC_WAIT_DEFAULT_VALUE))
-            box64DynarecDirty = booleanToString(preferences.getBoolean(BOX64_DYNAREC_DIRTY, BOX64_DYNAREC_DIRTY_DEFAULT_VALUE))
-            box64DynarecForward = preferences.getString(BOX64_DYNAREC_FORWARD, BOX64_DYNAREC_FORWARD_DEFAULT_VALUE)
-            box64ShowSegv = booleanToString(preferences.getBoolean(BOX64_SHOWSEGV, BOX64_SHOWSEGV_DEFAULT_VALUE))
-            box64ShowBt = booleanToString(preferences.getBoolean(BOX64_SHOWBT, BOX64_SHOWBT_DEFAULT_VALUE))
-            box64NoSigSegv = booleanToString(preferences.getBoolean(BOX64_NOSIGSEGV, BOX64_NOSIGSEGV_DEFAULT_VALUE))
-            box64NoSigill = booleanToString(preferences.getBoolean(BOX64_NOSIGILL, BOX64_NOSIGILL_DEFAULT_VALUE))
+
+            val selectedBox64Preset = preferences.getString(SELECTED_BOX64_PRESET_KEY, "default")!!
+
+            box64Mmap32 = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_MMAP32)[0])
+            box64Avx = getBox64Mapping(selectedBox64Preset, BOX64_AVX)[0]
+            box64Sse42 = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_SSE42)[0])
+            box64DynarecBigblock = getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_BIGBLOCK)[0]
+            box64DynarecStrongmem = getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_STRONGMEM)[0]
+            box64DynarecWeakbarrier = getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_WEAKBARRIER)[0]
+            box64DynarecPause = getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_PAUSE)[0]
+            box64DynarecX87double = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_X87DOUBLE)[0])
+            box64DynarecFastnan = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_FASTNAN)[0])
+            box64DynarecFastround = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_FASTROUND)[0])
+            box64DynarecSafeflags = getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_SAFEFLAGS)[0]
+            box64DynarecCallret = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_CALLRET)[0])
+            box64DynarecAlignedAtomics = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_ALIGNED_ATOMICS)[0])
+            box64DynarecNativeflags = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_NATIVEFLAGS)[0])
+            box64DynarecWait = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_WAIT)[0])
+            box64DynarecDirty = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_DIRTY)[0])
+            box64DynarecForward = getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_FORWARD)[0]
 
             enableDRI3 = preferences.getBoolean(ENABLE_DRI3, ENABLE_DRI3_DEFAULT_VALUE)
             enableMangoHUD = preferences.getBoolean(ENABLE_MANGOHUD, ENABLE_MANGOHUD_DEFAULT_VALUE)
             enableServices = preferences.getBoolean(ENABLE_SERVICES, ENABLE_SERVICES_DEFAULT_VALUE)
-            wineESync = booleanToString(preferences.getBoolean(WINE_ESYNC, WINE_ESYNC_DEFAULT_VALUE))
+            wineESync = strBoolToNumStr(preferences.getBoolean(WINE_ESYNC, WINE_ESYNC_DEFAULT_VALUE))
             wineLogLevel = preferences.getString(WINE_LOG_LEVEL, WINE_LOG_LEVEL_DEFAULT_VALUE)
             selectedDriver = preferences.getString(SELECTED_DRIVER, SELECTED_DRIVER_DEFAULT_VALUE)
             d3dxRenderer = preferences.getString(SELECTED_D3DX_RENDERER, SELECTED_D3DX_RENDERER_DEFAULT_VALUE)

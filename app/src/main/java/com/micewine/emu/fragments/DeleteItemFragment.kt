@@ -20,6 +20,7 @@ import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.core.ShellLoader.runCommand
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.deleteBox64Preset
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.deleteControllerPreset
 import com.micewine.emu.fragments.FileManagerFragment.Companion.deleteFile
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
@@ -56,6 +57,9 @@ class DeleteItemFragment(private val deleteType: Int, private val context: Conte
                 }
                 DELETE_VIRTUAL_CONTROLLER_PRESET -> {
                     deleteVirtualControllerPreset(context, clickedPresetName)
+                }
+                DELETE_BOX64_PRESET -> {
+                    deleteBox64Preset(context, clickedPresetName)
                 }
                 DELETE_WINE_PREFIX -> {
                     if (winePrefixesDir.listFiles()!!.count() == 1) {
@@ -105,5 +109,6 @@ class DeleteItemFragment(private val deleteType: Int, private val context: Conte
         const val DELETE_CONTROLLER_PRESET = 1
         const val DELETE_VIRTUAL_CONTROLLER_PRESET = 2
         const val DELETE_WINE_PREFIX = 3
+        const val DELETE_BOX64_PRESET = 4
     }
 }

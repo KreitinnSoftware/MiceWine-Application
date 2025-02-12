@@ -10,7 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.preference.PreferenceManager
 import com.micewine.emu.LorieView
-import com.micewine.emu.activities.ControllerMapperActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY
 import com.micewine.emu.controller.ControllerUtils.KEYBOARD
 import com.micewine.emu.controller.ControllerUtils.MOUSE
 import com.micewine.emu.controller.ControllerUtils.handleAxis
