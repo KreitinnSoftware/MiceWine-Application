@@ -66,7 +66,7 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
         }
 
         buttonContinue.setOnClickListener {
-            val newName = editTextNewName.text.toString().replace(" ", "_")
+            val newName = editTextNewName.text.toString()
 
             if (newName == "") {
                 dismiss()

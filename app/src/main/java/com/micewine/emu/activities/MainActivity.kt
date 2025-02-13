@@ -1042,7 +1042,7 @@ class MainActivity : AppCompatActivity() {
 
                 File("$userSharedFolder/AppData").mkdirs()
 
-                runCommand("ln -sf $userSharedFolder/AppData $localAppData")
+                runCommand("ln -sf $userSharedFolder/AppData '$localAppData'")
 
                 startMenu.deleteRecursively()
 
@@ -1054,8 +1054,8 @@ class MainActivity : AppCompatActivity() {
                 File("$wineUtils/OpenAL/x64").copyRecursively(system32, true)
                 File("$wineUtils/OpenAL/x32").copyRecursively(syswow64, true)
 
-                WineWrapper.wine("regedit $driveC/Addons/DefaultDLLsOverrides.reg")
-                WineWrapper.wine("regedit $driveC/Addons/Themes/DarkBlue/DarkBlue.reg")
+                WineWrapper.wine("regedit '$driveC/Addons/DefaultDLLsOverrides.reg'")
+                WineWrapper.wine("regedit '$driveC/Addons/Themes/DarkBlue/DarkBlue.reg'")
                 WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Decorated /d N /f")
                 WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Managed /d N /f")
             }

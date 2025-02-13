@@ -33,14 +33,14 @@ object WineWrapper {
 
     fun wine(args: String) {
         runCommand(
-            getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
+            getEnv() + "WINEPREFIX='$winePrefix' $IS_BOX64 wine $args"
         )
     }
 
     fun wine(args: String, retLog: Boolean): String {
         if (retLog) {
             return runCommandWithOutput(
-                getEnv() + "BOX64_LOG=0 WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
+                getEnv() + "BOX64_LOG=0 WINEPREFIX='$winePrefix' $IS_BOX64 wine $args"
             )
         }
         return ""
@@ -48,7 +48,7 @@ object WineWrapper {
 
     fun wine(args: String, cwd: String) {
         runCommand(
-            "cd $cwd;" + getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
+            "cd $cwd;" + getEnv() + "WINEPREFIX='$winePrefix' $IS_BOX64 wine $args"
         )
     }
 
