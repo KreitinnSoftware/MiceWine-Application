@@ -1,12 +1,8 @@
 package com.micewine.emu.fragments
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,29 +39,6 @@ import java.util.Collections
 
 class Box64PresetManagerFragment : Fragment() {
     private var rootView: View? = null
-    private var recyclerView: RecyclerView? = null
-    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                ACTION_DELETE_BOX64_PRESET -> {
-                    val index = intent.getIntExtra("index", -1)
-
-                    recyclerView?.adapter?.notifyItemRemoved(index)
-
-                    if (index == selectedPresetId) {
-                        preferences?.edit {
-                            putString(SELECTED_BOX64_PRESET_KEY, presetListNames.first().titleSettings)
-                            apply()
-                        }
-                        recyclerView?.adapter?.notifyItemChanged(0)
-                    }
-                }
-                ACTION_ADD_BOX64_PRESET -> {
-                    recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
-                }
-            }
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,19 +51,7 @@ class Box64PresetManagerFragment : Fragment() {
         initialize(requireContext())
         setAdapter()
 
-        requireActivity().registerReceiver(receiver, object : IntentFilter() {
-            init {
-                addAction(ACTION_ADD_BOX64_PRESET)
-                addAction(ACTION_DELETE_BOX64_PRESET)
-            }
-        })
-
         return rootView
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        requireActivity().unregisterReceiver(receiver)
     }
 
     private fun setAdapter() {
@@ -99,7 +60,7 @@ class Box64PresetManagerFragment : Fragment() {
         presetListNames.clear()
 
         presetList = getBox64Presets()
-        presetList?.forEach {
+        presetList.forEach {
             addToAdapter(it[0], BOX64_PRESET, true)
         }
     }
@@ -109,12 +70,10 @@ class Box64PresetManagerFragment : Fragment() {
     }
 
     companion object {
+        private var recyclerView: RecyclerView? = null
         private val presetListNames: MutableList<AdapterPreset.Item> = mutableListOf()
-        private var presetList: MutableList<MutableList<String>>? = null
+        private var presetList: MutableList<MutableList<String>> = mutableListOf()
         private var preferences: SharedPreferences? = null
-
-        const val ACTION_DELETE_BOX64_PRESET = "com.micewine.emu.ACTION_DELETE_BOX64_PRESET"
-        const val ACTION_ADD_BOX64_PRESET = "com.micewine.emu.ACTION_ADD_BOX64_PRESET"
 
         private val gson = Gson()
 
@@ -144,24 +103,24 @@ class Box64PresetManagerFragment : Fragment() {
         }
 
         fun getBox64Mapping(name: String, key: String): List<String> {
-            val index = presetList?.indexOfFirst { it[0] == name } ?: return listOf()
+            val index = presetList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
                 return listOf()
             }
 
-            return presetList!![index][mappingMap[key]!!].split(":")
+            return presetList[index][mappingMap[key]!!].split(":")
         }
 
         fun editBox64Mapping(name: String, key: String, value: String) {
-            var index = presetList?.indexOfFirst { it[0] == name } ?: return
+            var index = presetList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
-                presetList!![0][0] = name
+                presetList[0][0] = name
                 index = 0
             }
 
-            presetList!![index][mappingMap[key]!!] = value
+            presetList[index][mappingMap[key]!!] = value
 
             saveBox64Preset()
         }
@@ -193,29 +152,31 @@ class Box64PresetManagerFragment : Fragment() {
                 this[mappingMap[BOX64_DYNAREC_FORWARD]!!] = "128"
             }
 
-            presetList?.add(defaultPreset)
+            presetList.add(defaultPreset)
             presetListNames.add(
                 AdapterPreset.Item(name, BOX64_PRESET, true)
             )
 
-            context.sendBroadcast(
-                Intent(ACTION_ADD_BOX64_PRESET)
-            )
+            recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
 
             saveBox64Preset()
         }
 
-        fun deleteBox64Preset(context: Context, name: String) {
-            val index = presetList?.indexOfFirst { it[0] == name }
+        fun deleteBox64Preset(name: String) {
+            val index = presetList.indexOfFirst { it[0] == name }
 
-            presetList?.removeAt(index!!)
-            presetListNames.removeAt(index!!)
+            presetList.removeAt(index)
+            presetListNames.removeAt(index)
 
-            val intent = Intent(ACTION_DELETE_BOX64_PRESET).apply {
-                putExtra("index", index)
+            recyclerView?.adapter?.notifyItemRemoved(index)
+
+            if (index == selectedPresetId) {
+                preferences?.edit {
+                    putString(SELECTED_BOX64_PRESET_KEY, presetListNames.first().titleSettings)
+                    apply()
+                }
+                recyclerView?.adapter?.notifyItemChanged(0)
             }
-
-            context.sendBroadcast(intent)
 
             saveBox64Preset()
         }

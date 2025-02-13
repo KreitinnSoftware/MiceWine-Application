@@ -14,10 +14,10 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
 import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.selectedFragment
-import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
 import com.micewine.emu.activities.MainActivity.Companion.setupDone
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
+import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.deleteBox64Preset
@@ -47,19 +47,19 @@ class DeleteItemFragment(private val deleteType: Int, private val context: Conte
             when (deleteType) {
                 DELETE_GAME_ITEM -> {
                     if (selectedFragment == "ShortcutsFragment") {
-                        removeGameFromList(preferences!!, selectedGameArray)
+                        removeGameFromList(selectedGameName)
                     } else if (selectedFragment == "FileManagerFragment") {
                         deleteFile(selectedFile)
                     }
                 }
                 DELETE_CONTROLLER_PRESET -> {
-                    deleteControllerPreset(context, clickedPresetName)
+                    deleteControllerPreset(clickedPresetName)
                 }
                 DELETE_VIRTUAL_CONTROLLER_PRESET -> {
-                    deleteVirtualControllerPreset(context, clickedPresetName)
+                    deleteVirtualControllerPreset(clickedPresetName)
                 }
                 DELETE_BOX64_PRESET -> {
-                    deleteBox64Preset(context, clickedPresetName)
+                    deleteBox64Preset(clickedPresetName)
                 }
                 DELETE_WINE_PREFIX -> {
                     if (winePrefixesDir.listFiles()!!.count() == 1) {

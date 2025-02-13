@@ -1,9 +1,6 @@
 package com.micewine.emu.fragments
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -21,36 +18,10 @@ import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRT
 import com.micewine.emu.adapters.AdapterPreset
 import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
-import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.ACTION_ADD_CONTROLLER_PRESET
-import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.ACTION_DELETE_CONTROLLER_PRESET
-import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.ACTION_EDIT_CONTROLLER_PRESET
 import com.micewine.emu.views.OverlayView
 
 class VirtualControllerPresetManagerFragment : Fragment() {
     private var rootView: View? = null
-    private var recyclerView: RecyclerView? = null
-    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                ACTION_DELETE_CONTROLLER_PRESET -> {
-                    val index = intent.getIntExtra("index", -1)
-
-                    recyclerView?.adapter?.notifyItemRemoved(index)
-
-                    if (index == selectedPresetId) {
-                        preferences?.edit {
-                            putString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, presetListNames.first().titleSettings)
-                            apply()
-                        }
-                        recyclerView?.adapter?.notifyItemChanged(0)
-                    }
-                }
-                ACTION_ADD_CONTROLLER_PRESET -> {
-                    recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
-                }
-            }
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,20 +34,7 @@ class VirtualControllerPresetManagerFragment : Fragment() {
         initialize(requireContext())
         setAdapter()
 
-        requireActivity().registerReceiver(receiver, object : IntentFilter() {
-            init {
-                addAction(ACTION_EDIT_CONTROLLER_PRESET)
-                addAction(ACTION_ADD_CONTROLLER_PRESET)
-                addAction(ACTION_DELETE_CONTROLLER_PRESET)
-            }
-        })
-
         return rootView
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        requireActivity().unregisterReceiver(receiver)
     }
 
     private fun setAdapter() {
@@ -85,7 +43,7 @@ class VirtualControllerPresetManagerFragment : Fragment() {
         presetListNames.clear()
 
         presetList = getVirtualControllerPresets()
-        presetList?.forEach {
+        presetList.forEach {
             addToAdapter(it.name, VIRTUAL_CONTROLLER, true)
         }
     }
@@ -95,9 +53,10 @@ class VirtualControllerPresetManagerFragment : Fragment() {
     }
 
     companion object {
+        private var recyclerView: RecyclerView? = null
         private val presetListNames: MutableList<AdapterPreset.Item> = mutableListOf()
-        private var presetList: MutableList<VirtualControllerPreset>? = null
-        private var preferences: SharedPreferences? = null
+        private var presetList: MutableList<VirtualControllerPreset> = mutableListOf()
+        var preferences: SharedPreferences? = null
 
         private val gson = Gson()
 
@@ -107,26 +66,26 @@ class VirtualControllerPresetManagerFragment : Fragment() {
         }
 
         fun getMapping(name: String): VirtualControllerPreset? {
-            val index = presetList?.indexOfFirst { it.name == name } ?: return null
+            val index = presetList.indexOfFirst { it.name == name }
 
             if (index == -1) return null
 
-            return presetList!![index]
+            return presetList[index]
         }
 
         fun putMapping(name: String, buttonList: MutableList<OverlayView.VirtualButton>, analogList: MutableList<OverlayView.VirtualAnalog>) {
-            val index = presetList?.indexOfFirst { it.name == name } ?: return
+            val index = presetList.indexOfFirst { it.name == name }
 
             if (index == -1) return
 
-            presetList!![index].buttons.clear()
-            presetList!![index].analogs.clear()
+            presetList[index].buttons.clear()
+            presetList[index].analogs.clear()
 
             buttonList.forEach {
-                presetList!![index].buttons.add(it)
+                presetList[index].buttons.add(it)
             }
             analogList.forEach {
-                presetList!![index].analogs.add(it)
+                presetList[index].analogs.add(it)
             }
 
             saveControllerPresets()
@@ -140,29 +99,31 @@ class VirtualControllerPresetManagerFragment : Fragment() {
 
             val defaultPreset = VirtualControllerPreset(name, mutableListOf(), mutableListOf())
 
-            presetList?.add(defaultPreset)
+            presetList.add(defaultPreset)
             presetListNames.add(
                 AdapterPreset.Item(name, VIRTUAL_CONTROLLER, true)
             )
 
-            context.sendBroadcast(
-                Intent(ACTION_ADD_CONTROLLER_PRESET)
-            )
+            recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
 
             saveControllerPresets()
         }
 
-        fun deleteVirtualControllerPreset(context: Context, name: String) {
-            val index = presetList?.indexOfFirst { it.name == name }
+        fun deleteVirtualControllerPreset(name: String) {
+            val index = presetList.indexOfFirst { it.name == name }
 
-            presetList?.removeAt(index!!)
-            presetListNames.removeAt(index!!)
+            presetList.removeAt(index)
+            presetListNames.removeAt(index)
 
-            val intent = Intent(ACTION_DELETE_CONTROLLER_PRESET).apply {
-                putExtra("index", index)
+            recyclerView?.adapter?.notifyItemRemoved(index)
+
+            if (index == selectedPresetId) {
+                preferences?.edit {
+                    putString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, presetListNames.first().titleSettings)
+                    apply()
+                }
+                recyclerView?.adapter?.notifyItemChanged(0)
             }
-
-            context.sendBroadcast(intent)
 
             saveControllerPresets()
         }

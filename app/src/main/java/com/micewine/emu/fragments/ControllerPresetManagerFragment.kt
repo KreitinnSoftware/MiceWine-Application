@@ -1,9 +1,6 @@
 package com.micewine.emu.fragments
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -41,9 +38,9 @@ import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_THUMBL
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_THUMBR_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_Y_KEY
-import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DEAD_ZONE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.MOUSE_SENSIBILITY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
 import com.micewine.emu.adapters.AdapterPreset
 import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
@@ -51,29 +48,6 @@ import java.util.Collections
 
 class ControllerPresetManagerFragment : Fragment() {
     private var rootView: View? = null
-    private var recyclerView: RecyclerView? = null
-    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                ACTION_DELETE_CONTROLLER_PRESET -> {
-                    val index = intent.getIntExtra("index", -1)
-
-                    recyclerView?.adapter?.notifyItemRemoved(index)
-
-                    if (index == selectedPresetId) {
-                        preferences?.edit {
-                            putString(SELECTED_CONTROLLER_PRESET_KEY, presetListNames.first().titleSettings)
-                            apply()
-                        }
-                        recyclerView?.adapter?.notifyItemChanged(0)
-                    }
-                }
-                ACTION_ADD_CONTROLLER_PRESET -> {
-                    recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
-                }
-            }
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,20 +60,7 @@ class ControllerPresetManagerFragment : Fragment() {
         initialize(requireContext())
         setAdapter()
 
-        requireActivity().registerReceiver(receiver, object : IntentFilter() {
-            init {
-                addAction(ACTION_EDIT_CONTROLLER_PRESET)
-                addAction(ACTION_ADD_CONTROLLER_PRESET)
-                addAction(ACTION_DELETE_CONTROLLER_PRESET)
-            }
-        })
-
         return rootView
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        requireActivity().unregisterReceiver(receiver)
     }
 
     private fun setAdapter() {
@@ -108,7 +69,7 @@ class ControllerPresetManagerFragment : Fragment() {
         presetListNames.clear()
 
         presetList = getControllerPresets()
-        presetList?.forEach {
+        presetList.forEach {
             addToAdapter(it[0], PHYSICAL_CONTROLLER, true)
         }
     }
@@ -118,13 +79,10 @@ class ControllerPresetManagerFragment : Fragment() {
     }
 
     companion object {
+        private var recyclerView: RecyclerView? = null
         private val presetListNames: MutableList<AdapterPreset.Item> = mutableListOf()
-        private var presetList: MutableList<MutableList<String>>? = null
+        private var presetList: MutableList<MutableList<String>> = mutableListOf()
         private var preferences: SharedPreferences? = null
-
-        const val ACTION_EDIT_CONTROLLER_PRESET = "com.micewine.emu.ACTION_EDIT_CONTROLLER_PRESET"
-        const val ACTION_ADD_CONTROLLER_PRESET = "com.micewine.emu.ACTION_ADD_CONTROLLER_PRESET"
-        const val ACTION_DELETE_CONTROLLER_PRESET = "com.micewine.emu.ACTION_DELETE_CONTROLLER_PRESET"
 
         private val gson = Gson()
 
@@ -163,68 +121,68 @@ class ControllerPresetManagerFragment : Fragment() {
         }
 
         fun getMouseSensibility(name: String): Int {
-            val index = presetList?.indexOfFirst { it[0] == name }
+            val index = presetList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
                 return 100
             }
 
-            return presetList!![index!!][mappingMap[MOUSE_SENSIBILITY]!!].toInt()
+            return presetList[index][mappingMap[MOUSE_SENSIBILITY]!!].toInt()
         }
 
         fun putMouseSensibility(name: String, value: Int) {
-            val index = presetList?.indexOfFirst { it[0] == name }
+            val index = presetList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
                 return
             }
 
-            presetList!![index!!][mappingMap[MOUSE_SENSIBILITY]!!] = value.toString()
+            presetList[index][mappingMap[MOUSE_SENSIBILITY]!!] = value.toString()
 
             saveControllerPresets()
         }
 
         fun getDeadZone(name: String): Int {
-            val index = presetList?.indexOfFirst { it[0] == name }
+            val index = presetList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
                 return 25
             }
 
-            return presetList!![index!!][mappingMap[DEAD_ZONE]!!].toInt()
+            return presetList[index][mappingMap[DEAD_ZONE]!!].toInt()
         }
 
         fun putDeadZone(name: String, value: Int) {
-            val index = presetList?.indexOfFirst { it[0] == name }
+            val index = presetList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
                 return
             }
 
-            presetList!![index!!][mappingMap[DEAD_ZONE]!!] = value.toString()
+            presetList[index][mappingMap[DEAD_ZONE]!!] = value.toString()
 
             saveControllerPresets()
         }
 
         fun getMapping(name: String, key: String): List<String> {
-            val index = presetList?.indexOfFirst { it[0] == name }
+            val index = presetList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
                 return listOf("", "")
             }
 
-            return presetList!![index!!][mappingMap[key]!!].split(":")
+            return presetList[index][mappingMap[key]!!].split(":")
         }
 
         fun editControllerPreset(name: String, key: String, selectedItem: String) {
-            var index = presetList?.indexOfFirst { it[0] == name }
+            var index = presetList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
-                presetList!![0][0] = name
+                presetList[0][0] = name
                 index = 0
             }
 
-            presetList!![index!!][mappingMap[key]!!] = selectedItem
+            presetList[index][mappingMap[key]!!] = selectedItem
 
             saveControllerPresets()
         }
@@ -241,29 +199,31 @@ class ControllerPresetManagerFragment : Fragment() {
                 this[mappingMap[MOUSE_SENSIBILITY]!!] = "100"
             }
 
-            presetList?.add(defaultPreset)
+            presetList.add(defaultPreset)
             presetListNames.add(
                 AdapterPreset.Item(name, PHYSICAL_CONTROLLER, true)
             )
 
-            context.sendBroadcast(
-                Intent(ACTION_ADD_CONTROLLER_PRESET)
-            )
+            recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
 
             saveControllerPresets()
         }
 
-        fun deleteControllerPreset(context: Context, name: String) {
-            val index = presetList?.indexOfFirst { it[0] == name }
+        fun deleteControllerPreset(name: String) {
+            val index = presetList.indexOfFirst { it[0] == name }
 
-            presetList?.removeAt(index!!)
-            presetListNames.removeAt(index!!)
+            presetList.removeAt(index)
+            presetListNames.removeAt(index)
 
-            val intent = Intent(ACTION_DELETE_CONTROLLER_PRESET).apply {
-                putExtra("index", index)
+            recyclerView?.adapter?.notifyItemRemoved(index)
+
+            if (index == selectedPresetId) {
+                preferences?.edit {
+                    putString(SELECTED_CONTROLLER_PRESET_KEY, presetListNames.first().titleSettings)
+                    apply()
+                }
+                recyclerView?.adapter?.notifyItemChanged(0)
             }
-
-            context.sendBroadcast(intent)
 
             saveControllerPresets()
         }

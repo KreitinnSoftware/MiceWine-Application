@@ -7,6 +7,9 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -16,10 +19,12 @@ import androidx.fragment.app.DialogFragment
 import androidx.preference.PreferenceManager
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_ICON
-import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
+import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Presets
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getControllerPresets
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.editGameFromList
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameExeArguments
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameIcon
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getVirtualControllerPresets
 
 class EditGamePreferencesFragment : DialogFragment() {
@@ -40,7 +45,7 @@ class EditGamePreferencesFragment : DialogFragment() {
 
         imageView = view.findViewById(R.id.imageView)
 
-        val imageBitmap = BitmapFactory.decodeFile(selectedGameArray[2])
+        val imageBitmap = getGameIcon(selectedGameName)
 
         if (imageBitmap != null) {
             imageView?.setImageBitmap(
@@ -54,8 +59,8 @@ class EditGamePreferencesFragment : DialogFragment() {
 
         preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
-        editTextNewName.setText(selectedGameArray[0])
-        editTextArguments.setText(selectedGameArray[3])
+        editTextNewName.setText(selectedGameName)
+        editTextArguments.setText(getGameExeArguments(selectedGameName))
 
         imageView?.setOnClickListener {
             requireActivity().sendBroadcast(
@@ -83,6 +88,20 @@ class EditGamePreferencesFragment : DialogFragment() {
         selectedVirtualControllerProfileSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, virtualControllerProfilesNames)
         selectedBox64ProfileSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, box64ProfilesNames)
 
+        selectedControllerProfileSpinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
         buttonContinue.setOnClickListener {
             val newName = editTextNewName.text.toString()
             val newArguments = editTextArguments.text.toString()
@@ -91,7 +110,7 @@ class EditGamePreferencesFragment : DialogFragment() {
                 return@setOnClickListener
             }
 
-            editGameFromList(preferences!!, selectedGameArray, newName, newArguments)
+            editGameFromList(selectedGameName, newName, newArguments)
 
             dismiss()
         }
@@ -104,7 +123,7 @@ class EditGamePreferencesFragment : DialogFragment() {
     }
 
     override fun onResume() {
-        val imageBitmap = BitmapFactory.decodeFile(selectedGameArray[2])
+        val imageBitmap = getGameIcon(selectedGameName)
 
         if (imageBitmap != null) {
             imageView?.setImageBitmap(

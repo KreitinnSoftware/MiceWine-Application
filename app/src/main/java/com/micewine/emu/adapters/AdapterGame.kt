@@ -15,10 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.EmulationActivity
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_RUN_WINE
-import com.micewine.emu.activities.MainActivity.Companion.selectedGameArray
 import java.io.File
 
-class AdapterGame(private val gameList: MutableList<GameList>, private val activity: Activity) : RecyclerView.Adapter<AdapterGame.ViewHolder>() {
+class AdapterGame(private val gameList: MutableList<GameItem>, private val activity: Activity) : RecyclerView.Adapter<AdapterGame.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_game_item, parent, false)
         return ViewHolder(itemView)
@@ -28,10 +27,10 @@ class AdapterGame(private val gameList: MutableList<GameList>, private val activ
         val sList = gameList[position]
         holder.titleGame.text = sList.name
 
-        val imageFile = File(sList.imageGame)
+        val imageFile = File(sList.iconPath)
 
         if (imageFile.exists() && imageFile.length() > 0) {
-            val imageBitmap = BitmapFactory.decodeFile(sList.imageGame)
+            val imageBitmap = BitmapFactory.decodeFile(sList.iconPath)
 
             if (imageBitmap != null) {
                 holder.gameImage.setImageBitmap(
@@ -40,7 +39,7 @@ class AdapterGame(private val gameList: MutableList<GameList>, private val activ
                     )
                 )
             }
-        } else if (sList.imageGame == "") {
+        } else if (sList.iconPath == "") {
             holder.gameImage.setImageBitmap(resizeBitmap(
                 BitmapFactory.decodeResource(activity.resources, R.drawable.default_icon), holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height)
             )
@@ -56,7 +55,7 @@ class AdapterGame(private val gameList: MutableList<GameList>, private val activ
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateList(newList: List<GameList>) {
+    fun updateList(newList: List<GameItem>) {
         gameList.clear()
         gameList.addAll(newList)
         notifyDataSetChanged()
@@ -78,11 +77,12 @@ class AdapterGame(private val gameList: MutableList<GameList>, private val activ
         override fun onClick(v: View) {
             val gameModel = gameList[adapterPosition]
 
-            var exePath = gameModel.exeFile.path
+            val exeFile = File(gameModel.exePath)
+            var exePath = gameModel.exePath
             var exeArguments = gameModel.exeArguments
 
-            if (!gameModel.exeFile.exists()) {
-                if (gameModel.exeFile.path == activity.getString(R.string.desktop_mode_init)) {
+            if (!exeFile.exists()) {
+                if (exeFile.path == activity.getString(R.string.desktop_mode_init)) {
                     exePath = ""
                     exeArguments = ""
                 } else {
@@ -113,11 +113,20 @@ class AdapterGame(private val gameList: MutableList<GameList>, private val activ
 
             val gameModel = gameList[adapterPosition]
 
-            selectedGameArray = arrayOf(gameModel.name, gameModel.exeFile.path, gameModel.imageGame, gameModel.exeArguments)
+            selectedGameName = gameModel.name
 
             return false
         }
     }
 
-    class GameList(var exeFile: File, var name: String, var imageGame: String, var exeArguments: String)
+    class GameItem(
+        var name: String,
+        var exePath: String,
+        var exeArguments: String,
+        var iconPath: String
+    )
+
+    companion object {
+        var selectedGameName = ""
+    }
 }

@@ -3,16 +3,11 @@ package com.micewine.emu.activities
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
-import android.content.pm.ShortcutInfo
-import android.content.pm.ShortcutManager
-import android.graphics.BitmapFactory
-import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
 import android.os.storage.StorageManager
@@ -51,14 +46,6 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGSEGV
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGSEGV_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWBT
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWBT_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CPU_AFFINITY
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION
@@ -97,6 +84,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LE
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET_KEY
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateICDFile
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
+import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.HighlightState
@@ -127,7 +115,8 @@ import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
 import com.micewine.emu.fragments.ShortcutsFragment
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.ACTION_UPDATE_WINE_PREFIX_SPINNER
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.saveToGameList
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToLauncher
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToList
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
 import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
@@ -328,6 +317,7 @@ class MainActivity : AppCompatActivity() {
         ControllerPresetManagerFragment.initialize(this)
         VirtualControllerPresetManagerFragment.initialize(this)
         Box64PresetManagerFragment.initialize(this)
+        ShortcutsFragment.initialize(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
@@ -453,7 +443,7 @@ class MainActivity : AppCompatActivity() {
     override fun onContextItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.addToLauncher -> {
-                addGameToLauncher(this, selectedGameArray)
+                addGameToLauncher(this, selectedGameName)
             }
 
             R.id.removeGameItem -> {
@@ -470,9 +460,9 @@ class MainActivity : AppCompatActivity() {
 
                     WineWrapper.extractIcon(File(selectedFile), output)
 
-                    saveToGameList(preferences!!, selectedFile, File(selectedFile).nameWithoutExtension, output)
+                    addGameToList(selectedFile, File(selectedFile).nameWithoutExtension, output)
                 } else if (selectedFile.endsWith(".bat") || selectedFile.endsWith(".msi")) {
-                    saveToGameList(preferences!!, selectedFile, File(selectedFile).nameWithoutExtension, "")
+                    addGameToList(selectedFile, File(selectedFile).nameWithoutExtension, "")
                 } else {
                     Toast.makeText(this, getString(R.string.incompatible_selected_file), Toast.LENGTH_SHORT).show()
                 }
@@ -576,7 +566,7 @@ class MainActivity : AppCompatActivity() {
 
         else if (resultCode == Activity.RESULT_OK) {
             data?.data?.also { uri ->
-                setIconToGame(this, preferences!!, uri, selectedGameArray)
+                setIconToGame(this, uri)
             }
         }
 
@@ -990,7 +980,6 @@ class MainActivity : AppCompatActivity() {
         var selectedDXVKHud: String? = null
         var selectedMesaVkWsiPresentMode: String? = null
         var selectedTuDebugPreset: String? = null
-        var selectedGameArray: Array<String> = arrayOf()
         var memoryStats = "??/??"
         var totalCpuUsage = "???%"
         var winePrefixesDir: File = File("$appRootDir/winePrefixes")
@@ -1231,35 +1220,6 @@ class MainActivity : AppCompatActivity() {
 
                     Thread.sleep(800)
                 }
-            }
-        }
-
-        fun addGameToLauncher(context: Context, selectedGameArray: Array<String>) {
-            val shortcutManager = context.getSystemService(ShortcutManager::class.java)
-
-            if (shortcutManager!!.isRequestPinShortcutSupported) {
-                val intent = Intent(context, MainActivity::class.java).apply {
-                    action = Intent.ACTION_VIEW
-                    putExtra("exePath", selectedGameArray[1])
-                    putExtra("exeArguments", selectedGameArray[3])
-                }
-
-                val pinShortcutInfo = ShortcutInfo.Builder(context, selectedGameArray[0])
-                    .setShortLabel(selectedGameArray[0])
-                    .setIcon(
-                        if (selectedGameArray[2] == "" || !File(selectedGameArray[2]).exists()) {
-                            Icon.createWithResource(context, R.drawable.default_icon)
-                        } else {
-                            Icon.createWithBitmap(BitmapFactory.decodeFile(selectedGameArray[2]))
-                        })
-
-                    .setIntent(intent)
-                    .build()
-
-                val pinnedShortcutCallbackIntent = shortcutManager.createShortcutResultIntent(pinShortcutInfo)
-                val successCallback = PendingIntent.getBroadcast(context, 0, pinnedShortcutCallbackIntent, PendingIntent.FLAG_IMMUTABLE)
-
-                shortcutManager.requestPinShortcut(pinShortcutInfo, successCallback.intentSender)
             }
         }
 
