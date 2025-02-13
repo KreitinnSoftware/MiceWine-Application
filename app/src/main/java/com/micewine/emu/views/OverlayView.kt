@@ -48,12 +48,8 @@ class OverlayView @JvmOverloads constructor(
     private var lorieView: LorieView = LorieView(context)
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    init {
-        loadFromPreferences()
-    }
-
-    fun loadFromPreferences() {
-        val mapping = getMapping(preferences.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, "default")!!)
+    fun loadPreset(name: String?) {
+        val mapping = getMapping(name ?: preferences.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, "default")!!)
 
         buttonList.clear()
         analogList.clear()

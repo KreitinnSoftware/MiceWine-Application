@@ -63,6 +63,7 @@ import com.micewine.emu.activities.MainActivity.Companion.getMemoryInfo
 import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
+import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
@@ -71,6 +72,8 @@ import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.views.OverlayView
@@ -133,7 +136,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
         }
 
-        prepareButtonsAxisValues(this)
+        prepareButtonsAxisValues(this, getControllerPreset(selectedGameName))
 
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
@@ -180,6 +183,13 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         val lorieParent = lorieView.parent as View
 
         overlayView = findViewById(R.id.overlayView)
+
+        if (selectedGameName == getString(R.string.desktop_mode_init)) {
+            overlayView?.loadPreset(null)
+        } else {
+            overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
+        }
+
         overlayView?.visibility = View.INVISIBLE
 
         lifecycleScope.launch {
@@ -545,9 +555,13 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         lorieView!!.requestFocus()
         lorieView!!.requestLayout()
 
-        overlayView?.loadFromPreferences()
+        if (selectedGameName == getString(R.string.desktop_mode_init)) {
+            overlayView?.loadPreset(null)
+        } else {
+            overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
+        }
 
-        prepareButtonsAxisValues(this)
+        prepareButtonsAxisValues(this, getControllerPreset(selectedGameName))
     }
 
     public override fun onPause() {

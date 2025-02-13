@@ -23,8 +23,14 @@ import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Presets
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getControllerPresets
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.editGameFromList
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameExeArguments
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameIcon
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putBox64Preset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerPreset
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getVirtualControllerPresets
 
 class EditGamePreferencesFragment : DialogFragment() {
@@ -85,8 +91,13 @@ class EditGamePreferencesFragment : DialogFragment() {
         }
 
         selectedControllerProfileSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, controllerProfilesNames)
+        selectedControllerProfileSpinner.setSelection(controllerProfilesNames.indexOf(getControllerPreset(selectedGameName)))
+
         selectedVirtualControllerProfileSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, virtualControllerProfilesNames)
+        selectedVirtualControllerProfileSpinner.setSelection(virtualControllerProfilesNames.indexOf(getVirtualControllerPreset(selectedGameName)))
+
         selectedBox64ProfileSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, box64ProfilesNames)
+        selectedBox64ProfileSpinner.setSelection(box64ProfilesNames.indexOf(getBox64Preset(selectedGameName)))
 
         selectedControllerProfileSpinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(
@@ -95,7 +106,34 @@ class EditGamePreferencesFragment : DialogFragment() {
                 position: Int,
                 id: Long
             ) {
+                putControllerPreset(selectedGameName, parent?.selectedItem!!.toString())
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
 
+        selectedVirtualControllerProfileSpinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                putVirtualControllerPreset(selectedGameName, parent?.selectedItem!!.toString())
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
+        selectedBox64ProfileSpinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                putBox64Preset(selectedGameName, parent?.selectedItem!!.toString())
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

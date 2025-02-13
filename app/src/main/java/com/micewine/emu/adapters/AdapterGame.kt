@@ -77,6 +77,8 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val activ
         override fun onClick(v: View) {
             val gameModel = gameList[adapterPosition]
 
+            selectedGameName = gameModel.name
+
             val exeFile = File(gameModel.exePath)
             var exePath = gameModel.exePath
             var exeArguments = gameModel.exeArguments
@@ -93,9 +95,7 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val activ
                 }
             }
 
-            val intent = Intent(activity, EmulationActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-            }
+            val intent = Intent(activity, EmulationActivity::class.java)
 
             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                 putExtra("exePath", exePath)
@@ -103,7 +103,7 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val activ
             }
 
             activity.sendBroadcast(runWineIntent)
-            activity.startActivityIfNeeded(intent, 0)
+            activity.startActivity(intent)
         }
 
         override fun onLongClick(v: View): Boolean {

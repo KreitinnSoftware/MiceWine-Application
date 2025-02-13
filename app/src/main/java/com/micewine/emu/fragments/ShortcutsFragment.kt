@@ -117,33 +117,32 @@ class ShortcutsFragment : Fragment() {
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
-                        /*
                         val query = newText.orEmpty()
 
                         val filteredList = if (query.isEmpty()) {
-                            currentList.map {
-                                AdapterGame.GameList(File(it[1]), it[0], it[2], it[3])
+                            gameList.map {
+                                AdapterGame.GameItem(
+                                    it.name,
+                                    it.exePath,
+                                    it.exeArguments,
+                                    it.iconPath
+                                )
                             }
                         } else {
-                            gameList?.filter {
+                            gameList.filter {
                                 it.name.contains(query, ignoreCase = true)
-                            }?.map {
-                                AdapterGame.GameList(File(it[1]), it[0], it[2], it[3])
+                            }.map {
+                                AdapterGame.GameItem(
+                                    it.name,
+                                    it.exePath,
+                                    it.exeArguments,
+                                    it.iconPath
+                                )
                             }
                         }
 
-                        val updatedList = listOf(
-                            AdapterGame.GameList(
-                                File(""),
-                                getString(R.string.desktop_mode_init),
-                                "",
-                                ""
-                            )
-                        ) + filteredList
+                        (recyclerView?.adapter as? AdapterGame)?.updateList(filteredList)
 
-                        (recyclerView?.adapter as? AdapterGame)?.updateList(updatedList)
-
-                         */
                         return true
                     }
                 })
@@ -327,6 +326,60 @@ class ShortcutsFragment : Fragment() {
             gameList = getGameList(context)
         }
 
+        fun putBox64Preset(name: String, presetName: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].box64Preset = presetName
+
+            saveShortcuts()
+        }
+
+        fun getBox64Preset(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return "--"
+
+            return gameList[index].box64Preset
+        }
+
+        fun putControllerPreset(name: String, presetName: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].controllerPreset = presetName
+
+            saveShortcuts()
+        }
+
+        fun getControllerPreset(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return "--"
+
+            return gameList[index].controllerPreset
+        }
+
+        fun putVirtualControllerPreset(name: String, presetName: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].virtualControllerPreset = presetName
+
+            saveShortcuts()
+        }
+
+        fun getVirtualControllerPreset(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return "--"
+
+            return gameList[index].virtualControllerPreset
+        }
+
         fun addGameToList(path: String, prettyName: String, icon: String) {
             val gameExists = gameList.any { it.name == prettyName }
 
@@ -335,7 +388,7 @@ class ShortcutsFragment : Fragment() {
             }
 
             gameList.add(
-                GameItem(prettyName, path, "", icon)
+                GameItem(prettyName, path, "", icon, "--", "--", "--")
             )
             gameListNames.add(
                 AdapterGame.GameItem(prettyName, path, "", icon)
@@ -414,7 +467,7 @@ class ShortcutsFragment : Fragment() {
             val listType = object : TypeToken<MutableList<GameItem>>() {}.type
 
             return gson.fromJson(json, listType) ?: mutableListOf(
-                GameItem(context.getString(R.string.desktop_mode_init), context.getString(R.string.desktop_mode_init), "", "")
+                GameItem(context.getString(R.string.desktop_mode_init), context.getString(R.string.desktop_mode_init), "", "", "--", "--", "--")
             )
         }
 
@@ -453,7 +506,10 @@ class ShortcutsFragment : Fragment() {
             var name: String,
             var exePath: String,
             var exeArguments: String,
-            var iconPath: String
+            var iconPath: String,
+            var box64Preset: String,
+            var controllerPreset: String,
+            var virtualControllerPreset: String
         )
     }
 }

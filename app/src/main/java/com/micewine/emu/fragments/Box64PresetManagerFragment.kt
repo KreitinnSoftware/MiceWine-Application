@@ -106,7 +106,7 @@ class Box64PresetManagerFragment : Fragment() {
             val index = presetList.indexOfFirst { it[0] == name }
 
             if (index == -1) {
-                return listOf()
+                return listOf("")
             }
 
             return presetList[index][mappingMap[key]!!].split(":")
