@@ -261,14 +261,14 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
             findViewById<MaterialButton>(R.id.editVirtualControllerMapping).setOnClickListener {
                 val intent = Intent(context, PresetManagerActivity::class.java).apply {
-                    putExtra("controllerMapperType", VIRTUAL_CONTROLLER)
+                    putExtra("presetType", VIRTUAL_CONTROLLER)
                 }
                 startActivity(intent)
             }
 
             findViewById<MaterialButton>(R.id.editControllerMapping).setOnClickListener {
                 val intent = Intent(context, PresetManagerActivity::class.java).apply {
-                    putExtra("controllerMapperType", PHYSICAL_CONTROLLER)
+                    putExtra("presetType", PHYSICAL_CONTROLLER)
                 }
                 startActivity(intent)
             }
