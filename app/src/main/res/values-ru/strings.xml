@@ -171,4 +171,7 @@
     <string name="invalid_controller_preset_file">Файл предустановки контроллера недействителен</string>
     <string name="invalid_box64_preset_file">Файл предустановки Box64 недействителен</string>
     <string name="invalid_virtual_controller_preset_file">Файл предустановки виртуального контроллера недействителен</string>
+    <string name="sound_settings_title">Настройки звука</string>
+    <string name="sound_settings_description">Управление настройками звука</string>
+    <string name="select_audio_sink">Выберите аудиовыход PulseAudio</string>
 </resources>

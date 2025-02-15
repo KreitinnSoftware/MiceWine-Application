@@ -21,6 +21,7 @@ import com.micewine.emu.fragments.DisplaySettingsFragment
 import com.micewine.emu.fragments.DriversSettingsFragment
 import com.micewine.emu.fragments.EnvVarsSettingsFragment
 import com.micewine.emu.fragments.GeneralSettingsFragment
+import com.micewine.emu.fragments.SoundSettingsFragment
 import com.micewine.emu.fragments.WineSettingsFragment
 
 class GeneralSettingsActivity : AppCompatActivity() {
@@ -31,6 +32,7 @@ class GeneralSettingsActivity : AppCompatActivity() {
     private val displaySettingsFragment = DisplaySettingsFragment()
     private val driversSettingsFragment = DriversSettingsFragment()
     private val environmentVariablesSettings = EnvVarsSettingsFragment()
+    private val soundSettingsFragment = SoundSettingsFragment()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val preference = intent.getStringExtra("preference")
@@ -55,16 +57,22 @@ class GeneralSettingsActivity : AppCompatActivity() {
                         fragmentLoader(displaySettingsFragment, false)
                     }
 
-                    context.resources.getString(R.string.driver_settings_title) -> {
+                    getString(R.string.driver_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.driver_settings_title)
 
                         fragmentLoader(driversSettingsFragment, false)
                     }
 
-                    context.resources.getString(R.string.env_settings_title) -> {
+                    getString(R.string.env_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.env_settings_title)
 
                         fragmentLoader(environmentVariablesSettings, false)
+                    }
+
+                    getString(R.string.sound_settings_title) -> {
+                        generalSettingsToolbar?.title = getString(R.string.sound_settings_title)
+
+                        fragmentLoader(soundSettingsFragment, false)
                     }
                 }
             }
@@ -216,5 +224,7 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val MOUSE_SENSIBILITY = "mouseSensibility"
         const val CPU_AFFINITY = "cpuAffinity"
         const val FPS_LIMIT = "fpsLimit"
+        const val PA_SINK = "pulseAudioSink"
+        const val PA_SINK_DEFAULT_VALUE = "SLES"
     }
 }

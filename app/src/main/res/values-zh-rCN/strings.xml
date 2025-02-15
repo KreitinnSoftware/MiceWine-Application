@@ -175,4 +175,7 @@
     <string name="invalid_controller_preset_file">无效的控制器预设文件</string>
     <string name="invalid_box64_preset_file">无效的 Box64 预设文件</string>
     <string name="invalid_virtual_controller_preset_file">无效的虚拟控制器预设文件</string>
+    <string name="sound_settings_title">声音设置</string>
+    <string name="sound_settings_description">管理声音设置</string>
+    <string name="select_audio_sink">选择 PulseAudio 输出</string>
 </resources>

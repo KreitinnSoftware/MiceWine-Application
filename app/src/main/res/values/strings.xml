@@ -199,4 +199,7 @@
     <string name="invalid_controller_preset_file">Invalid Controller Preset File</string>
     <string name="invalid_box64_preset_file">Invalid Box64 Preset File</string>
     <string name="invalid_virtual_controller_preset_file">Invalid Virtual Controller Preset File</string>
+    <string name="sound_settings_title">Sound Settings</string>
+    <string name="sound_settings_description">Manage Sound Settings</string>
+    <string name="select_audio_sink">Select PulseAudio Sink</string>
 </resources>

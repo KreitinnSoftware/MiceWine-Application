@@ -57,6 +57,8 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANG
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_SERVICES
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_SERVICES_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.FPS_LIMIT
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.PA_SINK
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.PA_SINK_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_D3DX_RENDERER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_D3DX_RENDERER_DEFAULT_VALUE
@@ -122,6 +124,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToLauncher
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToList
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
+import com.micewine.emu.fragments.SoundSettingsFragment.Companion.generatePAFile
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
 import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.utils.DriveUtils
@@ -140,6 +143,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Files
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
@@ -159,6 +163,7 @@ class MainActivity : AppCompatActivity() {
 
                     generateICDFile(driverLibPath, File("$appRootDir/vulkan_icd.json"))
                     generateMangoHUDConfFile()
+                    generatePAFile()
 
                     setSharedVars(this@MainActivity)
 
@@ -1006,6 +1011,7 @@ class MainActivity : AppCompatActivity() {
         var cpuAffinity: String? = null
         var screenFpsLimit: Int = 60
         var fpsLimit: Int = 0
+        var paSink: String? = null
         private var selectedResolution: String? = ""
 
         var selectedFragment = "ShortcutsFragment"
@@ -1124,6 +1130,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             fileManagerDefaultDir = wineDisksFolder!!.path
+
+            paSink = preferences.getString(PA_SINK, PA_SINK_DEFAULT_VALUE)?.toLowerCase(Locale.getDefault())
         }
 
         fun setBox64Preset(activity: Activity, name: String?) {
