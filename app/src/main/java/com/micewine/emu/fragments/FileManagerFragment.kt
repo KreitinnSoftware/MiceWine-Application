@@ -120,5 +120,15 @@ class FileManagerFragment : Fragment() {
                 recyclerView?.adapter?.notifyItemRemoved(index)
             }
         }
+
+        fun renameFile(filePath: String, newFilePath: String) {
+            val file = File(filePath)
+
+            if (File(filePath).exists()) {
+                file.renameTo(File(newFilePath))
+
+                refreshFiles()
+            }
+        }
     }
 }

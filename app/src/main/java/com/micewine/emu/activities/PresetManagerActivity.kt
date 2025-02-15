@@ -20,6 +20,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.micewine.emu.R
 import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
+import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetType
 import com.micewine.emu.controller.ControllerUtils.getGameControllerNames
 import com.micewine.emu.databinding.ActivityPresetManagerBinding
 import com.micewine.emu.fragments.Box64PresetManagerFragment
@@ -30,6 +31,8 @@ import com.micewine.emu.fragments.CreatePresetFragment
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
+import com.micewine.emu.fragments.FloatingFileManagerFragment
+import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.OPERATION_IMPORT_PRESET
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
 
 class PresetManagerActivity : AppCompatActivity() {
@@ -37,6 +40,7 @@ class PresetManagerActivity : AppCompatActivity() {
     private var backButton: ImageButton? = null
     private var controllerConnected: TextView? = null
     private var addPresetFAB: FloatingActionButton? = null
+    private var importPresetFAB: FloatingActionButton? = null
     private var preferences: SharedPreferences? = null
     private val controllerPresetFragment = ControllerPresetManagerFragment()
     private val controllerMapperFragment = ControllerMapperFragment()
@@ -50,11 +54,13 @@ class PresetManagerActivity : AppCompatActivity() {
                     fragmentLoader(controllerMapperFragment, false)
 
                     addPresetFAB?.visibility = View.GONE
+                    importPresetFAB?.visibility = View.GONE
                 }
                 ACTION_EDIT_BOX64_PRESET -> {
                     fragmentLoader(box64SettingsFragment, false)
 
                     addPresetFAB?.visibility = View.GONE
+                    importPresetFAB?.visibility = View.GONE
                 }
             }
         }
@@ -77,6 +83,7 @@ class PresetManagerActivity : AppCompatActivity() {
         }
 
         addPresetFAB = findViewById(R.id.addPresetFAB)
+        importPresetFAB = findViewById(R.id.importPresetFAB)
 
         val intent = intent?.getIntExtra("presetType", -1)
 
@@ -97,6 +104,10 @@ class PresetManagerActivity : AppCompatActivity() {
                 addPresetFAB?.setOnClickListener {
                     CreatePresetFragment(CONTROLLER_PRESET).show(supportFragmentManager, "")
                 }
+                importPresetFAB?.setOnClickListener {
+                    clickedPresetType = PHYSICAL_CONTROLLER
+                    FloatingFileManagerFragment(OPERATION_IMPORT_PRESET).show(supportFragmentManager, "")
+                }
             }
             VIRTUAL_CONTROLLER -> {
                 fragmentLoader(virtualControllerMapperFragment, true)
@@ -108,6 +119,10 @@ class PresetManagerActivity : AppCompatActivity() {
                 addPresetFAB?.setOnClickListener {
                     CreatePresetFragment(VIRTUAL_CONTROLLER_PRESET).show(supportFragmentManager, "")
                 }
+                importPresetFAB?.setOnClickListener {
+                    clickedPresetType = VIRTUAL_CONTROLLER
+                    FloatingFileManagerFragment(OPERATION_IMPORT_PRESET).show(supportFragmentManager, "")
+                }
             }
             BOX64_PRESET -> {
                 fragmentLoader(box64PresetManagerFragment, true)
@@ -118,6 +133,10 @@ class PresetManagerActivity : AppCompatActivity() {
 
                 addPresetFAB?.setOnClickListener {
                     CreatePresetFragment(BOX64_PRESET).show(supportFragmentManager, "")
+                }
+                importPresetFAB?.setOnClickListener {
+                    clickedPresetType = BOX64_PRESET
+                    FloatingFileManagerFragment(OPERATION_IMPORT_PRESET).show(supportFragmentManager, "")
                 }
             }
         }
@@ -140,6 +159,7 @@ class PresetManagerActivity : AppCompatActivity() {
             if (supportFragmentManager.backStackEntryCount > 0) {
                 supportFragmentManager.popBackStack()
                 addPresetFAB?.visibility = View.VISIBLE
+                importPresetFAB?.visibility = View.VISIBLE
             } else {
                 finish()
             }

@@ -102,6 +102,7 @@
     <string name="controller_preset_create_text">Digite um nome</string>
     <string name="remove_last_preset_error">O Último Preset não pode ser removido</string>
     <string name="edit_game_icon">Editar Icone</string>
+    <string name="edit">Editar</string>
     <string name="add_game_to_home">Criar Atalho no Launcher</string>
     <string name="cancel_text">Cancelar</string>
     <string name="remove_game_item_warning">Você tem certeza que quer remover?</string>
@@ -171,4 +172,8 @@
     <string name="selected_box64_profile">Perfil do Box64 Selecionado</string>
     <string name="selected_virtual_controller_profile">Perfil do Controle Virtual Selecionado</string>
     <string name="selected_controller_profile">Perfil do Controle Selecionado</string>
+    <string name="export_preset">Exportar Perfil</string>
+    <string name="invalid_controller_preset_file">Invalid Controller Preset File</string>
+    <string name="invalid_box64_preset_file">Invalid Box64 Preset File</string>
+    <string name="invalid_virtual_controller_preset_file">Invalid Virtual Controller Preset File</string>
 </resources>

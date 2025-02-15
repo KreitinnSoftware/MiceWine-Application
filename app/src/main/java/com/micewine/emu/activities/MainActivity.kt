@@ -108,6 +108,9 @@ import com.micewine.emu.fragments.EditGamePreferencesFragment
 import com.micewine.emu.fragments.FileManagerFragment
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.fragments.FloatingFileManagerFragment
+import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.OPERATION_SELECT_RAT
+import com.micewine.emu.fragments.RenameFragment
+import com.micewine.emu.fragments.RenameFragment.Companion.RENAME_FILE
 import com.micewine.emu.fragments.SettingsFragment
 import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
@@ -498,6 +501,10 @@ class MainActivity : AppCompatActivity() {
             R.id.deleteFile -> {
                 DeleteItemFragment(DELETE_GAME_ITEM, this).show(supportFragmentManager, "")
             }
+
+            R.id.renameFile -> {
+                RenameFragment(RENAME_FILE, File(selectedFile).name).show(supportFragmentManager, "")
+            }
         }
 
         return super.onContextItemSelected(item)
@@ -629,7 +636,7 @@ class MainActivity : AppCompatActivity() {
             if (appBuiltinRootfs) {
                 SetupFragment().show(supportFragmentManager , "")
             } else {
-                FloatingFileManagerFragment().show(supportFragmentManager, "")
+                FloatingFileManagerFragment(OPERATION_SELECT_RAT).show(supportFragmentManager, "")
             }
         }
     }
@@ -777,7 +784,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this@MainActivity, R.string.invalid_rootfs_rat_file, Toast.LENGTH_SHORT).show()
                 }
 
-                FloatingFileManagerFragment().show(supportFragmentManager, "")
+                FloatingFileManagerFragment(OPERATION_SELECT_RAT).show(supportFragmentManager, "")
 
                 return@withContext
             }
@@ -789,7 +796,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this@MainActivity, R.string.invalid_architecture_rat_file, Toast.LENGTH_SHORT).show()
                 }
 
-                FloatingFileManagerFragment().show(supportFragmentManager, "")
+                FloatingFileManagerFragment(OPERATION_SELECT_RAT).show(supportFragmentManager, "")
 
                 return@withContext
             }

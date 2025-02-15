@@ -1,5 +1,6 @@
 package com.micewine.emu.fragments
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -35,6 +36,7 @@ import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX6
 import com.micewine.emu.adapters.AdapterPreset
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
+import java.io.File
 import java.util.Collections
 
 class Box64PresetManagerFragment : Fragment() {
@@ -140,9 +142,9 @@ class Box64PresetManagerFragment : Fragment() {
                 this[mappingMap[BOX64_DYNAREC_STRONGMEM]!!] = "1"
                 this[mappingMap[BOX64_DYNAREC_WEAKBARRIER]!!] = "2"
                 this[mappingMap[BOX64_DYNAREC_PAUSE]!!] = "0"
-                this[mappingMap[BOX64_DYNAREC_X87DOUBLE]!!] = "0"
-                this[mappingMap[BOX64_DYNAREC_FASTNAN]!!] = "1"
-                this[mappingMap[BOX64_DYNAREC_FASTROUND]!!] = "1"
+                this[mappingMap[BOX64_DYNAREC_X87DOUBLE]!!] = "false"
+                this[mappingMap[BOX64_DYNAREC_FASTNAN]!!] = "true"
+                this[mappingMap[BOX64_DYNAREC_FASTROUND]!!] = "true"
                 this[mappingMap[BOX64_DYNAREC_SAFEFLAGS]!!] = "1"
                 this[mappingMap[BOX64_DYNAREC_CALLRET]!!] = "true"
                 this[mappingMap[BOX64_DYNAREC_ALIGNED_ATOMICS]!!] = "false"
@@ -181,6 +183,61 @@ class Box64PresetManagerFragment : Fragment() {
             saveBox64Preset()
         }
 
+        fun renameBox64Preset(name: String, newName: String) {
+            val index = presetList.indexOfFirst { it[0] == name }
+
+            presetList[index][0] = newName
+            presetListNames[index].titleSettings = newName
+
+            recyclerView?.adapter?.notifyItemChanged(index)
+
+            saveBox64Preset()
+        }
+
+        fun importBox64Preset(activity: Activity, path: String) {
+            val json = File(path).readLines()
+            val listType = object : TypeToken<MutableList<String>>() {}.type
+
+            if (json.size < 2 || json[0] != "box64Preset") {
+                activity.runOnUiThread {
+                    Toast.makeText(activity, activity.getString(R.string.invalid_box64_preset_file), Toast.LENGTH_LONG).show()
+                }
+                return
+            }
+
+            val processed = gson.fromJson<MutableList<String>>(json[1], listType)
+
+            var presetName = processed[0]
+            var count = 1
+
+            while (presetList.any { it[0] == presetName }) {
+                presetName = "${processed[0]}-$count"
+                count++
+            }
+
+            processed[0] = presetName
+
+            presetList.add(processed)
+            presetListNames.add(
+                AdapterPreset.Item(processed[0], BOX64_PRESET, true)
+            )
+
+            activity.runOnUiThread {
+                recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
+            }
+
+            saveBox64Preset()
+        }
+
+        fun exportBox64Preset(context: Context, name: String, path: String) {
+            val index = presetList.indexOfFirst { it[0] == name }
+            val file = File(path)
+
+            file.writeText("box64Preset\n" + gson.toJson(presetList[index]))
+
+            Toast.makeText(context, "Box64 Preset '$name' exported", Toast.LENGTH_LONG).show()
+        }
+
         private fun saveBox64Preset() {
             preferences?.edit {
                 putString("box64PresetList", gson.toJson(presetList))
@@ -202,9 +259,9 @@ class Box64PresetManagerFragment : Fragment() {
                     this[mappingMap[BOX64_DYNAREC_STRONGMEM]!!] = "1"
                     this[mappingMap[BOX64_DYNAREC_WEAKBARRIER]!!] = "2"
                     this[mappingMap[BOX64_DYNAREC_PAUSE]!!] = "0"
-                    this[mappingMap[BOX64_DYNAREC_X87DOUBLE]!!] = "0"
-                    this[mappingMap[BOX64_DYNAREC_FASTNAN]!!] = "1"
-                    this[mappingMap[BOX64_DYNAREC_FASTROUND]!!] = "1"
+                    this[mappingMap[BOX64_DYNAREC_X87DOUBLE]!!] = "false"
+                    this[mappingMap[BOX64_DYNAREC_FASTNAN]!!] = "true"
+                    this[mappingMap[BOX64_DYNAREC_FASTROUND]!!] = "true"
                     this[mappingMap[BOX64_DYNAREC_SAFEFLAGS]!!] = "1"
                     this[mappingMap[BOX64_DYNAREC_CALLRET]!!] = "true"
                     this[mappingMap[BOX64_DYNAREC_ALIGNED_ATOMICS]!!] = "false"

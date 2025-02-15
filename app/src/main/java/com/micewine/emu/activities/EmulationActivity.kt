@@ -49,7 +49,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.navigation.NavigationView
-import com.micewine.emu.CmdEntryPoint
+import com.micewine.emu.CmdEntryPoint.Companion.ACTION_START
 import com.micewine.emu.ICmdEntryInterface
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
@@ -93,7 +93,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
-            if (CmdEntryPoint.ACTION_START == intent.action) {
+            if (ACTION_START == intent.action) {
                 try {
                     Log.v("LorieBroadcastReceiver", "Got new ACTION_START intent")
                     onReceiveConnection(intent)
@@ -104,8 +104,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                         e
                     )
                 }
-            } else if (ACTION_STOP == intent.action) {
-                finishAffinity()
             }
         }
     }
@@ -429,9 +427,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
         })
 
-        registerReceiver(receiver, object : IntentFilter(CmdEntryPoint.ACTION_START) {
+        registerReceiver(receiver, object : IntentFilter() {
             init {
-                addAction(ACTION_STOP)
+                addAction(ACTION_START)
             }
         }, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) RECEIVER_EXPORTED else 0)
 
@@ -633,7 +631,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
     companion object {
         const val KEY_BACK = 158
-        const val ACTION_STOP: String = "com.micewine.emu.ACTION_STOP"
 
         var handler: Handler = Handler(Looper.getMainLooper())
         var inputMethodManager: InputMethodManager? = null

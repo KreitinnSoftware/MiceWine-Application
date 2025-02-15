@@ -18,16 +18,23 @@ import com.micewine.emu.activities.MainActivity.Companion.setupDone
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
+import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
+import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
+import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetType
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.deleteBox64Preset
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.renameBox64Preset
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.deleteControllerPreset
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.renameControllerPreset
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.FileManagerFragment.Companion.deleteFile
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.ACTION_UPDATE_WINE_PREFIX_SPINNER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.removeGameFromList
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.deleteVirtualControllerPreset
+import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.renameVirtualControllerPreset
 
 class DeleteItemFragment(private val deleteType: Int, private val context: Context) : DialogFragment() {
     private var preferences: SharedPreferences? = null
@@ -52,14 +59,12 @@ class DeleteItemFragment(private val deleteType: Int, private val context: Conte
                         deleteFile(selectedFile)
                     }
                 }
-                DELETE_CONTROLLER_PRESET -> {
-                    deleteControllerPreset(clickedPresetName)
-                }
-                DELETE_VIRTUAL_CONTROLLER_PRESET -> {
-                    deleteVirtualControllerPreset(clickedPresetName)
-                }
-                DELETE_BOX64_PRESET -> {
-                    deleteBox64Preset(clickedPresetName)
+                DELETE_PRESET -> {
+                    when (clickedPresetType) {
+                        PHYSICAL_CONTROLLER -> deleteControllerPreset(clickedPresetName)
+                        VIRTUAL_CONTROLLER -> deleteVirtualControllerPreset(clickedPresetName)
+                        BOX64_PRESET -> deleteBox64Preset(clickedPresetName)
+                    }
                 }
                 DELETE_WINE_PREFIX -> {
                     if (winePrefixesDir.listFiles()!!.count() == 1) {
@@ -106,9 +111,7 @@ class DeleteItemFragment(private val deleteType: Int, private val context: Conte
 
     companion object {
         const val DELETE_GAME_ITEM = 0
-        const val DELETE_CONTROLLER_PRESET = 1
-        const val DELETE_VIRTUAL_CONTROLLER_PRESET = 2
-        const val DELETE_WINE_PREFIX = 3
-        const val DELETE_BOX64_PRESET = 4
+        const val DELETE_PRESET = 1
+        const val DELETE_WINE_PREFIX = 2
     }
 }

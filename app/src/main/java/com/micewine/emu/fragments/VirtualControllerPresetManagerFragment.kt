@@ -1,5 +1,6 @@
 package com.micewine.emu.fragments
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -19,6 +20,7 @@ import com.micewine.emu.adapters.AdapterPreset
 import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
 import com.micewine.emu.views.OverlayView
+import java.io.File
 
 class VirtualControllerPresetManagerFragment : Fragment() {
     private var rootView: View? = null
@@ -88,7 +90,7 @@ class VirtualControllerPresetManagerFragment : Fragment() {
                 presetList[index].analogs.add(it)
             }
 
-            saveControllerPresets()
+            saveVirtualControllerPresets()
         }
 
         fun addVirtualControllerPreset(context: Context, name: String) {
@@ -106,7 +108,7 @@ class VirtualControllerPresetManagerFragment : Fragment() {
 
             recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
 
-            saveControllerPresets()
+            saveVirtualControllerPresets()
         }
 
         fun deleteVirtualControllerPreset(name: String) {
@@ -125,10 +127,63 @@ class VirtualControllerPresetManagerFragment : Fragment() {
                 recyclerView?.adapter?.notifyItemChanged(0)
             }
 
-            saveControllerPresets()
+            saveVirtualControllerPresets()
         }
 
-        private fun saveControllerPresets() {
+        fun renameVirtualControllerPreset(name: String, newName: String) {
+            val index = presetList.indexOfFirst { it.name == name }
+
+            presetList[index].name = newName
+            presetListNames[index].titleSettings = newName
+
+            recyclerView?.adapter?.notifyItemChanged(index)
+
+            saveVirtualControllerPresets()
+        }
+
+        fun importVirtualControllerPreset(activity: Activity, path: String) {
+            val json = File(path).readLines()
+            val listType = object : TypeToken<VirtualControllerPreset>() {}.type
+
+            if (json.size < 2 || json[0] != "virtualControllerPreset") {
+                activity.runOnUiThread {
+                    Toast.makeText(activity, activity.getString(R.string.invalid_virtual_controller_preset_file), Toast.LENGTH_LONG).show()
+                }
+                return
+            }
+
+            val processed = gson.fromJson<VirtualControllerPreset>(json[1], listType)
+
+            var presetName = processed.name
+            var count = 1
+
+            while (presetList.any { it.name == presetName }) {
+                presetName = "${processed.name}-$count"
+                count++
+            }
+
+            processed.name = presetName
+
+            presetList.add(processed)
+            presetListNames.add(
+                AdapterPreset.Item(processed.name, VIRTUAL_CONTROLLER, true)
+            )
+
+            activity.runOnUiThread {
+                recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
+            }
+
+            saveVirtualControllerPresets()
+        }
+
+        fun exportVirtualControllerPreset(name: String, path: String) {
+            val index = presetList.indexOfFirst { it.name == name }
+            val file = File(path)
+
+            file.writeText("virtualControllerPreset\n" + gson.toJson(presetList[index]))
+        }
+
+        private fun saveVirtualControllerPresets() {
             preferences?.edit {
                 putString("virtualControllerPresetList", gson.toJson(presetList))
                 apply()

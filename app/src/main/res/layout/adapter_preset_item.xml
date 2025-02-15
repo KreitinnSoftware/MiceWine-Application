@@ -47,23 +47,12 @@
         </LinearLayout>
 
         <ImageButton
-            android:id="@+id/editPresetButton"
+            android:id="@+id/moreButton"
             android:layout_width="30dp"
             android:layout_height="match_parent"
             android:importantForAccessibility="no"
             style="@style/Widget.Material3.Button.TextButton"
-            android:layout_marginStart="10dp"
-            android:src="@android:drawable/ic_menu_edit">
-        </ImageButton>
-
-        <ImageButton
-            android:id="@+id/deletePresetButton"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:importantForAccessibility="no"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_marginStart="10dp"
-            android:src="@android:drawable/ic_menu_delete">
+            android:src="@drawable/ic_more_vert">
         </ImageButton>
 
     </LinearLayout>
