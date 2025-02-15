@@ -60,7 +60,7 @@
             android:layout_gravity="end|bottom"
             android:importantForAccessibility="no"
             android:layout_margin="10dp"
-            android:src="@android:drawable/btn_default">
+            android:src="@drawable/ic_download">
         </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
