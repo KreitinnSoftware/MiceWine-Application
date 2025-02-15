@@ -1136,7 +1136,9 @@ class MainActivity : AppCompatActivity() {
 
         fun setBox64Preset(activity: Activity, name: String?) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(activity)!!
-            val selectedBox64Preset = name ?: preferences.getString(SELECTED_BOX64_PRESET_KEY, "default")!!
+            var selectedBox64Preset = name ?: preferences.getString(SELECTED_BOX64_PRESET_KEY, "default")!!
+
+            if (name == "--") selectedBox64Preset = preferences.getString(SELECTED_BOX64_PRESET_KEY, "default")!!
 
             box64Mmap32 = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_MMAP32)[0])
             box64Avx = getBox64Mapping(selectedBox64Preset, BOX64_AVX)[0]

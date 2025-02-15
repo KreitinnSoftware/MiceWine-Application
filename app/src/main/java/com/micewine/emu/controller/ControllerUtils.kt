@@ -107,7 +107,10 @@ object ControllerUtils {
 
     private fun detectKey(context: Context, presetName: String?, key: String): List<Int> {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
-        val mapping =  getMapping(presetName ?: preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, key)
+        var mapping = getMapping(presetName ?: preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, key)
+
+        if (presetName == "--") mapping = getMapping(preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, key)
+
         val keyList: List<Int>
 
         when (mapping[0]) {

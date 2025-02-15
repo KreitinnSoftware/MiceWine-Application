@@ -49,7 +49,9 @@ class OverlayView @JvmOverloads constructor(
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     fun loadPreset(name: String?) {
-        val mapping = getMapping(name ?: preferences.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, "default")!!)
+        var mapping = getMapping(name ?: preferences.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, "default")!!)
+
+        if (name == "--") mapping = getMapping(preferences.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, "default")!!)
 
         buttonList.clear()
         analogList.clear()
