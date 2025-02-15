@@ -9,12 +9,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.Box64ManagerActivity
-import com.micewine.emu.activities.ControllerMapper
+import com.micewine.emu.activities.RatManagerActivity
+import com.micewine.emu.activities.PresetManagerActivity
 import com.micewine.emu.activities.GeneralSettingsActivity
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ACTION_PREFERENCE_SELECT
-import com.micewine.emu.activities.DriverManagerActivity
-import com.micewine.emu.activities.VirtualControllerOverlayMapper
+import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
+import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
+import com.micewine.emu.adapters.AdapterRatPackage.Companion.BOX64
+import com.micewine.emu.adapters.AdapterRatPackage.Companion.VK_DRIVER
+import com.micewine.emu.adapters.AdapterRatPackage.Companion.WINE
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 
 class AdapterSettings(private val settingsList: List<SettingsList>, private val context: Context) :
     RecyclerView.Adapter<AdapterSettings.ViewHolder>() {
@@ -54,28 +58,54 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
                 }
 
                 context.getString(R.string.controller_mapper_title) -> {
-                    val intent = Intent(context, ControllerMapper::class.java)
+                    val intent = Intent(context, PresetManagerActivity::class.java).apply {
+                        putExtra("presetType", PHYSICAL_CONTROLLER)
+                    }
                     context.startActivity(intent)
                 }
 
                 context.getString(R.string.virtual_controller_mapper_title) -> {
-                    val intent = Intent(context, VirtualControllerOverlayMapper::class.java)
+                    val intent = Intent(context, PresetManagerActivity::class.java).apply {
+                        putExtra("presetType", VIRTUAL_CONTROLLER)
+                    }
                     context.startActivity(intent)
                 }
 
                 context.getString(R.string.box64_manager_title) -> {
-                    val intent = Intent(context, Box64ManagerActivity::class.java)
+                    val intent = Intent(context, RatManagerActivity::class.java).apply {
+                        putExtra("prefix", "Box64-")
+                        putExtra("type", BOX64)
+                    }
+                    context.startActivity(intent)
+                }
+
+                context.getString(R.string.box64_preset_manager_title) -> {
+                    val intent = Intent(context, PresetManagerActivity::class.java).apply {
+                        putExtra("presetType", BOX64_PRESET)
+                    }
                     context.startActivity(intent)
                 }
 
                 context.getString(R.string.driver_manager_title) -> {
-                    val intent = Intent(context, DriverManagerActivity::class.java)
+                    val intent = Intent(context, RatManagerActivity::class.java).apply {
+                        putExtra("prefix", "VulkanDriver-")
+                        putExtra("type", VK_DRIVER)
+                    }
+                    context.startActivity(intent)
+                }
+
+                context.getString(R.string.wine_manager_title) -> {
+                    val intent = Intent(context, RatManagerActivity::class.java).apply {
+                        putExtra("prefix", "Wine-")
+                        putExtra("type", WINE)
+                    }
                     context.startActivity(intent)
                 }
 
                 else -> {
-                    val intent = Intent(ACTION_PREFERENCE_SELECT)
-                    intent.putExtra("preference", settingsModel.titleSettings)
+                    val intent = Intent(ACTION_PREFERENCE_SELECT).apply {
+                        putExtra("preference", settingsModel.titleSettings)
+                    }
                     context.sendBroadcast(intent)
                 }
             }

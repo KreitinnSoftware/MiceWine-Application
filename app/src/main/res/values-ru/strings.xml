@@ -155,4 +155,23 @@
     <string name="unlimited">Неограниченно</string>
     <string name="fps_limit_title">Ограничение FPS</string>
     <string name="app_arguments">Аргументы запуска</string>
+    <string name="deleting_wine_prefix">Удаление префикса Wine…</string>
+    <string name="remove_last_wine_prefix_error">Вы не можете удалить последний префикс</string>
+    <string name="wine_manager_title">Менеджер Wine</string>
+    <string name="wine_manager_description">Управление версиями Wine</string>
+    <string name="installing_drivers">Установка драйверов…</string>
+    <string name="installing_box64">Установка Box64…</string>
+    <string name="installing_wine">Установка Wine…</string>
+    <string name="box64_preset_manager_title">Менеджер предустановок Box64</string>
+    <string name="box64_preset_manager_description">Управление предустановками Box64</string>
+    <string name="selected_box64_profile">Выбранный профиль Box64</string>
+    <string name="selected_virtual_controller_profile">Выбранный профиль виртуального контроллера</string>
+    <string name="selected_controller_profile">Выбранный профиль контроллера</string>
+    <string name="export_preset">Экспорт предустановки</string>
+    <string name="invalid_controller_preset_file">Файл предустановки контроллера недействителен</string>
+    <string name="invalid_box64_preset_file">Файл предустановки Box64 недействителен</string>
+    <string name="invalid_virtual_controller_preset_file">Файл предустановки виртуального контроллера недействителен</string>
+    <string name="sound_settings_title">Настройки звука</string>
+    <string name="sound_settings_description">Управление настройками звука</string>
+    <string name="select_audio_sink">Выберите аудиовыход PulseAudio</string>
 </resources>

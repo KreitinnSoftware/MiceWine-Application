@@ -5,14 +5,15 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.micewine.emu.R
-import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.databinding.ActivityGeneralSettingsBinding
 import com.micewine.emu.fragments.Box64SettingsFragment
@@ -20,6 +21,7 @@ import com.micewine.emu.fragments.DisplaySettingsFragment
 import com.micewine.emu.fragments.DriversSettingsFragment
 import com.micewine.emu.fragments.EnvVarsSettingsFragment
 import com.micewine.emu.fragments.GeneralSettingsFragment
+import com.micewine.emu.fragments.SoundSettingsFragment
 import com.micewine.emu.fragments.WineSettingsFragment
 
 class GeneralSettingsActivity : AppCompatActivity() {
@@ -30,6 +32,7 @@ class GeneralSettingsActivity : AppCompatActivity() {
     private val displaySettingsFragment = DisplaySettingsFragment()
     private val driversSettingsFragment = DriversSettingsFragment()
     private val environmentVariablesSettings = EnvVarsSettingsFragment()
+    private val soundSettingsFragment = SoundSettingsFragment()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val preference = intent.getStringExtra("preference")
@@ -54,16 +57,22 @@ class GeneralSettingsActivity : AppCompatActivity() {
                         fragmentLoader(displaySettingsFragment, false)
                     }
 
-                    context.resources.getString(R.string.driver_settings_title) -> {
+                    getString(R.string.driver_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.driver_settings_title)
 
                         fragmentLoader(driversSettingsFragment, false)
                     }
 
-                    context.resources.getString(R.string.env_settings_title) -> {
+                    getString(R.string.env_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.env_settings_title)
 
                         fragmentLoader(environmentVariablesSettings, false)
+                    }
+
+                    getString(R.string.sound_settings_title) -> {
+                        generalSettingsToolbar?.title = getString(R.string.sound_settings_title)
+
+                        fragmentLoader(soundSettingsFragment, false)
                     }
                 }
             }
@@ -139,11 +148,11 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val BOX64_SSE42 = "BOX64_SSE42"
         const val BOX64_SSE42_DEFAULT_VALUE = true
         const val BOX64_DYNAREC_BIGBLOCK = "BOX64_DYNAREC_BIGBLOCK"
-        const val BOX64_DYNAREC_BIGBLOCK_DEFAULT_VALUE = "0"
+        const val BOX64_DYNAREC_BIGBLOCK_DEFAULT_VALUE = "1"
         const val BOX64_DYNAREC_STRONGMEM = "BOX64_DYNAREC_STRONGMEM"
-        const val BOX64_DYNAREC_STRONGMEM_DEFAULT_VALUE = "2"
+        const val BOX64_DYNAREC_STRONGMEM_DEFAULT_VALUE = "1"
         const val BOX64_DYNAREC_WEAKBARRIER = "BOX64_DYNAREC_WEAKBARRIER"
-        const val BOX64_DYNAREC_WEAKBARRIER_DEFAULT_VALUE = "0"
+        const val BOX64_DYNAREC_WEAKBARRIER_DEFAULT_VALUE = "1"
         const val BOX64_DYNAREC_PAUSE = "BOX64_DYNAREC_PAUSE"
         const val BOX64_DYNAREC_PAUSE_DEFAULT_VALUE = "0"
         const val BOX64_DYNAREC_X87DOUBLE = "BOX64_DYNAREC_X87DOUBLE"
@@ -178,6 +187,7 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val BOX64_NOSIGILL_DEFAULT_VALUE = false
 
         const val SELECTED_BOX64 = "selectedBox64"
+        const val SELECTED_WINE_PREFIX = "selectedWinePrefix"
         const val SELECTED_TU_DEBUG_PRESET = "selectedTuDebugPreset"
         const val SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE = "noconform"
         const val SELECTED_DRIVER = "selectedDriver"
@@ -201,7 +211,7 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val WINE_LOG_LEVEL = "wineLogLevel"
         const val WINE_LOG_LEVEL_DEFAULT_VALUE = "default"
         const val SELECTED_GL_PROFILE = "selectedGLProfile"
-        const val SELECTED_GL_PROFILE_DEFAULT_VALUE = "GL 4.6"
+        const val SELECTED_GL_PROFILE_DEFAULT_VALUE = "GL 3.2"
         const val SELECTED_DXVK_HUD_PRESET = "selectedDXVKHudPreset"
         const val SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE = ""
         const val SELECTED_MESA_VK_WSI_PRESENT_MODE = "MESA_VK_WSI_PRESENT_MODE"
@@ -214,5 +224,7 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val MOUSE_SENSIBILITY = "mouseSensibility"
         const val CPU_AFFINITY = "cpuAffinity"
         const val FPS_LIMIT = "fpsLimit"
+        const val PA_SINK = "pulseAudioSink"
+        const val PA_SINK_DEFAULT_VALUE = "SLES"
     }
 }

@@ -24,35 +24,35 @@ import android.view.MotionEvent.AXIS_Y
 import android.view.MotionEvent.AXIS_Z
 import androidx.preference.PreferenceManager
 import com.micewine.emu.LorieView
-import com.micewine.emu.activities.ControllerMapper
-import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_HAT_X_MINUS_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_HAT_X_PLUS_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_HAT_Y_MINUS_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_HAT_Y_PLUS_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_RZ_MINUS_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_RZ_PLUS_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_X_MINUS_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_X_PLUS_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_Y_MINUS_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_Y_PLUS_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_Z_MINUS_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.AXIS_Z_PLUS_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_A_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_B_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_L1_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_L2_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_R1_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_R2_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_SELECT_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_START_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_THUMBL_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_THUMBR_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_X_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.BUTTON_Y_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.SELECTED_CONTROLLER_PRESET_KEY
-import com.micewine.emu.activities.ControllerMapper.Companion.getDeadZone
-import com.micewine.emu.activities.ControllerMapper.Companion.getMouseSensibility
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_MINUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_PLUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_Y_MINUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_Y_PLUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_RZ_MINUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_RZ_PLUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_X_MINUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_X_PLUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_Y_MINUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_Y_PLUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_Z_MINUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_Z_PLUS_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_A_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_B_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_L1_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_L2_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_R1_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_R2_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_SELECT_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_START_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_THUMBL_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_THUMBR_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_X_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_Y_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getDeadZone
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMapping
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMouseSensibility
 import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
@@ -105,9 +105,11 @@ object ControllerUtils {
     private const val RIGHT_UP = 7
     private const val RIGHT_DOWN = 8
 
-    private fun detectKey(context: Context, key: String): List<Int> {
+    private fun detectKey(context: Context, presetName: String?, key: String): List<Int> {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
-        val mapping = ControllerMapper.getMapping(context, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, key)
+        var mapping = getMapping(presetName ?: preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, key)
+
+        if (presetName == "--") mapping = getMapping(preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!, key)
 
         val keyList: List<Int>
 
@@ -136,46 +138,46 @@ object ControllerUtils {
         return keyList
     }
 
-    fun prepareButtonsAxisValues(context: Context) {
+    fun prepareButtonsAxisValues(context: Context, presetName: String?) {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
 
-        buttonA_mapping = detectKey(context, BUTTON_A_KEY)
-        buttonX_mapping = detectKey(context, BUTTON_X_KEY)
-        buttonB_mapping = detectKey(context, BUTTON_B_KEY)
-        buttonY_mapping = detectKey(context, BUTTON_Y_KEY)
+        buttonA_mapping = detectKey(context, presetName, BUTTON_A_KEY)
+        buttonX_mapping = detectKey(context, presetName,BUTTON_X_KEY)
+        buttonB_mapping = detectKey(context, presetName,BUTTON_B_KEY)
+        buttonY_mapping = detectKey(context, presetName,BUTTON_Y_KEY)
 
-        buttonR1_mapping = detectKey(context, BUTTON_R1_KEY)
-        buttonR2_mapping = detectKey(context, BUTTON_R2_KEY)
+        buttonR1_mapping = detectKey(context, presetName,BUTTON_R1_KEY)
+        buttonR2_mapping = detectKey(context, presetName,BUTTON_R2_KEY)
 
-        buttonL1_mapping = detectKey(context, BUTTON_L1_KEY)
-        buttonL2_mapping = detectKey(context, BUTTON_L2_KEY)
+        buttonL1_mapping = detectKey(context, presetName,BUTTON_L1_KEY)
+        buttonL2_mapping = detectKey(context, presetName,BUTTON_L2_KEY)
 
-        buttonThumbL_mapping = detectKey(context, BUTTON_THUMBL_KEY)
-        buttonThumbR_mapping = detectKey(context, BUTTON_THUMBR_KEY)
+        buttonThumbL_mapping = detectKey(context, presetName,BUTTON_THUMBL_KEY)
+        buttonThumbR_mapping = detectKey(context, presetName,BUTTON_THUMBR_KEY)
 
-        buttonStart_mapping = detectKey(context, BUTTON_START_KEY)
-        buttonSelect_mapping = detectKey(context, BUTTON_SELECT_KEY)
+        buttonStart_mapping = detectKey(context, presetName,BUTTON_START_KEY)
+        buttonSelect_mapping = detectKey(context, presetName, BUTTON_SELECT_KEY)
 
-        axisX_plus_mapping = detectKey(context, AXIS_X_PLUS_KEY)
-        axisX_minus_mapping = detectKey(context, AXIS_X_MINUS_KEY)
+        axisX_plus_mapping = detectKey(context, presetName, AXIS_X_PLUS_KEY)
+        axisX_minus_mapping = detectKey(context, presetName, AXIS_X_MINUS_KEY)
 
-        axisY_plus_mapping = detectKey(context, AXIS_Y_PLUS_KEY)
-        axisY_minus_mapping = detectKey(context, AXIS_Y_MINUS_KEY)
+        axisY_plus_mapping = detectKey(context, presetName, AXIS_Y_PLUS_KEY)
+        axisY_minus_mapping = detectKey(context, presetName, AXIS_Y_MINUS_KEY)
 
-        axisZ_plus_mapping = detectKey(context, AXIS_Z_PLUS_KEY)
-        axisZ_minus_mapping = detectKey(context, AXIS_Z_MINUS_KEY)
+        axisZ_plus_mapping = detectKey(context, presetName, AXIS_Z_PLUS_KEY)
+        axisZ_minus_mapping = detectKey(context, presetName, AXIS_Z_MINUS_KEY)
 
-        axisRZ_plus_mapping = detectKey(context, AXIS_RZ_PLUS_KEY)
-        axisRZ_minus_mapping = detectKey(context, AXIS_RZ_MINUS_KEY)
+        axisRZ_plus_mapping = detectKey(context, presetName, AXIS_RZ_PLUS_KEY)
+        axisRZ_minus_mapping = detectKey(context, presetName, AXIS_RZ_MINUS_KEY)
 
-        axisHatX_plus_mapping = detectKey(context, AXIS_HAT_X_PLUS_KEY)
-        axisHatX_minus_mapping = detectKey(context, AXIS_HAT_X_MINUS_KEY)
+        axisHatX_plus_mapping = detectKey(context, presetName, AXIS_HAT_X_PLUS_KEY)
+        axisHatX_minus_mapping = detectKey(context, presetName, AXIS_HAT_X_MINUS_KEY)
 
-        axisHatY_plus_mapping = detectKey(context, AXIS_HAT_Y_PLUS_KEY)
-        axisHatY_minus_mapping = detectKey(context, AXIS_HAT_Y_MINUS_KEY)
+        axisHatY_plus_mapping = detectKey(context, presetName, AXIS_HAT_Y_PLUS_KEY)
+        axisHatY_minus_mapping = detectKey(context, presetName, AXIS_HAT_Y_MINUS_KEY)
 
-        deadZone = getDeadZone(context, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
-        mouseSensibility = getMouseSensibility(context, preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
+        deadZone = getDeadZone(presetName ?: preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
+        mouseSensibility = getMouseSensibility(presetName ?: preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
     }
 
     private fun getGameControllerIds(): List<Int> {

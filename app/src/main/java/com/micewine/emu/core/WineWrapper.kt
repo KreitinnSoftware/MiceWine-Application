@@ -25,12 +25,6 @@ object WineWrapper {
         return Integer.toHexString(cpuMask.joinToString("").toInt(2))
     }
 
-    fun wineServer(args: String) {
-        runCommand(
-            getEnv() + "$IS_BOX64 wineserver $args"
-        )
-    }
-
     fun waitFor(name: String) {
         while (!wine("tasklist", true).contains(name)) {
             Thread.sleep(100)
@@ -39,14 +33,14 @@ object WineWrapper {
 
     fun wine(args: String) {
         runCommand(
-            getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
+            getEnv() + "WINEPREFIX='$winePrefix' $IS_BOX64 wine $args"
         )
     }
 
     fun wine(args: String, retLog: Boolean): String {
         if (retLog) {
             return runCommandWithOutput(
-                getEnv() + "BOX64_LOG=0 WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
+                getEnv() + "BOX64_LOG=0 WINEPREFIX='$winePrefix' $IS_BOX64 wine $args"
             )
         }
         return ""
@@ -54,8 +48,7 @@ object WineWrapper {
 
     fun wine(args: String, cwd: String) {
         runCommand(
-            "cd $cwd;" +
-                    getEnv() + "WINEPREFIX=$winePrefix $IS_BOX64 wine $args"
+            "cd $cwd;" + getEnv() + "WINEPREFIX='$winePrefix' $IS_BOX64 wine $args"
         )
     }
 
@@ -92,8 +85,12 @@ object WineWrapper {
     fun extractIcon(exeFile: File, output: String) {
         if (exeFile.extension.lowercase() == "exe") {
             runCommand(
-                getEnv() + "wrestool -x -t 14 '${exeFile.path}' > '$output'"
+                getEnv() + "wrestool -x -t 14 '${getSanitizedPath(exeFile.path)}' > '$output'"
             )
         }
+    }
+
+    fun getSanitizedPath(filePath: String) : String {
+        return filePath.replace("'", "'\\''")
     }
 }

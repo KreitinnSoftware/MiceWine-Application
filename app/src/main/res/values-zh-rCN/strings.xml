@@ -159,4 +159,23 @@
     <string name="unlimited">无限</string>
     <string name="fps_limit_title">FPS 限制</string>
     <string name="app_arguments">启动参数</string>
+    <string name="deleting_wine_prefix">正在删除 Wine 前缀…</string>
+    <string name="remove_last_wine_prefix_error">您无法删除最后一个前缀</string>
+    <string name="wine_manager_title">Wine 管理器</string>
+    <string name="wine_manager_description">管理 Wine 版本</string>
+    <string name="installing_drivers">正在安装驱动程序…</string>
+    <string name="installing_box64">正在安装 Box64…</string>
+    <string name="installing_wine">正在安装 Wine…</string>
+    <string name="box64_preset_manager_title">Box64 预设管理器</string>
+    <string name="box64_preset_manager_description">管理 Box64 预设</string>
+    <string name="selected_box64_profile">已选择 Box64 配置文件</string>
+    <string name="selected_virtual_controller_profile">已选择虚拟控制器配置文件</string>
+    <string name="selected_controller_profile">已选择控制器配置文件</string>
+    <string name="export_preset">导出预设</string>
+    <string name="invalid_controller_preset_file">无效的控制器预设文件</string>
+    <string name="invalid_box64_preset_file">无效的 Box64 预设文件</string>
+    <string name="invalid_virtual_controller_preset_file">无效的虚拟控制器预设文件</string>
+    <string name="sound_settings_title">声音设置</string>
+    <string name="sound_settings_description">管理声音设置</string>
+    <string name="select_audio_sink">选择 PulseAudio 输出</string>
 </resources>

@@ -2,7 +2,7 @@ package com.micewine.emu.fragments
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.app.Activity
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -36,6 +36,10 @@ class FileManagerFragment : Fragment() {
         recyclerView = rootView?.findViewById(R.id.recyclerViewFiles)
         recyclerView?.adapter = AdapterFiles(fileList, requireContext(), false)
 
+        if (fileManagerCwd == null) {
+            fileManagerCwd = fileManagerDefaultDir
+        }
+
         refreshFiles()
         registerForContextMenu(recyclerView!!)
 
@@ -65,6 +69,7 @@ class FileManagerFragment : Fragment() {
                     .setDuration(ANIMATION_DURATION / 2)
                     .setInterpolator(AccelerateDecelerateInterpolator())
                     .setListener(object : AnimatorListenerAdapter() {
+                        @SuppressLint("NotifyDataSetChanged")
                         override fun onAnimationEnd(animation: Animator) {
                             fragmentInstance?.lifecycleScope?.launch {
                                 val newFileList = withContext(Dispatchers.IO) {
@@ -72,11 +77,11 @@ class FileManagerFragment : Fragment() {
                                     if (fileManagerCwd != fileManagerDefaultDir) {
                                         filesList.add(AdapterFiles.FileList(File("..")))
                                     }
-                                    File(fileManagerCwd).listFiles()
+                                    File(fileManagerCwd!!).listFiles()
                                         ?.sorted()
                                         ?.filter { it.isDirectory }
                                         ?.forEach { filesList.add(AdapterFiles.FileList(it)) }
-                                    File(fileManagerCwd).listFiles()
+                                    File(fileManagerCwd!!).listFiles()
                                         ?.sorted()
                                         ?.filter { it.isFile }
                                         ?.forEach { filesList.add(AdapterFiles.FileList(it)) }
@@ -113,6 +118,16 @@ class FileManagerFragment : Fragment() {
                 fileList.removeAt(index)
 
                 recyclerView?.adapter?.notifyItemRemoved(index)
+            }
+        }
+
+        fun renameFile(filePath: String, newFilePath: String) {
+            val file = File(filePath)
+
+            if (File(filePath).exists()) {
+                file.renameTo(File(newFilePath))
+
+                refreshFiles()
             }
         }
     }

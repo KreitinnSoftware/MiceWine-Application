@@ -124,6 +124,7 @@
     <string name="controller_preset_create_text">Type a Name</string>
     <string name="remove_last_preset_error">The Last Preset Cannot be Removed</string>
     <string name="edit_game_icon">Edit Icon</string>
+    <string name="edit">Edit</string>
     <string name="add_game_to_home">Create Shortcut on Launcher</string>
     <string name="cancel_text">Cancel</string>
     <string name="remove_game_item_warning">Are you sure you want to remove it?</string>
@@ -182,4 +183,23 @@
     <string name="unlimited">Unlimited</string>
     <string name="fps_limit_title">FPS Limit</string>
     <string name="app_arguments">Launch Arguments</string>
+    <string name="deleting_wine_prefix">Deleting Wine Prefix…</string>
+    <string name="remove_last_wine_prefix_error">You cannot remove last prefix</string>
+    <string name="wine_manager_title">Wine Manager</string>
+    <string name="wine_manager_description">Manage Wine Versions</string>
+    <string name="installing_drivers">Installing Drivers…</string>
+    <string name="installing_box64">Installing Box64…</string>
+    <string name="installing_wine">Installing Wine…</string>
+    <string name="box64_preset_manager_title">Box64 Preset Manager</string>
+    <string name="box64_preset_manager_description">Manage Box64 Presets</string>
+    <string name="selected_box64_profile">Selected Box64 Profile</string>
+    <string name="selected_virtual_controller_profile">Selected Virtual Controller Profile</string>
+    <string name="selected_controller_profile">Selected Controller Profile</string>
+    <string name="export_preset">Export Preset</string>
+    <string name="invalid_controller_preset_file">Invalid Controller Preset File</string>
+    <string name="invalid_box64_preset_file">Invalid Box64 Preset File</string>
+    <string name="invalid_virtual_controller_preset_file">Invalid Virtual Controller Preset File</string>
+    <string name="sound_settings_title">Sound Settings</string>
+    <string name="sound_settings_description">Manage Sound Settings</string>
+    <string name="select_audio_sink">Select PulseAudio Sink</string>
 </resources>

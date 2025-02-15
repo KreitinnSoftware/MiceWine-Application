@@ -22,7 +22,6 @@ import android.util.Log
 import android.view.Display
 import android.view.InputDevice
 import android.view.KeyEvent
-import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.Surface
 import android.view.View
@@ -33,7 +32,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -51,11 +49,10 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.navigation.NavigationView
-import com.micewine.emu.CmdEntryPoint
+import com.micewine.emu.CmdEntryPoint.Companion.ACTION_START
 import com.micewine.emu.ICmdEntryInterface
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
-import com.micewine.emu.activities.DriverManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.FPS_LIMIT
@@ -65,12 +62,18 @@ import com.micewine.emu.activities.MainActivity.Companion.getCpuInfo
 import com.micewine.emu.activities.MainActivity.Companion.getMemoryInfo
 import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
+import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
+import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
+import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
+import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.views.OverlayView
@@ -90,7 +93,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
         override fun onReceive(context: Context, intent: Intent) {
-            if (CmdEntryPoint.ACTION_START == intent.action) {
+            if (ACTION_START == intent.action) {
                 try {
                     Log.v("LorieBroadcastReceiver", "Got new ACTION_START intent")
                     onReceiveConnection(intent)
@@ -101,8 +104,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                         e
                     )
                 }
-            } else if (ACTION_STOP == intent.action) {
-                finishAffinity()
             }
         }
     }
@@ -133,7 +134,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
         }
 
-        prepareButtonsAxisValues(this)
+        prepareButtonsAxisValues(this, getControllerPreset(selectedGameName))
 
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
@@ -180,6 +181,13 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         val lorieParent = lorieView.parent as View
 
         overlayView = findViewById(R.id.overlayView)
+
+        if (selectedGameName == getString(R.string.desktop_mode_init)) {
+            overlayView?.loadPreset(null)
+        } else {
+            overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
+        }
+
         overlayView?.visibility = View.INVISIBLE
 
         lifecycleScope.launch {
@@ -188,19 +196,12 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         val headerViewMain: View = findViewById<NavigationView>(R.id.NavigationView).getHeaderView(0).apply {
             findViewById<MaterialButton>(R.id.exitButton).setOnClickListener {
-                drawerLayout?.closeDrawers()
-
-                runCommand("pkill -9 wineserver")
+                runCommand("pkill -9 wine")
                 runCommand("pkill -9 .exe")
-                runCommand("pkill -9 pulseaudio")
 
                 logTextView.text = ""
 
-                val intent = Intent(this@EmulationActivity, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-                }
-
-                startActivityIfNeeded(intent, 0)
+                finishAffinity()
             }
 
             findViewById<MaterialButton>(R.id.openKeyboardButton).setOnClickListener {
@@ -257,11 +258,17 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
 
             findViewById<MaterialButton>(R.id.editVirtualControllerMapping).setOnClickListener {
-                startActivity(Intent(this@EmulationActivity, VirtualControllerOverlayMapper::class.java))
+                val intent = Intent(context, PresetManagerActivity::class.java).apply {
+                    putExtra("presetType", VIRTUAL_CONTROLLER)
+                }
+                startActivity(intent)
             }
 
             findViewById<MaterialButton>(R.id.editControllerMapping).setOnClickListener {
-                startActivity(Intent(this@EmulationActivity, ControllerMapper::class.java))
+                val intent = Intent(context, PresetManagerActivity::class.java).apply {
+                    putExtra("presetType", PHYSICAL_CONTROLLER)
+                }
+                startActivity(intent)
             }
         }
 
@@ -420,9 +427,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
         })
 
-        registerReceiver(receiver, object : IntentFilter(CmdEntryPoint.ACTION_START) {
+        registerReceiver(receiver, object : IntentFilter() {
             init {
-                addAction(ACTION_STOP)
+                addAction(ACTION_START)
             }
         }, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) RECEIVER_EXPORTED else 0)
 
@@ -546,9 +553,13 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         lorieView!!.requestFocus()
         lorieView!!.requestLayout()
 
-        overlayView?.loadFromPreferences()
+        if (selectedGameName == getString(R.string.desktop_mode_init)) {
+            overlayView?.loadPreset(null)
+        } else {
+            overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
+        }
 
-        prepareButtonsAxisValues(this)
+        prepareButtonsAxisValues(this, getControllerPreset(selectedGameName))
     }
 
     public override fun onPause() {
@@ -620,7 +631,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
     companion object {
         const val KEY_BACK = 158
-        const val ACTION_STOP: String = "com.micewine.emu.ACTION_STOP"
 
         var handler: Handler = Handler(Looper.getMainLooper())
         var inputMethodManager: InputMethodManager? = null

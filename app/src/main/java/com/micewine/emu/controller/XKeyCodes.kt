@@ -76,7 +76,7 @@ object XKeyCodes {
     )
 
     fun getKeyNames(getMouseButtons: Boolean): List<String> {
-        val keyNames: MutableList<String> = mutableListOf("Null")
+        val keyNames: MutableList<String> = mutableListOf("--")
 
         if (getMouseButtons) {
             keyNames.plusAssign("M_Left")

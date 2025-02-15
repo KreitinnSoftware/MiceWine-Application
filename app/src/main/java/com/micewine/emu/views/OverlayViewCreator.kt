@@ -4,23 +4,25 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.drawable.VectorDrawable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import androidx.preference.PreferenceManager
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import androidx.core.content.ContextCompat
+import com.micewine.emu.R
 import com.micewine.emu.activities.VirtualControllerOverlayMapper.Companion.ACTION_EDIT_VIRTUAL_BUTTON
+import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogDownKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogLeftKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogRightKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogUpKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonRadius
+import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getMapping
+import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.putMapping
 import com.micewine.emu.views.OverlayView.Companion.analogList
 import com.micewine.emu.views.OverlayView.Companion.buttonList
 import com.micewine.emu.views.OverlayView.Companion.detectClick
@@ -29,8 +31,17 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     private val editButton: CircleButton = CircleButton(0F, 0F, 150F)
     private val removeButton: CircleButton = CircleButton(0F, 0F, 150F)
 
-    private var editIcon: Bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resources, android.R.drawable.ic_menu_edit), (editButton.radius / 2).toInt(), (editButton.radius / 2).toInt(), false)
-    private var removeIcon: Bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resources, android.R.drawable.ic_menu_delete), (removeButton.radius / 2).toInt(), (removeButton.radius / 2).toInt(), false)
+    private var editIcon: Bitmap = getBitmapFromVectorDrawable(context, R.drawable.ic_edit, (editButton.radius / 2).toInt(), (editButton.radius / 2).toInt())
+    private var removeIcon: Bitmap = getBitmapFromVectorDrawable(context, R.drawable.ic_delete, (removeButton.radius / 2).toInt(), (removeButton.radius / 2).toInt())
+
+    private fun getBitmapFromVectorDrawable(context: Context, drawableId: Int, width: Int, height: Int): Bitmap {
+        val drawable = ContextCompat.getDrawable(context, drawableId) as VectorDrawable
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        return bitmap
+    }
 
     private val paint = Paint().apply {
         color = Color.BLACK
@@ -55,27 +66,18 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
     private var selectedButton = 0
     private var selectedVAxis = 0
-    private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-    private val gson = Gson()
 
     private fun loadFromPreferences() {
-        val buttonJson = preferences.getString("overlayButtons", "")
-        val axisJson = preferences.getString("overlayAxis", "")
-
-        val virtualButtonListType = object : TypeToken<MutableList<OverlayView.VirtualButton>>() {}.type
-        val virtualAxisListType = object : TypeToken<MutableList<OverlayView.VirtualAnalog>>() {}.type
-
-        val currentButtons: MutableList<OverlayView.VirtualButton> = gson.fromJson(buttonJson, virtualButtonListType) ?: mutableListOf()
-        val currentVAxis: MutableList<OverlayView.VirtualAnalog> = gson.fromJson(axisJson, virtualAxisListType) ?: mutableListOf()
+        val mapping = getMapping(clickedPresetName)
 
         buttonList.clear()
         analogList.clear()
 
-        currentButtons.forEach {
+        mapping?.buttons?.forEach {
             buttonList.add(it)
         }
 
-        currentVAxis.forEach {
+        mapping?.analogs?.forEach {
             analogList.add(it)
         }
 
@@ -83,14 +85,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     }
 
     fun saveOnPreferences() {
-        val buttonJson = gson.toJson(buttonList)
-        val axisJson = gson.toJson(analogList)
-
-        preferences.edit().apply {
-            putString("overlayButtons", buttonJson)
-            putString("overlayAxis", axisJson)
-            apply()
-        }
+        putMapping(clickedPresetName, buttonList, analogList)
     }
 
     init {

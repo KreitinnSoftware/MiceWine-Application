@@ -56,11 +56,10 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SWITCH
-import com.micewine.emu.adapters.AdapterSettingsPreferences
-import com.micewine.emu.adapters.AdapterSettingsPreferences.SettingsListSpinner
+import com.micewine.emu.adapters.AdapterSettingsBox64Preset
 
 class Box64SettingsFragment : Fragment() {
-    private val settingsList: MutableList<SettingsListSpinner> = ArrayList()
+    private val settingsList: MutableList<AdapterSettingsBox64Preset.Box64ListSpinner> = ArrayList()
     private var rootView: View? = null
     private var recyclerView: RecyclerView? = null
     private var layoutManager: GridLayoutManager? = null
@@ -82,7 +81,7 @@ class Box64SettingsFragment : Fragment() {
     }
 
     private fun setAdapter() {
-        val adapterSettingsPreferences = AdapterSettingsPreferences(settingsList, requireActivity(), recyclerView!!)
+        val adapterSettingsPreferences = AdapterSettingsBox64Preset(settingsList, requireActivity())
 
         recyclerView?.setAdapter(adapterSettingsPreferences)
 
@@ -99,24 +98,25 @@ class Box64SettingsFragment : Fragment() {
         addToAdapter(R.string.box64_callret_title, R.string.box64_callret_description, null, SWITCH, BOX64_DYNAREC_CALLRET_DEFAULT_VALUE, BOX64_DYNAREC_CALLRET)
         addToAdapter(R.string.box64_aligned_atomics_title, R.string.box64_aligned_atomics_description, null, SWITCH, BOX64_DYNAREC_ALIGNED_ATOMICS_DEFAULT_VALUE, BOX64_DYNAREC_ALIGNED_ATOMICS)
         addToAdapter(R.string.box64_nativeflags_title, R.string.box64_nativeflags_description, null, SWITCH, BOX64_DYNAREC_NATIVEFLAGS_DEFAULT_VALUE, BOX64_DYNAREC_NATIVEFLAGS)
-        addToAdapter(R.string.box64_bleeding_edge_title, R.string.box64_bleeding_edge_description, null, SWITCH, BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE, BOX64_DYNAREC_BLEEDING_EDGE)
         addToAdapter(R.string.box64_dynarec_wait_title, R.string.box64_dynarec_wait_description, null, SWITCH, BOX64_DYNAREC_WAIT_DEFAULT_VALUE, BOX64_DYNAREC_WAIT)
         addToAdapter(R.string.box64_dynarec_dirty_title, R.string.box64_dynarec_dirty_description, null, SWITCH, BOX64_DYNAREC_DIRTY_DEFAULT_VALUE, BOX64_DYNAREC_DIRTY)
         addToAdapter(R.string.box64_dynarec_forward_title, R.string.box64_dynarec_forward_description, arrayOf("0", "128", "256", "512", "1024"), SPINNER, BOX64_DYNAREC_FORWARD_DEFAULT_VALUE, BOX64_DYNAREC_FORWARD)
-        addToAdapter(R.string.box64_log_title, R.string.box64_log_description, arrayOf("0", "1"), SPINNER, BOX64_LOG_DEFAULT_VALUE, BOX64_LOG)
         addToAdapter(R.string.box64_avx_title, R.string.box64_avx_description, arrayOf("0", "1", "2"), SPINNER, BOX64_AVX_DEFAULT_VALUE, BOX64_AVX)
         addToAdapter(R.string.box64_sse42_title, R.string.box64_sse42_description, null, SWITCH, BOX64_SSE42_DEFAULT_VALUE, BOX64_SSE42)
         addToAdapter(R.string.box64_mmap32_title, R.string.box64_mmap32_description, null, SWITCH, BOX64_MMAP32_DEFAULT_VALUE, BOX64_MMAP32)
-
-        // Debugging Options
-
-        addToAdapter(R.string.box64_show_segv_title, R.string.box64_show_segv_description, null, SWITCH, BOX64_SHOWSEGV_DEFAULT_VALUE, BOX64_SHOWSEGV)
-        addToAdapter(R.string.box64_no_sigsegv_title, R.string.box64_no_sigsegv_description, null, SWITCH, BOX64_NOSIGSEGV_DEFAULT_VALUE, BOX64_NOSIGSEGV)
-        addToAdapter(R.string.box64_show_bt_title, R.string.box64_show_bt_description, null, SWITCH, BOX64_SHOWBT_DEFAULT_VALUE, BOX64_SHOWBT)
-        addToAdapter(R.string.box64_no_sigill_title, R.string.box64_no_sigill_description, null, SWITCH, BOX64_NOSIGILL_DEFAULT_VALUE, BOX64_NOSIGILL)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>?, type: Int, defaultValue: Any, keyId: String) {
-        settingsList.add(SettingsListSpinner(titleId, descriptionId, valuesArray, null, type, "$defaultValue", keyId))
+        settingsList.add(
+            AdapterSettingsBox64Preset.Box64ListSpinner(
+                titleId,
+                descriptionId,
+                valuesArray,
+                null,
+                type,
+                "$defaultValue",
+                keyId
+            )
+        )
     }
 }

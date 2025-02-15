@@ -73,6 +73,57 @@
         tools:ignore="LabelFor">
     </EditText>
 
+    <TextView
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:text="@string/selected_controller_profile">
+    </TextView>
+
+    <Spinner
+        android:id="@+id/selectedControllerProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+    </Spinner>
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:text="@string/selected_virtual_controller_profile">
+    </TextView>
+
+    <Spinner
+        android:id="@+id/selectedVirtualControllerProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+    </Spinner>
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:text="@string/selected_box64_profile">
+    </TextView>
+
+    <Spinner
+        android:id="@+id/selectedBox64Profile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+    </Spinner>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

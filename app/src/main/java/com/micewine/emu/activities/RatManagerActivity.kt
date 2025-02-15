@@ -12,19 +12,24 @@ import com.micewine.emu.activities.MainActivity.Companion.enableMangoHUD
 import com.micewine.emu.activities.MainActivity.Companion.fpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
-import com.micewine.emu.databinding.ActivityDriverManagerBinding
-import com.micewine.emu.fragments.DriverListFragment
+import com.micewine.emu.adapters.AdapterRatPackage.Companion.BOX64
+import com.micewine.emu.adapters.AdapterRatPackage.Companion.VK_DRIVER
+import com.micewine.emu.adapters.AdapterRatPackage.Companion.WINE
+import com.micewine.emu.databinding.ActivityRatManagerBinding
+import com.micewine.emu.fragments.RatManagerFragment
 import java.io.File
 
-class DriverManagerActivity : AppCompatActivity() {
-    private var binding: ActivityDriverManagerBinding? = null
+class RatManagerActivity : AppCompatActivity() {
+    private var binding: ActivityRatManagerBinding? = null
     private var backButton: ImageButton? = null
     private var ratManagerToolBar: Toolbar? = null
+    private var prefix: String? = null
+    private var type: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityDriverManagerBinding.inflate(layoutInflater)
+        binding = ActivityRatManagerBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
         backButton = findViewById(R.id.backButton)
@@ -32,10 +37,18 @@ class DriverManagerActivity : AppCompatActivity() {
             onKeyDown(KeyEvent.KEYCODE_BACK, null)
         }
 
-        ratManagerToolBar = findViewById(R.id.driverManagerToolbar)
-        ratManagerToolBar?.setTitle(R.string.driver_manager_title)
+        ratManagerToolBar = findViewById(R.id.ratManagerToolbar)
 
-        fragmentLoader(DriverListFragment())
+        prefix = intent.getStringExtra("prefix")
+        type = intent.getIntExtra("type", -1)
+
+        when (type) {
+            BOX64 -> ratManagerToolBar?.setTitle(R.string.box64_manager_title)
+            VK_DRIVER -> ratManagerToolBar?.setTitle(R.string.driver_manager_title)
+            WINE -> ratManagerToolBar?.setTitle(R.string.wine_manager_title)
+        }
+
+        fragmentLoader(RatManagerFragment(prefix!!, type!!))
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -62,13 +75,15 @@ class DriverManagerActivity : AppCompatActivity() {
         private val gson = Gson()
 
         fun generateICDFile(driverLib: String, destIcd: File) {
-            val json = gson.toJson(mapOf(
-                "ICD" to mapOf(
-                    "api_version" to "1.1.296",
-                    "library_path" to driverLib
-                ),
-                "file_format_version" to "1.0.0"
-            ))
+            val json = gson.toJson(
+                mapOf(
+                    "ICD" to mapOf(
+                        "api_version" to "1.1.296",
+                        "library_path" to driverLib
+                    ),
+                    "file_format_version" to "1.0.0"
+                )
+            )
 
             destIcd.writeText(json)
         }

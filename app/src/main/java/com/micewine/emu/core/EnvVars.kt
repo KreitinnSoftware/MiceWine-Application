@@ -40,6 +40,7 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedDXVKHud
 import com.micewine.emu.activities.MainActivity.Companion.selectedMesaVkWsiPresentMode
 import com.micewine.emu.activities.MainActivity.Companion.selectedTuDebugPreset
 import com.micewine.emu.activities.MainActivity.Companion.selectedGLProfile
+import com.micewine.emu.activities.MainActivity.Companion.selectedWine
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.activities.MainActivity.Companion.wineESync
@@ -79,7 +80,7 @@ object EnvVars {
         vars.add("DISPLAY=:0")
         vars.add("PULSE_LATENCY_MSEC=60")
         vars.add("LD_LIBRARY_PATH=/system/lib64:$usrDir/lib")
-        vars.add("PATH=\$PATH:$usrDir/bin:$appRootDir/wine/bin:$ratPackagesDir/$selectedBox64/files/usr/bin")
+        vars.add("PATH=\$PATH:$usrDir/bin:$ratPackagesDir/$selectedWine/files/wine/bin:$ratPackagesDir/$selectedBox64/files/usr/bin")
         vars.add("PREFIX=$usrDir")
         vars.add("MESA_SHADER_CACHE_DIR=$homeDir/.cache")
         vars.add("MESA_VK_WSI_PRESENT_MODE=$selectedMesaVkWsiPresentMode")
