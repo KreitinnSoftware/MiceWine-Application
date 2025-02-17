@@ -10,6 +10,7 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment.getExternalStorageDirectory
 import android.os.storage.StorageManager
 import android.view.ContextMenu
 import android.view.KeyEvent
@@ -1035,7 +1036,7 @@ class MainActivity : AppCompatActivity() {
                 val driveC = File("$winePrefix/drive_c")
                 val wineUtils = File("$appRootDir/wine-utils")
                 val startMenu = File("$driveC/ProgramData/Microsoft/Windows/Start Menu")
-                val userSharedFolder = File("/storage/emulated/0/MiceWine")
+                val userSharedFolder = File(getExternalStorageDirectory(), "MiceWine")
                 val localAppData = File("$driveC/users/$unixUsername/AppData")
                 val system32 = File("$driveC/windows/system32")
                 val syswow64 = File("$driveC/windows/syswow64")

@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.os.Environment.getExternalStorageDirectory
 import android.util.Log
 import android.view.View
 import android.widget.EditText
@@ -43,7 +44,7 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
         recyclerView  = view.findViewById(R.id.recyclerViewFiles)
         recyclerView?.adapter = AdapterFiles(fileList, requireContext(), true)
 
-        fileManagerCwd = "/storage/emulated/0"
+        fileManagerCwd = externalStorageDir
 
         refreshFiles(operationType)
 
@@ -144,6 +145,7 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
     }
 
     companion object {
+        private val externalStorageDir by lazy { getExternalStorageDirectory().absolutePath }
         private var recyclerView: RecyclerView? = null
         private val fileList: MutableList<AdapterFiles.FileList> = mutableListOf()
         var calledSetup: Boolean = false
@@ -158,7 +160,7 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
 
             fileList.clear()
 
-            if (fileManagerCwd != "/storage/emulated/0") {
+            if (fileManagerCwd != externalStorageDir) {
                 addToAdapter(File(".."))
             }
 
