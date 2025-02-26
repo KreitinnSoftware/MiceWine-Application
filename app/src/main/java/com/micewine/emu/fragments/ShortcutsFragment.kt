@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
@@ -97,10 +98,8 @@ class ShortcutsFragment : Fragment() {
 
         layoutManager = recyclerView?.layoutManager as GridLayoutManager?
 
-        val spanCount = max(1F, requireActivity().resources.displayMetrics.widthPixels / dpToPx(150, requireContext())).toInt()
-
-        recyclerView?.layoutManager = GridLayoutManager(requireContext(), spanCount)
-        recyclerView?.addItemDecoration(GridSpacingItemDecoration(spanCount, 20))
+        recyclerView?.layoutManager = GridLayoutManager(requireContext(), getSpanCount())
+        recyclerView?.addItemDecoration(GridSpacingItemDecoration(10))
 
         setAdapter()
 
@@ -224,14 +223,19 @@ class ShortcutsFragment : Fragment() {
         return rootView
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        recyclerView?.layoutManager = GridLayoutManager(requireContext(), getSpanCount())
+    }
+
     private fun setupDragAndDrop() {
         val callback = object : ItemTouchHelper.Callback() {
             override fun getMovementFlags(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ): Int {
-                val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or
-                        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+                val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
                 return makeMovementFlags(dragFlags, 0)
             }
 
@@ -261,9 +265,7 @@ class ShortcutsFragment : Fragment() {
                 return true
             }
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            }
-
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
             override fun isLongPressDragEnabled(): Boolean = true
             override fun isItemViewSwipeEnabled(): Boolean = false
         }
@@ -277,22 +279,13 @@ class ShortcutsFragment : Fragment() {
         return dp * density
     }
 
-    class GridSpacingItemDecoration(
-        private val spanCount: Int,
-        private val spacing: Int,
-    ) : RecyclerView.ItemDecoration() {
+    class GridSpacingItemDecoration(private val spacing: Int) : RecyclerView.ItemDecoration() {
         override fun getItemOffsets(
             outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State
         ) {
-            val position = parent.getChildAdapterPosition(view)
-            val column = position % spanCount
-
-            outRect.left = spacing - column * spacing / spanCount
-            outRect.right = (column + 1) * spacing / spanCount
-
-            if (position < spanCount) {
-                outRect.top = spacing
-            }
+            outRect.left = spacing
+            outRect.right = spacing
+            outRect.top = spacing
             outRect.bottom = spacing
         }
     }
@@ -310,6 +303,10 @@ class ShortcutsFragment : Fragment() {
 
     private fun addToAdapter(name: String, exePath: String, exeArguments: String, iconPath: String) {
         gameListNames.add(AdapterGame.GameItem(name, exePath, exeArguments, iconPath))
+    }
+
+    private fun getSpanCount(): Int {
+        return max(1F, requireActivity().resources.displayMetrics.widthPixels / dpToPx(150, requireContext())).toInt()
     }
 
     companion object {

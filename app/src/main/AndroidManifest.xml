@@ -50,11 +50,6 @@
             android:exported="false">
         </activity>
         <activity
-            android:name=".activities.DriverManagerActivity"
-            android:theme="@style/Theme.MiceWine"
-            android:exported="false">
-        </activity>
-        <activity
             android:name=".activities.MainActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"

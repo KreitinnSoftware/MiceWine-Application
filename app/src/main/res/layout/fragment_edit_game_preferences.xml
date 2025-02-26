@@ -18,7 +18,7 @@
             android:layout_width="128dp"
             android:layout_height="128dp"
             android:importantForAccessibility="no"
-            android:src="@drawable/default_icon"
+            android:src="@drawable/ic_edit"
             android:padding="6dp"
             app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.ExtraSmall">
         </ImageView>
