@@ -43,7 +43,8 @@ class EditVirtualButtonFragment : DialogFragment() {
                 OnSeekBarChangeListener {
                 @SuppressLint("SetTextI18n")
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    radiusSeekbarValue?.text = "$progress%"
+                    seekBar?.progress = Math.round(progress.toFloat() / 5) * 5
+                    radiusSeekbarValue?.text = "${seekBar?.progress}%"
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -54,7 +55,7 @@ class EditVirtualButtonFragment : DialogFragment() {
             })
         }
 
-        val allKeyNames = getKeyNames(true)
+        val allKeyNames = getKeyNames(lastSelectedType != ANALOG)
 
         val buttonSpinner = view.findViewById<Spinner>(R.id.buttonSpinner).apply {
             adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, allKeyNames)

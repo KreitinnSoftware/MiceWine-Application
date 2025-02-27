@@ -26,6 +26,7 @@ import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Compani
 import com.micewine.emu.views.OverlayView.Companion.analogList
 import com.micewine.emu.views.OverlayView.Companion.buttonList
 import com.micewine.emu.views.OverlayView.Companion.detectClick
+import kotlin.math.roundToInt
 
 class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0): View(context, attrs, defStyleAttr) {
     private val editButton: CircleButton = CircleButton(0F, 0F, 150F)
@@ -62,6 +63,13 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
         color = Color.WHITE
         textAlign = Paint.Align.CENTER
         textSize = 40F
+    }
+
+    private val gridPaint = Paint().apply {
+        color = Color.BLACK
+        strokeWidth = 10F
+        isAntiAlias = true
+        alpha = 200
     }
 
     private var selectedButton = 0
@@ -101,6 +109,18 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
+        for (i in 0..width) {
+            if (i % GRID_SIZE == 0) {
+                canvas.drawLine(i.toFloat(), 0F, i.toFloat(), height.toFloat(), gridPaint)
+            }
+        }
+
+        for (i in 0..height) {
+            if (i % GRID_SIZE == 0) {
+                canvas.drawLine(0F, i.toFloat(), width.toFloat(), i.toFloat(), gridPaint)
+            }
+        }
 
         buttonList.forEach {
             buttonPaint.color = if (lastSelectedButton == it.id && lastSelectedType == BUTTON) Color.GRAY else Color.WHITE
@@ -202,8 +222,8 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                              buttonList[buttonList.indexOfFirst { i ->
                                  i.id == selectedButton
                              }].apply {
-                                 x = event.getX(event.actionIndex)
-                                 y = event.getY(event.actionIndex)
+                                 x = (event.getX(event.actionIndex) / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
+                                 y = (event.getY(event.actionIndex) / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
                              }
                          }
                      }
@@ -215,8 +235,8 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                              analogList[analogList.indexOfFirst { i ->
                                  i.id == selectedVAxis
                              }].apply {
-                                 x = event.getX(event.actionIndex)
-                                 y = event.getY(event.actionIndex)
+                                 x = (event.getX(event.actionIndex) / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
+                                 y = (event.getY(event.actionIndex) / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
                              }
                          }
                      }
@@ -290,6 +310,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     companion object {
         const val BUTTON = 0
         const val ANALOG = 1
+        const val GRID_SIZE = 35
 
         var lastSelectedButton = 0
         var lastSelectedType = BUTTON
