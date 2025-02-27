@@ -92,7 +92,7 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
                             getXKeyScanCodes("--"),
                             false,
                             -1,
-                            0.5F
+                            0.75F
                         )
                     )
 
