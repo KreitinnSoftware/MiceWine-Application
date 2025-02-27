@@ -250,12 +250,8 @@ class ShortcutsFragment : Fragment() {
                 val toPosition = target.adapterPosition
 
                 val initialGame = gameList[fromPosition]
-                val endGame = gameList[toPosition]
 
                 gameList.removeAt(fromPosition)
-                gameList.add(fromPosition, endGame)
-
-                gameList.removeAt(toPosition)
                 gameList.add(toPosition, initialGame)
 
                 recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
