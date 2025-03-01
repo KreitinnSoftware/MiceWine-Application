@@ -319,6 +319,78 @@ class ShortcutsFragment : Fragment() {
             gameList = getGameList(context)
         }
 
+        fun putVKD3DVersion(name: String, vkd3dVersion: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].vkd3dVersion = vkd3dVersion
+
+            saveShortcuts()
+        }
+
+        fun getVKD3DVersion(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return ""
+
+            return gameList[index].vkd3dVersion
+        }
+
+        fun putWineD3DVersion(name: String, wineD3DVersion: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].wineD3DVersion = wineD3DVersion
+
+            saveShortcuts()
+        }
+
+        fun getWineD3DVersion(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return ""
+
+            return gameList[index].wineD3DVersion
+        }
+
+        fun putDXVKVersion(name: String, dxvkVersion: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].dxvkVersion = dxvkVersion
+
+            saveShortcuts()
+        }
+
+        fun getDXVKVersion(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return ""
+
+            return gameList[index].dxvkVersion
+        }
+
+        fun putD3DXRenderer(name: String, d3dxRenderer: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].d3dxRenderer = d3dxRenderer
+
+            saveShortcuts()
+        }
+
+        fun getD3DXRenderer(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return "DXVK"
+
+            return gameList[index].d3dxRenderer
+        }
+
         fun putDisplaySettings(name: String, displayMode: String, displayResolution: String) {
             val index = gameList.indexOfFirst { it.name == name }
 
@@ -400,7 +472,7 @@ class ShortcutsFragment : Fragment() {
             }
 
             gameList.add(
-                GameItem(prettyName, path, "", icon, "--", "--", "--", "16:9", "1280x720")
+                GameItem(prettyName, path, "", icon, "", "", "", "16:9", "1280x720", "DXVK", "", "", "")
             )
             gameListNames.add(
                 AdapterGame.GameItem(prettyName, path, "", icon)
@@ -479,7 +551,7 @@ class ShortcutsFragment : Fragment() {
             val listType = object : TypeToken<MutableList<GameItem>>() {}.type
 
             return gson.fromJson(json, listType) ?: mutableListOf(
-                GameItem(context.getString(R.string.desktop_mode_init), context.getString(R.string.desktop_mode_init), "", "", "--", "--", "--", "--", "--")
+                GameItem(context.getString(R.string.desktop_mode_init), context.getString(R.string.desktop_mode_init), "", "", "", "", "", "", "", "DXVK", "", "", "")
             )
         }
 
@@ -523,7 +595,11 @@ class ShortcutsFragment : Fragment() {
             var controllerPreset: String,
             var virtualControllerPreset: String,
             var displayMode: String,
-            var displayResolution: String
+            var displayResolution: String,
+            var d3dxRenderer: String,
+            var dxvkVersion: String,
+            var wineD3DVersion: String,
+            var vkd3dVersion: String
         )
     }
 }

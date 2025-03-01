@@ -125,6 +125,74 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textStyle="bold"
+                android:text="@string/select_d3dx_title">
+            </TextView>
+
+            <Spinner
+                android:id="@+id/selectedD3DXRenderer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+            </Spinner>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:text="@string/select_dxvk_title">
+            </TextView>
+
+            <Spinner
+                android:id="@+id/selectedDXVK"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+            </Spinner>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:text="@string/select_wined3d_title">
+            </TextView>
+
+            <Spinner
+                android:id="@+id/selectedWineD3D"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+            </Spinner>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:text="@string/select_vkd3d_title">
+            </TextView>
+
+            <Spinner
+                android:id="@+id/selectedVKD3D"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+            </Spinner>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 android:text="@string/selected_controller_profile">
             </TextView>
 

@@ -7,7 +7,6 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
@@ -20,6 +19,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.preference.PreferenceManager
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_ICON
+import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Presets
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getControllerPresets
@@ -29,15 +29,24 @@ import com.micewine.emu.fragments.DisplaySettingsFragment.Companion.resolutions4
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.editGameFromList
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameExeArguments
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameIcon
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putD3DXRenderer
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDisplaySettings
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineD3DVersion
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getVirtualControllerPresets
+import java.io.File
 
 class EditGamePreferencesFragment : DialogFragment() {
     private var preferences: SharedPreferences? = null
@@ -53,6 +62,10 @@ class EditGamePreferencesFragment : DialogFragment() {
         val buttonCancel = view.findViewById<Button>(R.id.buttonCancel)
         val selectedDisplayModeSpinner = view.findViewById<Spinner>(R.id.selectedDisplayMode)
         val selectedDisplayResolutionSpinner = view.findViewById<Spinner>(R.id.selectedDisplayResolution)
+        val selectedD3DXRendererSpinner = view.findViewById<Spinner>(R.id.selectedD3DXRenderer)
+        val selectedDXVKSpinner = view.findViewById<Spinner>(R.id.selectedDXVK)
+        val selectedWineD3DSpinner = view.findViewById<Spinner>(R.id.selectedWineD3D)
+        val selectedVKD3DSpinner = view.findViewById<Spinner>(R.id.selectedVKD3D)
         val selectedControllerProfileSpinner = view.findViewById<Spinner>(R.id.selectedControllerProfile)
         val selectedVirtualControllerProfileSpinner = view.findViewById<Spinner>(R.id.selectedVirtualControllerProfile)
         val selectedBox64ProfileSpinner = view.findViewById<Spinner>(R.id.selectedBox64Profile)
@@ -93,21 +106,9 @@ class EditGamePreferencesFragment : DialogFragment() {
             )
         }
 
-        val controllerProfilesNames: MutableList<String> = mutableListOf("--")
-        val virtualControllerProfilesNames: MutableList<String> = mutableListOf("--")
-        val box64ProfilesNames: MutableList<String> = mutableListOf("--")
-
-        getControllerPresets().forEach {
-            controllerProfilesNames.add(it[0])
-        }
-
-        getVirtualControllerPresets().forEach {
-            virtualControllerProfilesNames.add(it.name)
-        }
-
-        getBox64Presets().forEach {
-            box64ProfilesNames.add(it[0])
-        }
+        val controllerProfilesNames: List<String> = getControllerPresets().map { it[0] }
+        val virtualControllerProfilesNames: List<String> = getVirtualControllerPresets().map { it.name }
+        val box64ProfilesNames: List<String> = getBox64Presets().map { it[0] }
 
         selectedDisplayModeSpinner.apply {
             val aspectRatios = listOf("16:9", "4:3", "Native")
@@ -160,6 +161,105 @@ class EditGamePreferencesFragment : DialogFragment() {
                     val selectedItem = parent?.getItemAtPosition(position).toString()
 
                     putDisplaySettings(selectedGameName, getDisplaySettings(selectedGameName)[0], selectedItem)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+        }
+
+        selectedD3DXRendererSpinner.apply {
+            val d3dxRenderers = listOf("DXVK", "WineD3D")
+            adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, d3dxRenderers)
+            setSelection(d3dxRenderers.indexOf(getD3DXRenderer(selectedGameName)))
+
+            onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val selectedItem = parent?.getItemAtPosition(position).toString()
+
+                    when (selectedItem) {
+                        "DXVK" -> {
+                            selectedWineD3DSpinner.isEnabled = false
+                            selectedDXVKSpinner.isEnabled = true
+                        }
+                        "WineD3D" -> {
+                            selectedDXVKSpinner.isEnabled = false
+                            selectedWineD3DSpinner.isEnabled = true
+                        }
+                    }
+
+                    putD3DXRenderer(selectedGameName, selectedItem)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+        }
+
+        selectedDXVKSpinner.apply {
+            val dxvkVersions = File("$appRootDir/wine-utils/DXVK").listFiles()?.map { it.name }?.sorted()!!
+            adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, dxvkVersions)
+            setSelection(dxvkVersions.indexOf(getDXVKVersion(selectedGameName)))
+
+            onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val selectedItem = parent?.getItemAtPosition(position).toString()
+
+                    putDXVKVersion(selectedGameName, selectedItem)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+        }
+
+        selectedWineD3DSpinner.apply {
+            val wineD3DVersions = File("$appRootDir/wine-utils/WineD3D").listFiles()?.map { it.name }?.sorted()!!
+            adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, wineD3DVersions)
+            setSelection(wineD3DVersions.indexOf(getWineD3DVersion(selectedGameName)))
+
+            onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val selectedItem = parent?.getItemAtPosition(position).toString()
+
+                    putWineD3DVersion(selectedGameName, selectedItem)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+        }
+
+        selectedVKD3DSpinner.apply {
+            val vkd3dVersions = File("$appRootDir/wine-utils/VKD3D").listFiles()?.map { it.name }?.sorted()!!
+            adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, vkd3dVersions)
+            setSelection(vkd3dVersions.indexOf(getVKD3DVersion(selectedGameName)))
+
+            onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val selectedItem = parent?.getItemAtPosition(position).toString()
+
+                    putVKD3DVersion(selectedGameName, selectedItem)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {

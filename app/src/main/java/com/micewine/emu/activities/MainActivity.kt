@@ -48,8 +48,6 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG_D
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CPU_AFFINITY
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD
@@ -60,12 +58,8 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.FPS_LIMIT
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.PA_SINK
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.PA_SINK_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_D3DX_RENDERER
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_D3DX_RENDERER_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DRIVER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DRIVER_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DXVK
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DXVK_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DXVK_HUD_PRESET
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_GL_PROFILE
@@ -74,10 +68,6 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_ME
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_TU_DEBUG_PRESET
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VKD3D
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VKD3D_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINED3D
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINED3D_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC_DEFAULT_VALUE
@@ -123,7 +113,11 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.ACTION_UPDATE_WINE
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToLauncher
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToList
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.SoundSettingsFragment.Companion.generatePAFile
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
@@ -170,11 +164,6 @@ class MainActivity : AppCompatActivity() {
 
                     if (exePath != getString(R.string.desktop_mode_init)) {
                         setBox64Preset(this@MainActivity, getBox64Preset(selectedGameName))
-                    }
-
-                    preferences!!.edit().apply {
-                        putString(DISPLAY_RESOLUTION, getDisplaySettings(selectedGameName)[1])
-                        apply()
                     }
 
                     lifecycleScope.launch { runXServer(":0") }
@@ -1022,7 +1011,7 @@ class MainActivity : AppCompatActivity() {
         var screenFpsLimit: Int = 60
         var fpsLimit: Int = 0
         var paSink: String? = null
-        private var selectedResolution: String? = ""
+        var selectedResolution: String? = ""
 
         var selectedFragment = "ShortcutsFragment"
 
@@ -1111,15 +1100,19 @@ class MainActivity : AppCompatActivity() {
             wineESync = strBoolToNumStr(preferences.getBoolean(WINE_ESYNC, WINE_ESYNC_DEFAULT_VALUE))
             wineLogLevel = preferences.getString(WINE_LOG_LEVEL, WINE_LOG_LEVEL_DEFAULT_VALUE)
             selectedDriver = preferences.getString(SELECTED_DRIVER, SELECTED_DRIVER_DEFAULT_VALUE)
-            d3dxRenderer = preferences.getString(SELECTED_D3DX_RENDERER, SELECTED_D3DX_RENDERER_DEFAULT_VALUE)
-            selectedWineD3D = preferences.getString(SELECTED_WINED3D, SELECTED_WINED3D_DEFAULT_VALUE)
-            selectedDXVK = preferences.getString(SELECTED_DXVK, SELECTED_DXVK_DEFAULT_VALUE)
-            selectedVKD3D = preferences.getString(SELECTED_VKD3D, SELECTED_VKD3D_DEFAULT_VALUE)
+
+            d3dxRenderer = getD3DXRenderer(selectedGameName)
+            selectedWineD3D = getWineD3DVersion(selectedGameName)
+            selectedDXVK = getDXVKVersion(selectedGameName)
+            selectedVKD3D = getVKD3DVersion(selectedGameName)
+
             selectedGLProfile = preferences.getString(SELECTED_GL_PROFILE, SELECTED_GL_PROFILE_DEFAULT_VALUE)
             selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET, SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE)
             selectedMesaVkWsiPresentMode = preferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE, SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE)
             selectedTuDebugPreset = preferences.getString(SELECTED_TU_DEBUG_PRESET, SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE)
-            selectedResolution = preferences.getString(DISPLAY_RESOLUTION, DISPLAY_RESOLUTION_DEFAULT_VALUE)
+
+            selectedResolution = getDisplaySettings(selectedGameName)[1]
+
             enableRamCounter = preferences.getBoolean(RAM_COUNTER, RAM_COUNTER_DEFAULT_VALUE)
             enableCpuCounter = preferences.getBoolean(CPU_COUNTER, CPU_COUNTER_DEFAULT_VALUE)
             enableDebugInfo = preferences.getBoolean(ENABLE_DEBUG_INFO, ENABLE_DEBUG_INFO_DEFAULT_VALUE)

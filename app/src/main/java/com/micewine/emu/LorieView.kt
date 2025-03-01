@@ -24,6 +24,7 @@ import androidx.preference.PreferenceManager
 import com.micewine.emu.activities.EmulationActivity
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION_DEFAULT_VALUE
+import com.micewine.emu.activities.MainActivity.Companion.selectedResolution
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
 import dalvik.annotation.optimization.CriticalNative
@@ -165,7 +166,7 @@ class LorieView : SurfaceView, InputStub {
             val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
             val width = measuredWidth
             val height = measuredHeight
-            val resolution = preferences.getString(DISPLAY_RESOLUTION, DISPLAY_RESOLUTION_DEFAULT_VALUE)!!.split("x".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            val resolution = selectedResolution!!.split("x".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             val w = resolution[0].toInt()
             val h = resolution[1].toInt()
 
