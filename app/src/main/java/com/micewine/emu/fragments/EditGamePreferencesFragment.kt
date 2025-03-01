@@ -1,22 +1,29 @@
 package com.micewine.emu.fragments
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.content.SharedPreferences
+import android.database.DataSetObserver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Spinner
+import android.widget.SpinnerAdapter
+import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.preference.PreferenceManager
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_ICON
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
@@ -29,6 +36,7 @@ import com.micewine.emu.fragments.DisplaySettingsFragment.Companion.resolutions4
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.editGameFromList
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
@@ -37,15 +45,21 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameIcon
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineD3DVersion
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineESync
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineServices
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getVirtualControllerPresets
+import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
 import java.io.File
 
 class EditGamePreferencesFragment : DialogFragment() {
@@ -66,6 +80,9 @@ class EditGamePreferencesFragment : DialogFragment() {
         val selectedDXVKSpinner = view.findViewById<Spinner>(R.id.selectedDXVK)
         val selectedWineD3DSpinner = view.findViewById<Spinner>(R.id.selectedWineD3D)
         val selectedVKD3DSpinner = view.findViewById<Spinner>(R.id.selectedVKD3D)
+        val wineESyncSwitch = view.findViewById<MaterialSwitch>(R.id.wineESync)
+        val wineServicesSwitch = view.findViewById<MaterialSwitch>(R.id.wineServices)
+        val cpuAffinitySpinner = view.findViewById<Spinner>(R.id.cpuAffinity)
         val selectedControllerProfileSpinner = view.findViewById<Spinner>(R.id.selectedControllerProfile)
         val selectedVirtualControllerProfileSpinner = view.findViewById<Spinner>(R.id.selectedVirtualControllerProfile)
         val selectedBox64ProfileSpinner = view.findViewById<Spinner>(R.id.selectedBox64Profile)
@@ -131,9 +148,11 @@ class EditGamePreferencesFragment : DialogFragment() {
                         "16:9" -> {
                             resolutionList = resolutions16_9
                         }
+
                         "4:3" -> {
                             resolutionList = resolutions4_3
                         }
+
                         "Native" -> {
                             resolutionList = getNativeResolutions(requireActivity()).toTypedArray()
                         }
@@ -187,6 +206,7 @@ class EditGamePreferencesFragment : DialogFragment() {
                             selectedWineD3DSpinner.isEnabled = false
                             selectedDXVKSpinner.isEnabled = true
                         }
+
                         "WineD3D" -> {
                             selectedDXVKSpinner.isEnabled = false
                             selectedWineD3DSpinner.isEnabled = true
@@ -267,6 +287,26 @@ class EditGamePreferencesFragment : DialogFragment() {
             }
         }
 
+        wineESyncSwitch.apply {
+            isChecked = getWineESync(selectedGameName)
+
+            setOnClickListener {
+                putWineESync(selectedGameName, isChecked)
+            }
+        }
+
+        wineServicesSwitch.apply {
+            isChecked = getWineServices(selectedGameName)
+
+            setOnClickListener {
+                putWineServices(selectedGameName, isChecked)
+            }
+        }
+
+        cpuAffinitySpinner.apply {
+            adapter = CPUAffinityAdapter(requireActivity(), availableCPUs, cpuAffinitySpinner)
+        }
+
         selectedControllerProfileSpinner.apply {
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, controllerProfilesNames)
             setSelection(controllerProfilesNames.indexOf(getControllerPreset(selectedGameName)))
@@ -280,6 +320,7 @@ class EditGamePreferencesFragment : DialogFragment() {
                 ) {
                     putControllerPreset(selectedGameName, parent?.selectedItem!!.toString())
                 }
+
                 override fun onNothingSelected(parent: AdapterView<*>?) {
                 }
             }
@@ -359,5 +400,95 @@ class EditGamePreferencesFragment : DialogFragment() {
 
     private fun resizeBitmap(originalBitmap: Bitmap, width: Int, height: Int): Bitmap {
         return Bitmap.createScaledBitmap(originalBitmap, width, height, false)
+    }
+
+    companion object {
+        class CPUAffinityAdapter(
+            val activity: Activity,
+            private val arrayElements: Array<String>,
+            private val spinner: Spinner
+        ) : SpinnerAdapter {
+            val checked = BooleanArray(count)
+
+            override fun registerDataSetObserver(p0: DataSetObserver?) {
+            }
+
+            override fun unregisterDataSetObserver(p0: DataSetObserver?) {
+            }
+
+            override fun getCount(): Int {
+                return arrayElements.count()
+            }
+
+            override fun getItem(p0: Int): Any {
+                return arrayElements[p0]
+            }
+
+            override fun getItemId(p0: Int): Long {
+                return p0.toLong()
+            }
+
+            override fun hasStableIds(): Boolean {
+                return true
+            }
+
+            override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View? {
+                val inflater = activity.layoutInflater
+                val view = p1 ?: inflater.inflate(android.R.layout.simple_spinner_item, p2, false)
+
+                view.findViewById<TextView>(android.R.id.text1).apply {
+                    text = getCpuAffinity(selectedGameName)
+                }
+
+                return view
+            }
+
+            override fun getItemViewType(p0: Int): Int {
+                return 0
+            }
+
+            override fun getViewTypeCount(): Int {
+                return 1
+            }
+
+            override fun isEmpty(): Boolean {
+                return arrayElements.isEmpty()
+            }
+
+            override fun getDropDownView(p0: Int, p1: View?, p2: ViewGroup?): View {
+                val inflater = activity.layoutInflater
+                val view = inflater.inflate(R.layout.item_checkbox, p2, false)
+                val checkBox = view.findViewById<CheckBox>(R.id.checkbox)
+                val cpuAffinity = getCpuAffinity(selectedGameName)
+
+                checked[p0] = cpuAffinity.contains(arrayElements[p0]) == true
+
+                checkBox.isChecked = checked[p0]
+                checkBox.text = arrayElements[p0]
+
+                checkBox.setOnClickListener {
+                    checked[p0] = !checked[p0]
+
+                    val builder: StringBuilder = StringBuilder()
+
+                    for (i in checked.indices) {
+                        if (checked[i]) {
+                            builder.append(",")
+                            builder.append(arrayElements[i])
+                        }
+                    }
+
+                    if (builder.isNotEmpty()) {
+                        builder.deleteCharAt(0)
+                    }
+
+                    putCpuAffinity(selectedGameName, builder.toString())
+
+                    spinner.adapter = this
+                }
+
+                return view
+            }
+        }
     }
 }

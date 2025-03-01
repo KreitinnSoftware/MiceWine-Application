@@ -54,6 +54,7 @@ import com.micewine.emu.databinding.FragmentShortcutsBinding
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_WINE_PREFIX
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.preferences
+import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.max
@@ -319,6 +320,60 @@ class ShortcutsFragment : Fragment() {
             gameList = getGameList(context)
         }
 
+        fun putCpuAffinity(name: String, cpuCores: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].cpuAffinityCores = cpuCores
+
+            saveShortcuts()
+        }
+
+        fun getCpuAffinity(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return availableCPUs.joinToString(",")
+
+            return gameList[index].cpuAffinityCores
+        }
+
+        fun putWineServices(name: String, enabled: Boolean) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].wineServices = enabled
+
+            saveShortcuts()
+        }
+
+        fun getWineServices(name: String): Boolean {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return true
+
+            return gameList[index].wineServices
+        }
+
+        fun putWineESync(name: String, enabled: Boolean) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].wineESync = enabled
+
+            saveShortcuts()
+        }
+
+        fun getWineESync(name: String): Boolean {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return true
+
+            return gameList[index].wineESync
+        }
+
         fun putVKD3DVersion(name: String, vkd3dVersion: String) {
             val index = gameList.indexOfFirst { it.name == name }
 
@@ -472,7 +527,7 @@ class ShortcutsFragment : Fragment() {
             }
 
             gameList.add(
-                GameItem(prettyName, path, "", icon, "", "", "", "16:9", "1280x720", "DXVK", "", "", "")
+                GameItem(prettyName, path, "", icon, "", "", "", "16:9", "1280x720", "DXVK", "", "", "", true, false, availableCPUs.joinToString(","))
             )
             gameListNames.add(
                 AdapterGame.GameItem(prettyName, path, "", icon)
@@ -551,7 +606,7 @@ class ShortcutsFragment : Fragment() {
             val listType = object : TypeToken<MutableList<GameItem>>() {}.type
 
             return gson.fromJson(json, listType) ?: mutableListOf(
-                GameItem(context.getString(R.string.desktop_mode_init), context.getString(R.string.desktop_mode_init), "", "", "", "", "", "", "", "DXVK", "", "", "")
+                GameItem(context.getString(R.string.desktop_mode_init), context.getString(R.string.desktop_mode_init), "", "", "", "", "", "", "", "DXVK", "", "", "", true, false, availableCPUs.joinToString(","))
             )
         }
 
@@ -599,7 +654,10 @@ class ShortcutsFragment : Fragment() {
             var d3dxRenderer: String,
             var dxvkVersion: String,
             var wineD3DVersion: String,
-            var vkd3dVersion: String
+            var vkd3dVersion: String,
+            var wineESync: Boolean,
+            var wineServices: Boolean,
+            var cpuAffinityCores: String
         )
     }
 }

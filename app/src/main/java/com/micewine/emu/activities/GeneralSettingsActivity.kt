@@ -5,14 +5,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.databinding.ActivityGeneralSettingsBinding

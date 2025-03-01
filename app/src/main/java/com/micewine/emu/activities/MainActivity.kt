@@ -47,13 +47,10 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CPU_AFFINITY
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_SERVICES
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_SERVICES_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.FPS_LIMIT
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.PA_SINK
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.PA_SINK_DEFAULT_VALUE
@@ -69,8 +66,6 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_ME
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_TU_DEBUG_PRESET
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_ESYNC_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL_DEFAULT_VALUE
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET_KEY
@@ -118,10 +113,10 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.SoundSettingsFragment.Companion.generatePAFile
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
-import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.utils.DriveUtils
 import com.micewine.emu.utils.FilePathResolver
 import io.ByteWriter
@@ -699,7 +694,7 @@ class MainActivity : AppCompatActivity() {
                 runCommand(getEnv() + "LD_PRELOAD=$skCodec $usrDir/bin/pulseaudio --start --exit-idle=-1")
             }
 
-            if (!enableServices) {
+            if (!getWineServices(selectedGameName)) {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         val processName = if (exePath == "") "TFM.exe" else File(exePath).name
@@ -959,7 +954,6 @@ class MainActivity : AppCompatActivity() {
         var enableDebugInfo: Boolean = false
         var enableDRI3: Boolean = false
         var enableMangoHUD: Boolean = false
-        var enableServices: Boolean = false
         var appLang: String? = null
         var box64LogLevel: String? = null
         var box64Mmap32: String? = null
@@ -984,7 +978,6 @@ class MainActivity : AppCompatActivity() {
         var box64ShowBt: String? = null
         var box64NoSigSegv: String? = null
         var box64NoSigill: String? = null
-        var wineESync: String? = null
         var wineLogLevel: String? = null
         var selectedBox64: String? = null
         var selectedDriver: String? = null
@@ -1007,7 +1000,6 @@ class MainActivity : AppCompatActivity() {
         var selectedFile: String = ""
         var miceWineVersion: String = "MiceWine ${BuildConfig.VERSION_NAME} (git-${BuildConfig.GIT_SHORT_SHA})"
         var vulkanDriverDeviceName: String? = null
-        var cpuAffinity: String? = null
         var screenFpsLimit: Int = 60
         var fpsLimit: Int = 0
         var paSink: String? = null
@@ -1096,8 +1088,6 @@ class MainActivity : AppCompatActivity() {
 
             enableDRI3 = preferences.getBoolean(ENABLE_DRI3, ENABLE_DRI3_DEFAULT_VALUE)
             enableMangoHUD = preferences.getBoolean(ENABLE_MANGOHUD, ENABLE_MANGOHUD_DEFAULT_VALUE)
-            enableServices = preferences.getBoolean(ENABLE_SERVICES, ENABLE_SERVICES_DEFAULT_VALUE)
-            wineESync = strBoolToNumStr(preferences.getBoolean(WINE_ESYNC, WINE_ESYNC_DEFAULT_VALUE))
             wineLogLevel = preferences.getString(WINE_LOG_LEVEL, WINE_LOG_LEVEL_DEFAULT_VALUE)
             selectedDriver = preferences.getString(SELECTED_DRIVER, SELECTED_DRIVER_DEFAULT_VALUE)
 
@@ -1116,8 +1106,6 @@ class MainActivity : AppCompatActivity() {
             enableRamCounter = preferences.getBoolean(RAM_COUNTER, RAM_COUNTER_DEFAULT_VALUE)
             enableCpuCounter = preferences.getBoolean(CPU_COUNTER, CPU_COUNTER_DEFAULT_VALUE)
             enableDebugInfo = preferences.getBoolean(ENABLE_DEBUG_INFO, ENABLE_DEBUG_INFO_DEFAULT_VALUE)
-
-            cpuAffinity = preferences.getString(CPU_AFFINITY, availableCPUs.joinToString(","))
 
             screenFpsLimit = (activity.getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay.refreshRate.toInt()
             fpsLimit = preferences.getInt(FPS_LIMIT, screenFpsLimit)

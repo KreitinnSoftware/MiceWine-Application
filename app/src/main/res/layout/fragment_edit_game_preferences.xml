@@ -208,6 +208,70 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:text="@string/wine_settings_title">
+            </TextView>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:text="@string/wine_esync_title">
+            </TextView>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/wineESync"
+                android:theme="@style/Theme.MiceWine"
+                android:gravity="center_vertical"
+                android:layout_marginStart="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+            </com.google.android.material.materialswitch.MaterialSwitch>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:text="@string/enable_wine_services_title">
+            </TextView>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/wineServices"
+                android:theme="@style/Theme.MiceWine"
+                android:gravity="center_vertical"
+                android:layout_marginStart="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+            </com.google.android.material.materialswitch.MaterialSwitch>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:text="@string/cpu_affinity_title">
+            </TextView>
+
+            <Spinner
+                android:id="@+id/cpuAffinity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+            </Spinner>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 android:text="@string/others">
             </TextView>
 

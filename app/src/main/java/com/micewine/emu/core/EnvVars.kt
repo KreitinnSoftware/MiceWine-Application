@@ -32,7 +32,6 @@ import com.micewine.emu.activities.MainActivity.Companion.box64ShowBt
 import com.micewine.emu.activities.MainActivity.Companion.box64ShowSegv
 import com.micewine.emu.activities.MainActivity.Companion.box64Sse42
 import com.micewine.emu.activities.MainActivity.Companion.enableDRI3
-import com.micewine.emu.activities.MainActivity.Companion.enableMangoHUD
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedBox64
@@ -43,10 +42,11 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedGLProfile
 import com.micewine.emu.activities.MainActivity.Companion.selectedWine
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
-import com.micewine.emu.activities.MainActivity.Companion.wineESync
 import com.micewine.emu.activities.MainActivity.Companion.wineLogLevel
+import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.fragments.EnvVarsSettingsFragment.Companion.ENV_VARS_KEY
 import com.micewine.emu.fragments.EnvironmentVariable
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 
 object EnvVars {
     private lateinit var sharedPreferences: SharedPreferences
@@ -149,6 +149,6 @@ object EnvVars {
             vars.add("WINEDEBUG=-all")
         }
 
-        vars.add("WINEESYNC=$wineESync")
+        vars.add("WINEESYNC=${getWineESync(selectedGameName)}")
     }
 }
