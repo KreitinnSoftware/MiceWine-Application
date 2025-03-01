@@ -202,4 +202,5 @@
     <string name="sound_settings_title">Sound Settings</string>
     <string name="sound_settings_description">Manage Sound Settings</string>
     <string name="select_audio_sink">Select PulseAudio Sink</string>
+    <string name="others">Others</string>
 </resources>

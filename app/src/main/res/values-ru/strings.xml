@@ -174,4 +174,5 @@
     <string name="sound_settings_title">Настройки звука</string>
     <string name="sound_settings_description">Управление настройками звука</string>
     <string name="select_audio_sink">Выберите аудиовыход PulseAudio</string>
+    <string name="others">Другие</string>
 </resources>

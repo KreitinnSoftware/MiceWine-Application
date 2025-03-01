@@ -178,4 +178,5 @@
     <string name="sound_settings_title">声音设置</string>
     <string name="sound_settings_description">管理声音设置</string>
     <string name="select_audio_sink">选择 PulseAudio 输出</string>
+    <string name="others">其他</string>
 </resources>

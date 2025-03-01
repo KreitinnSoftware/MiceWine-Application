@@ -179,4 +179,5 @@
     <string name="sound_settings_title">Configurações de Som</string>
     <string name="sound_settings_description">Gerenciar Configurações de Som</string>
     <string name="select_audio_sink">Selecionar Saida de Áudio do PulseAudio</string>
+    <string name="others">Outros</string>
 </resources>

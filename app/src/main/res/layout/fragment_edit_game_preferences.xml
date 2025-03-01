@@ -51,7 +51,6 @@
 
                     <EditText
                         android:id="@+id/editTextNewName"
-                        android:layout_marginTop="16dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:importantForAutofill="no"
@@ -76,13 +75,21 @@
 
             <EditText
                 android:id="@+id/appArgumentsEditText"
-                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:importantForAutofill="no"
                 android:inputType="text"
                 tools:ignore="LabelFor">
             </EditText>
+
+            <TextView
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/display_settings_title">
+            </TextView>
 
             <TextView
                 android:layout_marginTop="16dp"
@@ -98,7 +105,7 @@
                 android:id="@+id/selectedDisplayMode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="8dp">
             </Spinner>
 
             <TextView
@@ -115,8 +122,17 @@
                 android:id="@+id/selectedDisplayResolution"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="8dp">
             </Spinner>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/driver_settings_title">
+            </TextView>
 
             <TextView
                 android:layout_marginTop="16dp"
@@ -132,7 +148,7 @@
                 android:id="@+id/selectedD3DXRenderer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="8dp">
             </Spinner>
 
             <TextView
@@ -149,7 +165,7 @@
                 android:id="@+id/selectedDXVK"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="8dp">
             </Spinner>
 
             <TextView
@@ -166,7 +182,7 @@
                 android:id="@+id/selectedWineD3D"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="8dp">
             </Spinner>
 
             <TextView
@@ -183,8 +199,17 @@
                 android:id="@+id/selectedVKD3D"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="8dp">
             </Spinner>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/others">
+            </TextView>
 
             <TextView
                 android:layout_marginTop="16dp"
@@ -200,7 +225,7 @@
                 android:id="@+id/selectedControllerProfile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="8dp">
             </Spinner>
 
             <TextView
@@ -217,7 +242,7 @@
                 android:id="@+id/selectedVirtualControllerProfile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="8dp">
             </Spinner>
 
             <TextView
@@ -234,7 +259,7 @@
                 android:id="@+id/selectedBox64Profile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="8dp">
             </Spinner>
 
         </LinearLayout>
