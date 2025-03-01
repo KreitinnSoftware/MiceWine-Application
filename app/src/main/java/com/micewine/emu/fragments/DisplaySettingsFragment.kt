@@ -52,12 +52,6 @@ class DisplaySettingsFragment : Fragment() {
 
         settingsList.clear()
 
-        addToAdapter(R.string.display_mode_title, R.string.display_mode_description, arrayOf(
-            "16:9", "4:3", "Native"
-            ),
-            SPINNER, DISPLAY_MODE_DEFAULT_VALUE, DISPLAY_MODE)
-        addToAdapter(R.string.display_resolution_title, R.string.display_resolution_description, null,
-            SPINNER, DISPLAY_RESOLUTION_DEFAULT_VALUE, DISPLAY_RESOLUTION)
         addToAdapter(R.string.enable_ram_counter, R.string.enable_ram_counter_description, null,
             SWITCH, RAM_COUNTER_DEFAULT_VALUE, RAM_COUNTER)
         addToAdapter(R.string.enable_cpu_counter, R.string.enable_cpu_counter_description, null,

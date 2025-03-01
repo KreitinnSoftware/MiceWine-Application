@@ -107,10 +107,6 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val activ
         }
 
         override fun onLongClick(v: View): Boolean {
-            if (adapterPosition == 0) {
-                return true
-            }
-
             val gameModel = gameList[adapterPosition]
 
             selectedGameName = gameModel.name

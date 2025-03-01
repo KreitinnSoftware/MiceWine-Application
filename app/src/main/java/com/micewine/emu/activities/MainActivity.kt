@@ -123,6 +123,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.ACTION_UPDATE_WINE
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToLauncher
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToList
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.SoundSettingsFragment.Companion.generatePAFile
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
@@ -169,6 +170,11 @@ class MainActivity : AppCompatActivity() {
 
                     if (exePath != getString(R.string.desktop_mode_init)) {
                         setBox64Preset(this@MainActivity, getBox64Preset(selectedGameName))
+                    }
+
+                    preferences!!.edit().apply {
+                        putString(DISPLAY_RESOLUTION, getDisplaySettings(selectedGameName)[1])
+                        apply()
                     }
 
                     lifecycleScope.launch { runXServer(":0") }
@@ -447,7 +453,11 @@ class MainActivity : AppCompatActivity() {
         menuInfo: ContextMenu.ContextMenuInfo?
     ) {
         if (selectedFragment == "ShortcutsFragment") {
-            menuInflater.inflate(R.menu.game_list_context_menu, menu)
+            if (selectedGameName == getString(R.string.desktop_mode_init)) {
+                menuInflater.inflate(R.menu.game_list_context_menu_lite, menu)
+            } else {
+                menuInflater.inflate(R.menu.game_list_context_menu, menu)
+            }
         } else if (selectedFragment == "FileManagerFragment") {
             menuInflater.inflate(R.menu.file_list_context_menu, menu)
         }

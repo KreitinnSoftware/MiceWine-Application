@@ -602,9 +602,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         lorieView?.requestFocus()
     }
 
-    /** @noinspection NullableProblems
-     */
-    @SuppressLint("WrongConstant")
     override fun onApplyWindowInsets(v: View, insets: WindowInsets): WindowInsets {
         handler.postDelayed({ lorieView!!.triggerCallback() }, 100)
         return insets

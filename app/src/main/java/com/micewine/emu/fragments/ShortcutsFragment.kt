@@ -319,6 +319,25 @@ class ShortcutsFragment : Fragment() {
             gameList = getGameList(context)
         }
 
+        fun putDisplaySettings(name: String, displayMode: String, displayResolution: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].displayMode = displayMode
+            gameList[index].displayResolution = displayResolution
+
+            saveShortcuts()
+        }
+
+        fun getDisplaySettings(name: String): List<String> {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return listOf("16:9", "1280x720")
+
+            return listOf(gameList[index].displayMode, gameList[index].displayResolution)
+        }
+
         fun putBox64Preset(name: String, presetName: String) {
             val index = gameList.indexOfFirst { it.name == name }
 
@@ -381,7 +400,7 @@ class ShortcutsFragment : Fragment() {
             }
 
             gameList.add(
-                GameItem(prettyName, path, "", icon, "--", "--", "--")
+                GameItem(prettyName, path, "", icon, "--", "--", "--", "16:9", "1280x720")
             )
             gameListNames.add(
                 AdapterGame.GameItem(prettyName, path, "", icon)
@@ -460,7 +479,7 @@ class ShortcutsFragment : Fragment() {
             val listType = object : TypeToken<MutableList<GameItem>>() {}.type
 
             return gson.fromJson(json, listType) ?: mutableListOf(
-                GameItem(context.getString(R.string.desktop_mode_init), context.getString(R.string.desktop_mode_init), "", "", "--", "--", "--")
+                GameItem(context.getString(R.string.desktop_mode_init), context.getString(R.string.desktop_mode_init), "", "", "--", "--", "--", "--", "--")
             )
         }
 
@@ -502,7 +521,9 @@ class ShortcutsFragment : Fragment() {
             var iconPath: String,
             var box64Preset: String,
             var controllerPreset: String,
-            var virtualControllerPreset: String
+            var virtualControllerPreset: String,
+            var displayMode: String,
+            var displayResolution: String
         )
     }
 }

@@ -5,7 +5,9 @@ import android.app.Dialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
@@ -21,14 +23,19 @@ import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_ICON
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Presets
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getControllerPresets
+import com.micewine.emu.fragments.DisplaySettingsFragment.Companion.getNativeResolutions
+import com.micewine.emu.fragments.DisplaySettingsFragment.Companion.resolutions16_9
+import com.micewine.emu.fragments.DisplaySettingsFragment.Companion.resolutions4_3
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.editGameFromList
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameExeArguments
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameIcon
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerPreset
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getVirtualControllerPresets
 
@@ -44,6 +51,8 @@ class EditGamePreferencesFragment : DialogFragment() {
         val editTextArguments = view.findViewById<EditText>(R.id.appArgumentsEditText)
         val buttonContinue = view.findViewById<Button>(R.id.buttonContinue)
         val buttonCancel = view.findViewById<Button>(R.id.buttonCancel)
+        val selectedDisplayModeSpinner = view.findViewById<Spinner>(R.id.selectedDisplayMode)
+        val selectedDisplayResolutionSpinner = view.findViewById<Spinner>(R.id.selectedDisplayResolution)
         val selectedControllerProfileSpinner = view.findViewById<Spinner>(R.id.selectedControllerProfile)
         val selectedVirtualControllerProfileSpinner = view.findViewById<Spinner>(R.id.selectedVirtualControllerProfile)
         val selectedBox64ProfileSpinner = view.findViewById<Spinner>(R.id.selectedBox64Profile)
@@ -67,6 +76,17 @@ class EditGamePreferencesFragment : DialogFragment() {
         editTextNewName.setText(selectedGameName)
         editTextArguments.setText(getGameExeArguments(selectedGameName))
 
+        if (selectedGameName == getString(R.string.desktop_mode_init)) {
+            editTextNewName.isEnabled = false
+            editTextArguments.isEnabled = false
+
+            imageView?.setImageBitmap(
+                resizeBitmap(
+                    BitmapFactory.decodeResource(requireActivity().resources, R.drawable.default_icon), imageView?.layoutParams?.width!!, imageView?.layoutParams?.height!!
+                )
+            )
+        }
+
         imageView?.setOnClickListener {
             requireActivity().sendBroadcast(
                 Intent(ACTION_SELECT_ICON)
@@ -89,53 +109,117 @@ class EditGamePreferencesFragment : DialogFragment() {
             box64ProfilesNames.add(it[0])
         }
 
-        selectedControllerProfileSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, controllerProfilesNames)
-        selectedControllerProfileSpinner.setSelection(controllerProfilesNames.indexOf(getControllerPreset(selectedGameName)))
+        selectedDisplayModeSpinner.apply {
+            val aspectRatios = listOf("16:9", "4:3", "Native")
+            val displaySettings = getDisplaySettings(selectedGameName)
 
-        selectedVirtualControllerProfileSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, virtualControllerProfilesNames)
-        selectedVirtualControllerProfileSpinner.setSelection(virtualControllerProfilesNames.indexOf(getVirtualControllerPreset(selectedGameName)))
+            adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, aspectRatios)
+            setSelection(aspectRatios.indexOf(displaySettings[0]))
 
-        selectedBox64ProfileSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, box64ProfilesNames)
-        selectedBox64ProfileSpinner.setSelection(box64ProfilesNames.indexOf(getBox64Preset(selectedGameName)))
+            onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val selectedItem = parent?.getItemAtPosition(position).toString()
+                    var resolutionList: Array<String>? = null
 
-        selectedControllerProfileSpinner.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                putControllerPreset(selectedGameName, parent?.selectedItem!!.toString())
-            }
-            override fun onNothingSelected(parent: AdapterView<*>?) {
+                    when (selectedItem) {
+                        "16:9" -> {
+                            resolutionList = resolutions16_9
+                        }
+                        "4:3" -> {
+                            resolutionList = resolutions4_3
+                        }
+                        "Native" -> {
+                            resolutionList = getNativeResolutions(requireActivity()).toTypedArray()
+                        }
+                    }
+
+                    selectedDisplayResolutionSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, resolutionList!!)
+                    selectedDisplayResolutionSpinner.setSelection(resolutionList.indexOf(displaySettings[1]))
+
+                    putDisplaySettings(selectedGameName, selectedItem, getDisplaySettings(selectedGameName)[1])
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
             }
         }
 
-        selectedVirtualControllerProfileSpinner.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                putVirtualControllerPreset(selectedGameName, parent?.selectedItem!!.toString())
-            }
+        selectedDisplayResolutionSpinner.apply {
+            onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val selectedItem = parent?.getItemAtPosition(position).toString()
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
+                    putDisplaySettings(selectedGameName, getDisplaySettings(selectedGameName)[0], selectedItem)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
             }
         }
 
-        selectedBox64ProfileSpinner.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                putBox64Preset(selectedGameName, parent?.selectedItem!!.toString())
-            }
+        selectedControllerProfileSpinner.apply {
+            adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, controllerProfilesNames)
+            setSelection(controllerProfilesNames.indexOf(getControllerPreset(selectedGameName)))
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
+            onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    putControllerPreset(selectedGameName, parent?.selectedItem!!.toString())
+                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+        }
+
+        selectedVirtualControllerProfileSpinner.apply {
+            adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, virtualControllerProfilesNames)
+            setSelection(virtualControllerProfilesNames.indexOf(getVirtualControllerPreset(selectedGameName)))
+
+            onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    putVirtualControllerPreset(selectedGameName, parent?.selectedItem!!.toString())
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+        }
+
+        selectedBox64ProfileSpinner.apply {
+            adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, box64ProfilesNames)
+            setSelection(box64ProfilesNames.indexOf(getBox64Preset(selectedGameName)))
+
+            onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    putBox64Preset(selectedGameName, parent?.selectedItem!!.toString())
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
             }
         }
 
