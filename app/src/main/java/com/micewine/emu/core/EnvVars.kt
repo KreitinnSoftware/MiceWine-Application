@@ -40,6 +40,7 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedMesaVkWsiPrese
 import com.micewine.emu.activities.MainActivity.Companion.selectedTuDebugPreset
 import com.micewine.emu.activities.MainActivity.Companion.selectedGLProfile
 import com.micewine.emu.activities.MainActivity.Companion.selectedWine
+import com.micewine.emu.activities.MainActivity.Companion.strBoolToNumStr
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.activities.MainActivity.Companion.wineLogLevel
@@ -149,6 +150,6 @@ object EnvVars {
             vars.add("WINEDEBUG=-all")
         }
 
-        vars.add("WINEESYNC=${getWineESync(selectedGameName)}")
+        vars.add("WINEESYNC=${strBoolToNumStr(getWineESync(selectedGameName))}")
     }
 }

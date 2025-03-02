@@ -1069,7 +1069,7 @@ class MainActivity : AppCompatActivity() {
             return strBoolToNumStr(strBool.toBoolean())
         }
 
-        private fun strBoolToNumStr(strBool: Boolean): String {
+        fun strBoolToNumStr(strBool: Boolean): String {
             return if (strBool) "1" else "0"
         }
 
