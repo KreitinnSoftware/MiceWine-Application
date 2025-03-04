@@ -28,15 +28,15 @@
 
     <string name="full_screen">Tela Cheia</string>
     <string name="settings_title">Configurações</string>
-    <string name="settings_description">Configurar MiceWine</string>
+    <string name="settings_description">Configurar Windroid</string>
     <string name="app_close">Sair</string>
     <string name="log_title">Log</string>
-    <string name="log_description">Ver Logs do MiceWine</string>
+    <string name="log_description">Ver Logs do Windroid</string>
     <string name="clear_log">Limpar</string>
     <string name="desktop_mode_init">Área de Trabalho</string>
     <string name="about_title">Sobre</string>
     <string name="home_title">Início</string>
-    <string name="about_description">Sobre o MiceWine</string>
+    <string name="about_description">Sobre o Windroid</string>
     <string name="general_settings">Configurações Gerais</string>
     <string name="exit">Sair</string>
     <string name="open_keyboard">Abrir Teclado</string>
@@ -77,7 +77,7 @@
     <string name="mouse_sensibility_title">Sensibilidade do Mouse Virtual</string>
     <string name="dead_zone_title">Dead Zone</string>
     <string name="open_overlay">Abrir/Fechar Overlay</string>
-    <string name="welcome_text">Bem-vindo(a) ao MiceWine!</string>
+    <string name="welcome_text">Bem-vindo(a) ao Windroid!</string>
     <string name="continue_text">Continuar</string>
     <string name="confirm_text">Confirmar</string>
     <string name="get_file_permission_text">Permita o Gerenciamento de Arquivos</string>
