@@ -196,16 +196,16 @@ class MainActivity : AppCompatActivity() {
                                     }
 
                                     runWineIntent.putExtra("exePath", drive.getUnixPath())
-
-                                    sendBroadcast(runWineIntent)
-
-                                    startActivity(Intent(this@MainActivity, EmulationActivity::class.java))
                                 } catch(_: ShellLinkException) {
                                     Toast.makeText(this@MainActivity, getString(R.string.lnk_read_fail), Toast.LENGTH_SHORT).show()
                                 }
                             } else {
                                 runWineIntent.putExtra("exePath", file.path)
                             }
+
+                            sendBroadcast(runWineIntent)
+
+                            startActivity(Intent(this@MainActivity, EmulationActivity::class.java))
                         } else if (file.name.endsWith("rat")) {
                             ratCandidate = RatPackageManager.RatPackage(file.path)
                             AskInstallRatPackageFragment().show(supportFragmentManager, "")
