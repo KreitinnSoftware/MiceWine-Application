@@ -256,6 +256,44 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textStyle="bold"
+                android:text="@string/enable_wine_virtual_desktop">
+            </TextView>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/enableWineVirtualDesktop"
+                android:theme="@style/Theme.MiceWine"
+                android:gravity="center_vertical"
+                android:layout_marginStart="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+            </com.google.android.material.materialswitch.MaterialSwitch>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:text="@string/enable_xinput_title">
+            </TextView>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/enableXInput"
+                android:theme="@style/Theme.MiceWine"
+                android:gravity="center_vertical"
+                android:layout_marginStart="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+            </com.google.android.material.materialswitch.MaterialSwitch>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 android:text="@string/cpu_affinity_title">
             </TextView>
 

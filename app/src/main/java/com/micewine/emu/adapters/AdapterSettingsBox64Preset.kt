@@ -13,12 +13,8 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CHECKBOX
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_MODE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SEEKBAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SWITCH
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName

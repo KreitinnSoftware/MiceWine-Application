@@ -77,6 +77,7 @@ import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.HighlightState
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.RatPackageManager.installRat
+import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
@@ -114,6 +115,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineVirtualDesktop
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.SoundSettingsFragment.Companion.generatePAFile
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
@@ -710,22 +712,33 @@ class MainActivity : AppCompatActivity() {
             if (exePath == "") {
                 WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler ${getCpuHexMask()} TFM")
             } else {
-                WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe ${getCpuHexMask()}")
+                if (getWineVirtualDesktop(selectedGameName)) {
+                    if (exePath.endsWith(".lnk")) {
+                        val drive = DriveUtils.parseWindowsPath(ShellLink(exePath).resolveTarget())
 
-                if (exePath.endsWith(".lnk")) {
-                    try {
-                        val shell = ShellLink(exePath)
-                        val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
-                        if (drive != null) {
-                            WineWrapper.wine("'${getSanitizedPath(drive.getUnixPath())}' $exeArguments", "'${getSanitizedPath(File(drive.getUnixPath()).parent!!)}'")
-                        }
-                    }
-                    catch (e: ShellLinkException) {
-                        runOnUiThread {
+                        if (drive == null) {
                             Toast.makeText(this@MainActivity, getString(R.string.lnk_read_fail), Toast.LENGTH_SHORT).show()
+                            return@withContext
                         }
+
+                        WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler ${getCpuHexMask()} '${getSanitizedPath(drive.getUnixPath())}' $exeArguments", "'${getSanitizedPath(File(drive.getUnixPath()).parent!!)}'")
                     }
+
+                    WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler ${getCpuHexMask()} '${getSanitizedPath(exePath)}' $exeArguments", "'${getSanitizedPath(File(exePath).parent!!)}'")
                 } else {
+                    WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe ${getCpuHexMask()}")
+
+                    if (exePath.endsWith(".lnk")) {
+                        val drive = DriveUtils.parseWindowsPath(ShellLink(exePath).resolveTarget())
+
+                        if (drive == null) {
+                            Toast.makeText(this@MainActivity, getString(R.string.lnk_read_fail), Toast.LENGTH_SHORT).show()
+                            return@withContext
+                        }
+
+                        WineWrapper.wine("'${getSanitizedPath(drive.getUnixPath())}' $exeArguments", "'${getSanitizedPath(File(drive.getUnixPath()).parent!!)}'")
+                    }
+
                     WineWrapper.wine("'${getSanitizedPath(exePath)}' $exeArguments", "'${getSanitizedPath(File(exePath).parent!!)}'")
                 }
             }

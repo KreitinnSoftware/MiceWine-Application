@@ -180,4 +180,6 @@
     <string name="sound_settings_description">Gerenciar Configurações de Som</string>
     <string name="select_audio_sink">Selecionar Saida de Áudio do PulseAudio</string>
     <string name="others">Outros</string>
+    <string name="enable_xinput_title">Ativar Controle XInput</string>
+    <string name="enable_wine_virtual_desktop">Ativar Área de Trabalho Virtual Wine</string>
 </resources>

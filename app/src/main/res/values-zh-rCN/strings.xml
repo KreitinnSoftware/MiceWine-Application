@@ -179,4 +179,6 @@
     <string name="sound_settings_description">管理声音设置</string>
     <string name="select_audio_sink">选择 PulseAudio 输出</string>
     <string name="others">其他</string>
+    <string name="enable_xinput_title">启用 XInput 游戏手柄</string>
+    <string name="enable_wine_virtual_desktop">启用 Wine 虚拟桌面</string>
 </resources>

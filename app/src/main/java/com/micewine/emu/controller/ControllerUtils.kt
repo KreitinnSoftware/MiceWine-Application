@@ -1,6 +1,7 @@
 package com.micewine.emu.controller
 
 import android.content.Context
+import android.util.Log
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_BUTTON_A
@@ -49,16 +50,38 @@ import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_THUMBR
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_Y_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
+import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.aPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.bPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.dpadStatus
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.l1Pressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.lt
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.lx
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.ly
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.r1Pressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.rt
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.rx
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.ry
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.selectPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.startPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.thumbLPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.thumbRPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.xPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.yPressed
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getDeadZone
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMapping
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMouseSensibility
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getEnableXInput
 import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
 import com.micewine.emu.input.InputStub.BUTTON_UNDEFINED
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.nio.ByteBuffer
 import kotlin.math.absoluteValue
 
 object ControllerUtils {
@@ -95,6 +118,7 @@ object ControllerUtils {
     private var mouseSensibility: Float = 0F
     private var axisXVelocity: Float = 0F
     private var axisYVelocity: Float = 0F
+    private var enableXInput: Boolean = false
 
     private const val LEFT = 1
     private const val RIGHT = 2
@@ -142,18 +166,18 @@ object ControllerUtils {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
 
         buttonA_mapping = detectKey(context, presetName, BUTTON_A_KEY)
-        buttonX_mapping = detectKey(context, presetName,BUTTON_X_KEY)
-        buttonB_mapping = detectKey(context, presetName,BUTTON_B_KEY)
-        buttonY_mapping = detectKey(context, presetName,BUTTON_Y_KEY)
+        buttonX_mapping = detectKey(context, presetName, BUTTON_X_KEY)
+        buttonB_mapping = detectKey(context, presetName, BUTTON_B_KEY)
+        buttonY_mapping = detectKey(context, presetName, BUTTON_Y_KEY)
 
-        buttonR1_mapping = detectKey(context, presetName,BUTTON_R1_KEY)
-        buttonR2_mapping = detectKey(context, presetName,BUTTON_R2_KEY)
+        buttonR1_mapping = detectKey(context, presetName, BUTTON_R1_KEY)
+        buttonR2_mapping = detectKey(context, presetName, BUTTON_R2_KEY)
 
-        buttonL1_mapping = detectKey(context, presetName,BUTTON_L1_KEY)
-        buttonL2_mapping = detectKey(context, presetName,BUTTON_L2_KEY)
+        buttonL1_mapping = detectKey(context, presetName, BUTTON_L1_KEY)
+        buttonL2_mapping = detectKey(context, presetName, BUTTON_L2_KEY)
 
-        buttonThumbL_mapping = detectKey(context, presetName,BUTTON_THUMBL_KEY)
-        buttonThumbR_mapping = detectKey(context, presetName,BUTTON_THUMBR_KEY)
+        buttonThumbL_mapping = detectKey(context, presetName, BUTTON_THUMBL_KEY)
+        buttonThumbR_mapping = detectKey(context, presetName, BUTTON_THUMBR_KEY)
 
         buttonStart_mapping = detectKey(context, presetName,BUTTON_START_KEY)
         buttonSelect_mapping = detectKey(context, presetName, BUTTON_SELECT_KEY)
@@ -178,6 +202,8 @@ object ControllerUtils {
 
         deadZone = getDeadZone(presetName ?: preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
         mouseSensibility = getMouseSensibility(presetName ?: preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
+
+        enableXInput = getEnableXInput(selectedGameName)
     }
 
     private fun getGameControllerIds(): List<Int> {
@@ -219,73 +245,125 @@ object ControllerUtils {
 
         return when (e.keyCode) {
             KEYCODE_BUTTON_Y -> {
-                handleKey(lorieView, pressed, buttonY_mapping)
+                if (enableXInput) {
+                    yPressed = pressed
+                } else {
+                    handleKey(lorieView, pressed, buttonY_mapping)
+                }
 
                 true
             }
 
             KEYCODE_BUTTON_A -> {
-                handleKey(lorieView, pressed, buttonA_mapping)
+                if (enableXInput) {
+                    aPressed = pressed
+                } else {
+                    handleKey(lorieView, pressed, buttonA_mapping)
+                }
 
                 true
             }
 
             KEYCODE_BUTTON_B -> {
-                handleKey(lorieView, pressed, buttonB_mapping)
+                if (enableXInput) {
+                    bPressed = pressed
+                } else {
+                    handleKey(lorieView, pressed, buttonB_mapping)
+                }
 
                 true
             }
 
             KEYCODE_BUTTON_X -> {
-                handleKey(lorieView, pressed, buttonX_mapping)
+                if (enableXInput) {
+                    xPressed = pressed
+                } else {
+                    handleKey(lorieView, pressed, buttonX_mapping)
+                }
 
                 true
             }
 
             KEYCODE_BUTTON_START -> {
-                handleKey(lorieView, pressed, buttonStart_mapping)
+                if (enableXInput) {
+                    startPressed = pressed
+                } else {
+                    handleKey(lorieView, pressed, buttonStart_mapping)
+                }
 
                 true
             }
 
             KEYCODE_BUTTON_SELECT -> {
-                handleKey(lorieView, pressed, buttonSelect_mapping)
+                if (enableXInput) {
+                    selectPressed = pressed
+                } else {
+                    handleKey(lorieView, pressed, buttonSelect_mapping)
+                }
 
                 true
             }
 
             KEYCODE_BUTTON_R1 -> {
-                handleKey(lorieView, pressed, buttonR1_mapping)
+                if (enableXInput) {
+                    r1Pressed = pressed
+                } else {
+                    handleKey(lorieView, pressed, buttonR1_mapping)
+                }
 
                 true
             }
 
             KEYCODE_BUTTON_R2 -> {
-                handleKey(lorieView, pressed, buttonR2_mapping)
+                if (enableXInput) {
+                    rt[0] = if (pressed) 2 else 0
+                    rt[1] = if (pressed) 5 else 0
+                    rt[2] = if (pressed) 5 else 0
+                } else {
+                    handleKey(lorieView, pressed, buttonR2_mapping)
+                }
 
                 true
             }
 
             KEYCODE_BUTTON_L1 -> {
-                handleKey(lorieView, pressed, buttonL1_mapping)
+                if (enableXInput) {
+                    l1Pressed = pressed
+                } else {
+                    handleKey(lorieView, pressed, buttonL1_mapping)
+                }
 
                 true
             }
 
             KEYCODE_BUTTON_L2 -> {
-                handleKey(lorieView, pressed, buttonL2_mapping)
+                if (enableXInput) {
+                    lt[0] = if (pressed) 2 else 0
+                    lt[1] = if (pressed) 5 else 0
+                    lt[2] = if (pressed) 5 else 0
+                } else {
+                    handleKey(lorieView, pressed, buttonL2_mapping)
+                }
 
                 true
             }
 
             KEYCODE_BUTTON_THUMBR -> {
-                handleKey(lorieView, pressed, buttonThumbR_mapping)
+                if (enableXInput) {
+                    thumbRPressed = pressed
+                } else {
+                    handleKey(lorieView, pressed, buttonThumbR_mapping)
+                }
 
                 true
             }
 
             KEYCODE_BUTTON_THUMBL -> {
-                handleKey(lorieView, pressed, buttonThumbL_mapping)
+                if (enableXInput) {
+                    thumbLPressed = pressed
+                } else {
+                    handleKey(lorieView, pressed, buttonThumbL_mapping)
+                }
 
                 true
             }
@@ -391,8 +469,8 @@ object ControllerUtils {
         axisYVelocity = axisY.absoluteValue
     }
 
-    fun handleAxis(lorieView: LorieView, axisX: Float, axisY: Float, axisXNeutral: Boolean, axisYNeutral: Boolean, axisXPlusMapping: List<Int>, axisXMinusMapping: List<Int>, axisYPlusMapping: List<Int>, axisYMinusMapping: List<Int>, deadZone: Float): Boolean {
-        return when {
+    fun handleAxis(lorieView: LorieView, axisX: Float, axisY: Float, axisXNeutral: Boolean, axisYNeutral: Boolean, axisXPlusMapping: List<Int>, axisXMinusMapping: List<Int>, axisYPlusMapping: List<Int>, axisYMinusMapping: List<Int>, deadZone: Float) {
+        when {
             // Left
             axisX < -deadZone && axisYNeutral -> {
                 if (axisXMinusMapping[2] == KEYBOARD) {
@@ -404,8 +482,6 @@ object ControllerUtils {
                 } else {
                     checkMouse(axisX, axisY, LEFT)
                 }
-
-                true
             }
 
             // Right
@@ -419,8 +495,6 @@ object ControllerUtils {
                 } else {
                     checkMouse(axisX, axisY, RIGHT)
                 }
-
-                true
             }
 
             // Up
@@ -434,8 +508,6 @@ object ControllerUtils {
                 } else {
                     checkMouse(axisX, axisY, UP)
                 }
-
-                true
             }
 
             // Down
@@ -449,8 +521,6 @@ object ControllerUtils {
                 } else {
                     checkMouse(axisX, axisY, DOWN)
                 }
-
-                true
             }
 
             // Left/Up
@@ -464,8 +534,6 @@ object ControllerUtils {
                 } else {
                     checkMouse(axisX, axisY, LEFT_UP)
                 }
-
-                true
             }
 
             // Left/Down
@@ -479,8 +547,6 @@ object ControllerUtils {
                 } else {
                     checkMouse(axisX, axisY, LEFT_DOWN)
                 }
-
-                true
             }
 
             // Right/Up
@@ -494,8 +560,6 @@ object ControllerUtils {
                 } else {
                     checkMouse(axisX, axisY, RIGHT_UP)
                 }
-
-                true
             }
 
             // Right/Down
@@ -509,8 +573,6 @@ object ControllerUtils {
                 } else {
                     checkMouse(axisX, axisY, RIGHT_DOWN)
                 }
-
-                true
             }
             else -> {
                 if (axisXPlusMapping[2] == KEYBOARD &&
@@ -525,9 +587,37 @@ object ControllerUtils {
                 } else {
                     moveVMouse = null
                 }
-
-                false
             }
+        }
+    }
+
+    private fun getDPadStatus(axisX: Float, axisY: Float, axisXNeutral: Boolean, axisYNeutral: Boolean) {
+        when {
+            // Up
+            axisY < -deadZone && axisXNeutral -> dpadStatus = 1
+
+            // Right/Up
+            axisX > deadZone && axisY < -deadZone -> dpadStatus = 2
+
+            // Right
+            axisX > deadZone && axisYNeutral -> dpadStatus = 3
+
+            // Right/Down
+            axisX > deadZone && axisY > deadZone -> dpadStatus = 4
+
+            // Down
+            axisY > deadZone && axisXNeutral -> dpadStatus = 5
+
+            // Left/Down
+            axisX < -deadZone && axisY > deadZone -> dpadStatus = 6
+
+            // Left
+            axisX < -deadZone && axisYNeutral -> dpadStatus = 7
+
+            // Left/Up
+            axisX < -deadZone && axisY < -deadZone -> dpadStatus = 8
+
+            else -> dpadStatus = 0
         }
     }
 
@@ -547,7 +637,126 @@ object ControllerUtils {
         val axisHatXNeutral = axisHatX < deadZone && axisHatX > -deadZone
         val axisHatYNeutral = axisHatY < deadZone && axisHatY > -deadZone
 
-        handleAxis(lorieView, axisX, axisY, axisXNeutral, axisYNeutral, axisX_plus_mapping, axisX_minus_mapping, axisY_plus_mapping, axisY_minus_mapping, deadZone)
-        handleAxis(lorieView, axisZ, axisRZ, axisZNeutral, axisRZNeutral, axisZ_plus_mapping, axisZ_minus_mapping, axisRZ_plus_mapping, axisRZ_minus_mapping, deadZone)
-        handleAxis(lorieView, axisHatX, axisHatY, axisHatXNeutral, axisHatYNeutral, axisHatX_plus_mapping, axisHatX_minus_mapping, axisHatY_plus_mapping, axisHatY_minus_mapping, deadZone)    }
+        if (enableXInput) {
+            val lxStr = ((axisX + 1) / 2 * 255).toInt().toString().padStart(3, '0')
+            val lyStr = ((-axisY + 1) / 2 * 255).toInt().toString().padStart(3, '0')
+
+            lx[0] = lxStr[0].digitToInt().toByte()
+            lx[1] = lxStr[1].digitToInt().toByte()
+            lx[2] = lxStr[2].digitToInt().toByte()
+
+            ly[0] = lyStr[0].digitToInt().toByte()
+            ly[1] = lyStr[1].digitToInt().toByte()
+            ly[2] = lyStr[2].digitToInt().toByte()
+
+            val rxStr = ((axisZ + 1) / 2 * 255).toInt().toString().padStart(3, '0')
+            val ryStr = ((-axisRZ + 1) / 2 * 255).toInt().toString().padStart(3, '0')
+
+            rx[0] = rxStr[0].digitToInt().toByte()
+            rx[1] = rxStr[1].digitToInt().toByte()
+            rx[2] = rxStr[2].digitToInt().toByte()
+
+            ry[0] = ryStr[0].digitToInt().toByte()
+            ry[1] = ryStr[1].digitToInt().toByte()
+            ry[2] = ryStr[2].digitToInt().toByte()
+
+            getDPadStatus(axisHatX, axisHatY, axisHatXNeutral, axisHatYNeutral)
+        } else {
+            handleAxis(lorieView, axisX, axisY, axisXNeutral, axisYNeutral, axisX_plus_mapping, axisX_minus_mapping, axisY_plus_mapping, axisY_minus_mapping, deadZone)
+            handleAxis(lorieView, axisZ, axisRZ, axisZNeutral, axisRZNeutral, axisZ_plus_mapping, axisZ_minus_mapping, axisRZ_plus_mapping, axisRZ_minus_mapping, deadZone)
+            handleAxis(lorieView, axisHatX, axisHatY, axisHatXNeutral, axisHatYNeutral, axisHatX_plus_mapping, axisHatX_minus_mapping, axisHatY_plus_mapping, axisHatY_minus_mapping, deadZone)
+        }
+    }
+
+    class GamePadServer {
+        fun startServer() {
+            val serverSocket = DatagramSocket(CLIENT_PORT)
+
+            Thread {
+                try {
+                    Log.v("GamePad","Server initialized on 127.0.0.1:${CLIENT_PORT}")
+
+                    val buffer = ByteArray(BUFFER_SIZE)
+                    val packet = DatagramPacket(buffer, buffer.size)
+
+                    while (true) {
+                        serverSocket.receive(packet)
+
+                        val receivedData = ByteBuffer.wrap(buffer).get().toInt()
+                        if (receivedData == GET_CONNECTION) {
+                            val responsePacket = DatagramPacket(buffer, buffer.size, packet.address, packet.port)
+
+                            serverSocket.send(responsePacket)
+                        } else if (receivedData == GET_GAMEPAD_STATE) {
+                            buffer[0] = GET_GAMEPAD_STATE.toByte()
+                            buffer[1] = if (aPressed) 1 else 0
+                            buffer[2] = if (bPressed) 1 else 0
+                            buffer[3] = if (xPressed) 1 else 0
+                            buffer[4] = if (yPressed) 1 else 0
+                            buffer[5] = if (l1Pressed) 1 else 0
+                            buffer[6] = if (r1Pressed) 1 else 0
+                            buffer[7] = if (selectPressed) 1 else 0
+                            buffer[8] = if (startPressed) 1 else 0
+                            buffer[9] = if (thumbLPressed) 1 else 0
+                            buffer[10] = if (thumbRPressed) 1 else 0
+                            buffer[11] = 0
+                            buffer[12] = dpadStatus.toByte()
+                            buffer[13] = lx[0]
+                            buffer[14] = lx[1]
+                            buffer[15] = lx[2]
+                            buffer[16] = ly[0]
+                            buffer[17] = ly[1]
+                            buffer[18] = ly[2]
+                            buffer[19] = rx[0]
+                            buffer[20] = rx[1]
+                            buffer[21] = rx[2]
+                            buffer[22] = ry[0]
+                            buffer[23] = ry[1]
+                            buffer[24] = ry[2]
+
+                            buffer[25] = lt[0]
+                            buffer[26] = lt[1]
+                            buffer[27] = lt[2]
+                            buffer[28] = rt[0]
+                            buffer[29] = rt[1]
+                            buffer[30] = rt[2]
+
+                            val responsePacket = DatagramPacket(buffer, buffer.size, packet.address, packet.port)
+
+                            serverSocket.send(responsePacket)
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    serverSocket.close()
+                }
+            }.start()
+        }
+
+        companion object {
+            const val CLIENT_PORT = 7941
+            const val BUFFER_SIZE = 64
+            const val GET_CONNECTION = 1
+            const val GET_GAMEPAD_STATE = 2
+            var gamePadServerRunning = false
+            var aPressed = false
+            var bPressed = false
+            var xPressed = false
+            var yPressed = false
+            var startPressed = false
+            var selectPressed = false
+            var r1Pressed = false
+            var l1Pressed = false
+            var thumbLPressed = false
+            var thumbRPressed = false
+            var dpadStatus = 0
+            var lx: ByteArray = byteArrayOf(1, 2, 7)
+            var ly: ByteArray = byteArrayOf(1, 2, 7)
+            var rx: ByteArray = byteArrayOf(1, 2, 7)
+            var ry: ByteArray = byteArrayOf(1, 2, 7)
+            var lt: ByteArray = byteArrayOf(0, 0, 0)
+            var rt: ByteArray = byteArrayOf(0, 0, 0)
+        }
+    }
 }

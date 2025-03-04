@@ -66,6 +66,8 @@ import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUD
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
+import com.micewine.emu.controller.ControllerUtils
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.gamePadServerRunning
 import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
@@ -73,6 +75,7 @@ import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getEnableXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.TouchInputHandler
@@ -135,6 +138,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
 
         prepareButtonsAxisValues(this, getControllerPreset(selectedGameName))
+
+        if (!gamePadServerRunning && getEnableXInput(selectedGameName)) {
+            ControllerUtils.GamePadServer().startServer()
+        }
 
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager

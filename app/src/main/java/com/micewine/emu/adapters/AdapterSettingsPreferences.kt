@@ -21,7 +21,6 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CHECKBOX
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_MODE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SEEKBAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SWITCH
@@ -99,12 +98,6 @@ class AdapterSettingsPreferences(
                             preferences.edit().apply {
                                 putString(sList.key, selectedItem)
                                 apply()
-                            }
-
-                            if (sList.key == DISPLAY_MODE) {
-                                activity.runOnUiThread {
-                                    notifyItemRangeChanged(holder.adapterPosition + 1, itemCount)
-                                }
                             }
                         }
 

@@ -22,8 +22,6 @@ import android.view.inputmethod.InputConnection
 import androidx.annotation.Keep
 import androidx.preference.PreferenceManager
 import com.micewine.emu.activities.EmulationActivity
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION_DEFAULT_VALUE
 import com.micewine.emu.activities.MainActivity.Companion.selectedResolution
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler

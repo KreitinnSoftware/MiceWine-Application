@@ -203,4 +203,6 @@
     <string name="sound_settings_description">Manage Sound Settings</string>
     <string name="select_audio_sink">Select PulseAudio Sink</string>
     <string name="others">Others</string>
+    <string name="enable_xinput_title">Enable XInput GamePad</string>
+    <string name="enable_wine_virtual_desktop">Enable Wine Virtual Desktop</string>
 </resources>

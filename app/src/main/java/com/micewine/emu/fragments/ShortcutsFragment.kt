@@ -320,6 +320,42 @@ class ShortcutsFragment : Fragment() {
             gameList = getGameList(context)
         }
 
+        fun putEnableXInput(name: String, enabled: Boolean) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].enableXInput = enabled
+
+            saveShortcuts()
+        }
+
+        fun getEnableXInput(name: String): Boolean {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return false
+
+            return gameList[index].enableXInput
+        }
+
+        fun putWineVirtualDesktop(name: String, enabled: Boolean) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].wineVirtualDesktop = enabled
+
+            saveShortcuts()
+        }
+
+        fun getWineVirtualDesktop(name: String): Boolean {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return false
+
+            return gameList[index].wineVirtualDesktop
+        }
+
         fun putCpuAffinity(name: String, cpuCores: String) {
             val index = gameList.indexOfFirst { it.name == name }
 
@@ -351,7 +387,7 @@ class ShortcutsFragment : Fragment() {
         fun getWineServices(name: String): Boolean {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return true
+            if (index == -1) return false
 
             return gameList[index].wineServices
         }
@@ -387,7 +423,7 @@ class ShortcutsFragment : Fragment() {
         fun getVKD3DVersion(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return ""
+            if (index == -1) return "VKD3D-2.8"
 
             return gameList[index].vkd3dVersion
         }
@@ -405,7 +441,7 @@ class ShortcutsFragment : Fragment() {
         fun getWineD3DVersion(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return ""
+            if (index == -1) return "WineD3D-(10.0)"
 
             return gameList[index].wineD3DVersion
         }
@@ -423,7 +459,7 @@ class ShortcutsFragment : Fragment() {
         fun getDXVKVersion(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return ""
+            if (index == -1) return "DXVK-1.10.3-async"
 
             return gameList[index].dxvkVersion
         }
@@ -478,7 +514,7 @@ class ShortcutsFragment : Fragment() {
         fun getBox64Preset(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return "--"
+            if (index == -1) return "default"
 
             return gameList[index].box64Preset
         }
@@ -496,7 +532,7 @@ class ShortcutsFragment : Fragment() {
         fun getControllerPreset(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return "--"
+            if (index == -1) return "default"
 
             return gameList[index].controllerPreset
         }
@@ -514,7 +550,7 @@ class ShortcutsFragment : Fragment() {
         fun getVirtualControllerPreset(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return "--"
+            if (index == -1) return "default"
 
             return gameList[index].virtualControllerPreset
         }
@@ -527,7 +563,26 @@ class ShortcutsFragment : Fragment() {
             }
 
             gameList.add(
-                GameItem(prettyName, path, "", icon, "", "", "", "16:9", "1280x720", "DXVK", "", "", "", true, false, availableCPUs.joinToString(","))
+                GameItem(
+                    prettyName,
+                    path,
+                    "",
+                    icon,
+                    "default",
+                    "default",
+                    "default",
+                    "16:9",
+                    "1280x720",
+                    "DXVK",
+                    "DXVK-1.10.3-async",
+                    "WineD3D-(10.0)",
+                    "VKD3D-2.8",
+                    true,
+                    false,
+                    availableCPUs.joinToString(","),
+                    false,
+                    false
+                )
             )
             gameListNames.add(
                 AdapterGame.GameItem(prettyName, path, "", icon)
@@ -604,10 +659,15 @@ class ShortcutsFragment : Fragment() {
         private fun getGameList(context: Context): MutableList<GameItem> {
             val json = preferences?.getString("gameList", "")
             val listType = object : TypeToken<MutableList<GameItem>>() {}.type
+            val gameList = gson.fromJson<MutableList<GameItem>>(json, listType)
 
-            return gson.fromJson(json, listType) ?: mutableListOf(
-                GameItem(context.getString(R.string.desktop_mode_init), context.getString(R.string.desktop_mode_init), "", "", "", "", "", "", "", "DXVK", "", "", "", true, false, availableCPUs.joinToString(","))
-            )
+            if (gameList == null) {
+                addGameToList(context.getString(R.string.desktop_mode_init), context.getString(R.string.desktop_mode_init), "")
+
+                return getGameList(context)
+            }
+
+            return gameList
         }
 
         fun addGameToLauncher(context: Context, name: String) {
@@ -657,7 +717,9 @@ class ShortcutsFragment : Fragment() {
             var vkd3dVersion: String,
             var wineESync: Boolean,
             var wineServices: Boolean,
-            var cpuAffinityCores: String
+            var cpuAffinityCores: String,
+            var wineVirtualDesktop: Boolean,
+            var enableXInput: Boolean
         )
     }
 }

@@ -40,6 +40,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getEnableXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameExeArguments
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameIcon
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
@@ -47,17 +48,20 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControll
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineVirtualDesktop
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDisplaySettings
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putEnableXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineServices
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineVirtualDesktop
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getVirtualControllerPresets
 import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
 import java.io.File
@@ -82,6 +86,8 @@ class EditGamePreferencesFragment : DialogFragment() {
         val selectedVKD3DSpinner = view.findViewById<Spinner>(R.id.selectedVKD3D)
         val wineESyncSwitch = view.findViewById<MaterialSwitch>(R.id.wineESync)
         val wineServicesSwitch = view.findViewById<MaterialSwitch>(R.id.wineServices)
+        val enableWineVirtualDesktopSwitch = view.findViewById<MaterialSwitch>(R.id.enableWineVirtualDesktop)
+        val enableXInputSwitch = view.findViewById<MaterialSwitch>(R.id.enableXInput)
         val cpuAffinitySpinner = view.findViewById<Spinner>(R.id.cpuAffinity)
         val selectedControllerProfileSpinner = view.findViewById<Spinner>(R.id.selectedControllerProfile)
         val selectedVirtualControllerProfileSpinner = view.findViewById<Spinner>(R.id.selectedVirtualControllerProfile)
@@ -109,6 +115,8 @@ class EditGamePreferencesFragment : DialogFragment() {
         if (selectedGameName == getString(R.string.desktop_mode_init)) {
             editTextNewName.isEnabled = false
             editTextArguments.isEnabled = false
+            enableWineVirtualDesktopSwitch.isEnabled = false
+            enableWineVirtualDesktopSwitch.isChecked = true
 
             imageView?.setImageBitmap(
                 resizeBitmap(
@@ -300,6 +308,24 @@ class EditGamePreferencesFragment : DialogFragment() {
 
             setOnClickListener {
                 putWineServices(selectedGameName, isChecked)
+            }
+        }
+
+        if (selectedGameName != getString(R.string.desktop_mode_init)) {
+            enableWineVirtualDesktopSwitch.apply {
+                isChecked = getWineVirtualDesktop(selectedGameName)
+
+                setOnClickListener {
+                    putWineVirtualDesktop(selectedGameName, isChecked)
+                }
+            }
+        }
+
+        enableXInputSwitch.apply {
+            isChecked = getEnableXInput(selectedGameName)
+
+            setOnClickListener {
+                putEnableXInput(selectedGameName, isChecked)
             }
         }
 
