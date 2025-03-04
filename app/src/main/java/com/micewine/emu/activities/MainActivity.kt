@@ -77,7 +77,6 @@ import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.HighlightState
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.RatPackageManager.installRat
-import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
@@ -185,17 +184,28 @@ class MainActivity : AppCompatActivity() {
 
                         if (fileExtension == "exe" || fileExtension == "bat" || fileExtension == "msi" || fileExtension == "lnk") {
                             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
-                                putExtra("exePath", file.path)
                                 putExtra("exeArguments", "")
                             }
+                            if (fileExtension == "lnk") {
+                                try {
+                                    val drive = DriveUtils.parseWindowsPath(ShellLink(file).resolveTarget())
 
-                            sendBroadcast(runWineIntent)
+                                    if (drive == null || !File(drive.getUnixPath()).exists()) {
+                                        Toast.makeText(this@MainActivity, getString(R.string.lnk_read_fail), Toast.LENGTH_SHORT).show()
+                                        return
+                                    }
 
-                            val emulationActivityIntent = Intent(this@MainActivity, EmulationActivity::class.java).apply {
-                                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                                    runWineIntent.putExtra("exePath", drive.getUnixPath())
+
+                                    sendBroadcast(runWineIntent)
+
+                                    startActivity(Intent(this@MainActivity, EmulationActivity::class.java))
+                                } catch(_: ShellLinkException) {
+                                    Toast.makeText(this@MainActivity, getString(R.string.lnk_read_fail), Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                runWineIntent.putExtra("exePath", file.path)
                             }
-
-                            startActivityIfNeeded(emulationActivityIntent, 0)
                         } else if (file.name.endsWith("rat")) {
                             ratCandidate = RatPackageManager.RatPackage(file.path)
                             AskInstallRatPackageFragment().show(supportFragmentManager, "")
@@ -713,17 +723,6 @@ class MainActivity : AppCompatActivity() {
                 WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler ${getCpuHexMask()} TFM")
             } else {
                 if (getWineVirtualDesktop(selectedGameName)) {
-                    if (exePath.endsWith(".lnk")) {
-                        val drive = DriveUtils.parseWindowsPath(ShellLink(exePath).resolveTarget())
-
-                        if (drive == null) {
-                            Toast.makeText(this@MainActivity, getString(R.string.lnk_read_fail), Toast.LENGTH_SHORT).show()
-                            return@withContext
-                        }
-
-                        WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler ${getCpuHexMask()} '${getSanitizedPath(drive.getUnixPath())}' $exeArguments", "'${getSanitizedPath(File(drive.getUnixPath()).parent!!)}'")
-                    }
-
                     WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler ${getCpuHexMask()} '${getSanitizedPath(exePath)}' $exeArguments", "'${getSanitizedPath(File(exePath).parent!!)}'")
                 } else {
                     WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe ${getCpuHexMask()}")
