@@ -434,6 +434,12 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
         })
 
+        lorieView.setOnFocusChangeListener { _, _ ->
+            if (!lorieView.isInLayout) {
+                lorieView.requestLayout()
+            }
+        }
+
         registerReceiver(receiver, object : IntentFilter() {
             init {
                 addAction(ACTION_START)
@@ -468,7 +474,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         return true
     }
-
 
     override fun onDestroy() {
         unregisterReceiver(receiver)
