@@ -19,16 +19,16 @@
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:contentDescription="@string/exit"
-            android:src="@drawable/ic_back">
-        </ImageButton>
+            android:src="@drawable/ic_back"
+            android:visibility="gone"></ImageButton>
 
         <androidx.appcompat.widget.Toolbar
+            android:id="@+id/generalSettingsToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/generalSettingsToolbar"
             android:title="@string/general_settings"
-            android:titleTextColor="@color/white">
-        </androidx.appcompat.widget.Toolbar>
+            android:titleTextColor="@color/white"
+            android:visibility="gone"></androidx.appcompat.widget.Toolbar>
     </LinearLayout>
 
     <FrameLayout

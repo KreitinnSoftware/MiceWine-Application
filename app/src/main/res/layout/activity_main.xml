@@ -16,12 +16,12 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/appToolbar"
-            app:titleTextAppearance="@style/TextAppearance.Quicksand"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_marginStart="6dp"
             android:layout_marginEnd="6dp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </com.google.android.material.appbar.MaterialToolbar>
+            android:visibility="gone"
+            app:titleTextAppearance="@style/TextAppearance.Quicksand"></com.google.android.material.appbar.MaterialToolbar>
 
     </LinearLayout>
 

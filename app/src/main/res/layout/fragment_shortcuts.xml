@@ -16,8 +16,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="8dp">
-        </Spinner>
+            android:padding="8dp"
+            android:visibility="gone"></Spinner>
 
         <ImageButton
             android:id="@+id/deleteWinePrefix"
@@ -25,9 +25,9 @@
             android:layout_height="match_parent"
             android:layout_weight="0.1"
             android:background="@android:color/transparent"
+            android:importantForAccessibility="no"
             android:src="@android:drawable/ic_menu_delete"
-            android:importantForAccessibility="no">
-        </ImageButton>
+            android:visibility="gone"></ImageButton>
 
         <ImageButton
             android:id="@+id/createWinePrefix"
@@ -35,9 +35,9 @@
             android:layout_height="match_parent"
             android:layout_weight="0.1"
             android:background="@android:color/transparent"
+            android:importantForAccessibility="no"
             android:src="@android:drawable/ic_menu_add"
-            android:importantForAccessibility="no">
-        </ImageButton>
+            android:visibility="gone"></ImageButton>
 
     </LinearLayout>
 

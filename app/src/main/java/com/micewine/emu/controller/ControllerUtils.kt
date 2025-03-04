@@ -300,7 +300,7 @@ object ControllerUtils {
                 when (moveVMouse) {
                     LEFT -> {
                         lorieView.sendMouseEvent(
-                            -20F * (axisXVelocity * mouseSensibility),
+                            -10F * (axisXVelocity * mouseSensibility),
                             0F,
                             BUTTON_UNDEFINED,
                             false,
@@ -310,7 +310,7 @@ object ControllerUtils {
 
                     RIGHT -> {
                         lorieView.sendMouseEvent(
-                            20F * (axisXVelocity * mouseSensibility),
+                            10F * (axisXVelocity * mouseSensibility),
                             0F,
                             BUTTON_UNDEFINED,
                             false,
@@ -321,7 +321,7 @@ object ControllerUtils {
                     UP -> {
                         lorieView.sendMouseEvent(
                             0F,
-                            -20F * (axisYVelocity * mouseSensibility),
+                            -10F * (axisYVelocity * mouseSensibility),
                             BUTTON_UNDEFINED,
                             false,
                             true
@@ -331,7 +331,7 @@ object ControllerUtils {
                     DOWN -> {
                         lorieView.sendMouseEvent(
                             0F,
-                            20F * (axisYVelocity * mouseSensibility),
+                            10F * (axisYVelocity * mouseSensibility),
                             BUTTON_UNDEFINED,
                             false,
                             true
@@ -340,8 +340,8 @@ object ControllerUtils {
 
                     LEFT_UP -> {
                         lorieView.sendMouseEvent(
-                            -20F * (axisXVelocity * mouseSensibility),
-                            -20F * (axisYVelocity * mouseSensibility),
+                            -10F * (axisXVelocity * mouseSensibility),
+                            -10F * (axisYVelocity * mouseSensibility),
                             BUTTON_UNDEFINED,
                             false,
                             true
@@ -350,8 +350,8 @@ object ControllerUtils {
 
                     LEFT_DOWN -> {
                         lorieView.sendMouseEvent(
-                            -20F * (axisXVelocity * mouseSensibility),
-                            20F * (axisYVelocity * mouseSensibility),
+                            -10F * (axisXVelocity * mouseSensibility),
+                            10F * (axisYVelocity * mouseSensibility),
                             BUTTON_UNDEFINED,
                             false,
                             true
@@ -360,8 +360,8 @@ object ControllerUtils {
 
                     RIGHT_UP -> {
                         lorieView.sendMouseEvent(
-                            20F * (axisXVelocity * mouseSensibility),
-                            -20F * (axisYVelocity * mouseSensibility),
+                            10F * (axisXVelocity * mouseSensibility),
+                            -10F * (axisYVelocity * mouseSensibility),
                             BUTTON_UNDEFINED,
                             false,
                             true
@@ -370,8 +370,8 @@ object ControllerUtils {
 
                     RIGHT_DOWN -> {
                         lorieView.sendMouseEvent(
-                            20F * (axisXVelocity * mouseSensibility),
-                            20F * (axisYVelocity * mouseSensibility),
+                            10F * (axisXVelocity * mouseSensibility),
+                            10F * (axisYVelocity * mouseSensibility),
                             BUTTON_UNDEFINED,
                             false,
                             true

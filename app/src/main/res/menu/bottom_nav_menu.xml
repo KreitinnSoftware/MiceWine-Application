@@ -4,7 +4,7 @@
         android:id="@+id/nav_shortcuts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:icon="@drawable/ic_shortcut"
+        android:icon="@drawable/ic_home"
         android:title="@string/shortcuts_title">
     </item>
     <item
@@ -26,8 +26,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/ic_info_outline"
-        android:title="@string/about_title">
-    </item>
+        android:title="@string/about_title"
+        android:visible="false"></item>
 </menu>
 
 

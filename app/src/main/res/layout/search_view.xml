@@ -12,5 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/action_search"
-        android:inputType="text" />
+        android:inputType="text"
+        android:visibility="gone" />
 </com.google.android.material.textfield.TextInputLayout>

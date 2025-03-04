@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">MiceWine</string>
+    <string name="app_name" translatable="false">Windroid</string>
     <string name="app_lang">en_US</string>
 
     <string name="box64_bigblock_title" translatable="false">BOX64_DYNAREC_BIGBLOCK</string>
@@ -51,15 +51,15 @@
 
     <string name="full_screen">Fullscreen</string>
     <string name="settings_title">Settings</string>
-    <string name="settings_description">Configure MiceWine</string>
+    <string name="settings_description">Configure Windroid</string>
     <string name="app_close">Exit</string>
     <string name="log_title">Log</string>
-    <string name="log_description">See MiceWine Logs</string>
+    <string name="log_description">See Windroid Logs</string>
     <string name="clear_log">Clear</string>
     <string name="desktop_mode_init">Desktop</string>
     <string name="about_title">About</string>
     <string name="home_title">Home</string>
-    <string name="about_description">About MiceWine</string>
+    <string name="about_description">About Windroid</string>
     <string name="general_settings">General Settings</string>
     <string name="exit">Exit</string>
     <string name="open_keyboard">Open Keyboard</string>
@@ -99,7 +99,7 @@
     <string name="dead_zone_title">Dead Zone</string>
     <string name="mouse_sensibility_title">Virtual Mouse Sensibility</string>
     <string name="open_overlay">Open/Close Overlay</string>
-    <string name="welcome_text">Welcome to MiceWine!</string>
+    <string name="welcome_text">Welcome to Windroid!</string>
     <string name="continue_text">Continue</string>
     <string name="confirm_text">Confirm</string>
     <string name="get_file_permission_text">Allow File Management Permission</string>

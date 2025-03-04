@@ -11,11 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:importantForAccessibility="no"
         android:layout_marginBottom="20dp"
+        android:importantForAccessibility="no"
         android:src="@drawable/icon_grayscale"
-        tools:ignore="ImageContrastCheck">
-    </ImageView>
+        android:visibility="gone"
+        tools:ignore="ImageContrastCheck"></ImageView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/exitButton"
@@ -78,28 +78,28 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <com.google.android.material.button.MaterialButton
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:layout_weight="1"
             android:text="@string/enable_mangohud_title"
-            android:textSize="15sp"
             android:textAlignment="textStart"
             android:textColor="@color/textColor"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="55dp"
-            style="@style/Widget.Material3.Button.TextButton"
+            android:textSize="15sp"
+            android:visibility="gone"
             app:icon="@drawable/ic_display"
-            app:iconTint="@color/textColor"
+            app:iconGravity="start"
             app:iconPadding="10dp"
-            app:iconGravity="start">
-        </com.google.android.material.button.MaterialButton>
+            app:iconTint="@color/textColor"></com.google.android.material.button.MaterialButton>
 
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/enableMangoHudSwitch"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-        </com.google.android.material.materialswitch.MaterialSwitch>
+            android:layout_height="match_parent"></com.google.android.material.materialswitch.MaterialSwitch>
 
     </LinearLayout>
 
@@ -109,34 +109,34 @@
         android:orientation="vertical">
 
         <com.google.android.material.button.MaterialButton
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:text="@string/fps_limit_title"
-            android:textSize="15sp"
             android:textAlignment="textStart"
             android:textColor="@color/textColor"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="0dp"
-            style="@style/Widget.Material3.Button.TextButton"
+            android:textSize="15sp"
+            android:visibility="gone"
             app:icon="@drawable/ic_display"
-            app:iconTint="@color/textColor"
+            app:iconGravity="start"
             app:iconPadding="10dp"
-            app:iconGravity="start">
-        </com.google.android.material.button.MaterialButton>
+            app:iconTint="@color/textColor"></com.google.android.material.button.MaterialButton>
 
         <TextView
             android:id="@+id/fpsLimitText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:textAlignment="center"
-            android:padding="8dp">
-        </TextView>
+            android:visibility="gone"></TextView>
 
         <SeekBar
             android:id="@+id/fpsLimitSeekbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="10dp">
-        </SeekBar>
+            android:padding="10dp"
+            android:visibility="gone"></SeekBar>
 
     </LinearLayout>
 
@@ -185,18 +185,18 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/editVirtualControllerMapping"
-        android:text="@string/edit_virtual_controller_mapping"
-        android:textSize="15sp"
-        android:textAlignment="textStart"
-        android:textColor="@color/textColor"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        style="@style/Widget.Material3.Button.TextButton"
+        android:text="@string/edit_virtual_controller_mapping"
+        android:textAlignment="textStart"
+        android:textColor="@color/textColor"
+        android:textSize="15sp"
+        android:visibility="gone"
         app:icon="@drawable/ic_joystick"
-        app:iconTint="@color/textColor"
+        app:iconGravity="start"
         app:iconPadding="10dp"
-        app:iconGravity="start">
-    </com.google.android.material.button.MaterialButton>
+        app:iconTint="@color/textColor"></com.google.android.material.button.MaterialButton>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/editControllerMapping"

@@ -1,14 +1,14 @@
 <resources>
 
     <style name="Base.Theme.MiceWine" parent="Theme.Material3.DynamicColors.Light.NoActionBar">
-        <item name="android:statusBarColor">@android:color/darker_gray</item>
+        <item name="android:statusBarColor">#1A91F1</item>
         <item name="popupMenuBackground">@drawable/menu_bg</item>
     </style>
 
     <color name="textColor">@color/black</color>
 
     <style name="Base.Theme.MiceWine.FullScreen" parent="Theme.Material3.DynamicColors.Light.NoActionBar">
-        <item name="android:statusBarColor">@android:color/darker_gray</item>
+        <item name="android:statusBarColor">#3788FF</item>
         <item name="popupMenuBackground">@drawable/menu_bg</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
