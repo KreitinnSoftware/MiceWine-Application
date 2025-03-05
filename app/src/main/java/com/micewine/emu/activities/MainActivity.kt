@@ -349,30 +349,31 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_shortcuts -> {
                     selectedFragment = "ShortcutsFragment"
-                    fragmentLoader(shortcutsFragment, false)
+                    fragmentLoader(shortcutsFragment)
                 }
 
                 R.id.nav_settings -> {
                     selectedFragment = "SettingsFragment"
-                    fragmentLoader(settingsFragment, false)
+                    fragmentLoader(settingsFragment)
                 }
 
                 R.id.nav_file_manager -> {
                     selectedFragment = "FileManagerFragment"
-                    fragmentLoader(fileManagerFragment, false)
+                    fragmentLoader(fileManagerFragment)
                 }
 
                 R.id.nav_about -> {
                     selectedFragment = "AboutFragment"
-                    fragmentLoader(aboutFragment, false)
+                    fragmentLoader(aboutFragment)
                 }
             }
 
             true
         }
 
-        selectedFragment = "ShortcutsFragment"
-        fragmentLoader(shortcutsFragment, true)
+        bottomNavigation?.post {
+            bottomNavigation?.selectedItemId = R.id.nav_shortcuts
+        }
 
         registerReceiver(receiver, object : IntentFilter() {
             init {
@@ -622,14 +623,9 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(intent, EXPORT_LNK_ACTION)
     }
 
-    private fun fragmentLoader(fragment: Fragment, appInit: Boolean) {
+    private fun fragmentLoader(fragment: Fragment) {
         supportFragmentManager.beginTransaction().apply {
-            if (appInit) {
-                add(R.id.content, fragment)
-            } else {
-                replace(R.id.content, fragment)
-            }
-
+            replace(R.id.content, fragment)
             commit()
         }
     }
@@ -847,6 +843,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
         val exePath = intent.getStringExtra("exePath")
         val exeArguments = intent.getStringExtra("exeArguments")
 
@@ -881,8 +879,6 @@ class MainActivity : AppCompatActivity() {
 
             startActivity(emulationActivityIntent)
         }
-
-        super.onNewIntent(intent)
     }
 
     private fun showHighlightSequence() {
