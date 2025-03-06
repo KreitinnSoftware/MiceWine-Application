@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="#0003A9F4"
         android:fillViewport="true"
         android:padding="10dp">
 
@@ -18,41 +19,37 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
-            android:textSize="16sp"
             android:textIsSelectable="true"
-            android:background="@drawable/top_rounded_shape"
-            android:theme="@style/Theme.MiceWine">
-        </TextView>
+            android:textSize="16sp"
+            android:theme="@style/Theme.MiceWine"></TextView>
 
     </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:orientation="horizontal">
+        android:paddingEnd="20dp">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/copyButton"
-            android:text="@string/copy"
-            android:textSize="15sp"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
             android:layout_height="60dp"
             android:layout_marginEnd="10dp"
-            tools:ignore="PrivateResource">
-        </com.google.android.material.button.MaterialButton>
+            android:layout_weight="0.5"
+            android:text="@string/copy"
+            android:textSize="15sp"
+            tools:ignore="PrivateResource"></com.google.android.material.button.MaterialButton>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/closeButton"
-            android:text="@string/exit"
-            android:textSize="15sp"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
             android:layout_height="60dp"
-            android:layout_marginStart="10dp">
-        </com.google.android.material.button.MaterialButton>
+            android:layout_marginStart="10dp"
+            android:layout_weight="0.5"
+            android:text="@string/exit"
+            android:textSize="15sp"></com.google.android.material.button.MaterialButton>
 
     </LinearLayout>
 

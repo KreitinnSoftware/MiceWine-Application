@@ -41,7 +41,9 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val activ
             }
         } else if (sList.iconPath == "") {
             holder.gameImage.setImageBitmap(resizeBitmap(
-                BitmapFactory.decodeResource(activity.resources, R.drawable.default_icon), holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height)
+                BitmapFactory.decodeResource(activity.resources,
+                    R.drawable._363211_game_gaming_play_steam_valve_85503
+                ), holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height)
             )
         } else {
             holder.gameImage.setImageBitmap(

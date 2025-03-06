@@ -37,11 +37,13 @@
         android:id="@+id/bottom_navigation"
         style="@style/RoundTopCorners"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="75dp"
+        android:background="#00FFFEFE"
         android:padding="8dp"
         android:theme="@style/Theme.MiceWine"
-        app:labelVisibilityMode="selected"
-        app:menu="@menu/bottom_nav_menu">
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+        android:visibility="visible"
+        app:labelVisibilityMode="unlabeled"
+        app:menu="@menu/bottom_nav_menu"
+        tools:visibility="visible"></com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </LinearLayout>

@@ -34,18 +34,18 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/openKeyboardButton"
-        android:text="@string/open_keyboard"
-        android:textSize="15sp"
-        android:textAlignment="textStart"
-        android:textColor="@color/textColor"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        style="@style/Widget.Material3.Button.TextButton"
+        android:text="@string/open_keyboard"
+        android:textAlignment="textStart"
+        android:textColor="@color/textColor"
+        android:textSize="15sp"
+        android:visibility="gone"
         app:icon="@drawable/ic_keyboard"
-        app:iconTint="@color/textColor"
+        app:iconGravity="start"
         app:iconPadding="10dp"
-        app:iconGravity="start">
-    </com.google.android.material.button.MaterialButton>
+        app:iconTint="@color/textColor"></com.google.android.material.button.MaterialButton>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -140,21 +140,6 @@
 
     </LinearLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/openLogViewer"
-        android:text="@string/open_log_viewer"
-        android:textSize="15sp"
-        android:textAlignment="textStart"
-        android:textColor="@color/textColor"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        style="@style/Widget.Material3.Button.TextButton"
-        app:icon="@drawable/ic_log"
-        app:iconTint="@color/textColor"
-        app:iconPadding="10dp"
-        app:iconGravity="start">
-    </com.google.android.material.button.MaterialButton>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -192,7 +177,7 @@
         android:textAlignment="textStart"
         android:textColor="@color/textColor"
         android:textSize="15sp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:icon="@drawable/ic_joystick"
         app:iconGravity="start"
         app:iconPadding="10dp"
@@ -212,5 +197,19 @@
         app:iconPadding="10dp"
         app:iconGravity="start">
     </com.google.android.material.button.MaterialButton>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/openLogViewer"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:text="@string/open_log_viewer"
+        android:textAlignment="textStart"
+        android:textColor="@color/textColor"
+        android:textSize="15sp"
+        app:icon="@drawable/ic_log"
+        app:iconGravity="start"
+        app:iconPadding="10dp"
+        app:iconTint="@color/textColor"></com.google.android.material.button.MaterialButton>
 
 </LinearLayout>

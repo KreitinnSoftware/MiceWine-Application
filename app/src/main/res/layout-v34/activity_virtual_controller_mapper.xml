@@ -9,14 +9,15 @@
     android:gravity="bottom"
     android:orientation="vertical"
     android:theme="@style/Theme.MiceWine"
-    android:background="@color/darker_gray"
+    android:background="#2C8FF2"
     tools:context=".activities.VirtualControllerOverlayMapper">
 
     <com.micewine.emu.views.OverlayViewCreator
         android:id="@+id/overlayView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </com.micewine.emu.views.OverlayViewCreator>
+        android:layout_height="match_parent"
+        android:background="#2C8EF0"
+        android:backgroundTint="#2C8DEE"></com.micewine.emu.views.OverlayViewCreator>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"

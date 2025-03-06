@@ -9,10 +9,11 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnAddEnvVar"
+        style="@style/Widget.Material3.Button.ElevatedButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/env_add_action"
-        style="@style/Widget.Material3.Button.ElevatedButton"/>
+        android:background="#00FFFFFF"
+        android:text="@string/env_add_action" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvEnvVars"

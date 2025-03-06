@@ -148,20 +148,19 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/cancelButton"
-                android:layout_marginTop="10dp"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/cancel_text">
-            </com.google.android.material.button.MaterialButton>
+                android:layout_marginTop="10dp"
+                android:text="@string/cancel_text"
+                android:visibility="gone"></com.google.android.material.button.MaterialButton>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/saveButton"
-                android:layout_marginTop="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/save_text">
-            </com.google.android.material.button.MaterialButton>
+                android:layout_marginTop="10dp"
+                android:text="@string/save_text"></com.google.android.material.button.MaterialButton>
 
         </LinearLayout>
 
