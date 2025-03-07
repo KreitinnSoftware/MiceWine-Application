@@ -153,11 +153,18 @@ class OverlayViewCreator @JvmOverloads constructor(
 
         // Se houver um botão selecionado, desenha os ícones de editar e remover
         if (lastSelectedButton > 0) {
-            editButton.x = width - 20F - editButton.radius / 2
-            editButton.y = 20F + editButton.radius / 2
+            // Calcula o centro horizontal da tela e define a margem superior
+            val centerX = width / 2F
+            val topMargin = 20F + editButton.radius / 2
+            val spacing = 20F
 
-            removeButton.x = editButton.x - removeButton.radius
-            removeButton.y = 20F + removeButton.radius / 2
+            // Posiciona o botão de editar à direita do centro
+            editButton.x = centerX + spacing / 2 + editButton.radius / 2
+            editButton.y = topMargin
+
+            // Posiciona o botão de remover à esquerda do centro
+            removeButton.x = centerX - spacing / 2 - removeButton.radius / 2
+            removeButton.y = topMargin
 
             canvas.drawCircle(editButton.x, editButton.y, editButton.radius / 2, paint)
             canvas.drawCircle(removeButton.x, removeButton.y, removeButton.radius / 2, paint)
