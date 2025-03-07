@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="button_shape_label" translatable="false">Formato do Botão</string>
+
     <style name="RoundTopCorners">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay_card_top_corners</item>
     </style>
@@ -20,5 +22,4 @@
         <item name="android:textSize">26sp</item>
         <item name="android:padding">16dp</item>
     </style>
-
 </resources>

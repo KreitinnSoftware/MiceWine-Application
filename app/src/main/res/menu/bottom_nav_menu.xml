@@ -4,7 +4,7 @@
         android:id="@+id/nav_shortcuts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:icon="@drawable/ic_joystick"
+        android:icon="@drawable/ic_home"
         android:title="@string/shortcuts_title"></item>
     <item
         android:id="@+id/nav_settings"

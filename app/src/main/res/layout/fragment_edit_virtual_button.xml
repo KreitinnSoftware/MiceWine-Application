@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Seção de tamanho do botão -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -22,32 +23,46 @@
                 android:textSize="16sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:importantForAutofill="no">
-            </TextView>
+                android:importantForAutofill="no" />
 
             <TextView
                 android:id="@+id/radiusSeekbarValue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
-                android:padding="8dp">
-            </TextView>
+                android:padding="8dp" />
 
             <SeekBar
                 android:id="@+id/radiusSeekbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="2dp">
-            </SeekBar>
+                android:paddingTop="2dp" />
 
         </LinearLayout>
 
+        <!-- Spinner para seleção da tecla do botão -->
         <Spinner
             android:id="@+id/buttonSpinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </Spinner>
+            android:layout_height="wrap_content" />
 
+        <!-- Novo: Rótulo para o formato do botão -->
+        <TextView
+            android:id="@+id/buttonShapeLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_shape_label"
+            android:textSize="16sp"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp" />
+
+        <!-- Novo: Spinner para seleção do formato do botão -->
+        <Spinner
+            android:id="@+id/shapeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Layouts para as teclas analógicas -->
         <LinearLayout
             android:id="@+id/layoutAnalogUp"
             android:layout_width="match_parent"
@@ -59,15 +74,13 @@
                 android:layout_width="32dp"
                 android:layout_height="wrap_content"
                 android:src="@drawable/l_up"
-                android:importantForAccessibility="no">
-            </ImageView>
+                android:importantForAccessibility="no" />
 
             <Spinner
                 android:id="@+id/analogUpKeySpinner"
                 android:layout_marginStart="8dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            </Spinner>
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 
@@ -82,15 +95,13 @@
                 android:layout_width="32dp"
                 android:layout_height="wrap_content"
                 android:src="@drawable/l_left"
-                android:importantForAccessibility="no">
-            </ImageView>
+                android:importantForAccessibility="no" />
 
             <Spinner
                 android:id="@+id/analogLeftKeySpinner"
                 android:layout_marginStart="8dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            </Spinner>
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 
@@ -105,15 +116,13 @@
                 android:layout_width="32dp"
                 android:layout_height="wrap_content"
                 android:src="@drawable/l_down"
-                android:importantForAccessibility="no">
-            </ImageView>
+                android:importantForAccessibility="no" />
 
             <Spinner
                 android:id="@+id/analogDownKeySpinner"
                 android:layout_marginStart="8dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            </Spinner>
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 
@@ -128,23 +137,22 @@
                 android:layout_width="32dp"
                 android:layout_height="wrap_content"
                 android:src="@drawable/l_right"
-                android:importantForAccessibility="no">
-            </ImageView>
+                android:importantForAccessibility="no" />
 
             <Spinner
                 android:id="@+id/analogRightKeySpinner"
                 android:layout_marginStart="8dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            </Spinner>
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 
+        <!-- Botões de salvar e cancelar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="end">
+            android:gravity="center">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/cancelButton"
@@ -153,14 +161,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="@string/cancel_text"
-                android:visibility="gone"></com.google.android.material.button.MaterialButton>
+                android:visibility="gone" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/saveButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/save_text"></com.google.android.material.button.MaterialButton>
+                android:text="@string/save_text" />
 
         </LinearLayout>
 

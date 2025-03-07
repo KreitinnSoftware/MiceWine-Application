@@ -61,24 +61,19 @@ class OverlayView @JvmOverloads constructor(
                 "M_Left" -> {
                     it.keyCodes = listOf(BUTTON_LEFT, BUTTON_LEFT, MOUSE)
                 }
-
                 "M_Middle" -> {
                     it.keyCodes = listOf(BUTTON_MIDDLE, BUTTON_MIDDLE, MOUSE)
                 }
-
                 "M_Right" -> {
                     it.keyCodes = listOf(BUTTON_RIGHT, BUTTON_RIGHT, MOUSE)
                 }
-
                 "Mouse" -> {
                     it.keyCodes = listOf(MOUSE, MOUSE, MOUSE)
                 }
-
                 else -> {
                     it.keyCodes = getXKeyScanCodes(it.keyName)
                 }
             }
-
             buttonList.add(it)
         }
 
@@ -87,7 +82,6 @@ class OverlayView @JvmOverloads constructor(
             it.downKeyCodes = getXKeyScanCodes(it.downKeyName)
             it.leftKeyCodes = getXKeyScanCodes(it.leftKeyName)
             it.rightKeyCodes = getXKeyScanCodes(it.rightKeyName)
-
             analogList.add(it)
         }
     }
@@ -98,10 +92,23 @@ class OverlayView @JvmOverloads constructor(
         buttonList.forEach {
             buttonPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
             buttonPaint.alpha = 150
-
             textPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
 
-            canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
+            // Desenha o botão de acordo com seu formato
+            when (it.shape) {
+                "Quadrado" -> {
+                    val halfSide = it.radius / 2
+                    canvas.drawRect(it.x - halfSide, it.y - halfSide, it.x + halfSide, it.y + halfSide, buttonPaint)
+                }
+                "Retangular" -> {
+                    val halfWidth = it.radius / 2
+                    val halfHeight = it.radius / 4
+                    canvas.drawRect(it.x - halfWidth, it.y - halfHeight, it.x + halfWidth, it.y + halfHeight, buttonPaint)
+                }
+                else -> { // Padrão: Circular
+                    canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
+                }
+            }
             paint.textSize = it.radius / 4
             canvas.drawText(it.keyName, it.x, it.y + 10, textPaint)
         }
@@ -126,7 +133,6 @@ class OverlayView @JvmOverloads constructor(
                 analogX = it.x + (it.fingerX * scale)
                 analogY = it.y + (it.fingerY * scale)
             }
-
             canvas.drawCircle(analogX, analogY, it.radius / 4, paint)
         }
     }
@@ -139,77 +145,72 @@ class OverlayView @JvmOverloads constructor(
                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
                         it.isPressed = true
                         it.fingerId = event.actionIndex
-
                         handleButton(it, true)
-
                         return@forEach
                     }
                 }
-
                 analogList.forEach {
                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
                         val posX = event.getX(event.actionIndex) - it.x
                         val posY = event.getY(event.actionIndex) - it.y
-
                         it.fingerX = posX
                         it.fingerY = posY
                         it.isPressed = true
                         it.fingerId = event.actionIndex
-
-                        it.fingerX = posX
-                        it.fingerY = posY
-
-                        virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), it.upKeyCodes!!, it.downKeyCodes!!, it.leftKeyCodes!!, it.rightKeyCodes!!, it.deadZone)
-
+                        virtualAxis(
+                            posX / (it.radius / 4),
+                            posY / (it.radius / 4),
+                            it.upKeyCodes!!,
+                            it.downKeyCodes!!,
+                            it.leftKeyCodes!!,
+                            it.rightKeyCodes!!,
+                            it.deadZone
+                        )
                         return@forEach
                     }
                 }
-
                 invalidate()
             }
-
             MotionEvent.ACTION_MOVE -> {
                 for (i in 0 until event.pointerCount) {
                     var isFingerPressingButton = false
-
                     buttonList.forEach {
                         if (it.fingerId == i) {
                             it.isPressed = true
                             handleButton(it, true)
-
                             isFingerPressingButton = true
                         }
                     }
-
                     analogList.forEach {
                         if (it.isPressed && it.fingerId == i) {
                             val posX = event.getX(i) - it.x
                             val posY = event.getY(i) - it.y
-
                             it.fingerX = posX
                             it.fingerY = posY
-
-                            virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), it.upKeyCodes!!, it.downKeyCodes!!, it.leftKeyCodes!!, it.rightKeyCodes!!, it.deadZone)
-
+                            virtualAxis(
+                                posX / (it.radius / 4),
+                                posY / (it.radius / 4),
+                                it.upKeyCodes!!,
+                                it.downKeyCodes!!,
+                                it.leftKeyCodes!!,
+                                it.rightKeyCodes!!,
+                                it.deadZone
+                            )
                             isFingerPressingButton = true
                         }
                     }
-
                     if (!isFingerPressingButton) {
                         if (event.historySize > 0) {
                             val deltaX = event.getX(i) - event.getHistoricalX(i, 0)
                             val deltaY = event.getY(i) - event.getHistoricalY(i, 0)
-
                             if ((deltaX > 0.08 || deltaX < -0.08) && (deltaY > 0.08 || deltaY < -0.08)) {
                                 lorieView.sendMouseEvent(deltaX, deltaY, BUTTON_UNDEFINED, false, true)
                             }
                         }
                     }
                 }
-
                 invalidate()
             }
-
             MotionEvent.ACTION_POINTER_UP -> {
                 buttonList.forEach {
                     if (it.fingerId == event.actionIndex) {
@@ -219,50 +220,73 @@ class OverlayView @JvmOverloads constructor(
                         handleButton(it, false)
                     }
                 }
-
                 analogList.forEach {
                     if (it.fingerId == event.actionIndex) {
                         it.fingerId = -1
                         it.fingerX = 0F
                         it.fingerY = 0F
-
                         it.isPressed = false
-
-                        virtualAxis(0F, 0F, it.upKeyCodes!!, it.downKeyCodes!!, it.leftKeyCodes!!, it.rightKeyCodes!!, it.deadZone)
+                        virtualAxis(
+                            0F, 0F,
+                            it.upKeyCodes!!,
+                            it.downKeyCodes!!,
+                            it.leftKeyCodes!!,
+                            it.rightKeyCodes!!,
+                            it.deadZone
+                        )
                     }
                 }
-
                 invalidate()
             }
-
             MotionEvent.ACTION_UP -> {
                 buttonList.forEach {
                     it.fingerId = -1
                     handleButton(it, false)
                 }
-
                 analogList.forEach {
                     it.fingerX = 0F
                     it.fingerY = 0F
                     it.isPressed = false
-
-                    virtualAxis(0F, 0F, it.upKeyCodes!!, it.downKeyCodes!!, it.leftKeyCodes!!, it.rightKeyCodes!!, it.deadZone)
+                    virtualAxis(
+                        0F, 0F,
+                        it.upKeyCodes!!,
+                        it.downKeyCodes!!,
+                        it.leftKeyCodes!!,
+                        it.rightKeyCodes!!,
+                        it.deadZone
+                    )
                 }
-
                 invalidate()
             }
         }
-
         return true
     }
 
-    private fun virtualAxis(axisX: Float, axisY: Float, upKeyCodes: List<Int>, downKeyCodes: List<Int>, leftKeyCodes: List<Int>, rightKeyCodes: List<Int>, deadZone: Float) {
-        handleAxis(lorieView, axisX, axisY, axisX < deadZone && axisX > -deadZone, axisY < deadZone && axisY > -deadZone, rightKeyCodes, leftKeyCodes, downKeyCodes, upKeyCodes, deadZone)
+    private fun virtualAxis(
+        axisX: Float,
+        axisY: Float,
+        upKeyCodes: List<Int>,
+        downKeyCodes: List<Int>,
+        leftKeyCodes: List<Int>,
+        rightKeyCodes: List<Int>,
+        deadZone: Float
+    ) {
+        handleAxis(
+            lorieView,
+            axisX,
+            axisY,
+            axisX < deadZone && axisX > -deadZone,
+            axisY < deadZone && axisY > -deadZone,
+            rightKeyCodes,
+            leftKeyCodes,
+            downKeyCodes,
+            upKeyCodes,
+            deadZone
+        )
     }
 
     private fun handleButton(button: VirtualButton, pressed: Boolean) {
         button.isPressed = pressed
-
         when (button.keyCodes!![2]) {
             KEYBOARD -> lorieView.sendKeyEvent(button.keyCodes!![0], button.keyCodes!![1], pressed)
             MOUSE -> lorieView.sendMouseEvent(0F, 0F, button.keyCodes!![0], pressed, true)
@@ -277,7 +301,8 @@ class OverlayView @JvmOverloads constructor(
         var keyName: String,
         var keyCodes: List<Int>?,
         var fingerId: Int,
-        var isPressed: Boolean
+        var isPressed: Boolean,
+        var shape: String = "Circular" // Propriedade adicionada para definir o formato do botão
     )
 
     class VirtualAnalog(
@@ -305,8 +330,8 @@ class OverlayView @JvmOverloads constructor(
         val analogList = mutableListOf<VirtualAnalog>()
 
         fun detectClick(event: MotionEvent, index: Int, x: Float, y: Float, radius: Float): Boolean {
-            return (event.getX(index) >= x - radius / 2 && event.getX(index) <= (x + (radius / 2))) &&
-                    (event.getY(index) >= y - radius / 2 && event.getY(index) <= (y + (radius / 2)))
+            return (event.getX(index) >= x - radius / 2 && event.getX(index) <= (x + radius / 2)) &&
+                    (event.getY(index) >= y - radius / 2 && event.getY(index) <= (y + radius / 2))
         }
     }
 }
