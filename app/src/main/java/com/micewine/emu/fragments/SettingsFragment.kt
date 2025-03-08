@@ -34,7 +34,9 @@ class SettingsFragment : Fragment() {
 
         settingsList.clear()
 
-        addToAdapter(R.string.settings_title, R.string.settings_description, R.drawable.ic_settings_outline)
+        addToAdapter(R.string.settings_title, R.string.settings_description,
+            R.drawable.setting_icon_242766
+        )
         addToAdapter(R.string.controller_mapper_title, R.string.controller_mapper_description, R.drawable.ic_joystick)
         addToAdapter(R.string.virtual_controller_mapper_title, R.string.controller_virtual_mapper_description, R.drawable.ic_joystick)
 
@@ -43,7 +45,9 @@ class SettingsFragment : Fragment() {
             addToAdapter(R.string.box64_manager_title, R.string.box64_manager_description, R.drawable.ic_box64)
         }
 
-        addToAdapter(R.string.driver_manager_title, R.string.driver_manager_description, R.drawable.ic_gpu)
+        addToAdapter(R.string.driver_manager_title, R.string.driver_manager_description,
+            R.drawable.gpu
+        )
         addToAdapter(R.string.wine_manager_title, R.string.wine_manager_description, R.drawable.ic_wine)
     }
 

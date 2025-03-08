@@ -4,28 +4,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="?attr/materialCardViewElevatedStyle"
-    android:layout_width="109dp"
-    android:layout_height="109dp"
+    android:layout_width="132dp"
+    android:layout_height="134dp"
     android:layout_gravity="center"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:clipToPadding="false"
     android:focusable="true"
     android:transitionName="card_game"
-    app:cardBackgroundColor="#00FFFFFF"
-    app:cardCornerRadius="5dp"
-    app:cardElevation="0dp"
-    app:layout_constraintVertical_chainStyle="packed">
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="106dp"
-        android:layout_height="107dp"
-        android:padding="2dp">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="6dp">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/img_game"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -55,4 +53,3 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>
-

@@ -885,62 +885,62 @@ class MainActivity : AppCompatActivity() {
             return
         }
         TapTargetSequence(this).targets(
-                TapTarget.forView(
-                    findViewById(R.id.nav_shortcuts),
-                    getString(R.string.highlight_nav_shortcuts)
-                ),
+            TapTarget.forView(
+                findViewById(R.id.nav_shortcuts),
+                getString(R.string.highlight_nav_shortcuts)
+            ),
 
-                TapTarget.forView(
-                    findViewById(R.id.nav_settings),
-                    getString(R.string.highlight_nav_settings)
-                ),
+            TapTarget.forView(
+                findViewById(R.id.nav_settings),
+                getString(R.string.highlight_nav_settings)
+            ),
 
-                TapTarget.forView(
-                    findViewById(R.id.nav_file_manager),
-                    getString(R.string.highlight_nav_files),
-                    getString(R.string.highlight_nav_files_description)
-                )
-            ).listener(object : TapTargetSequence.Listener {
-                override fun onSequenceFinish() {
-                }
+            TapTarget.forView(
+                findViewById(R.id.nav_file_manager),
+                getString(R.string.highlight_nav_files),
+                getString(R.string.highlight_nav_files_description)
+            )
+        ).listener(object : TapTargetSequence.Listener {
+            override fun onSequenceFinish() {
+            }
 
-                override fun onSequenceStep(lastTarget: TapTarget, targetClicked: Boolean) {
-                    if (targetClicked) {
-                        when (currentState) {
-                            HighlightState.HIGHLIGHT_SHORTCUTS -> {
-                                bottomNavigation?.selectedItemId = R.id.nav_shortcuts
-                                currentState = HighlightState.HIGHLIGHT_SETTINGS
-                                preferences!!.edit().apply {
-                                    putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
-                                    apply()
-                                }
+            override fun onSequenceStep(lastTarget: TapTarget, targetClicked: Boolean) {
+                if (targetClicked) {
+                    when (currentState) {
+                        HighlightState.HIGHLIGHT_SHORTCUTS -> {
+                            bottomNavigation?.selectedItemId = R.id.nav_shortcuts
+                            currentState = HighlightState.HIGHLIGHT_SETTINGS
+                            preferences!!.edit().apply {
+                                putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
+                                apply()
                             }
-                            HighlightState.HIGHLIGHT_SETTINGS -> {
-                                bottomNavigation?.selectedItemId = R.id.nav_settings
-                                currentState = HighlightState.HIGHLIGHT_FILES
-                                preferences!!.edit().apply {
-                                    putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
-                                    apply()
-                                }
+                        }
+                        HighlightState.HIGHLIGHT_SETTINGS -> {
+                            bottomNavigation?.selectedItemId = R.id.nav_settings
+                            currentState = HighlightState.HIGHLIGHT_FILES
+                            preferences!!.edit().apply {
+                                putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
+                                apply()
                             }
-                            HighlightState.HIGHLIGHT_FILES -> {
-                                bottomNavigation?.selectedItemId = R.id.nav_file_manager
-                                currentState = HighlightState.HIGHLIGHT_DONE
-                                preferences!!.edit().apply {
-                                    putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
-                                    apply()
-                                }
+                        }
+                        HighlightState.HIGHLIGHT_FILES -> {
+                            bottomNavigation?.selectedItemId = R.id.nav_file_manager
+                            currentState = HighlightState.HIGHLIGHT_DONE
+                            preferences!!.edit().apply {
+                                putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
+                                apply()
                             }
-                            else -> {
-                                return
-                            }
+                        }
+                        else -> {
+                            return
                         }
                     }
                 }
+            }
 
-                override fun onSequenceCanceled(lastTarget: TapTarget) {
-                }
-            })
+            override fun onSequenceCanceled(lastTarget: TapTarget) {
+            }
+        })
             .start()
     }
 
@@ -1006,7 +1006,7 @@ class MainActivity : AppCompatActivity() {
         var fileManagerDefaultDir: String = ""
         var fileManagerCwd: String? = null
         var selectedFile: String = ""
-        var miceWineVersion: String = "MiceWine ${BuildConfig.VERSION_NAME} (git-${BuildConfig.GIT_SHORT_SHA})"
+        var miceWineVersion: String = "Windroid ${BuildConfig.VERSION_NAME} (git-${BuildConfig.GIT_SHORT_SHA})"
         var vulkanDriverDeviceName: String? = null
         var cpuAffinity: String? = null
         var screenFpsLimit: Int = 60
@@ -1035,7 +1035,7 @@ class MainActivity : AppCompatActivity() {
                 val driveC = File("$winePrefix/drive_c")
                 val wineUtils = File("$appRootDir/wine-utils")
                 val startMenu = File("$driveC/ProgramData/Microsoft/Windows/Start Menu")
-                val userSharedFolder = File("/storage/emulated/0/MiceWine")
+                val userSharedFolder = File("/storage/emulated/0/Windroid")
                 val localAppData = File("$driveC/users/$unixUsername/AppData")
                 val system32 = File("$driveC/windows/system32")
                 val syswow64 = File("$driveC/windows/syswow64")

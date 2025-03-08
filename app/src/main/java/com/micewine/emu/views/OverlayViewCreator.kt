@@ -57,12 +57,12 @@ class OverlayViewCreator @JvmOverloads constructor(
 
     private val buttonPaint: Paint = Paint().apply {
         strokeWidth = 8F
-        color = Color.RED
+        color = Color.WHITE
         style = Paint.Style.STROKE
     }
 
     private val textPaint: Paint = Paint().apply {
-        color = Color.RED
+        color = Color.WHITE
         textAlign = Paint.Align.CENTER
         textSize = 50F
     }
