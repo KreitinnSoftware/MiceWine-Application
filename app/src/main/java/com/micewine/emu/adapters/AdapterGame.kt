@@ -17,44 +17,24 @@ import com.micewine.emu.activities.EmulationActivity
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_RUN_WINE
 import java.io.File
 
-class AdapterGame(private val gameList: MutableList<GameItem>, private val activity: Activity) : RecyclerView.Adapter<AdapterGame.ViewHolder>() {
+class AdapterGame(
+    private val gameList: MutableList<GameItem>,
+    private val activity: Activity
+) : RecyclerView.Adapter<AdapterGame.ViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_game_item, parent, false)
+        val itemView = LayoutInflater.from(parent.context)
+            .inflate(R.layout.adapter_game_item, parent, false)
         return ViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val sList = gameList[position]
-        holder.titleGame.text = sList.name
-
-        val imageFile = File(sList.iconPath)
-
-        if (imageFile.exists() && imageFile.length() > 0) {
-            val imageBitmap = BitmapFactory.decodeFile(sList.iconPath)
-
-            if (imageBitmap != null) {
-                holder.gameImage.setImageBitmap(
-                    resizeBitmap(
-                        imageBitmap, holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height
-                    )
-                )
-            }
-        } else if (sList.iconPath == "") {
-            holder.gameImage.setImageBitmap(resizeBitmap(
-                BitmapFactory.decodeResource(activity.resources,
-                    R.drawable._363211_game_gaming_play_steam_valve_85503
-                ), holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height)
-            )
-        } else {
-            holder.gameImage.setImageBitmap(
-                Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888),
-            )
-        }
+        val game = gameList[position]
+        holder.titleGame.text = game.name
+        holder.setGameImage(game.iconPath)
     }
 
-    override fun getItemCount(): Int {
-        return gameList.size
-    }
+    override fun getItemCount(): Int = gameList.size
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateList(newList: List<GameItem>) {
@@ -63,11 +43,9 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val activ
         notifyDataSetChanged()
     }
 
-    private fun resizeBitmap(originalBitmap: Bitmap, width: Int, height: Int): Bitmap {
-        return Bitmap.createScaledBitmap(originalBitmap, width, height, false)
-    }
+    inner class ViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
         val titleGame: TextView = itemView.findViewById(R.id.title_game_model)
         val gameImage: ImageView = itemView.findViewById(R.id.img_game)
 
@@ -76,32 +54,47 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val activ
             itemView.setOnLongClickListener(this)
         }
 
-        override fun onClick(v: View) {
-            val gameModel = gameList[adapterPosition]
+        fun setGameImage(iconPath: String) {
+            val imageFile = File(iconPath)
 
-            selectedGameName = gameModel.name
-
-            val exeFile = File(gameModel.exePath)
-            var exePath = gameModel.exePath
-            var exeArguments = gameModel.exeArguments
-
-            if (!exeFile.exists()) {
-                if (exeFile.path == activity.getString(R.string.desktop_mode_init)) {
-                    exePath = ""
-                    exeArguments = ""
-                } else {
-                    activity.runOnUiThread {
-                        Toast.makeText(activity, "", Toast.LENGTH_SHORT).show()
+            val bitmap = when {
+                imageFile.exists() && imageFile.length() > 0 -> {
+                    BitmapFactory.decodeFile(iconPath)?.let {
+                        resizeBitmap(it, gameImage.layoutParams.width, gameImage.layoutParams.height)
                     }
-                    return
                 }
+                iconPath.isEmpty() -> {
+                    resizeBitmap(
+                        BitmapFactory.decodeResource(activity.resources, R.drawable._363211_game_gaming_play_steam_valve_85503),
+                        gameImage.layoutParams.width,
+                        gameImage.layoutParams.height
+                    )
+                }
+                else -> Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888)
+            }
+
+            gameImage.setImageBitmap(bitmap)
+        }
+
+        override fun onClick(v: View) {
+            if (adapterPosition == RecyclerView.NO_POSITION) return
+
+            val game = gameList[adapterPosition]
+            selectedGameName = game.name
+
+            val exeFile = File(game.exePath)
+
+            if (!exeFile.exists() && game.exePath != activity.getString(R.string.desktop_mode_init)) {
+                activity.runOnUiThread {
+                    Toast.makeText(activity, "Arquivo executável não encontrado!", Toast.LENGTH_SHORT).show()
+                }
+                return
             }
 
             val intent = Intent(activity, EmulationActivity::class.java)
-
             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
-                putExtra("exePath", exePath)
-                putExtra("exeArguments", exeArguments)
+                putExtra("exePath", game.exePath)
+                putExtra("exeArguments", game.exeArguments)
             }
 
             activity.sendBroadcast(runWineIntent)
@@ -109,19 +102,21 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val activ
         }
 
         override fun onLongClick(v: View): Boolean {
-            if (adapterPosition == 0) {
+            if (adapterPosition == RecyclerView.NO_POSITION || adapterPosition == 0) {
                 return true
             }
 
-            val gameModel = gameList[adapterPosition]
-
-            selectedGameName = gameModel.name
-
+            val game = gameList[adapterPosition]
+            selectedGameName = game.name
             return false
         }
     }
 
-    class GameItem(
+    private fun resizeBitmap(originalBitmap: Bitmap, width: Int, height: Int): Bitmap {
+        return Bitmap.createScaledBitmap(originalBitmap, width, height, false)
+    }
+
+    data class GameItem(
         var name: String,
         var exePath: String,
         var exeArguments: String,

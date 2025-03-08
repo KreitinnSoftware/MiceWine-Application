@@ -308,4 +308,3 @@ class OverlayViewCreator @JvmOverloads constructor(
         var lastSelectedType = BUTTON
     }
 }
-s

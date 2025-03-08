@@ -29,11 +29,9 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:src="@drawable/icon_grayscale"
             android:padding="80dp"
-            app:tintMode="multiply"
-            app:tint="?attr/colorAccent">
-        </ImageView>
+            android:src="@drawable/icon_grayscale"
+            app:tintMode="multiply"></ImageView>
 
     </LinearLayout>
 
