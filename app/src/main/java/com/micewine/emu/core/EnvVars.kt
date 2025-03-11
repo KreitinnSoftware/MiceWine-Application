@@ -43,11 +43,10 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedWine
 import com.micewine.emu.activities.MainActivity.Companion.strBoolToNumStr
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
+import com.micewine.emu.activities.MainActivity.Companion.wineESync
 import com.micewine.emu.activities.MainActivity.Companion.wineLogLevel
-import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.fragments.EnvVarsSettingsFragment.Companion.ENV_VARS_KEY
 import com.micewine.emu.fragments.EnvironmentVariable
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 
 object EnvVars {
     private lateinit var sharedPreferences: SharedPreferences
@@ -150,6 +149,7 @@ object EnvVars {
             vars.add("WINEDEBUG=-all")
         }
 
-        vars.add("WINEESYNC=${strBoolToNumStr(getWineESync(selectedGameName))}")
+        vars.add("WINE_Z_DISK=$appRootDir")
+        vars.add("WINEESYNC=${strBoolToNumStr(wineESync)}")
     }
 }

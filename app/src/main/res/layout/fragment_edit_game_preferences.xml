@@ -141,6 +141,23 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textStyle="bold"
+                android:text="@string/select_driver_title">
+            </TextView>
+
+            <Spinner
+                android:id="@+id/selectedDriver"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+            </Spinner>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 android:text="@string/select_d3dx_title">
             </TextView>
 

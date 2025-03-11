@@ -1,13 +1,12 @@
 package com.micewine.emu.core
 
 import android.os.Build
+import com.micewine.emu.activities.MainActivity.Companion.selectedCpuAffinity
 import com.micewine.emu.activities.MainActivity.Companion.wineDisksFolder
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
-import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getCpuAffinity
 import java.io.File
 import kotlin.math.abs
 
@@ -17,7 +16,7 @@ object WineWrapper {
     fun getCpuHexMask(): String {
         val availCpus = Runtime.getRuntime().availableProcessors()
         val cpuMask = MutableList(availCpus) { '0' }
-        val cpuAffinity = getCpuAffinity(selectedGameName).replace(",", "")
+        val cpuAffinity = selectedCpuAffinity!!.replace(",", "")
 
         for (element in cpuAffinity) {
             cpuMask[abs(element.toString().toInt() - availCpus) - 1] = '1'

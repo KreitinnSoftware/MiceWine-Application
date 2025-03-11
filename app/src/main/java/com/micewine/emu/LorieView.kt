@@ -161,7 +161,6 @@ class LorieView : SurfaceView, InputStub {
 
     private val dimensionsFromSettings: Unit
         get() {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
             val width = measuredWidth
             val height = measuredHeight
             val resolution = selectedResolution!!.split("x".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()

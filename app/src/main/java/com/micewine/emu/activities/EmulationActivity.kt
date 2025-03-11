@@ -61,6 +61,8 @@ import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.activities.MainActivity.Companion.getCpuInfo
 import com.micewine.emu.activities.MainActivity.Companion.getMemoryInfo
 import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
+import com.micewine.emu.activities.MainActivity.Companion.selectedControllerPreset
+import com.micewine.emu.activities.MainActivity.Companion.selectedVirtualControllerPreset
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
@@ -568,10 +570,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         if (selectedGameName == getString(R.string.desktop_mode_init)) {
             overlayView?.loadPreset(null)
         } else {
-            overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
+            overlayView?.loadPreset(selectedVirtualControllerPreset)
         }
 
-        prepareButtonsAxisValues(this, getControllerPreset(selectedGameName))
+        prepareButtonsAxisValues(this, selectedControllerPreset)
     }
 
     public override fun onPause() {

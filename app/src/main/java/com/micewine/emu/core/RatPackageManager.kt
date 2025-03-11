@@ -93,15 +93,6 @@ object RatPackageManager {
                 installingRootFS = false
             }
             "VulkanDriver" -> {
-                preferences.apply {
-                    if (getString(SELECTED_DRIVER, "") == "") {
-                        edit().apply {
-                            putString(SELECTED_DRIVER, File(extractDir!!).name)
-                            apply()
-                        }
-                    }
-                }
-
                 val driverLibPath = "$extractDir/files/usr/lib/${ratPackage.driverLib}"
 
                 File("$extractDir/pkg-header").writeText("name=${ratPackage.name}\ncategory=${ratPackage.category}\nversion=${ratPackage.version}\narchitecture=${ratPackage.architecture}\nvkDriverLib=$driverLibPath\n")

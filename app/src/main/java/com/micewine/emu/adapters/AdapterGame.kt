@@ -15,6 +15,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.EmulationActivity
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_RUN_WINE
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getCpuAffinity
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getEnableXInput
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineVirtualDesktop
 import java.io.File
 
 class AdapterGame(private val gameList: MutableList<GameItem>, private val activity: Activity) : RecyclerView.Adapter<AdapterGame.ViewHolder>() {
@@ -100,6 +114,20 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val activ
             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                 putExtra("exePath", exePath)
                 putExtra("exeArguments", exeArguments)
+                putExtra("driverName", getVulkanDriver(selectedGameName))
+                putExtra("box64Preset", getBox64Preset(selectedGameName))
+                putExtra("displayResolution", getDisplaySettings(selectedGameName)[1])
+                putExtra("virtualControllerPreset", getVirtualControllerPreset(selectedGameName))
+                putExtra("controllerPreset", getControllerPreset(selectedGameName))
+                putExtra("d3dxRenderer", getD3DXRenderer(selectedGameName))
+                putExtra("wineD3D", getWineD3DVersion(selectedGameName))
+                putExtra("dxvk", getDXVKVersion(selectedGameName))
+                putExtra("vkd3d", getVKD3DVersion(selectedGameName))
+                putExtra("esync", getWineESync(selectedGameName))
+                putExtra("services", getWineServices(selectedGameName))
+                putExtra("virtualDesktop", getWineVirtualDesktop(selectedGameName))
+                putExtra("xinput", getEnableXInput(selectedGameName))
+                putExtra("cpuAffinity", getCpuAffinity(selectedGameName))
             }
 
             activity.sendBroadcast(runWineIntent)

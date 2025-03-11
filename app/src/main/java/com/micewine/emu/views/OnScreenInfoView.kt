@@ -4,9 +4,11 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.View
-import com.micewine.emu.activities.MainActivity.Companion.d3dxRenderer
+import com.micewine.emu.activities.MainActivity.Companion.selectedD3DXRenderer
 import com.micewine.emu.activities.MainActivity.Companion.enableCpuCounter
 import com.micewine.emu.activities.MainActivity.Companion.enableDebugInfo
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
@@ -23,6 +25,18 @@ class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: Attri
         strokeWidth = 8F
     }
 
+    private val handler = Handler(Looper.getMainLooper())
+    private val updateRunnable = object : Runnable {
+        override fun run() {
+            invalidate()
+            handler.postDelayed(this, 800)
+        }
+    }
+
+    init {
+        handler.post(updateRunnable)
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -37,16 +51,14 @@ class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: Attri
         if (enableDebugInfo) {
             onScreenInfo(canvas)
         }
-
-        invalidate()
     }
 
     private fun onScreenInfo(c: Canvas) {
         drawText(miceWineVersion, getTextEndX(c, miceWineVersion), 40F, c)
 
-        if (d3dxRenderer == "DXVK") {
+        if (selectedD3DXRenderer == "DXVK") {
             drawText(selectedDXVK!!, getTextEndX(c, selectedDXVK!!), 80F, c)
-        } else if (d3dxRenderer == "WineD3D") {
+        } else if (selectedD3DXRenderer == "WineD3D") {
             drawText(selectedWineD3D!!, getTextEndX(c, selectedWineD3D!!), 80F, c)
         }
 

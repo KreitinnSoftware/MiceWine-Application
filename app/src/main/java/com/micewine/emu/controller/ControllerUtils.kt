@@ -25,6 +25,7 @@ import android.view.MotionEvent.AXIS_Y
 import android.view.MotionEvent.AXIS_Z
 import androidx.preference.PreferenceManager
 import com.micewine.emu.LorieView
+import com.micewine.emu.activities.MainActivity.Companion.enableXInput
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_MINUS_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_PLUS_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_Y_MINUS_KEY
@@ -50,7 +51,6 @@ import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_THUMBR
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_Y_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
-import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.aPressed
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.bPressed
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.dpadStatus
@@ -72,7 +72,6 @@ import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getDeadZone
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMapping
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMouseSensibility
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getEnableXInput
 import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
@@ -118,7 +117,6 @@ object ControllerUtils {
     private var mouseSensibility: Float = 0F
     private var axisXVelocity: Float = 0F
     private var axisYVelocity: Float = 0F
-    private var enableXInput: Boolean = false
 
     private const val LEFT = 1
     private const val RIGHT = 2
@@ -202,8 +200,6 @@ object ControllerUtils {
 
         deadZone = getDeadZone(presetName ?: preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
         mouseSensibility = getMouseSensibility(presetName ?: preferences.getString(SELECTED_CONTROLLER_PRESET_KEY, "default")!!).toFloat() / 100
-
-        enableXInput = getEnableXInput(selectedGameName)
     }
 
     private fun getGameControllerIds(): List<Int> {

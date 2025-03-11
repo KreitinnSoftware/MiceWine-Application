@@ -48,7 +48,6 @@ import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
 import com.micewine.emu.adapters.AdapterGame
-import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.core.HighlightState
 import com.micewine.emu.databinding.FragmentShortcutsBinding
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
@@ -482,6 +481,24 @@ class ShortcutsFragment : Fragment() {
             return gameList[index].d3dxRenderer
         }
 
+        fun putVulkanDriver(name: String, driverName: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].vulkanDriver = driverName
+
+            saveShortcuts()
+        }
+
+        fun getVulkanDriver(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return ""
+
+            return gameList[index].vulkanDriver
+        }
+
         fun putDisplaySettings(name: String, displayMode: String, displayResolution: String) {
             val index = gameList.indexOfFirst { it.name == name }
 
@@ -558,9 +575,7 @@ class ShortcutsFragment : Fragment() {
         fun addGameToList(path: String, prettyName: String, icon: String) {
             val gameExists = gameList.any { it.name == prettyName }
 
-            if (gameExists) {
-                return
-            }
+            if (gameExists) return
 
             gameList.add(
                 GameItem(
@@ -573,6 +588,7 @@ class ShortcutsFragment : Fragment() {
                     "default",
                     "16:9",
                     "1280x720",
+                    "",
                     "DXVK",
                     "DXVK-1.10.3-async",
                     "WineD3D-(10.0)",
@@ -596,6 +612,8 @@ class ShortcutsFragment : Fragment() {
         fun removeGameFromList(name: String) {
             val index = gameList.indexOfFirst { it.name == name }
 
+            if (index == -1) return
+
             gameList.removeAt(index)
             gameListNames.removeAt(index)
 
@@ -607,6 +625,8 @@ class ShortcutsFragment : Fragment() {
         fun editGameFromList(name: String, newName: String, newArguments: String) {
             val index = gameList.indexOfFirst { it.name == name }
 
+            if (index == -1) return
+
             gameList[index].name = newName
             gameList[index].exeArguments = newArguments
             gameListNames[index].name = newName
@@ -617,13 +637,15 @@ class ShortcutsFragment : Fragment() {
             recyclerView?.adapter?.notifyItemChanged(index)
         }
 
-        fun setIconToGame(context: Context, uri: Uri) {
-            val index = gameList.indexOfFirst { it.name == selectedGameName }
+        fun setIconToGame(name: String, context: Context, uri: Uri) {
+            val index = gameList.indexOfFirst { it.name == name }
 
-            createIconCache(context, uri, selectedGameName)
+            if (index == -1) return
 
-            gameList[index].iconPath = "$usrDir/icons/$selectedGameName-icon"
-            gameListNames[index].iconPath = "$usrDir/icons/$selectedGameName-icon"
+            createIconCache(context, uri, name)
+
+            gameList[index].iconPath = "$usrDir/icons/$name-icon"
+            gameListNames[index].iconPath = "$usrDir/icons/$name-icon"
 
             saveShortcuts()
 
@@ -633,11 +655,15 @@ class ShortcutsFragment : Fragment() {
         fun getGameIcon(name: String): Bitmap? {
             val index = gameList.indexOfFirst { it.name == name }
 
+            if (index == -1) return null
+
             return BitmapFactory.decodeFile(gameList[index].iconPath)
         }
 
         fun getGameExeArguments(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return ""
 
             return gameList[index].exeArguments
         }
@@ -711,6 +737,7 @@ class ShortcutsFragment : Fragment() {
             var virtualControllerPreset: String,
             var displayMode: String,
             var displayResolution: String,
+            var vulkanDriver: String,
             var d3dxRenderer: String,
             var dxvkVersion: String,
             var wineD3DVersion: String,

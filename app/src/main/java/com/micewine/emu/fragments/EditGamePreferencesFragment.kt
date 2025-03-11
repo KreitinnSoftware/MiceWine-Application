@@ -25,8 +25,12 @@ import androidx.fragment.app.DialogFragment
 import androidx.preference.PreferenceManager
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.micewine.emu.R
+import com.micewine.emu.activities.EmulationActivity
+import com.micewine.emu.activities.MainActivity.Companion.ACTION_RUN_WINE
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_ICON
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
+import com.micewine.emu.activities.MainActivity.Companion.selectedCpuAffinity
+import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Presets
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getControllerPresets
@@ -45,6 +49,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameExeArgument
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameIcon
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
@@ -58,6 +63,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putEnableXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineServices
@@ -66,7 +72,7 @@ import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Compani
 import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
 import java.io.File
 
-class EditGamePreferencesFragment : DialogFragment() {
+class EditGamePreferencesFragment(private val type: Int, private val exePath: File? = null) : DialogFragment() {
     private var preferences: SharedPreferences? = null
     private var imageView: ImageView? = null
 
@@ -80,6 +86,7 @@ class EditGamePreferencesFragment : DialogFragment() {
         val buttonCancel = view.findViewById<Button>(R.id.buttonCancel)
         val selectedDisplayModeSpinner = view.findViewById<Spinner>(R.id.selectedDisplayMode)
         val selectedDisplayResolutionSpinner = view.findViewById<Spinner>(R.id.selectedDisplayResolution)
+        val selectedDriverSpinner = view.findViewById<Spinner>(R.id.selectedDriver)
         val selectedD3DXRendererSpinner = view.findViewById<Spinner>(R.id.selectedD3DXRenderer)
         val selectedDXVKSpinner = view.findViewById<Spinner>(R.id.selectedDXVK)
         val selectedWineD3DSpinner = view.findViewById<Spinner>(R.id.selectedWineD3D)
@@ -95,40 +102,58 @@ class EditGamePreferencesFragment : DialogFragment() {
 
         imageView = view.findViewById(R.id.imageView)
 
-        val imageBitmap = getGameIcon(selectedGameName)
+        if (type == EDIT_GAME_PREFERENCES) {
+            val imageBitmap = getGameIcon(selectedGameName)
 
-        if (imageBitmap != null) {
-            imageView?.setImageBitmap(
-                resizeBitmap(
-                    imageBitmap, imageView?.layoutParams?.width!!, imageView?.layoutParams?.height!!
+            if (imageBitmap != null) {
+                imageView?.setImageBitmap(
+                    resizeBitmap(
+                        imageBitmap, imageView?.layoutParams?.width!!, imageView?.layoutParams?.height!!
+                    )
                 )
-            )
+            }
+        } else if (type == FILE_MANAGER_START_PREFERENCES) {
+            val iconFile = File("$usrDir/icons/${exePath?.nameWithoutExtension}-icon")
+
+            if (iconFile.exists() && iconFile.length() > 0) {
+                imageView?.setImageBitmap(BitmapFactory.decodeFile(iconFile.path))
+            } else {
+                imageView?.setImageResource(R.drawable.ic_log)
+            }
         }
 
         val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create()
 
         preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
-        editTextNewName.setText(selectedGameName)
-        editTextArguments.setText(getGameExeArguments(selectedGameName))
+        if (type == EDIT_GAME_PREFERENCES) {
+            editTextNewName.setText(selectedGameName)
+            editTextArguments.setText(getGameExeArguments(selectedGameName))
 
-        if (selectedGameName == getString(R.string.desktop_mode_init)) {
-            editTextNewName.isEnabled = false
-            editTextArguments.isEnabled = false
-            enableWineVirtualDesktopSwitch.isEnabled = false
-            enableWineVirtualDesktopSwitch.isChecked = true
+            if (selectedGameName == getString(R.string.desktop_mode_init)) {
+                editTextNewName.isEnabled = false
+                editTextArguments.isEnabled = false
+                enableWineVirtualDesktopSwitch.isEnabled = false
+                enableWineVirtualDesktopSwitch.isChecked = true
 
-            imageView?.setImageBitmap(
-                resizeBitmap(
-                    BitmapFactory.decodeResource(requireActivity().resources, R.drawable.default_icon), imageView?.layoutParams?.width!!, imageView?.layoutParams?.height!!
+                imageView?.setImageBitmap(
+                    resizeBitmap(
+                        BitmapFactory.decodeResource(requireActivity().resources, R.drawable.default_icon), imageView?.layoutParams?.width!!, imageView?.layoutParams?.height!!
+                    )
                 )
-            )
-        }
+            }
 
-        imageView?.setOnClickListener {
-            requireActivity().sendBroadcast(
-                Intent(ACTION_SELECT_ICON)
-            )
+            imageView?.setOnClickListener {
+                requireActivity().sendBroadcast(
+                    Intent(ACTION_SELECT_ICON)
+                )
+            }
+        } else if (type == FILE_MANAGER_START_PREFERENCES) {
+            editTextNewName.setText(exePath?.nameWithoutExtension)
+            editTextNewName.isEnabled = false
+            editTextArguments.setText("")
+
+            selectedGameName = ""
         }
 
         val controllerProfilesNames: List<String> = getControllerPresets().map { it[0] }
@@ -195,6 +220,29 @@ class EditGamePreferencesFragment : DialogFragment() {
             }
         }
 
+        val vulkanDriversId = File("$appRootDir/packages").listFiles()?.filter { it.name.startsWith("VulkanDriver-") }?.mapNotNull { it.name }!!
+
+        selectedDriverSpinner.apply {
+            val vulkanDrivers = File("$appRootDir/packages").listFiles()?.filter { it.name.startsWith("VulkanDriver-") }?.mapNotNull { "${File(it.path + "/pkg-header").readLines()[0].substringAfter("=")} (${File(it.path + "/pkg-header").readLines()[2].substringAfter("=")})" }!!
+            adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, vulkanDrivers)
+            val index = vulkanDriversId.indexOf(getVulkanDriver(selectedGameName))
+            setSelection(if (index == -1) 0 else index)
+
+            onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    putVulkanDriver(selectedGameName, vulkanDriversId[position])
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+        }
+
         selectedD3DXRendererSpinner.apply {
             val d3dxRenderers = listOf("DXVK", "WineD3D")
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, d3dxRenderers)
@@ -207,7 +255,7 @@ class EditGamePreferencesFragment : DialogFragment() {
                     position: Int,
                     id: Long
                 ) {
-                    val selectedItem = parent?.getItemAtPosition(position).toString()
+                    val selectedItem = d3dxRenderers[position]
 
                     when (selectedItem) {
                         "DXVK" -> {
@@ -230,7 +278,7 @@ class EditGamePreferencesFragment : DialogFragment() {
         }
 
         selectedDXVKSpinner.apply {
-            val dxvkVersions = File("$appRootDir/wine-utils/DXVK").listFiles()?.map { it.name }?.sorted()!!
+            val dxvkVersions = File("$appRootDir/wine-utils/DXVK").listFiles()?.map { it.name }!!
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, dxvkVersions)
             setSelection(dxvkVersions.indexOf(getDXVKVersion(selectedGameName)))
 
@@ -241,9 +289,7 @@ class EditGamePreferencesFragment : DialogFragment() {
                     position: Int,
                     id: Long
                 ) {
-                    val selectedItem = parent?.getItemAtPosition(position).toString()
-
-                    putDXVKVersion(selectedGameName, selectedItem)
+                    putDXVKVersion(selectedGameName, dxvkVersions[position])
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -252,7 +298,7 @@ class EditGamePreferencesFragment : DialogFragment() {
         }
 
         selectedWineD3DSpinner.apply {
-            val wineD3DVersions = File("$appRootDir/wine-utils/WineD3D").listFiles()?.map { it.name }?.sorted()!!
+            val wineD3DVersions = File("$appRootDir/wine-utils/WineD3D").listFiles()?.map { it.name }!!
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, wineD3DVersions)
             setSelection(wineD3DVersions.indexOf(getWineD3DVersion(selectedGameName)))
 
@@ -263,9 +309,7 @@ class EditGamePreferencesFragment : DialogFragment() {
                     position: Int,
                     id: Long
                 ) {
-                    val selectedItem = parent?.getItemAtPosition(position).toString()
-
-                    putWineD3DVersion(selectedGameName, selectedItem)
+                    putWineD3DVersion(selectedGameName, wineD3DVersions[position])
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -274,7 +318,7 @@ class EditGamePreferencesFragment : DialogFragment() {
         }
 
         selectedVKD3DSpinner.apply {
-            val vkd3dVersions = File("$appRootDir/wine-utils/VKD3D").listFiles()?.map { it.name }?.sorted()!!
+            val vkd3dVersions = File("$appRootDir/wine-utils/VKD3D").listFiles()?.map { it.name }!!
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, vkd3dVersions)
             setSelection(vkd3dVersions.indexOf(getVKD3DVersion(selectedGameName)))
 
@@ -285,9 +329,7 @@ class EditGamePreferencesFragment : DialogFragment() {
                     position: Int,
                     id: Long
                 ) {
-                    val selectedItem = parent?.getItemAtPosition(position).toString()
-
-                    putVKD3DVersion(selectedGameName, selectedItem)
+                    putVKD3DVersion(selectedGameName, vkd3dVersions[position])
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -330,7 +372,7 @@ class EditGamePreferencesFragment : DialogFragment() {
         }
 
         cpuAffinitySpinner.apply {
-            adapter = CPUAffinityAdapter(requireActivity(), availableCPUs, cpuAffinitySpinner)
+            adapter = CPUAffinityAdapter(requireActivity(), availableCPUs, cpuAffinitySpinner, type)
         }
 
         selectedControllerProfileSpinner.apply {
@@ -344,7 +386,7 @@ class EditGamePreferencesFragment : DialogFragment() {
                     position: Int,
                     id: Long
                 ) {
-                    putControllerPreset(selectedGameName, parent?.selectedItem!!.toString())
+                    putControllerPreset(selectedGameName, controllerProfilesNames[position])
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -363,7 +405,7 @@ class EditGamePreferencesFragment : DialogFragment() {
                     position: Int,
                     id: Long
                 ) {
-                    putVirtualControllerPreset(selectedGameName, parent?.selectedItem!!.toString())
+                    putVirtualControllerPreset(selectedGameName, virtualControllerProfilesNames[position])
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -382,7 +424,7 @@ class EditGamePreferencesFragment : DialogFragment() {
                     position: Int,
                     id: Long
                 ) {
-                    putBox64Preset(selectedGameName, parent?.selectedItem!!.toString())
+                    putBox64Preset(selectedGameName, box64ProfilesNames[position])
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -391,14 +433,40 @@ class EditGamePreferencesFragment : DialogFragment() {
         }
 
         buttonContinue.setOnClickListener {
-            val newName = editTextNewName.text.toString()
-            val newArguments = editTextArguments.text.toString()
+            if (type == EDIT_GAME_PREFERENCES) {
+                val newName = editTextNewName.text.toString()
+                val newArguments = editTextArguments.text.toString()
 
-            if (newName == "") {
-                return@setOnClickListener
+                if (newName == "") {
+                    return@setOnClickListener
+                }
+
+                editGameFromList(selectedGameName, newName, newArguments)
+            } else if (type == FILE_MANAGER_START_PREFERENCES) {
+                val runWineIntent = Intent(ACTION_RUN_WINE).apply {
+                    putExtra("exePath", exePath?.path)
+                    putExtra("exeArguments", editTextArguments.text.toString())
+                    putExtra("driverName", vulkanDriversId[selectedDriverSpinner.selectedItemPosition])
+                    putExtra("box64Preset", selectedBox64ProfileSpinner.selectedItem.toString())
+                    putExtra("displayResolution", selectedDisplayResolutionSpinner.selectedItem.toString())
+                    putExtra("virtualControllerPreset", selectedVirtualControllerProfileSpinner.selectedItem.toString())
+                    putExtra("controllerPreset", selectedControllerProfileSpinner.selectedItem.toString())
+                    putExtra("d3dxRenderer", selectedD3DXRendererSpinner.selectedItem.toString())
+                    putExtra("wineD3D", selectedWineD3DSpinner.selectedItem.toString())
+                    putExtra("dxvk", selectedDXVKSpinner.selectedItem.toString())
+                    putExtra("vkd3d", selectedVKD3DSpinner.selectedItem.toString())
+                    putExtra("esync", wineESyncSwitch.isChecked)
+                    putExtra("services", wineServicesSwitch.isChecked)
+                    putExtra("virtualDesktop", enableWineVirtualDesktopSwitch.isChecked)
+                    putExtra("xinput", enableXInputSwitch.isChecked)
+                    putExtra("cpuAffinity", selectedCpuAffinity)
+                }
+
+                requireActivity().sendBroadcast(runWineIntent)
+                requireActivity().startActivity(
+                    Intent(requireActivity(), EmulationActivity::class.java)
+                )
             }
-
-            editGameFromList(selectedGameName, newName, newArguments)
 
             dismiss()
         }
@@ -429,10 +497,14 @@ class EditGamePreferencesFragment : DialogFragment() {
     }
 
     companion object {
+        const val EDIT_GAME_PREFERENCES = 0
+        const val FILE_MANAGER_START_PREFERENCES = 1
+
         class CPUAffinityAdapter(
             val activity: Activity,
             private val arrayElements: Array<String>,
-            private val spinner: Spinner
+            private val spinner: Spinner,
+            private val type: Int
         ) : SpinnerAdapter {
             val checked = BooleanArray(count)
 
@@ -508,7 +580,11 @@ class EditGamePreferencesFragment : DialogFragment() {
                         builder.deleteCharAt(0)
                     }
 
-                    putCpuAffinity(selectedGameName, builder.toString())
+                    if (type == EDIT_GAME_PREFERENCES) {
+                        putCpuAffinity(selectedGameName, builder.toString())
+                    } else if (type == FILE_MANAGER_START_PREFERENCES) {
+                        selectedCpuAffinity = builder.toString()
+                    }
 
                     spinner.adapter = this
                 }
