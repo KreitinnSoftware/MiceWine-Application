@@ -177,4 +177,6 @@
     <string name="others">Другие</string>
     <string name="enable_xinput_title">Включить геймпад XInput</string>
     <string name="enable_wine_virtual_desktop">Включить виртуальный рабочий стол Wine</string>
+    <string name="shape_text">Shape</string>
+    <string name="button_mapping_text">Button Mapping</string>
 </resources>

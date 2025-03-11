@@ -22,6 +22,7 @@ import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
 import com.micewine.emu.databinding.ActivityVirtualControllerMapperBinding
 import com.micewine.emu.fragments.EditVirtualButtonFragment
 import com.micewine.emu.views.OverlayView
+import com.micewine.emu.views.OverlayView.Companion.SHAPE_CIRCLE
 import com.micewine.emu.views.OverlayView.Companion.analogList
 import com.micewine.emu.views.OverlayView.Companion.buttonList
 import com.micewine.emu.views.OverlayViewCreator
@@ -66,7 +67,8 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
                             "--",
                             null,
                             -1,
-                            false
+                            false,
+                            SHAPE_CIRCLE
                         )
                     )
 

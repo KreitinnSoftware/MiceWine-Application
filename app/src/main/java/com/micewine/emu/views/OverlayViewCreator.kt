@@ -21,8 +21,12 @@ import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAn
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogUpKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonRadius
+import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonShape
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getMapping
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.putMapping
+import com.micewine.emu.views.OverlayView.Companion.SHAPE_CIRCLE
+import com.micewine.emu.views.OverlayView.Companion.SHAPE_RECTANGLE
+import com.micewine.emu.views.OverlayView.Companion.SHAPE_SQUARE
 import com.micewine.emu.views.OverlayView.Companion.analogList
 import com.micewine.emu.views.OverlayView.Companion.buttonList
 import com.micewine.emu.views.OverlayView.Companion.detectClick
@@ -128,9 +132,31 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
             buttonPaint.alpha = 220
 
-            canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
-
             paint.textSize = it.radius / 4
+
+            when (it.shape) {
+                SHAPE_CIRCLE -> {
+                    canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
+                }
+                SHAPE_SQUARE -> {
+                    canvas.drawRect(
+                        it.x - it.radius / 2,
+                        it.y - it.radius / 2,
+                        it.x + it.radius / 2,
+                        it.y + it.radius / 2,
+                        buttonPaint
+                    )
+                }
+                SHAPE_RECTANGLE -> {
+                    canvas.drawRect(
+                        it.x - it.radius / 2,
+                        it.y - it.radius / 4,
+                        it.x + it.radius / 2,
+                        it.y + it.radius / 4,
+                        buttonPaint
+                    )
+                }
+            }
 
             drawText(it.keyName, it.x, it.y + 10, canvas)
         }
@@ -188,12 +214,12 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     override fun onTouchEvent(event: MotionEvent): Boolean {
          when (event.actionMasked) {
              MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
-                 if (!detectClick(event, event.actionIndex, editButton.x, editButton.y, editButton.radius) && !detectClick(event, event.actionIndex, removeButton.x, removeButton.y, removeButton.radius)) {
+                 if (!detectClick(event, event.actionIndex, editButton.x, editButton.y, editButton.radius, SHAPE_CIRCLE) && !detectClick(event, event.actionIndex, removeButton.x, removeButton.y, removeButton.radius, SHAPE_CIRCLE)) {
                      lastSelectedButton = 0
                  }
 
                  buttonList.forEach {
-                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
                          if (selectedButton == 0) {
                              selectedButton = it.id
                              lastSelectedType = BUTTON
@@ -203,7 +229,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                  }
 
                  analogList.forEach {
-                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_CIRCLE)) {
                          if (selectedVAxis == 0) {
                              selectedVAxis = it.id
                              lastSelectedType = ANALOG
@@ -217,7 +243,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
              MotionEvent.ACTION_MOVE -> {
                  buttonList.forEach {
-                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
                          if (selectedButton > 0) {
                              buttonList[buttonList.indexOfFirst { i ->
                                  i.id == selectedButton
@@ -230,7 +256,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                  }
 
                  analogList.forEach {
-                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_CIRCLE)) {
                          if (selectedVAxis > 0) {
                              analogList[analogList.indexOfFirst { i ->
                                  i.id == selectedVAxis
@@ -247,7 +273,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
              MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_UP -> {
                  buttonList.forEach {
-                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
                          if (selectedButton == it.id) {
                              selectedButton = 0
                          }
@@ -255,17 +281,18 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                  }
 
                  analogList.forEach {
-                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_CIRCLE)) {
                          if (selectedVAxis == it.id) {
                              selectedVAxis = 0
                          }
                      }
                  }
 
-                 if (detectClick(event, event.actionIndex, editButton.x, editButton.y, editButton.radius) && lastSelectedButton > 0) {
+                 if (detectClick(event, event.actionIndex, editButton.x, editButton.y, editButton.radius, SHAPE_CIRCLE) && lastSelectedButton > 0) {
                      if (buttonList.isNotEmpty() && lastSelectedType == BUTTON) {
                          selectedButtonKeyName = buttonList[lastSelectedButton - 1].keyName
                          selectedButtonRadius = buttonList[lastSelectedButton - 1].radius.toInt()
+                         selectedButtonShape = buttonList[lastSelectedButton - 1].shape
                      }
 
                      if (analogList.isNotEmpty() && lastSelectedType == ANALOG) {
@@ -281,7 +308,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                      )
                  }
 
-                 if (detectClick(event, event.actionIndex, removeButton.x, removeButton.y, removeButton.radius) && lastSelectedButton > 0) {
+                 if (detectClick(event, event.actionIndex, removeButton.x, removeButton.y, removeButton.radius, SHAPE_CIRCLE) && lastSelectedButton > 0) {
                      if (buttonList.isNotEmpty() && lastSelectedType == BUTTON) {
                          buttonList.removeAt(lastSelectedButton - 1)
                      }

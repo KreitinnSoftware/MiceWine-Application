@@ -182,4 +182,6 @@
     <string name="others">Outros</string>
     <string name="enable_xinput_title">Ativar Controle XInput</string>
     <string name="enable_wine_virtual_desktop">Ativar Área de Trabalho Virtual Wine</string>
+    <string name="shape_text">Shape</string>
+    <string name="button_mapping_text">Button Mapping</string>
 </resources>

@@ -101,8 +101,32 @@ class OverlayView @JvmOverloads constructor(
 
             textPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
 
-            canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
             paint.textSize = it.radius / 4
+
+            when (it.shape) {
+                SHAPE_CIRCLE -> {
+                    canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
+                }
+                SHAPE_SQUARE -> {
+                    canvas.drawRect(
+                        it.x - it.radius / 2,
+                        it.y - it.radius / 2,
+                        it.x + it.radius / 2,
+                        it.y + it.radius / 2,
+                        buttonPaint
+                    )
+                }
+                SHAPE_RECTANGLE -> {
+                    canvas.drawRect(
+                        it.x - it.radius / 2,
+                        it.y - it.radius / 4,
+                        it.x + it.radius / 2,
+                        it.y + it.radius / 4,
+                        buttonPaint
+                    )
+                }
+            }
+
             canvas.drawText(it.keyName, it.x, it.y + 10, textPaint)
         }
 
@@ -136,7 +160,7 @@ class OverlayView @JvmOverloads constructor(
         when (event.actionMasked) {
             MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_DOWN -> {
                 buttonList.forEach {
-                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
                         it.isPressed = true
                         it.fingerId = event.actionIndex
 
@@ -147,7 +171,7 @@ class OverlayView @JvmOverloads constructor(
                 }
 
                 analogList.forEach {
-                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_CIRCLE)) {
                         val posX = event.getX(event.actionIndex) - it.x
                         val posY = event.getY(event.actionIndex) - it.y
 
@@ -215,7 +239,7 @@ class OverlayView @JvmOverloads constructor(
                     if (it.fingerId == event.actionIndex) {
                         it.fingerId = -1
                     }
-                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
                         handleButton(it, false)
                     }
                 }
@@ -277,7 +301,8 @@ class OverlayView @JvmOverloads constructor(
         var keyName: String,
         var keyCodes: List<Int>?,
         var fingerId: Int,
-        var isPressed: Boolean
+        var isPressed: Boolean,
+        var shape: Int
     )
 
     class VirtualAnalog(
@@ -301,12 +326,23 @@ class OverlayView @JvmOverloads constructor(
     )
 
     companion object {
+        const val SHAPE_CIRCLE = 0
+        const val SHAPE_SQUARE = 1
+        const val SHAPE_RECTANGLE = 2
+
         val buttonList = mutableListOf<VirtualButton>()
         val analogList = mutableListOf<VirtualAnalog>()
 
-        fun detectClick(event: MotionEvent, index: Int, x: Float, y: Float, radius: Float): Boolean {
-            return (event.getX(index) >= x - radius / 2 && event.getX(index) <= (x + (radius / 2))) &&
-                    (event.getY(index) >= y - radius / 2 && event.getY(index) <= (y + (radius / 2)))
+        fun detectClick(event: MotionEvent, index: Int, x: Float, y: Float, radius: Float, shape: Int): Boolean {
+            return when (shape) {
+                SHAPE_RECTANGLE -> {
+                    (event.getX(index) >= x - radius / 2 && event.getX(index) <= (x + (radius / 2))) &&
+                            (event.getY(index) >= y - radius / 4 && event.getY(index) <= (y + (radius / 4)))
+                }
+
+                else -> (event.getX(index) >= x - radius / 2 && event.getX(index) <= (x + (radius / 2))) &&
+                        (event.getY(index) >= y - radius / 2 && event.getY(index) <= (y + (radius / 2)))
+            }
         }
     }
 }

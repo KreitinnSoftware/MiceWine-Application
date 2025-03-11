@@ -18,6 +18,9 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.VirtualControllerOverlayMapper.Companion.ACTION_INVALIDATE
 import com.micewine.emu.controller.XKeyCodes.getKeyNames
 import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
+import com.micewine.emu.views.OverlayView.Companion.SHAPE_CIRCLE
+import com.micewine.emu.views.OverlayView.Companion.SHAPE_RECTANGLE
+import com.micewine.emu.views.OverlayView.Companion.SHAPE_SQUARE
 import com.micewine.emu.views.OverlayView.Companion.analogList
 import com.micewine.emu.views.OverlayView.Companion.buttonList
 import com.micewine.emu.views.OverlayViewCreator.Companion.ANALOG
@@ -56,7 +59,19 @@ class EditVirtualButtonFragment : DialogFragment() {
         }
 
         val allKeyNames = getKeyNames(lastSelectedType != ANALOG)
+        val shapes = listOf("Circle", "Square", "Rectangle")
 
+        val shapeSpinner = view.findViewById<Spinner>(R.id.shapeSpinner).apply {
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, shapes)
+            setSelection(
+                when (selectedButtonShape) {
+                    SHAPE_CIRCLE -> 0
+                    SHAPE_SQUARE -> 1
+                    SHAPE_RECTANGLE -> 2
+                    else -> -1
+                }
+            )
+        }
         val buttonSpinner = view.findViewById<Spinner>(R.id.buttonSpinner).apply {
             adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, allKeyNames)
             setSelection(allKeyNames.indexOf(selectedButtonKeyName))
@@ -97,6 +112,12 @@ class EditVirtualButtonFragment : DialogFragment() {
                 buttonList[lastSelectedButton - 1].keyCodes = getXKeyScanCodes(buttonSpinner.selectedItem.toString())
 
                 buttonList[lastSelectedButton - 1].radius = radiusSeekbar.progress.toFloat()
+
+                when (shapeSpinner.selectedItem.toString()) {
+                    "Circle" -> buttonList[lastSelectedButton - 1].shape = SHAPE_CIRCLE
+                    "Square" -> buttonList[lastSelectedButton - 1].shape = SHAPE_SQUARE
+                    "Rectangle" -> buttonList[lastSelectedButton - 1].shape = SHAPE_RECTANGLE
+                }
             } else if (lastSelectedType == ANALOG && analogList.isNotEmpty()) {
                 analogList[lastSelectedButton - 1].upKeyName = analogUpKeySpinner.selectedItem.toString()
                 analogList[lastSelectedButton - 1].upKeyCodes = getXKeyScanCodes(analogUpKeySpinner.selectedItem.toString())
@@ -133,6 +154,7 @@ class EditVirtualButtonFragment : DialogFragment() {
         var selectedAnalogDownKeyName = ""
         var selectedAnalogLeftKeyName = ""
         var selectedAnalogRightKeyName = ""
+        var selectedButtonShape = -1
         var selectedButtonRadius = 0
     }
 }

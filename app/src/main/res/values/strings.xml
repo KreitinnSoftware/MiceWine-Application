@@ -205,4 +205,6 @@
     <string name="others">Others</string>
     <string name="enable_xinput_title">Enable XInput GamePad</string>
     <string name="enable_wine_virtual_desktop">Enable Wine Virtual Desktop</string>
+    <string name="shape_text">Shape</string>
+    <string name="button_mapping_text">Button Mapping</string>
 </resources>
