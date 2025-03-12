@@ -51,6 +51,14 @@ import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_THUMBR
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_Y_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_DOWN
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT_DOWN
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT_UP
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_DOWN
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_UP
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_UP
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.aPressed
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.bPressed
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.dpadStatus
@@ -590,28 +598,28 @@ object ControllerUtils {
     private fun getDPadStatus(axisX: Float, axisY: Float, axisXNeutral: Boolean, axisYNeutral: Boolean) {
         when {
             // Up
-            axisY < -deadZone && axisXNeutral -> dpadStatus = 1
+            axisY < -deadZone && axisXNeutral -> dpadStatus = DPAD_UP
 
             // Right/Up
-            axisX > deadZone && axisY < -deadZone -> dpadStatus = 2
+            axisX > deadZone && axisY < -deadZone -> dpadStatus = DPAD_RIGHT_UP
 
             // Right
-            axisX > deadZone && axisYNeutral -> dpadStatus = 3
+            axisX > deadZone && axisYNeutral -> dpadStatus = DPAD_RIGHT
 
             // Right/Down
-            axisX > deadZone && axisY > deadZone -> dpadStatus = 4
+            axisX > deadZone && axisY > deadZone -> dpadStatus = DPAD_RIGHT_DOWN
 
             // Down
-            axisY > deadZone && axisXNeutral -> dpadStatus = 5
+            axisY > deadZone && axisXNeutral -> dpadStatus = DPAD_DOWN
 
             // Left/Down
-            axisX < -deadZone && axisY > deadZone -> dpadStatus = 6
+            axisX < -deadZone && axisY > deadZone -> dpadStatus = DPAD_LEFT_DOWN
 
             // Left
-            axisX < -deadZone && axisYNeutral -> dpadStatus = 7
+            axisX < -deadZone && axisYNeutral -> dpadStatus = DPAD_LEFT
 
             // Left/Up
-            axisX < -deadZone && axisY < -deadZone -> dpadStatus = 8
+            axisX < -deadZone && axisY < -deadZone -> dpadStatus = DPAD_LEFT_UP
 
             else -> dpadStatus = 0
         }
@@ -753,6 +761,15 @@ object ControllerUtils {
             var ry: ByteArray = byteArrayOf(1, 2, 7)
             var lt: ByteArray = byteArrayOf(0, 0, 0)
             var rt: ByteArray = byteArrayOf(0, 0, 0)
+
+            const val DPAD_UP = 1
+            const val DPAD_RIGHT_UP = 2
+            const val DPAD_RIGHT = 3
+            const val DPAD_RIGHT_DOWN = 4
+            const val DPAD_DOWN = 5
+            const val DPAD_LEFT_DOWN = 6
+            const val DPAD_LEFT = 7
+            const val DPAD_LEFT_UP = 8
         }
     }
 }

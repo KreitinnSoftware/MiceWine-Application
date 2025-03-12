@@ -181,6 +181,7 @@
     <string name="others">其他</string>
     <string name="enable_xinput_title">启用 XInput 游戏手柄</string>
     <string name="enable_wine_virtual_desktop">启用 Wine 虚拟桌面</string>
-    <string name="shape_text">Shape</string>
-    <string name="button_mapping_text">Button Mapping</string>
+    <string name="shape_text">形状</string>
+    <string name="button_mapping_text">按钮映射</string>
+    <string name="add_virtual_dpad">添加虚拟方向键</string>
 </resources>

@@ -101,6 +101,32 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
                     virtualControllerMapperDrawerLayout?.closeDrawers()
                 }
 
+                R.id.addDPad -> {
+                    overlayView?.addDPad(
+                        OverlayView.VirtualDPad(
+                            analogList.count() + 1,
+                            overlayView?.width!! / 2F,
+                            overlayView?.height!! / 2F,
+                            275F,
+                            "--",
+                            getXKeyScanCodes("--"),
+                            "--",
+                            getXKeyScanCodes("--"),
+                            "--",
+                            getXKeyScanCodes("--"),
+                            "--",
+                            getXKeyScanCodes("--"),
+                            -1,
+                            false,
+                            0F,
+                            0F,
+                            0
+                        )
+                    )
+
+                    virtualControllerMapperDrawerLayout?.closeDrawers()
+                }
+
                 R.id.exitButton -> {
                     overlayView?.saveOnPreferences()
 

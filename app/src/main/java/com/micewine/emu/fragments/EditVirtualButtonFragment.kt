@@ -23,8 +23,10 @@ import com.micewine.emu.views.OverlayView.Companion.SHAPE_RECTANGLE
 import com.micewine.emu.views.OverlayView.Companion.SHAPE_SQUARE
 import com.micewine.emu.views.OverlayView.Companion.analogList
 import com.micewine.emu.views.OverlayView.Companion.buttonList
+import com.micewine.emu.views.OverlayView.Companion.dpadList
 import com.micewine.emu.views.OverlayViewCreator.Companion.ANALOG
 import com.micewine.emu.views.OverlayViewCreator.Companion.BUTTON
+import com.micewine.emu.views.OverlayViewCreator.Companion.DPAD
 import com.micewine.emu.views.OverlayViewCreator.Companion.lastSelectedButton
 import com.micewine.emu.views.OverlayViewCreator.Companion.lastSelectedType
 
@@ -95,8 +97,12 @@ class EditVirtualButtonFragment : DialogFragment() {
 
         radiusSeekbar.progress = selectedButtonRadius
 
-        if (lastSelectedType == ANALOG) {
+        if (lastSelectedType == ANALOG || lastSelectedType == DPAD) {
+            view.findViewById<TextView>(R.id.shapeText).visibility = View.GONE
+            view.findViewById<TextView>(R.id.buttonMappingText).visibility = View.GONE
+            
             buttonSpinner.visibility = View.GONE
+            shapeSpinner.visibility = View.GONE
         } else if (lastSelectedType == BUTTON) {
             view.findViewById<LinearLayout>(R.id.layoutAnalogUp).visibility = View.GONE
             view.findViewById<LinearLayout>(R.id.layoutAnalogDown).visibility = View.GONE
@@ -132,6 +138,20 @@ class EditVirtualButtonFragment : DialogFragment() {
                 analogList[lastSelectedButton - 1].rightKeyCodes = getXKeyScanCodes(analogRightKeySpinner.selectedItem.toString())
 
                 analogList[lastSelectedButton - 1].radius = radiusSeekbar.progress.toFloat()
+            } else if (lastSelectedType == DPAD && dpadList.isNotEmpty()) {
+                dpadList[lastSelectedButton - 1].upKeyName = analogUpKeySpinner.selectedItem.toString()
+                dpadList[lastSelectedButton - 1].upKeyCodes = getXKeyScanCodes(analogUpKeySpinner.selectedItem.toString())
+
+                dpadList[lastSelectedButton - 1].downKeyName = analogDownKeySpinner.selectedItem.toString()
+                dpadList[lastSelectedButton - 1].downKeyCodes = getXKeyScanCodes(analogDownKeySpinner.selectedItem.toString())
+
+                dpadList[lastSelectedButton - 1].leftKeyName = analogLeftKeySpinner.selectedItem.toString()
+                dpadList[lastSelectedButton - 1].leftKeyCodes = getXKeyScanCodes(analogLeftKeySpinner.selectedItem.toString())
+
+                dpadList[lastSelectedButton - 1].rightKeyName = analogRightKeySpinner.selectedItem.toString()
+                dpadList[lastSelectedButton - 1].rightKeyCodes = getXKeyScanCodes(analogRightKeySpinner.selectedItem.toString())
+
+                dpadList[lastSelectedButton - 1].radius = radiusSeekbar.progress.toFloat()
             }
 
             context?.sendBroadcast(

@@ -75,19 +75,23 @@ class VirtualControllerPresetManagerFragment : Fragment() {
             return presetList[index]
         }
 
-        fun putMapping(name: String, buttonList: MutableList<OverlayView.VirtualButton>, analogList: MutableList<OverlayView.VirtualAnalog>) {
+        fun putMapping(name: String, buttonList: MutableList<OverlayView.VirtualButton>, analogList: MutableList<OverlayView.VirtualAnalog>, dpadList: MutableList<OverlayView.VirtualDPad>) {
             val index = presetList.indexOfFirst { it.name == name }
 
             if (index == -1) return
 
             presetList[index].buttons.clear()
             presetList[index].analogs.clear()
+            presetList[index].dpads.clear()
 
             buttonList.forEach {
                 presetList[index].buttons.add(it)
             }
             analogList.forEach {
                 presetList[index].analogs.add(it)
+            }
+            dpadList.forEach {
+                presetList[index].dpads.add(it)
             }
 
             saveVirtualControllerPresets()
@@ -99,7 +103,7 @@ class VirtualControllerPresetManagerFragment : Fragment() {
                 return
             }
 
-            val defaultPreset = VirtualControllerPreset(name, mutableListOf(), mutableListOf())
+            val defaultPreset = VirtualControllerPreset(name, mutableListOf(), mutableListOf(), mutableListOf())
 
             presetList.add(defaultPreset)
             presetListNames.add(
@@ -195,14 +199,15 @@ class VirtualControllerPresetManagerFragment : Fragment() {
             val listType = object : TypeToken<MutableList<VirtualControllerPreset>>() {}.type
 
             return gson.fromJson(json, listType) ?: mutableListOf(
-                VirtualControllerPreset("default", mutableListOf(), mutableListOf())
+                VirtualControllerPreset("default", mutableListOf(), mutableListOf(), mutableListOf())
             )
         }
 
         data class VirtualControllerPreset(
             var name: String,
             var analogs: MutableList<OverlayView.VirtualAnalog>,
-            var buttons: MutableList<OverlayView.VirtualButton>
+            var buttons: MutableList<OverlayView.VirtualButton>,
+            var dpads: MutableList<OverlayView.VirtualDPad>
         )
     }
 }

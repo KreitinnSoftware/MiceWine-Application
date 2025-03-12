@@ -36,6 +36,7 @@
         </SeekBar>
 
         <TextView
+            android:id="@+id/shapeText"
             android:text="@string/shape_text"
             android:textSize="16sp"
             android:layout_width="match_parent"
@@ -52,6 +53,7 @@
         </Spinner>
 
         <TextView
+            android:id="@+id/buttonMappingText"
             android:text="@string/button_mapping_text"
             android:textSize="16sp"
             android:layout_width="match_parent"
