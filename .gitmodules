@@ -20,19 +20,19 @@
 	ignore = dirty
 [submodule "app/src/main/cpp/libxfont"]
 	path = app/src/main/cpp/libxfont
-	url = https://gitlab.freedesktop.org/xorg/lib/libxfont
+	url = https://github.com/KreitinnSoftware/libxfont
 	ignore = dirty
 [submodule "app/src/main/cpp/libxkbfile"]
 	path = app/src/main/cpp/libxkbfile
-	url = https://gitlab.freedesktop.org/xorg/lib/libxkbfile
+	url = https://github.com/KreitinnSoftware/libxkbfile
 	ignore = dirty
 [submodule "app/src/main/cpp/libxshmfence"]
 	path = app/src/main/cpp/libxshmfence
-	url = https://gitlab.freedesktop.org/xorg/lib/libxshmfence
+	url = https://github.com/KreitinnSoftware/libxshmfence
 	ignore = dirty
 [submodule "app/src/main/cpp/libxtrans"]
 	path = app/src/main/cpp/libxtrans
-	url = https://gitlab.freedesktop.org/xorg/lib/libxtrans
+	url = https://github.com/KreitinnSoftware/libxtrans
 	ignore = dirty
 [submodule "app/src/main/cpp/libepoxy"]
 	path = app/src/main/cpp/libepoxy
@@ -48,15 +48,15 @@
 	ignore = dirty
 [submodule "app/src/main/cpp/xorgproto"]
 	path = app/src/main/cpp/xorgproto
-	url = https://gitlab.freedesktop.org/xorg/proto/xorgproto
+	url = https://github.com/KreitinnSoftware/xorgproto
 	ignore = dirty
 [submodule "app/src/main/cpp/xkbcomp"]
 	path = app/src/main/cpp/xkbcomp
-	url = https://gitlab.freedesktop.org/xorg/app/xkbcomp
+	url = https://github.com/KreitinnSoftware/xkbcomp
 	ignore = dirty
 [submodule "app/src/main/cpp/xserver"]
 	path = app/src/main/cpp/xserver
-	url = https://gitlab.freedesktop.org/xorg/xserver
+	url = https://github.com/KreitinnSoftware/xserver
 	ignore = dirty
 [submodule "app/src/main/cpp/bzip2"]
 	path = app/src/main/cpp/bzip2
