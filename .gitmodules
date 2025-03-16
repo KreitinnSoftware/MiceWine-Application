@@ -8,15 +8,15 @@
 	ignore = dirty
 [submodule "app/src/main/cpp/libfontenc"]
 	path = app/src/main/cpp/libfontenc
-	url = https://gitlab.freedesktop.org/xorg/lib/libfontenc
+	url = https://github.com/KreitinnSoftware/libfontenc
 	ignore = dirty
 [submodule "app/src/main/cpp/libxau"]
 	path = app/src/main/cpp/libxau
-	url = https://gitlab.freedesktop.org/xorg/lib/libxau
+	url = https://github.com/KreitinnSoftware/libxau
 	ignore = dirty
 [submodule "app/src/main/cpp/libxdmcp"]
 	path = app/src/main/cpp/libxdmcp
-	url = https://gitlab.freedesktop.org/xorg/lib/libxdmcp
+	url = https://github.com/KreitinnSoftware/libxdmcp
 	ignore = dirty
 [submodule "app/src/main/cpp/libxfont"]
 	path = app/src/main/cpp/libxfont
@@ -40,11 +40,11 @@
 	ignore = dirty
 [submodule "app/src/main/cpp/libxcvt"]
 	path = app/src/main/cpp/libxcvt
-	url = https://gitlab.freedesktop.org/xorg/lib/libxcvt
+	url = https://github.com/KreitinnSoftware/libxcvt
 	ignore = dirty
 [submodule "app/src/main/cpp/libx11"]
 	path = app/src/main/cpp/libx11
-	url = https://gitlab.freedesktop.org/xorg/lib/libx11
+	url = https://github.com/KreitinnSoftware/libx11
 	ignore = dirty
 [submodule "app/src/main/cpp/xorgproto"]
 	path = app/src/main/cpp/xorgproto
