@@ -11,10 +11,11 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.preference.PreferenceManager
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.ACTION_INSTALL_ADTOOLS_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_INSTALL_RAT
 import com.micewine.emu.core.RatPackageManager
 
-class AskInstallRatPackageFragment : DialogFragment() {
+class AskInstallRatPackageFragment(private val packageType: Int) : DialogFragment() {
     private var preferences: SharedPreferences? = null
 
     @SuppressLint("SetTextI18n")
@@ -28,16 +29,29 @@ class AskInstallRatPackageFragment : DialogFragment() {
         val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create()
 
         val askInstallText = view.findViewById<TextView>(R.id.askInstallText)
-        askInstallText.text = "${activity?.getString(R.string.install_rat_package_warning)} ${ratCandidate?.name} (${ratCandidate?.version})?"
+
+        if (packageType == RAT_PACKAGE) {
+            askInstallText.text = "${activity?.getString(R.string.install_rat_package_warning)} ${ratCandidate?.name} (${ratCandidate?.version})?"
+        } else if (packageType == ADTOOLS_DRIVER_PACKAGE) {
+            askInstallText.text = "${activity?.getString(R.string.install_rat_package_warning)} ${adToolsDriverCandidate?.name} (${adToolsDriverCandidate?.version})?"
+        }
 
         preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
         buttonContinue.setOnClickListener {
-            context?.sendBroadcast(
-                Intent(ACTION_INSTALL_RAT).apply {
-                    putExtra("ratFile", "")
-                }
-            )
+            if (packageType == RAT_PACKAGE) {
+                context?.sendBroadcast(
+                    Intent(ACTION_INSTALL_RAT).apply {
+                        putExtra("ratFile", "")
+                    }
+                )
+            } else if (packageType == ADTOOLS_DRIVER_PACKAGE) {
+                context?.sendBroadcast(
+                    Intent(ACTION_INSTALL_ADTOOLS_DRIVER).apply {
+                        putExtra("adToolsDriverFile", "")
+                    }
+                )
+            }
 
             dismiss()
         }
@@ -51,5 +65,9 @@ class AskInstallRatPackageFragment : DialogFragment() {
 
     companion object {
         var ratCandidate: RatPackageManager.RatPackage? = null
+        var adToolsDriverCandidate: RatPackageManager.AdrenoToolsPackage? = null
+
+        const val RAT_PACKAGE = 0
+        const val ADTOOLS_DRIVER_PACKAGE = 1
     }
 }

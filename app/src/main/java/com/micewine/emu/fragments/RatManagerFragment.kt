@@ -11,7 +11,7 @@ import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.adapters.AdapterRatPackage
 import java.io.File
 
-class RatManagerFragment(private val prefix: String, private val type: Int) : Fragment() {
+class RatManagerFragment(private val prefix: String, private val type: Int, private val anotherPrefix: String = prefix) : Fragment() {
     private val ratList: MutableList<AdapterRatPackage.Item> = mutableListOf()
     private var rootView: View? = null
     private var recyclerView: RecyclerView? = null
@@ -35,10 +35,14 @@ class RatManagerFragment(private val prefix: String, private val type: Int) : Fr
         ratList.clear()
 
         File("$appRootDir/packages").listFiles()?.forEach { file ->
-            if (file.isDirectory && file.name.startsWith(prefix)) {
+            if (file.isDirectory && (file.name.startsWith(prefix) || file.name.startsWith(anotherPrefix))) {
                 val lines = File("$file/pkg-header").readLines()
+                var name = lines[0].substringAfter("=")
 
-                val name = lines[0].substringAfter("=")
+                if (file.name.startsWith("AdrenoToolsDriver-")) {
+                    name += " (AdrenoTools)"
+                }
+
                 val version = lines[2].substringAfter("=")
                 val canDelete = File("$file/pkg-external").exists()
 

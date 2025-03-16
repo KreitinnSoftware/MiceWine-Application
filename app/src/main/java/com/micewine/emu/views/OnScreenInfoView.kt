@@ -8,16 +8,18 @@ import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.view.View
-import com.micewine.emu.activities.MainActivity.Companion.selectedD3DXRenderer
 import com.micewine.emu.activities.MainActivity.Companion.enableCpuCounter
 import com.micewine.emu.activities.MainActivity.Companion.enableDebugInfo
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.activities.MainActivity.Companion.memoryStats
 import com.micewine.emu.activities.MainActivity.Companion.miceWineVersion
+import com.micewine.emu.activities.MainActivity.Companion.selectedD3DXRenderer
 import com.micewine.emu.activities.MainActivity.Companion.selectedDXVK
+import com.micewine.emu.activities.MainActivity.Companion.selectedVKD3D
 import com.micewine.emu.activities.MainActivity.Companion.selectedWineD3D
 import com.micewine.emu.activities.MainActivity.Companion.totalCpuUsage
 import com.micewine.emu.activities.MainActivity.Companion.vulkanDriverDeviceName
+import com.micewine.emu.activities.MainActivity.Companion.vulkanDriverDriverVersion
 
 class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0): View(context, attrs, defStyleAttr) {
     private val paint: Paint = Paint().apply {
@@ -33,6 +35,9 @@ class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: Attri
         }
     }
 
+    private val textOffset = 40F
+    private var textCount = 0
+
     init {
         handler.post(updateRunnable)
     }
@@ -40,39 +45,44 @@ class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: Attri
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+        textCount = 0
+
         if (enableRamCounter) {
-            drawText("RAM: $memoryStats", 20F, 40F, canvas)
+            drawText("RAM: $memoryStats", 20F, canvas)
         }
-
         if (enableCpuCounter) {
-            drawText("CPU: $totalCpuUsage", 20F, 80F, canvas)
+            drawText("CPU: $totalCpuUsage", 20F, canvas)
         }
-
         if (enableDebugInfo) {
+            textCount = 0
             onScreenInfo(canvas)
         }
     }
 
     private fun onScreenInfo(c: Canvas) {
-        drawText(miceWineVersion, getTextEndX(c, miceWineVersion), 40F, c)
+        drawText(miceWineVersion, getTextEndX(c, miceWineVersion), c)
+        drawText(selectedVKD3D!!, getTextEndX(c, selectedVKD3D!!), c)
 
         if (selectedD3DXRenderer == "DXVK") {
-            drawText(selectedDXVK!!, getTextEndX(c, selectedDXVK!!), 80F, c)
+            drawText(selectedDXVK!!, getTextEndX(c, selectedDXVK!!), c)
         } else if (selectedD3DXRenderer == "WineD3D") {
-            drawText(selectedWineD3D!!, getTextEndX(c, selectedWineD3D!!), 80F, c)
+            drawText(selectedWineD3D!!, getTextEndX(c, selectedWineD3D!!), c)
         }
 
-        drawText(vulkanDriverDeviceName!!, getTextEndX(c, vulkanDriverDeviceName!!), 120F, c)
+        drawText(vulkanDriverDeviceName!!, getTextEndX(c, vulkanDriverDeviceName!!), c)
+        drawText(vulkanDriverDriverVersion!!, getTextEndX(c, vulkanDriverDriverVersion!!), c)
     }
 
-    private fun drawText(text: String, x: Float, y: Float, c: Canvas) {
+    private fun drawText(text: String, x: Float, c: Canvas) {
+        textCount++
+
         paint.style = Paint.Style.STROKE
         paint.color = Color.BLACK
-        c.drawText(text, x, y, paint)
+        c.drawText(text, x, textCount * textOffset, paint)
 
         paint.style = Paint.Style.FILL
         paint.color = Color.WHITE
-        c.drawText(text, x, y, paint)
+        c.drawText(text, x, textCount * textOffset, paint)
     }
 
     private fun getTextEndX(canvas: Canvas, string: String): Float {

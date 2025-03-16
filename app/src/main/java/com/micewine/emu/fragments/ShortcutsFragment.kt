@@ -15,6 +15,7 @@ import android.graphics.Rect
 import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -314,6 +315,9 @@ class ShortcutsFragment : Fragment() {
         const val HIGHLIGHT_SHORTCUT_PREFERENCE_KEY = "highlightedShortcut"
         const val ACTION_UPDATE_WINE_PREFIX_SPINNER = "com.micewine.emu.ACTION_UPDATE_WINE_PREFIX_SPINNER"
 
+        const val MESA_DRIVER = 0
+        const val ADRENO_TOOLS_DRIVER = 1
+
         fun initialize(context: Context) {
             preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
             gameList = getGameList(context)
@@ -481,12 +485,36 @@ class ShortcutsFragment : Fragment() {
             return gameList[index].d3dxRenderer
         }
 
+        fun putVulkanDriverType(name: String, driverType: Int) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].vulkanDriverType = driverType
+
+            saveShortcuts()
+        }
+
+        fun getVulkanDriverType(name: String): Int {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return MESA_DRIVER
+
+            return gameList[index].vulkanDriverType
+        }
+
         fun putVulkanDriver(name: String, driverName: String) {
             val index = gameList.indexOfFirst { it.name == name }
 
             if (index == -1) return
 
             gameList[index].vulkanDriver = driverName
+
+            if (driverName.startsWith("AdrenoToolsDriver-")) {
+                putVulkanDriverType(name, ADRENO_TOOLS_DRIVER)
+            } else (
+                putVulkanDriverType(name, MESA_DRIVER)
+            )
 
             saveShortcuts()
         }
@@ -589,6 +617,7 @@ class ShortcutsFragment : Fragment() {
                     "16:9",
                     "1280x720",
                     "",
+                    MESA_DRIVER,
                     "DXVK",
                     "DXVK-1.10.3-async",
                     "WineD3D-(10.0)",
@@ -738,6 +767,7 @@ class ShortcutsFragment : Fragment() {
             var displayMode: String,
             var displayResolution: String,
             var vulkanDriver: String,
+            var vulkanDriverType: Int,
             var d3dxRenderer: String,
             var dxvkVersion: String,
             var wineD3DVersion: String,

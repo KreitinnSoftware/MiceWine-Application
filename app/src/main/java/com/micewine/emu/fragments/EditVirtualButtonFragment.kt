@@ -100,7 +100,7 @@ class EditVirtualButtonFragment : DialogFragment() {
         if (lastSelectedType == ANALOG || lastSelectedType == DPAD) {
             view.findViewById<TextView>(R.id.shapeText).visibility = View.GONE
             view.findViewById<TextView>(R.id.buttonMappingText).visibility = View.GONE
-            
+
             buttonSpinner.visibility = View.GONE
             shapeSpinner.visibility = View.GONE
         } else if (lastSelectedType == BUTTON) {

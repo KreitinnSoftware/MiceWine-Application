@@ -220,10 +220,10 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             }
         }
 
-        val vulkanDriversId = File("$appRootDir/packages").listFiles()?.filter { it.name.startsWith("VulkanDriver-") }?.mapNotNull { it.name }!!
+        val vulkanDriversId = File("$appRootDir/packages").listFiles()?.filter { it.name.startsWith("VulkanDriver-") || it.name.startsWith("AdrenoToolsDriver-") }?.mapNotNull { it.name }!!
 
         selectedDriverSpinner.apply {
-            val vulkanDrivers = File("$appRootDir/packages").listFiles()?.filter { it.name.startsWith("VulkanDriver-") }?.mapNotNull { "${File(it.path + "/pkg-header").readLines()[0].substringAfter("=")} (${File(it.path + "/pkg-header").readLines()[2].substringAfter("=")})" }!!
+            val vulkanDrivers = File("$appRootDir/packages").listFiles()?.filter { it.name.startsWith("VulkanDriver-") || it.name.startsWith("AdrenoToolsDriver-") }?.mapNotNull { "${File(it.path + "/pkg-header").readLines()[0].substringAfter("=")} (${File(it.path + "/pkg-header").readLines()[2].substringAfter("=")}) ${if (it.name.startsWith("AdrenoToolsDriver-")) "(AdrenoTools)" else ""}" }!!
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, vulkanDrivers)
             val index = vulkanDriversId.indexOf(getVulkanDriver(selectedGameName))
             setSelection(if (index == -1) 0 else index)

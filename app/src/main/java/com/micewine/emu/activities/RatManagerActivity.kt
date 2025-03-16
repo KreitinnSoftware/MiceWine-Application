@@ -48,7 +48,11 @@ class RatManagerActivity : AppCompatActivity() {
             WINE -> ratManagerToolBar?.setTitle(R.string.wine_manager_title)
         }
 
-        fragmentLoader(RatManagerFragment(prefix!!, type!!))
+        if (type == VK_DRIVER) {
+            fragmentLoader(RatManagerFragment(prefix!!, type!!, "AdrenoToolsDriver-"))
+        } else {
+            fragmentLoader(RatManagerFragment(prefix!!, type!!))
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {

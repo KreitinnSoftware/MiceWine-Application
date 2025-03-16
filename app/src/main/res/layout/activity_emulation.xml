@@ -36,6 +36,14 @@
             android:visibility="visible">
         </com.micewine.emu.views.OverlayView>
 
+        <com.micewine.emu.views.XInputOverlayView
+            android:id="@+id/xInputOverlayView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="visible">
+        </com.micewine.emu.views.XInputOverlayView>
+
     </FrameLayout>
 
     <com.google.android.material.navigation.NavigationView

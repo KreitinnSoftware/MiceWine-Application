@@ -74,6 +74,7 @@ import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.HighlightState
 import com.micewine.emu.core.RatPackageManager
+import com.micewine.emu.core.RatPackageManager.installADToolsDriver
 import com.micewine.emu.core.RatPackageManager.installRat
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
@@ -83,6 +84,9 @@ import com.micewine.emu.core.WineWrapper.getSanitizedPath
 import com.micewine.emu.databinding.ActivityMainBinding
 import com.micewine.emu.fragments.AboutFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment
+import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ADTOOLS_DRIVER_PACKAGE
+import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.RAT_PACKAGE
+import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.adToolsDriverCandidate
 import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ratCandidate
 import com.micewine.emu.fragments.Box64PresetManagerFragment
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Mapping
@@ -105,6 +109,8 @@ import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
 import com.micewine.emu.fragments.ShortcutsFragment
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.ACTION_UPDATE_WINE_PREFIX_SPINNER
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.ADRENO_TOOLS_DRIVER
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.MESA_DRIVER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToLauncher
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToList
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getCpuAffinity
@@ -149,6 +155,7 @@ class MainActivity : AppCompatActivity() {
                     val exePath = intent.getStringExtra("exePath")!!
                     val exeArguments = intent.getStringExtra("exeArguments") ?: ""
                     val driverName = intent.getStringExtra("driverName") ?: File("$appRootDir/packages").listFiles()?.filter { it.name.startsWith("VulkanDriver-") }?.map { it.name }!![0]
+                    val driverType = intent.getIntExtra("driverType", MESA_DRIVER)
                     val box64Preset = intent.getStringExtra("box64Preset") ?: "default"
                     val displayResolution = intent.getStringExtra("displayResolution") ?: "1280x720"
                     val virtualControllerPreset = intent.getStringExtra("virtualControllerPreset") ?: "default"
@@ -168,13 +175,23 @@ class MainActivity : AppCompatActivity() {
                     tmpDir.deleteRecursively()
                     tmpDir.mkdirs()
 
-                    val driverLibPath = File("$ratPackagesDir/${driverName.ifEmpty { File("$appRootDir/packages").listFiles()?.filter { it.name.startsWith("VulkanDriver-") }?.map { it.name }!![0] }}/pkg-header").readLines()[4].substringAfter("=")
+                    val driverLibPath: String = when (driverType) {
+                        MESA_DRIVER -> {
+                            File("$ratPackagesDir/${driverName.ifEmpty { File("$appRootDir/packages").listFiles()?.filter { it.name.startsWith("VulkanDriver-") }?.map { it.name }!![0] }}/pkg-header").readLines()[4].substringAfter("=")
+                        }
+                        ADRENO_TOOLS_DRIVER -> {
+                            File("$ratPackagesDir/${File("$appRootDir/packages").listFiles()?.first { it.name.startsWith("AdrenoTools-") }?.name}/pkg-header").readLines()[4].substringAfter("=")
+                        }
+                        else -> ""
+                    }
 
                     generateICDFile(driverLibPath, File("$appRootDir/vulkan_icd.json"))
                     generateMangoHUDConfFile()
                     generatePAFile()
 
-                    setSharedVars(this@MainActivity, d3dxRenderer, wineD3D, dxvk, vkd3d, displayResolution, esync, services, virtualDesktop, xinput, cpuAffinity)
+                    val driverPath = File("$ratPackagesDir/$driverName/pkg-header").readLines()[4].substringAfter("=")
+
+                    setSharedVars(this@MainActivity, d3dxRenderer, wineD3D, dxvk, vkd3d, displayResolution, esync, services, virtualDesktop, xinput, cpuAffinity, (driverType == ADRENO_TOOLS_DRIVER), driverPath)
                     setBox64Preset(this@MainActivity, box64Preset)
 
                     selectedControllerPreset = controllerPreset
@@ -223,7 +240,10 @@ class MainActivity : AppCompatActivity() {
                             EditGamePreferencesFragment(FILE_MANAGER_START_PREFERENCES, exeFile!!).show(supportFragmentManager, "")
                         } else if (file.name.endsWith("rat")) {
                             ratCandidate = RatPackageManager.RatPackage(file.path)
-                            AskInstallRatPackageFragment().show(supportFragmentManager, "")
+                            AskInstallRatPackageFragment(RAT_PACKAGE).show(supportFragmentManager, "")
+                        } else if (file.name.endsWith(".zip")) {
+                            adToolsDriverCandidate = RatPackageManager.AdrenoToolsPackage(file.path)
+                            AskInstallRatPackageFragment(ADTOOLS_DRIVER_PACKAGE).show(supportFragmentManager, "")
                         }
                     } else if (file.isDirectory) {
                         fileManagerCwd = file.path
@@ -278,6 +298,29 @@ class MainActivity : AppCompatActivity() {
                             progressBarIsIndeterminate = true
 
                             installRat(ratFile, context)
+
+                            setupDone = true
+                        }
+                    }
+                }
+
+                ACTION_INSTALL_ADTOOLS_DRIVER -> {
+                    val adToolsDriverFile: RatPackageManager.AdrenoToolsPackage = if (intent.getStringExtra("adToolsDriverFile") == "") {
+                        adToolsDriverCandidate!!
+                    } else {
+                        RatPackageManager.AdrenoToolsPackage(intent.getStringExtra("adToolsDriverFile")!!)
+                    }
+
+                    lifecycleScope.launch {
+                        withContext(Dispatchers.Default) {
+                            setupDone = false
+
+                            SetupFragment().show(supportFragmentManager, "")
+
+                            dialogTitleText = "Installing ${adToolsDriverFile.name} (${adToolsDriverFile.version})..."
+                            progressBarIsIndeterminate = true
+
+                            installADToolsDriver(adToolsDriverFile)
 
                             setupDone = true
                         }
@@ -395,6 +438,7 @@ class MainActivity : AppCompatActivity() {
                 addAction(ACTION_RUN_WINE)
                 addAction(ACTION_SETUP)
                 addAction(ACTION_INSTALL_RAT)
+                addAction(ACTION_INSTALL_ADTOOLS_DRIVER)
                 addAction(ACTION_SELECT_FILE_MANAGER)
                 addAction(ACTION_SELECT_ICON)
                 addAction(ACTION_CREATE_WINE_PREFIX)
@@ -1029,18 +1073,22 @@ class MainActivity : AppCompatActivity() {
         var selectedFile: String = ""
         var miceWineVersion: String = "MiceWine ${BuildConfig.VERSION_NAME} (git-${BuildConfig.GIT_SHORT_SHA})"
         var vulkanDriverDeviceName: String? = null
+        var vulkanDriverDriverVersion: String? = null
         var screenFpsLimit: Int = 60
         var fpsLimit: Int = 0
         var paSink: String? = null
         var selectedResolution: String? = null
         var selectedControllerPreset: String? = null
         var selectedVirtualControllerPreset: String? = null
+        var useAdrenoTools: Boolean = false
+        var adrenoToolsDriverFile: File? = null
 
         var selectedFragment = "ShortcutsFragment"
 
         const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
         const val ACTION_SETUP = "com.micewine.emu.ACTION_SETUP"
         const val ACTION_INSTALL_RAT = "com.micewine.emu.ACTION_INSTALL_RAT"
+        const val ACTION_INSTALL_ADTOOLS_DRIVER = "com.micewine.emu.ACTION_INSTALL_ADTOOLS_DRIVER"
         const val ACTION_STOP_ALL = "com.micewine.emu.ACTION_STOP_ALL"
         const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
         const val ACTION_SELECT_ICON = "com.micewine.emu.ACTION_SELECT_ICON"
@@ -1115,9 +1163,16 @@ class MainActivity : AppCompatActivity() {
                           services: Boolean? = null,
                           virtualDesktop: Boolean? = null,
                           xinput: Boolean? = null,
-                          cpuAffinity: String? = null
+                          cpuAffinity: String? = null,
+                          adrenoTools: Boolean? = null,
+                          adrenoToolsDriverPath: String? = null
         ) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
+
+            if (adrenoTools == true) {
+                useAdrenoTools = true
+                adrenoToolsDriverFile = File(adrenoToolsDriverPath!!)
+            }
 
             appLang = activity.resources.getString(R.string.app_lang)
             appBuiltinRootfs = activity.assets.list("")?.contains("rootfs.zip")!!
@@ -1155,7 +1210,8 @@ class MainActivity : AppCompatActivity() {
             screenFpsLimit = (activity.getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay.refreshRate.toInt()
             fpsLimit = preferences.getInt(FPS_LIMIT, screenFpsLimit)
 
-            vulkanDriverDeviceName = getVulkanDeviceName()
+            vulkanDriverDeviceName = getVulkanDriverInfo("deviceName") + if (useAdrenoTools) " (AdrenoTools)" else ""
+            vulkanDriverDriverVersion = getVulkanDriverInfo("driverVersion").split(" ")[0]
 
             winePrefix = File("$winePrefixesDir/${preferences.getString(SELECTED_WINE_PREFIX, "default")}")
             wineDisksFolder = File("$winePrefix/dosdevices/")
@@ -1221,8 +1277,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        private fun getVulkanDeviceName(): String {
-            return runCommandWithOutput(getEnv() + "DISPLAY= vulkaninfo | grep deviceName | cut -d '=' -f 2")
+        private fun getVulkanDriverInfo(info: String): String {
+            return runCommandWithOutput("echo $(${getEnv()} DISPLAY= vulkaninfo | grep $info | cut -d '=' -f 2)")
         }
 
         @Throws(IOException::class)

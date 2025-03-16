@@ -677,63 +677,67 @@ object ControllerUtils {
             val serverSocket = DatagramSocket(CLIENT_PORT)
 
             Thread {
-                try {
-                    Log.v("GamePad","Server initialized on 127.0.0.1:${CLIENT_PORT}")
+                while (gamePadServerRunning) {
+                    try {
+                        Log.v("GamePad", "Server initialized on 127.0.0.1:${CLIENT_PORT}")
 
-                    val buffer = ByteArray(BUFFER_SIZE)
-                    val packet = DatagramPacket(buffer, buffer.size)
+                        val buffer = ByteArray(BUFFER_SIZE)
+                        val packet = DatagramPacket(buffer, buffer.size)
 
-                    while (true) {
-                        serverSocket.receive(packet)
+                        while (true) {
+                            serverSocket.receive(packet)
 
-                        val receivedData = ByteBuffer.wrap(buffer).get().toInt()
-                        if (receivedData == GET_CONNECTION) {
-                            val responsePacket = DatagramPacket(buffer, buffer.size, packet.address, packet.port)
+                            val receivedData = ByteBuffer.wrap(buffer).get().toInt()
+                            when (receivedData) {
+                                GET_CONNECTION -> {
+                                    val responsePacket = DatagramPacket(buffer, buffer.size, packet.address, packet.port)
 
-                            serverSocket.send(responsePacket)
-                        } else if (receivedData == GET_GAMEPAD_STATE) {
-                            buffer[0] = GET_GAMEPAD_STATE.toByte()
-                            buffer[1] = if (aPressed) 1 else 0
-                            buffer[2] = if (bPressed) 1 else 0
-                            buffer[3] = if (xPressed) 1 else 0
-                            buffer[4] = if (yPressed) 1 else 0
-                            buffer[5] = if (l1Pressed) 1 else 0
-                            buffer[6] = if (r1Pressed) 1 else 0
-                            buffer[7] = if (selectPressed) 1 else 0
-                            buffer[8] = if (startPressed) 1 else 0
-                            buffer[9] = if (thumbLPressed) 1 else 0
-                            buffer[10] = if (thumbRPressed) 1 else 0
-                            buffer[11] = 0
-                            buffer[12] = dpadStatus.toByte()
-                            buffer[13] = lx[0]
-                            buffer[14] = lx[1]
-                            buffer[15] = lx[2]
-                            buffer[16] = ly[0]
-                            buffer[17] = ly[1]
-                            buffer[18] = ly[2]
-                            buffer[19] = rx[0]
-                            buffer[20] = rx[1]
-                            buffer[21] = rx[2]
-                            buffer[22] = ry[0]
-                            buffer[23] = ry[1]
-                            buffer[24] = ry[2]
+                                    serverSocket.send(responsePacket)
+                                }
+                                GET_GAMEPAD_STATE -> {
+                                    buffer[0] = GET_GAMEPAD_STATE.toByte()
+                                    buffer[1] = if (aPressed) 1 else 0
+                                    buffer[2] = if (bPressed) 1 else 0
+                                    buffer[3] = if (xPressed) 1 else 0
+                                    buffer[4] = if (yPressed) 1 else 0
+                                    buffer[5] = if (l1Pressed) 1 else 0
+                                    buffer[6] = if (r1Pressed) 1 else 0
+                                    buffer[7] = if (selectPressed) 1 else 0
+                                    buffer[8] = if (startPressed) 1 else 0
+                                    buffer[9] = if (thumbLPressed) 1 else 0
+                                    buffer[10] = if (thumbRPressed) 1 else 0
+                                    buffer[11] = 0
+                                    buffer[12] = dpadStatus.toByte()
+                                    buffer[13] = lx[0]
+                                    buffer[14] = lx[1]
+                                    buffer[15] = lx[2]
+                                    buffer[16] = ly[0]
+                                    buffer[17] = ly[1]
+                                    buffer[18] = ly[2]
+                                    buffer[19] = rx[0]
+                                    buffer[20] = rx[1]
+                                    buffer[21] = rx[2]
+                                    buffer[22] = ry[0]
+                                    buffer[23] = ry[1]
+                                    buffer[24] = ry[2]
+                                    buffer[25] = lt[0]
+                                    buffer[26] = lt[1]
+                                    buffer[27] = lt[2]
+                                    buffer[28] = rt[0]
+                                    buffer[29] = rt[1]
+                                    buffer[30] = rt[2]
 
-                            buffer[25] = lt[0]
-                            buffer[26] = lt[1]
-                            buffer[27] = lt[2]
-                            buffer[28] = rt[0]
-                            buffer[29] = rt[1]
-                            buffer[30] = rt[2]
+                                    val responsePacket = DatagramPacket(buffer, buffer.size, packet.address, packet.port)
 
-                            val responsePacket = DatagramPacket(buffer, buffer.size, packet.address, packet.port)
-
-                            serverSocket.send(responsePacket)
+                                    serverSocket.send(responsePacket)
+                                }
+                            }
                         }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    } finally {
+                        serverSocket.close()
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    serverSocket.close()
                 }
             }.start()
         }

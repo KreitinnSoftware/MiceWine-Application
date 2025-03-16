@@ -58,6 +58,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANG
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.FPS_LIMIT
 import com.micewine.emu.activities.MainActivity.Companion.enableCpuCounter
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
+import com.micewine.emu.activities.MainActivity.Companion.enableXInput
 import com.micewine.emu.activities.MainActivity.Companion.getCpuInfo
 import com.micewine.emu.activities.MainActivity.Companion.getMemoryInfo
 import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
@@ -82,6 +83,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControll
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.views.OverlayView
+import com.micewine.emu.views.XInputOverlayView
 import kotlinx.coroutines.launch
 
 @SuppressLint("ApplySharedPref")
@@ -116,6 +118,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     private var drawerLayout: DrawerLayout? = null
     private var logsNavigationView: NavigationView? = null
     private var overlayView: OverlayView? = null
+    private var xInputOverlayView: XInputOverlayView? = null
 
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -190,6 +193,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         val lorieParent = lorieView.parent as View
 
         overlayView = findViewById(R.id.overlayView)
+        xInputOverlayView = findViewById(R.id.xInputOverlayView)
 
         if (selectedGameName == getString(R.string.desktop_mode_init)) {
             overlayView?.loadPreset(null)
@@ -198,6 +202,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
 
         overlayView?.visibility = View.INVISIBLE
+        xInputOverlayView?.visibility = View.INVISIBLE
 
         lifecycleScope.launch {
             controllerMouseEmulation(lorieView)
@@ -250,13 +255,26 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
 
             findViewById<MaterialSwitch>(R.id.openCloseOverlaySwitch).apply {
-                isChecked = overlayView?.isVisible!!
+                isChecked = if (enableXInput) {
+                    xInputOverlayView?.isVisible!!
+                } else {
+                    overlayView?.isVisible!!
+                }
+
 
                 setOnClickListener {
-                    if (overlayView?.isVisible!!) {
-                        overlayView?.visibility = View.INVISIBLE
+                    if (enableXInput) {
+                        if (xInputOverlayView?.isVisible!!) {
+                            xInputOverlayView?.visibility = View.INVISIBLE
+                        } else {
+                            xInputOverlayView?.visibility = View.VISIBLE
+                        }
                     } else {
-                        overlayView?.visibility = View.VISIBLE
+                        if (overlayView?.isVisible!!) {
+                            overlayView?.visibility = View.INVISIBLE
+                        } else {
+                            overlayView?.visibility = View.VISIBLE
+                        }
                     }
                 }
             }
