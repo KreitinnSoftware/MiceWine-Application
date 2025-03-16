@@ -58,8 +58,14 @@
         android:id="@+id/NavigationViewLogs"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="end"
-        app:headerLayout="@layout/nav_logs_header">
+        android:layout_gravity="end">
+
+        <FrameLayout
+            android:id="@+id/logViewerContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </FrameLayout>
+
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

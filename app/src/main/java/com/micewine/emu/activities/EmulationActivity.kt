@@ -29,6 +29,7 @@ import android.view.Window
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.FrameLayout
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -77,6 +78,7 @@ import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
+import com.micewine.emu.fragments.LogViewerFragment
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getEnableXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
@@ -160,33 +162,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         logsNavigationView = findViewById(R.id.NavigationViewLogs)
 
-        val headerView: View = logsNavigationView!!.getHeaderView(0)
-
-        val observer: Observer<String>
-        val logTextView = headerView.findViewById<TextView>(R.id.logsTextView)
-        val scrollView = headerView.findViewById<ScrollView>(R.id.scrollView)
-        val closeButton = headerView.findViewById<MaterialButton>(R.id.closeButton)
-        val copyButton = headerView.findViewById<MaterialButton>(R.id.copyButton)
-        val clipboard: ClipboardManager? = ContextCompat.getSystemService(this, ClipboardManager::class.java)
-
-        observer = Observer { out: String? ->
-            if (out != null) {
-                logTextView.append("$out")
-                scrollView.fullScroll(ScrollView.FOCUS_UP)
-            }
-        }
-
-        sharedLogs?.logsTextHead?.observe(this, observer)
-
-        scrollView.fullScroll(ScrollView.FOCUS_UP)
-
-        closeButton.setOnClickListener {
-            drawerLayout?.closeDrawers()
-        }
-
-        copyButton.setOnClickListener {
-            val clip = ClipData.newPlainText("MiceWine Logs", logTextView.text)
-            clipboard?.setPrimaryClip(clip)
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.logViewerContent, LogViewerFragment())
+            commit()
         }
 
         val lorieView = findViewById<LorieView>(R.id.lorieView)
@@ -212,8 +190,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             findViewById<MaterialButton>(R.id.exitButton).setOnClickListener {
                 runCommand("pkill -9 wine")
                 runCommand("pkill -9 .exe")
-
-                logTextView.text = ""
 
                 finishAffinity()
             }

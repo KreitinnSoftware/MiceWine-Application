@@ -163,7 +163,7 @@ class LorieView : SurfaceView, InputStub {
         get() {
             val width = measuredWidth
             val height = measuredHeight
-            val resolution = selectedResolution!!.split("x".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            val resolution = (selectedResolution ?: "1280x720" ).split("x".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             val w = resolution[0].toInt()
             val h = resolution[1].toInt()
 

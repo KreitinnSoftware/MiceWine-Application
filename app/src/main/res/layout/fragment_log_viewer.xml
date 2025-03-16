@@ -1,17 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="8dp">
 
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fillViewport="true"
-        android:padding="10dp">
+        android:fillViewport="true">
 
         <TextView
             android:id="@+id/logsTextView"
@@ -20,6 +20,7 @@
             android:gravity="start"
             android:textSize="16sp"
             android:textIsSelectable="true"
+            android:maxLines="10000"
             android:background="@drawable/top_rounded_shape"
             android:theme="@style/Theme.MiceWine">
         </TextView>
@@ -29,29 +30,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:orientation="horizontal">
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:gravity="end">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/copyButton"
-            android:text="@string/copy"
+            android:id="@+id/exportLogButton"
+            android:text="Export Log"
             android:textSize="15sp"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
+            android:layout_weight="1"
             android:layout_height="60dp"
             android:layout_marginEnd="10dp"
             tools:ignore="PrivateResource">
-        </com.google.android.material.button.MaterialButton>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/closeButton"
-            android:text="@string/exit"
-            android:textSize="15sp"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:layout_height="60dp"
-            android:layout_marginStart="10dp">
         </com.google.android.material.button.MaterialButton>
 
     </LinearLayout>
