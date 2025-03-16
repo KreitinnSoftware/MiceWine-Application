@@ -15,7 +15,6 @@ import android.graphics.Rect
 import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater

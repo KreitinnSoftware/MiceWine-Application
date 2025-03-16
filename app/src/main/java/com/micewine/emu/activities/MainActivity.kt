@@ -1071,7 +1071,7 @@ class MainActivity : AppCompatActivity() {
         var fileManagerDefaultDir: String = ""
         var fileManagerCwd: String? = null
         var selectedFile: String = ""
-        var miceWineVersion: String = "MiceWine ${BuildConfig.VERSION_NAME} (git-${BuildConfig.GIT_SHORT_SHA})"
+        var miceWineVersion: String = "MiceWine ${BuildConfig.VERSION_NAME}" + if (BuildConfig.DEBUG) " (git-${BuildConfig.GIT_SHORT_SHA})" else ""
         var vulkanDriverDeviceName: String? = null
         var vulkanDriverDriverVersion: String? = null
         var screenFpsLimit: Int = 60

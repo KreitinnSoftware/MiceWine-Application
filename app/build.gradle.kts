@@ -34,6 +34,16 @@ android {
             }
             buildConfigField("String", "GIT_SHORT_SHA", "\"${getGitShortSHA()}\"")
         }
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                file("proguard-rules.pro"))
+            ndk {
+                abiFilters += listOf("arm64-v8a", "x86_64")
+            }
+            buildConfigField("String", "GIT_SHORT_SHA", "\"\"")
+        }
     }
 
     compileOptions {
