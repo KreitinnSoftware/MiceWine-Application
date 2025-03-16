@@ -4,7 +4,7 @@
 	ignore = dirty
 [submodule "app/src/main/cpp/pixman"]
 	path = app/src/main/cpp/pixman
-	url = https://gitlab.freedesktop.org/pixman/pixman
+	url = https://github.com/KreitinnSoftware/pixman
 	ignore = dirty
 [submodule "app/src/main/cpp/libfontenc"]
 	path = app/src/main/cpp/libfontenc
