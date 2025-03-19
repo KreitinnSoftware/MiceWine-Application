@@ -676,6 +676,8 @@ object ControllerUtils {
         fun startServer() {
             val serverSocket = DatagramSocket(CLIENT_PORT)
 
+            gamePadServerRunning = true
+
             Thread {
                 while (gamePadServerRunning) {
                     try {
@@ -733,10 +735,11 @@ object ControllerUtils {
                                 }
                             }
                         }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+                    } catch (_: Exception) {
+                        Thread.sleep(400)
                     } finally {
                         serverSocket.close()
+                        gamePadServerRunning = false
                     }
                 }
             }.start()
