@@ -1107,6 +1107,7 @@ class MainActivity : AppCompatActivity() {
                 val startMenu = File("$driveC/ProgramData/Microsoft/Windows/Start Menu")
                 val userSharedFolder = File("/storage/emulated/0/MiceWine")
                 val localAppData = File("$driveC/users/$unixUsername/AppData")
+                val localSavedGames = File("$driveC/users/$unixUsername/Saved Games")
                 val system32 = File("$driveC/windows/system32")
                 val syswow64 = File("$driveC/windows/syswow64")
                 val winePrefixConfigFile = File("$winePrefix/config")
@@ -1125,7 +1126,12 @@ class MainActivity : AppCompatActivity() {
 
                 File("$userSharedFolder/AppData").mkdirs()
 
-                runCommand("ln -sf $userSharedFolder/AppData '$localAppData'")
+                localSavedGames.deleteRecursively()
+
+                File("$userSharedFolder/Saved Games").mkdirs()
+
+                runCommand("ln -sf '$userSharedFolder/AppData' '$localAppData'")
+                runCommand("ln -sf '$userSharedFolder/Saved Games' '$localSavedGames'")
 
                 startMenu.deleteRecursively()
 
