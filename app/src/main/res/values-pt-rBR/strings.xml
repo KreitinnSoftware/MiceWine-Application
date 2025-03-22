@@ -188,4 +188,7 @@
     <string name="rat_manager_title">Gerenciador de Pacotes Rat</string>
     <string name="rat_manager_description">Gerencie os Pacotes Rat Instalados</string>
     <string name="grant_files_permission_error">Conceda permissão de arquivos para continuar</string>
+    <string name="debug_settings_title">Configurações de Depuração</string>
+    <string name="debug_settings_description">Alterar Configurações de Depuração</string>
+    <string name="wine_log_level_description">Definir Nível de Log do Wine</string>
 </resources>

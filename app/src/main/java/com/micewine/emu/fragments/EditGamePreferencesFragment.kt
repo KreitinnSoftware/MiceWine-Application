@@ -28,6 +28,9 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.EmulationActivity
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_RUN_WINE
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_ICON
+import com.micewine.emu.activities.MainActivity.Companion.getNativeResolutions
+import com.micewine.emu.activities.MainActivity.Companion.resolutions16_9
+import com.micewine.emu.activities.MainActivity.Companion.resolutions4_3
 import com.micewine.emu.activities.MainActivity.Companion.selectedCpuAffinity
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
@@ -35,9 +38,7 @@ import com.micewine.emu.core.RatPackageManager.listRatPackages
 import com.micewine.emu.core.RatPackageManager.listRatPackagesId
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Presets
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getControllerPresets
-import com.micewine.emu.fragments.DisplaySettingsFragment.Companion.getNativeResolutions
-import com.micewine.emu.fragments.DisplaySettingsFragment.Companion.resolutions16_9
-import com.micewine.emu.fragments.DisplaySettingsFragment.Companion.resolutions4_3
+import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.editGameFromList
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
@@ -68,7 +69,6 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineServices
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineVirtualDesktop
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getVirtualControllerPresets
-import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
 import java.io.File
 
 class EditGamePreferencesFragment(private val type: Int, private val exePath: File? = null) : DialogFragment() {

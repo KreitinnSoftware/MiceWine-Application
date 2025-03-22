@@ -11,6 +11,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.os.storage.StorageManager
+import android.util.DisplayMetrics
 import android.view.ContextMenu
 import android.view.KeyEvent
 import android.view.Menu
@@ -93,6 +94,7 @@ import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ratCand
 import com.micewine.emu.fragments.Box64PresetManagerFragment
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Mapping
 import com.micewine.emu.fragments.ControllerPresetManagerFragment
+import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.fragments.DeleteItemFragment
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_GAME_ITEM
 import com.micewine.emu.fragments.EditGamePreferencesFragment
@@ -127,7 +129,6 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.SoundSettingsFragment.Companion.generatePAFile
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
-import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.utils.DriveUtils
 import com.micewine.emu.utils.FilePathResolver
 import io.ByteWriter
@@ -1334,6 +1335,51 @@ class MainActivity : AppCompatActivity() {
                     Thread.sleep(800)
                 }
             }
+        }
+
+        val resolutions16_9 = arrayOf(
+            "640x360", "854x480",
+            "960x540", "1280x720",
+            "1366x768", "1600x900",
+            "1920x1080", "2560x1440",
+            "3840x2160"
+        )
+
+        val resolutions4_3 = arrayOf(
+            "640x480", "800x600",
+            "1024x768", "1280x960",
+            "1400x1050", "1600x1200"
+        )
+
+        @Suppress("DEPRECATION")
+        private fun getNativeResolution(activity: Activity): String {
+            val displayMetrics = DisplayMetrics()
+            activity.windowManager.defaultDisplay.getRealMetrics(displayMetrics)
+            return "${displayMetrics.widthPixels}x${displayMetrics.heightPixels}"
+        }
+
+        private fun getPercentOfResolution(original: String, percent: Int): String {
+            val resolution = original.split("x")
+            val width = resolution[0].toInt() * percent / 100
+            val height = resolution[1].toInt() * percent / 100
+
+            return "${width}x${height}"
+        }
+
+        fun getNativeResolutions(activity: Activity): List<String> {
+            val parsedResolutions = mutableListOf<String>()
+            val nativeResolution = getNativeResolution(activity)
+
+            parsedResolutions.add(nativeResolution)
+            parsedResolutions.add(getPercentOfResolution(nativeResolution, 90))
+            parsedResolutions.add(getPercentOfResolution(nativeResolution, 80))
+            parsedResolutions.add(getPercentOfResolution(nativeResolution, 70))
+            parsedResolutions.add(getPercentOfResolution(nativeResolution, 60))
+            parsedResolutions.add(getPercentOfResolution(nativeResolution, 50))
+            parsedResolutions.add(getPercentOfResolution(nativeResolution, 40))
+            parsedResolutions.add(getPercentOfResolution(nativeResolution, 30))
+
+            return parsedResolutions
         }
 
         const val EXPORT_LNK_ACTION = 1

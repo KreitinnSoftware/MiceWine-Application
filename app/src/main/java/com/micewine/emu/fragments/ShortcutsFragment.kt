@@ -53,7 +53,7 @@ import com.micewine.emu.databinding.FragmentShortcutsBinding
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_WINE_PREFIX
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.preferences
-import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
+import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.max

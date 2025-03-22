@@ -14,8 +14,6 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BIGBLOCK
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BIGBLOCK_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BLEEDING_EDGE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BLEEDING_EDGE_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_CALLRET
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_CALLRET_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_DIRTY
@@ -40,18 +38,8 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_WEAKBARRIER_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_X87DOUBLE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_X87DOUBLE_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGSEGV
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGSEGV_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWBT
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWBT_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER

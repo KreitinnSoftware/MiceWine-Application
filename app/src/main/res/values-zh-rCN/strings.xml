@@ -187,4 +187,7 @@
     <string name="rat_manager_title">Rat软件包管理器</string>
     <string name="rat_manager_description">管理已安装的Rat软件包</string>
     <string name="grant_files_permission_error">授予文件权限以继续</string>
+    <string name="debug_settings_title">调试设置</string>
+    <string name="debug_settings_description">更改调试设置</string>
+    <string name="wine_log_level_description">设置 Wine 日志级别</string>
 </resources>

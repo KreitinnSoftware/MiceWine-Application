@@ -211,4 +211,7 @@
     <string name="rat_manager_title">Rat Package Manager</string>
     <string name="rat_manager_description">Manage Installed Rat Packages</string>
     <string name="grant_files_permission_error">Grant Files Permission for Continue</string>
+    <string name="debug_settings_title">Debug Settings</string>
+    <string name="debug_settings_description">Change Debug Settings</string>
+    <string name="wine_log_level_description">Set Wine Log Level</string>
 </resources>

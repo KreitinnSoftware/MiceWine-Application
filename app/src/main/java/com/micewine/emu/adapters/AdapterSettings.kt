@@ -49,7 +49,7 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
             val settingsModel = settingsList[getAdapterPosition()]
 
             when (settingsModel.titleSettings) {
-                context.getString(R.string.settings_title) -> {
+                context.getString(R.string.general_settings) -> {
                     val intent = Intent(context, GeneralSettingsActivity::class.java)
                     context.startActivity(intent)
                 }
@@ -68,15 +68,15 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
                     context.startActivity(intent)
                 }
 
-                context.getString(R.string.rat_manager_title) -> {
-                    val intent = Intent(context, RatManagerActivity::class.java)
-                    context.startActivity(intent)
-                }
-
                 context.getString(R.string.box64_preset_manager_title) -> {
                     val intent = Intent(context, PresetManagerActivity::class.java).apply {
                         putExtra("presetType", BOX64_PRESET)
                     }
+                    context.startActivity(intent)
+                }
+
+                context.getString(R.string.rat_manager_title) -> {
+                    val intent = Intent(context, RatManagerActivity::class.java)
                     context.startActivity(intent)
                 }
 

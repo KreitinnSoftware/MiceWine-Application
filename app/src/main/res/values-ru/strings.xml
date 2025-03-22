@@ -183,4 +183,7 @@
     <string name="rat_manager_title">Менеджер пакетов Rat</string>
     <string name="rat_manager_description">Управление установленными пакетами Rat</string>
     <string name="grant_files_permission_error">Предоставьте разрешение на файлы, чтобы продолжить</string>
+    <string name="debug_settings_title">调试设置</string>
+    <string name="debug_settings_description">更改调试设置</string>
+    <string name="wine_log_level_description">设置 Wine 日志级别</string>
 </resources>
