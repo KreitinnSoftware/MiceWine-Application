@@ -78,6 +78,7 @@ import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.RatPackageManager.installADToolsDriver
 import com.micewine.emu.core.RatPackageManager.installRat
 import com.micewine.emu.core.RatPackageManager.installablePackagesCategories
+import com.micewine.emu.core.RatPackageManager.listRatPackages
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
@@ -153,16 +154,16 @@ class MainActivity : AppCompatActivity() {
                 ACTION_RUN_WINE -> {
                     val exePath = intent.getStringExtra("exePath")!!
                     val exeArguments = intent.getStringExtra("exeArguments") ?: ""
-                    val driverName = intent.getStringExtra("driverName") ?: File("$appRootDir/packages").listFiles()?.filter { it.name.startsWith("VulkanDriver-") }?.map { it.name }!![0]
+                    val driverName = intent.getStringExtra("driverName") ?: listRatPackages("VulkanDriver-").map { it.name + " " + it.version }.first()
                     val driverType = intent.getIntExtra("driverType", MESA_DRIVER)
                     val box64Preset = intent.getStringExtra("box64Preset") ?: "default"
                     val displayResolution = intent.getStringExtra("displayResolution") ?: "1280x720"
                     val virtualControllerPreset = intent.getStringExtra("virtualControllerPreset") ?: "default"
                     val controllerPreset = intent.getStringExtra("controllerPreset") ?: "default"
                     val d3dxRenderer = intent.getStringExtra("d3dxRenderer") ?: "DXVK"
-                    val wineD3D = intent.getStringExtra("wineD3D") ?: "WineD3D-(10.0)"
-                    val dxvk = intent.getStringExtra("dxvk") ?: "DXVK-1.10.3-async"
-                    val vkd3d = intent.getStringExtra("vkd3d") ?: "VKD3D-2.8"
+                    val wineD3D = intent.getStringExtra("wineD3D") ?: listRatPackages("WineD3D-").map { it.name + " " + it.version }.first()
+                    val dxvk = intent.getStringExtra("dxvk") ?: listRatPackages("DXVK-").map { it.name + " " + it.version }.first()
+                    val vkd3d = intent.getStringExtra("vkd3d") ?: listRatPackages("VKD3D-").map { it.name + " " + it.version }.first()
                     val esync = intent.getBooleanExtra("esync", true)
                     val services = intent.getBooleanExtra("services", false)
                     val virtualDesktop = intent.getBooleanExtra("virtualDesktop", false)

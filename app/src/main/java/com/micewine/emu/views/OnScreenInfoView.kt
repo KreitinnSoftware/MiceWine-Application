@@ -21,6 +21,7 @@ import com.micewine.emu.activities.MainActivity.Companion.totalCpuUsage
 import com.micewine.emu.activities.MainActivity.Companion.vulkanDriverDeviceName
 import com.micewine.emu.activities.MainActivity.Companion.vulkanDriverDriverVersion
 import com.micewine.emu.core.RatPackageManager.getPackageNameVersionById
+import com.micewine.emu.core.RatPackageManager.listRatPackages
 
 class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0): View(context, attrs, defStyleAttr) {
     private val paint: Paint = Paint().apply {
@@ -38,9 +39,22 @@ class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: Attri
 
     private val textOffset = 40F
     private var textCount = 0
+    private var vkd3dVersion: String? = getPackageNameVersionById(selectedVKD3D)
+    private var dxvkVersion: String? = getPackageNameVersionById(selectedDXVK)
+    private var wineD3DVersion: String? = getPackageNameVersionById(selectedWineD3D)
 
     init {
         handler.post(updateRunnable)
+
+        if (vkd3dVersion == null) {
+            vkd3dVersion = listRatPackages("VKD3D-").map { it.name + " " + it.version }.first()
+        }
+        if (dxvkVersion == null) {
+            dxvkVersion = listRatPackages("DXVK-").map { it.name + " " + it.version }.first()
+        }
+        if (wineD3DVersion == null) {
+            wineD3DVersion = listRatPackages("WineD3D-").map { it.name + " " + it.version }.first()
+        }
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -62,12 +76,12 @@ class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: Attri
 
     private fun onScreenInfo(c: Canvas) {
         drawText(miceWineVersion, getTextEndX(c, miceWineVersion), c)
-        drawText(getPackageNameVersionById(selectedVKD3D!!), getTextEndX(c, getPackageNameVersionById(selectedVKD3D!!)), c)
+        drawText(vkd3dVersion!!, getTextEndX(c, vkd3dVersion!!), c)
 
         if (selectedD3DXRenderer == "DXVK") {
-            drawText(getPackageNameVersionById(selectedDXVK!!), getTextEndX(c, getPackageNameVersionById(selectedDXVK!!)), c)
+            drawText(dxvkVersion!!, getTextEndX(c, dxvkVersion!!), c)
         } else if (selectedD3DXRenderer == "WineD3D") {
-            drawText(getPackageNameVersionById(selectedWineD3D!!), getTextEndX(c, getPackageNameVersionById(selectedWineD3D!!)), c)
+            drawText(wineD3DVersion!!, getTextEndX(c, wineD3DVersion!!), c)
         }
 
         drawText(vulkanDriverDeviceName!!, getTextEndX(c, vulkanDriverDeviceName!!), c)

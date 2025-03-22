@@ -217,10 +217,15 @@ object RatPackageManager {
         return packagesIdList
     }
 
-    fun getPackageNameVersionById(id: String): String {
-        val lines = File("$ratPackagesDir/$id/pkg-header").readLines()
+    fun getPackageNameVersionById(id: String?): String? {
+        val pkgHeader = File("$ratPackagesDir/$id/pkg-header")
 
-        return lines[0].substringAfter("=") + " " + lines[2].substringAfter("=")
+        if (pkgHeader.exists() && id != null) {
+            val lines = pkgHeader.readLines()
+            return lines[0].substringAfter("=") + " " + lines[2].substringAfter("=")
+        }
+
+        return null
     }
 
     fun installADToolsDriver(adrenoToolsPackage: AdrenoToolsPackage) {

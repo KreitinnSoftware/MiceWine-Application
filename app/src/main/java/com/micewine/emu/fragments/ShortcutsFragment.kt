@@ -484,7 +484,7 @@ class ShortcutsFragment : Fragment() {
             return gameList[index].d3dxRenderer
         }
 
-        fun putVulkanDriverType(name: String, driverType: Int) {
+        private fun putVulkanDriverType(name: String, driverType: Int) {
             val index = gameList.indexOfFirst { it.name == name }
 
             if (index == -1) return
@@ -618,9 +618,9 @@ class ShortcutsFragment : Fragment() {
                     "",
                     MESA_DRIVER,
                     "DXVK",
-                    "DXVK-1.10.3-async",
-                    "WineD3D-(10.0)",
-                    "VKD3D-2.8",
+                    "",
+                    "",
+                    "",
                     true,
                     false,
                     availableCPUs.joinToString(","),
