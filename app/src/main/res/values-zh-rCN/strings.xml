@@ -184,4 +184,6 @@
     <string name="shape_text">形状</string>
     <string name="button_mapping_text">按钮映射</string>
     <string name="add_virtual_dpad">添加虚拟方向键</string>
+    <string name="rat_manager_title">Rat软件包管理器</string>
+    <string name="rat_manager_description">管理已安装的Rat软件包</string>
 </resources>

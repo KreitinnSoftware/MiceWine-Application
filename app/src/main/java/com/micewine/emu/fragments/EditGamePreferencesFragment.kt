@@ -28,10 +28,11 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.EmulationActivity
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_RUN_WINE
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_ICON
-import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedCpuAffinity
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
+import com.micewine.emu.core.RatPackageManager.listRatPackages
+import com.micewine.emu.core.RatPackageManager.listRatPackagesId
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Presets
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getControllerPresets
 import com.micewine.emu.fragments.DisplaySettingsFragment.Companion.getNativeResolutions
@@ -47,10 +48,8 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getEnableXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameExeArguments
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameIcon
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineVirtualDesktop
@@ -220,10 +219,10 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             }
         }
 
-        val vulkanDriversId = File("$appRootDir/packages").listFiles()?.filter { it.name.startsWith("VulkanDriver-") || it.name.startsWith("AdrenoToolsDriver-") }?.mapNotNull { it.name }!!
+        val vulkanDriversId = listRatPackagesId("VulkanDriver-", "AdrenoToolsDriver-")
 
         selectedDriverSpinner.apply {
-            val vulkanDrivers = File("$appRootDir/packages").listFiles()?.filter { it.name.startsWith("VulkanDriver-") || it.name.startsWith("AdrenoToolsDriver-") }?.mapNotNull { "${File(it.path + "/pkg-header").readLines()[0].substringAfter("=")} (${File(it.path + "/pkg-header").readLines()[2].substringAfter("=")}) ${if (it.name.startsWith("AdrenoToolsDriver-")) "(AdrenoTools)" else ""}" }!!
+            val vulkanDrivers = listRatPackages("VulkanDriver-", "AdrenoToolsDriver-").map { it.name + " " + it.version }
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, vulkanDrivers)
             val index = vulkanDriversId.indexOf(getVulkanDriver(selectedGameName))
             setSelection(if (index == -1) 0 else index)
@@ -278,9 +277,11 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         }
 
         selectedDXVKSpinner.apply {
-            val dxvkVersions = File("$appRootDir/wine-utils/DXVK").listFiles()?.map { it.name }!!
+            val dxvkVersions = listRatPackages("DXVK-").map { it.name + " " + it.version }
+            val dxvkVersionsId = listRatPackagesId("DXVK-")
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, dxvkVersions)
-            setSelection(dxvkVersions.indexOf(getDXVKVersion(selectedGameName)))
+            val index = dxvkVersionsId.indexOf(getDXVKVersion(selectedGameName))
+            setSelection(if (index == -1) 0 else index)
 
             onItemSelectedListener = object : OnItemSelectedListener {
                 override fun onItemSelected(
@@ -289,7 +290,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putDXVKVersion(selectedGameName, dxvkVersions[position])
+                    putDXVKVersion(selectedGameName, dxvkVersionsId[position])
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -298,9 +299,11 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         }
 
         selectedWineD3DSpinner.apply {
-            val wineD3DVersions = File("$appRootDir/wine-utils/WineD3D").listFiles()?.map { it.name }!!
+            val wineD3DVersions = listRatPackages("WineD3D-").map { it.name + " " + it.version }
+            val wineD3DVersionsId = listRatPackagesId("WineD3D-")
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, wineD3DVersions)
-            setSelection(wineD3DVersions.indexOf(getWineD3DVersion(selectedGameName)))
+            val index = wineD3DVersionsId.indexOf(getDXVKVersion(selectedGameName))
+            setSelection(if (index == -1) 0 else index)
 
             onItemSelectedListener = object : OnItemSelectedListener {
                 override fun onItemSelected(
@@ -309,7 +312,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putWineD3DVersion(selectedGameName, wineD3DVersions[position])
+                    putWineD3DVersion(selectedGameName, wineD3DVersionsId[position])
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -318,9 +321,11 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         }
 
         selectedVKD3DSpinner.apply {
-            val vkd3dVersions = File("$appRootDir/wine-utils/VKD3D").listFiles()?.map { it.name }!!
+            val vkd3dVersions = listRatPackages("VKD3D-").map { it.name + " " + it.version }
+            val vkd3dVersionsId = listRatPackagesId("VKD3D-")
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, vkd3dVersions)
-            setSelection(vkd3dVersions.indexOf(getVKD3DVersion(selectedGameName)))
+            val index = vkd3dVersionsId.indexOf(getDXVKVersion(selectedGameName))
+            setSelection(if (index == -1) 0 else index)
 
             onItemSelectedListener = object : OnItemSelectedListener {
                 override fun onItemSelected(
@@ -329,7 +334,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putVKD3DVersion(selectedGameName, vkd3dVersions[position])
+                    putVKD3DVersion(selectedGameName, vkd3dVersionsId[position])
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {

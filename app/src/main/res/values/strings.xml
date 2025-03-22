@@ -208,4 +208,6 @@
     <string name="shape_text">Shape</string>
     <string name="button_mapping_text">Button Mapping</string>
     <string name="add_virtual_dpad">Add Virtual DPad</string>
+    <string name="rat_manager_title">Rat Package Manager</string>
+    <string name="rat_manager_description">Manage Installed Rat Packages</string>
 </resources>

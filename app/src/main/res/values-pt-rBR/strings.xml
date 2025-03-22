@@ -185,4 +185,6 @@
     <string name="shape_text">Formato</string>
     <string name="button_mapping_text">Mapeamento de Botão</string>
     <string name="add_virtual_dpad">Adicionar DPad Virtual</string>
+    <string name="rat_manager_title">Gerenciador de Pacotes Rat</string>
+    <string name="rat_manager_description">Gerencie os Pacotes Rat Instalados</string>
 </resources>

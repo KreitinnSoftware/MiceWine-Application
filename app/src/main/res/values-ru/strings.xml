@@ -180,4 +180,6 @@
     <string name="shape_text">Форма</string>
     <string name="button_mapping_text">Настройка кнопок</string>
     <string name="add_virtual_dpad">Добавить виртуальный DPad</string>
+    <string name="rat_manager_title">Менеджер пакетов Rat</string>
+    <string name="rat_manager_description">Управление установленными пакетами Rat</string>
 </resources>

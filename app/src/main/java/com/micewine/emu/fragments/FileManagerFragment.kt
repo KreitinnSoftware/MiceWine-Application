@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +24,7 @@ import java.io.File
 
 class FileManagerFragment : Fragment() {
     private var binding: FragmentFileManagerBinding? = null
+    private var currentFolderText: TextView? = null
     private var rootView: View? = null
 
     override fun onCreateView(
@@ -35,6 +37,7 @@ class FileManagerFragment : Fragment() {
 
         recyclerView = rootView?.findViewById(R.id.recyclerViewFiles)
         recyclerView?.adapter = AdapterFiles(fileList, requireContext(), false)
+        currentFolderText = rootView?.findViewById(R.id.currentFolder)
 
         if (fileManagerCwd == null) {
             fileManagerCwd = fileManagerDefaultDir
@@ -42,6 +45,9 @@ class FileManagerFragment : Fragment() {
 
         refreshFiles()
         registerForContextMenu(recyclerView!!)
+
+        currentFolderText?.text = "/"
+        currentFolderText?.isSelected = true
 
         fragmentInstance = this
 
@@ -60,55 +66,58 @@ class FileManagerFragment : Fragment() {
                 _fragmentInstance = value
             }
 
+        @SuppressLint("SetTextI18n")
         fun refreshFiles() {
-            recyclerView?.let { rv ->
-                if (rv.tag as? Boolean == true) return
-                rv.tag = true
-                rv.animate()
-                    .alpha(0f)
-                    .setDuration(ANIMATION_DURATION / 2)
-                    .setInterpolator(AccelerateDecelerateInterpolator())
-                    .setListener(object : AnimatorListenerAdapter() {
-                        @SuppressLint("NotifyDataSetChanged")
-                        override fun onAnimationEnd(animation: Animator) {
-                            fragmentInstance?.lifecycleScope?.launch {
-                                val newFileList = withContext(Dispatchers.IO) {
-                                    val filesList = mutableListOf<AdapterFiles.FileList>()
-                                    if (fileManagerCwd != fileManagerDefaultDir) {
-                                        filesList.add(AdapterFiles.FileList(File("..")))
-                                    }
-                                    File(fileManagerCwd!!).listFiles()
-                                        ?.sorted()
-                                        ?.filter { it.isDirectory }
-                                        ?.forEach { filesList.add(AdapterFiles.FileList(it)) }
-                                    File(fileManagerCwd!!).listFiles()
-                                        ?.sorted()
-                                        ?.filter { it.isFile }
-                                        ?.forEach { filesList.add(AdapterFiles.FileList(it)) }
-                                    filesList
+            fragmentInstance?.currentFolderText?.text = (fileManagerCwd?.substringAfter("dosdevices")?.substringAfter("/") + "/").replaceFirstChar { it.uppercase() }
+
+            if (recyclerView?.tag as? Boolean == true) return
+
+            recyclerView?.tag = true
+            recyclerView!!.animate()
+                .alpha(0f)
+                .setDuration(ANIMATION_DURATION / 2)
+                .setInterpolator(AccelerateDecelerateInterpolator())
+                .setListener(object : AnimatorListenerAdapter() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    override fun onAnimationEnd(animation: Animator) {
+                        fragmentInstance?.lifecycleScope?.launch {
+                            val newFileList = withContext(Dispatchers.IO) {
+                                val filesList = mutableListOf<AdapterFiles.FileList>()
+                                if (fileManagerCwd != fileManagerDefaultDir) {
+                                    filesList.add(AdapterFiles.FileList(File("..")))
                                 }
 
-                                withContext(Dispatchers.Main) {
-                                    rv.post {
-                                        fileList.clear()
-                                        fileList.addAll(newFileList)
+                                File(fileManagerCwd!!).listFiles()
+                                    ?.sorted()
+                                    ?.filter { it.isDirectory }
+                                    ?.forEach { filesList.add(AdapterFiles.FileList(it)) }
+                                File(fileManagerCwd!!).listFiles()
+                                    ?.sorted()
+                                    ?.filter { it.isFile }
+                                    ?.forEach { filesList.add(AdapterFiles.FileList(it)) }
+                                filesList
+                            }
 
-                                        rv.adapter?.notifyDataSetChanged()
-                                        rv.animate()
-                                            .alpha(1f)
-                                            .setDuration(ANIMATION_DURATION / 2)
-                                            .setInterpolator(AccelerateDecelerateInterpolator())
-                                            .setListener(object : AnimatorListenerAdapter() {
-                                                override fun onAnimationEnd(animation: Animator) {
-                                                    rv.tag = false
-                                                }
-                                            })
-                                    }
+                            withContext(Dispatchers.Main) {
+                                recyclerView?.post {
+                                    fileList.clear()
+                                    fileList.addAll(newFileList)
+
+                                    recyclerView?.adapter?.notifyDataSetChanged()
+                                    recyclerView!!.animate()
+                                        .alpha(1f)
+                                        .setDuration(ANIMATION_DURATION / 2)
+                                        .setInterpolator(AccelerateDecelerateInterpolator())
+                                        .setListener(object : AnimatorListenerAdapter() {
+                                            override fun onAnimationEnd(animation: Animator) {
+                                                recyclerView?.tag = false
+                                            }
+                                        })
                                 }
                             }
                         }
-                    })
-            }
+                    }
+                })
         }
 
         fun deleteFile(filePath: String) {

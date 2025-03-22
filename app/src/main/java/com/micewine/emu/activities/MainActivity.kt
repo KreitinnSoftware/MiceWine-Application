@@ -19,9 +19,9 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import androidx.viewpager2.widget.ViewPager2
 import com.getkeepsafe.taptargetview.TapTarget
 import com.getkeepsafe.taptargetview.TapTargetSequence
 import com.google.android.material.appbar.MaterialToolbar
@@ -69,6 +69,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LE
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET_KEY
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateICDFile
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
+import com.micewine.emu.adapters.AdapterBottomNavigation
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
@@ -76,13 +77,13 @@ import com.micewine.emu.core.HighlightState
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.RatPackageManager.installADToolsDriver
 import com.micewine.emu.core.RatPackageManager.installRat
+import com.micewine.emu.core.RatPackageManager.installablePackagesCategories
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.core.WineWrapper.getCpuHexMask
 import com.micewine.emu.core.WineWrapper.getSanitizedPath
 import com.micewine.emu.databinding.ActivityMainBinding
-import com.micewine.emu.fragments.AboutFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment
 import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ADTOOLS_DRIVER_PACKAGE
 import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.RAT_PACKAGE
@@ -96,13 +97,11 @@ import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_GAME_ITEM
 import com.micewine.emu.fragments.EditGamePreferencesFragment
 import com.micewine.emu.fragments.EditGamePreferencesFragment.Companion.EDIT_GAME_PREFERENCES
 import com.micewine.emu.fragments.EditGamePreferencesFragment.Companion.FILE_MANAGER_START_PREFERENCES
-import com.micewine.emu.fragments.FileManagerFragment
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.fragments.FloatingFileManagerFragment
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.OPERATION_SELECT_RAT
 import com.micewine.emu.fragments.RenameFragment
 import com.micewine.emu.fragments.RenameFragment.Companion.RENAME_FILE
-import com.micewine.emu.fragments.SettingsFragment
 import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
@@ -274,7 +273,7 @@ class MainActivity : AppCompatActivity() {
                             RatPackageManager.RatPackage(intent.getStringExtra("ratFile")!!)
                         }
 
-                        if (ratFile.architecture != Build.SUPPORTED_ABIS[0].replace("arm64-v8a", "aarch64") && ratFile.category != "Wine") {
+                        if (!(ratFile.architecture == Build.SUPPORTED_ABIS[0].replace("arm64-v8a", "aarch64") || ratFile.architecture == "any") && ratFile.category != "Wine") {
                             Toast.makeText(context, R.string.invalid_architecture_rat_file, Toast.LENGTH_SHORT).show()
                             return@launch
                         }
@@ -284,7 +283,7 @@ class MainActivity : AppCompatActivity() {
                             return@launch
                         }
 
-                        if (ratFile.category != "VulkanDriver" && ratFile.category != "Box64" && ratFile.category != "Wine") {
+                        if (ratFile.category !in installablePackagesCategories) {
                             Toast.makeText(context, "You cannot install other packages than Vulkan Drivers Box64 or Wine.", Toast.LENGTH_SHORT).show()
                             return@launch
                         }
@@ -374,11 +373,8 @@ class MainActivity : AppCompatActivity() {
 
     private var appToolbar: MaterialToolbar? = null
     private var bottomNavigation: BottomNavigationView? = null
+    private var viewPager: ViewPager2? = null
     private var runningXServer = false
-    private val shortcutsFragment: ShortcutsFragment = ShortcutsFragment()
-    private val settingsFragment: SettingsFragment = SettingsFragment()
-    private val fileManagerFragment: FileManagerFragment = FileManagerFragment()
-    private val aboutFragment: AboutFragment = AboutFragment()
     private var preferences: SharedPreferences? = null
     private var currentState: HighlightState? = null
 
@@ -406,28 +402,32 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation?.setOnItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
                 R.id.nav_shortcuts -> {
-                    selectedFragment = "ShortcutsFragment"
-                    fragmentLoader(shortcutsFragment)
+                    selectedFragmentId = 0
+                    viewPager?.currentItem = 0
                 }
 
                 R.id.nav_settings -> {
-                    selectedFragment = "SettingsFragment"
-                    fragmentLoader(settingsFragment)
+                    selectedFragmentId = 1
+                    viewPager?.currentItem = 1
                 }
 
                 R.id.nav_file_manager -> {
-                    selectedFragment = "FileManagerFragment"
-                    fragmentLoader(fileManagerFragment)
+                    selectedFragmentId = 2
+                    viewPager?.currentItem = 2
                 }
 
                 R.id.nav_about -> {
-                    selectedFragment = "AboutFragment"
-                    fragmentLoader(aboutFragment)
+                    selectedFragmentId = 3
+                    viewPager?.currentItem = 3
                 }
             }
 
             true
         }
+
+        viewPager = findViewById(R.id.viewPager)
+        viewPager?.adapter = AdapterBottomNavigation(this)
+        viewPager?.isUserInputEnabled = false
 
         bottomNavigation?.post {
             bottomNavigation?.selectedItemId = R.id.nav_shortcuts
@@ -479,7 +479,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (selectedFragment == "FileManagerFragment") {
+            if (selectedFragmentId == 2) {
                 if (fileManagerCwd != fileManagerDefaultDir) {
                     fileManagerCwd = File(fileManagerCwd!!).parent!!
 
@@ -489,7 +489,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            if (selectedFragment != "ShortcutsFragment") {
+            if (selectedFragmentId > 0) {
                 bottomNavigation?.selectedItemId = R.id.nav_shortcuts
 
                 return true
@@ -508,14 +508,18 @@ class MainActivity : AppCompatActivity() {
         v: View?,
         menuInfo: ContextMenu.ContextMenuInfo?
     ) {
-        if (selectedFragment == "ShortcutsFragment") {
+        if (selectedFragmentId == 0) {
             if (selectedGameName == getString(R.string.desktop_mode_init)) {
                 menuInflater.inflate(R.menu.game_list_context_menu_lite, menu)
             } else {
                 menuInflater.inflate(R.menu.game_list_context_menu, menu)
             }
-        } else if (selectedFragment == "FileManagerFragment") {
-            menuInflater.inflate(R.menu.file_list_context_menu, menu)
+        } else if (selectedFragmentId == 2) {
+            if (File(selectedFile).isDirectory) {
+                menuInflater.inflate(R.menu.file_list_context_menu_folder, menu)
+            } else {
+                menuInflater.inflate(R.menu.file_list_context_menu, menu)
+            }
         }
     }
 
@@ -682,13 +686,6 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(intent, EXPORT_LNK_ACTION)
     }
 
-    private fun fragmentLoader(fragment: Fragment) {
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.content, fragment)
-            commit()
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         binding = null
@@ -709,18 +706,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun installDXWrapper(winePrefix: File) {
         val driveC = File("$winePrefix/drive_c")
-        val wineUtils = File("$appRootDir/wine-utils")
         val system32 = File("$driveC/windows/system32")
         val syswow64 = File("$driveC/windows/syswow64")
-        val selectedDXVK = File("$wineUtils/DXVK/$selectedDXVK")
-        val selectedVKD3D = File("$wineUtils/VKD3D/$selectedVKD3D")
-        val selectedWineD3D = File("$wineUtils/WineD3D/$selectedWineD3D")
+        val selectedDXVK = File("$ratPackagesDir/$selectedDXVK")
+        val selectedVKD3D = File("$ratPackagesDir/$selectedVKD3D")
+        val selectedWineD3D = File("$ratPackagesDir/$selectedWineD3D")
 
         when (selectedD3DXRenderer) {
             "DXVK" -> {
                 if (selectedDXVK.exists()) {
-                    val x64Folder = File("$selectedDXVK/x64")
-                    val x32Folder = File("$selectedDXVK/x32")
+                    val x64Folder = File("$selectedDXVK/files/x64")
+                    val x32Folder = File("$selectedDXVK/files/x32")
 
                     if (x64Folder.exists() && x32Folder.exists()) {
                         x64Folder.copyRecursively(system32, true)
@@ -731,8 +727,8 @@ class MainActivity : AppCompatActivity() {
 
             "WineD3D" -> {
                 if (selectedWineD3D.exists()) {
-                    val x64Folder = File("$selectedWineD3D/x64")
-                    val x32Folder = File("$selectedWineD3D/x32")
+                    val x64Folder = File("$selectedWineD3D/files/x64")
+                    val x32Folder = File("$selectedWineD3D/files/x32")
 
                     if (x64Folder.exists() && x32Folder.exists()) {
                         x64Folder.copyRecursively(system32, true)
@@ -743,8 +739,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (selectedVKD3D.exists()) {
-            File("$selectedVKD3D/x64").copyRecursively(system32, true)
-            File("$selectedVKD3D/x32").copyRecursively(syswow64, true)
+            File("$selectedVKD3D/files/x64").copyRecursively(system32, true)
+            File("$selectedVKD3D/files/x32").copyRecursively(syswow64, true)
         }
     }
 
@@ -1057,6 +1053,7 @@ class MainActivity : AppCompatActivity() {
         var selectedDXVKHud: String? = null
         var selectedMesaVkWsiPresentMode: String? = null
         var selectedTuDebugPreset: String? = null
+        var selectedFragmentId = 0
         var memoryStats = "??/??"
         var totalCpuUsage = "???%"
         var winePrefixesDir: File = File("$appRootDir/winePrefixes")
@@ -1082,8 +1079,6 @@ class MainActivity : AppCompatActivity() {
         var selectedVirtualControllerPreset: String? = null
         var useAdrenoTools: Boolean = false
         var adrenoToolsDriverFile: File? = null
-
-        var selectedFragment = "ShortcutsFragment"
 
         const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
         const val ACTION_SETUP = "com.micewine.emu.ACTION_SETUP"

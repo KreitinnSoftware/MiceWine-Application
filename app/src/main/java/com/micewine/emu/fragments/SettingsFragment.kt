@@ -40,14 +40,14 @@ class SettingsFragment : Fragment() {
 
         if (Build.SUPPORTED_ABIS[0] != "x86_64") {
             addToAdapter(R.string.box64_preset_manager_title, R.string.box64_preset_manager_description, R.drawable.ic_box64)
-            addToAdapter(R.string.box64_manager_title, R.string.box64_manager_description, R.drawable.ic_box64)
         }
 
-        addToAdapter(R.string.driver_manager_title, R.string.driver_manager_description, R.drawable.ic_gpu)
-        addToAdapter(R.string.wine_manager_title, R.string.wine_manager_description, R.drawable.ic_wine)
+        addToAdapter(R.string.rat_manager_title, R.string.rat_manager_description, R.drawable.ic_rat_package_grayscale)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, icon: Int) {
-        settingsList.add(SettingsList(context?.getString(titleId)!!, context?.getString(descriptionId)!!, icon))
+        settingsList.add(
+            SettingsList(context?.getString(titleId)!!, context?.getString(descriptionId)!!, icon)
+        )
     }
 }

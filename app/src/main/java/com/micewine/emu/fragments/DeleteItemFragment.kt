@@ -13,7 +13,7 @@ import androidx.preference.PreferenceManager
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
 import com.micewine.emu.activities.MainActivity.Companion.selectedFile
-import com.micewine.emu.activities.MainActivity.Companion.selectedFragment
+import com.micewine.emu.activities.MainActivity.Companion.selectedFragmentId
 import com.micewine.emu.activities.MainActivity.Companion.setupDone
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
@@ -24,9 +24,7 @@ import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetType
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.deleteBox64Preset
-import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.renameBox64Preset
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.deleteControllerPreset
-import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.renameControllerPreset
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.FileManagerFragment.Companion.deleteFile
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
@@ -34,7 +32,6 @@ import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndetermi
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.ACTION_UPDATE_WINE_PREFIX_SPINNER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.removeGameFromList
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.deleteVirtualControllerPreset
-import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.renameVirtualControllerPreset
 
 class DeleteItemFragment(private val deleteType: Int, private val context: Context) : DialogFragment() {
     private var preferences: SharedPreferences? = null
@@ -53,9 +50,9 @@ class DeleteItemFragment(private val deleteType: Int, private val context: Conte
         buttonContinue.setOnClickListener {
             when (deleteType) {
                 DELETE_GAME_ITEM -> {
-                    if (selectedFragment == "ShortcutsFragment") {
+                    if (selectedFragmentId == 0) {
                         removeGameFromList(selectedGameName)
-                    } else if (selectedFragment == "FileManagerFragment") {
+                    } else if (selectedFragmentId == 2) {
                         deleteFile(selectedFile)
                     }
                 }

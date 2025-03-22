@@ -6,25 +6,25 @@ import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.Gson
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.enableMangoHUD
 import com.micewine.emu.activities.MainActivity.Companion.fpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
-import com.micewine.emu.adapters.AdapterRatPackage.Companion.BOX64
-import com.micewine.emu.adapters.AdapterRatPackage.Companion.VK_DRIVER
-import com.micewine.emu.adapters.AdapterRatPackage.Companion.WINE
+import com.micewine.emu.adapters.AdapterTabPager
 import com.micewine.emu.databinding.ActivityRatManagerBinding
-import com.micewine.emu.fragments.RatManagerFragment
 import java.io.File
 
 class RatManagerActivity : AppCompatActivity() {
     private var binding: ActivityRatManagerBinding? = null
     private var backButton: ImageButton? = null
     private var ratManagerToolBar: Toolbar? = null
-    private var prefix: String? = null
-    private var type: Int? = null
+    private var viewPager: ViewPager2? = null
+    private var tabLayout: TabLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,21 +38,15 @@ class RatManagerActivity : AppCompatActivity() {
         }
 
         ratManagerToolBar = findViewById(R.id.ratManagerToolbar)
+        ratManagerToolBar?.setTitle(R.string.rat_manager_title)
+        tabLayout = findViewById(R.id.tabLayout)
+        viewPager = findViewById(R.id.viewPager)
 
-        prefix = intent.getStringExtra("prefix")
-        type = intent.getIntExtra("type", -1)
+        viewPager?.adapter = AdapterTabPager(this)
 
-        when (type) {
-            BOX64 -> ratManagerToolBar?.setTitle(R.string.box64_manager_title)
-            VK_DRIVER -> ratManagerToolBar?.setTitle(R.string.driver_manager_title)
-            WINE -> ratManagerToolBar?.setTitle(R.string.wine_manager_title)
-        }
-
-        if (type == VK_DRIVER) {
-            fragmentLoader(RatManagerFragment(prefix!!, type!!, "AdrenoToolsDriver-"))
-        } else {
-            fragmentLoader(RatManagerFragment(prefix!!, type!!))
-        }
+        TabLayoutMediator(tabLayout!!, viewPager!!) {
+            tab: TabLayout.Tab, position: Int -> tab.setText((viewPager?.adapter as AdapterTabPager).getItemName(position))
+        }.attach()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {

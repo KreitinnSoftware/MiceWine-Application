@@ -43,6 +43,8 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
             holder.fileName.text = sList.file.name
         }
 
+        holder.fileName.isSelected = true
+
         if (sList.file.isDirectory) {
             holder.icon.setImageResource(R.drawable.ic_folder)
 
@@ -105,7 +107,7 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                     holder.icon.setImageResource(R.drawable.ic_log)
                 }
             } else if (fileExtension == "rat") {
-                holder.icon.setImageResource(R.drawable.icon_grayscale)
+                holder.icon.setImageResource(R.drawable.ic_rat_package)
             } else {
                 holder.icon.setImageResource(R.drawable.ic_log)
             }

@@ -20,6 +20,7 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedWineD3D
 import com.micewine.emu.activities.MainActivity.Companion.totalCpuUsage
 import com.micewine.emu.activities.MainActivity.Companion.vulkanDriverDeviceName
 import com.micewine.emu.activities.MainActivity.Companion.vulkanDriverDriverVersion
+import com.micewine.emu.core.RatPackageManager.getPackageNameVersionById
 
 class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0): View(context, attrs, defStyleAttr) {
     private val paint: Paint = Paint().apply {
@@ -61,12 +62,12 @@ class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: Attri
 
     private fun onScreenInfo(c: Canvas) {
         drawText(miceWineVersion, getTextEndX(c, miceWineVersion), c)
-        drawText(selectedVKD3D!!, getTextEndX(c, selectedVKD3D!!), c)
+        drawText(getPackageNameVersionById(selectedVKD3D!!), getTextEndX(c, getPackageNameVersionById(selectedVKD3D!!)), c)
 
         if (selectedD3DXRenderer == "DXVK") {
-            drawText(selectedDXVK!!, getTextEndX(c, selectedDXVK!!), c)
+            drawText(getPackageNameVersionById(selectedDXVK!!), getTextEndX(c, getPackageNameVersionById(selectedDXVK!!)), c)
         } else if (selectedD3DXRenderer == "WineD3D") {
-            drawText(selectedWineD3D!!, getTextEndX(c, selectedWineD3D!!), c)
+            drawText(getPackageNameVersionById(selectedWineD3D!!), getTextEndX(c, getPackageNameVersionById(selectedWineD3D!!)), c)
         }
 
         drawText(vulkanDriverDeviceName!!, getTextEndX(c, vulkanDriverDeviceName!!), c)
