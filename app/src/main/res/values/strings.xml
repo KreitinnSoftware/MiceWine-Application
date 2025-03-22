@@ -210,4 +210,5 @@
     <string name="add_virtual_dpad">Add Virtual DPad</string>
     <string name="rat_manager_title">Rat Package Manager</string>
     <string name="rat_manager_description">Manage Installed Rat Packages</string>
+    <string name="grant_files_permission_error">Grant Files Permission for Continue</string>
 </resources>

@@ -182,4 +182,5 @@
     <string name="add_virtual_dpad">Добавить виртуальный DPad</string>
     <string name="rat_manager_title">Менеджер пакетов Rat</string>
     <string name="rat_manager_description">Управление установленными пакетами Rat</string>
+    <string name="grant_files_permission_error">Предоставьте разрешение на файлы, чтобы продолжить</string>
 </resources>
