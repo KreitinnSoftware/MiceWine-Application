@@ -6,7 +6,6 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -178,7 +177,25 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
                         }
                         OPERATION_IMPORT_PRESET -> {
                             if (it.name.endsWith(".mwp")) {
-                                addToAdapter(it)
+                                val mwpType = it.readLines()[0]
+
+                                when (clickedPresetType) {
+                                    PHYSICAL_CONTROLLER -> {
+                                        if (mwpType == "controllerPreset") {
+                                            addToAdapter(it)
+                                        }
+                                    }
+                                    VIRTUAL_CONTROLLER -> {
+                                        if (mwpType == "virtualControllerPreset") {
+                                            addToAdapter(it)
+                                        }
+                                    }
+                                    BOX64_PRESET -> {
+                                        if (mwpType == "box64Preset") {
+                                            addToAdapter(it)
+                                        }
+                                    }
+                                }
                             }
                         }
                         else -> {
@@ -192,7 +209,9 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
         }
 
         private fun addToAdapter(file: File) {
-            fileList.add(AdapterFiles.FileList(file))
+            fileList.add(
+                AdapterFiles.FileList(file)
+            )
         }
     }
 }
