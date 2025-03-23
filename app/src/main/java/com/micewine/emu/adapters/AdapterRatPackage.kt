@@ -66,6 +66,9 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
             if (sList.isInstalled) {
                 holder.downloadRatPackageButton.isEnabled = false
                 holder.downloadRatPackageButton.setImageResource(android.R.drawable.checkbox_on_background)
+            } else {
+                holder.downloadRatPackageButton.isEnabled = true
+                holder.downloadRatPackageButton.setImageResource(R.drawable.ic_download)
             }
         } else {
             holder.downloadRatPackageButton.visibility = View.GONE
@@ -139,7 +142,10 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
             }
 
             deleteRatPackageButton.setOnClickListener {
-                if (selectedItemId == holder.adapterPosition) {
+                val pos = holder.adapterPosition
+                if (pos == -1) return@setOnClickListener
+
+                if (selectedItemId == pos) {
                     selectedItemId = 0
 
                     val firstPackage = File("$ratPackagesDir").listFiles()?.first { it.name.startsWith(packagePrefix!!) }?.name
@@ -159,8 +165,8 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
 
                 File("$ratPackagesDir/${sList.itemFolderId}").deleteRecursively()
 
-                settingsList.removeAt(holder.adapterPosition)
-                notifyItemRemoved(holder.adapterPosition)
+                settingsList.removeAt(pos)
+                notifyItemRemoved(pos)
             }
 
             downloadRatPackageButton.setOnClickListener {

@@ -49,8 +49,10 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getEnableXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameExeArguments
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameIcon
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineVirtualDesktop
@@ -219,10 +221,10 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             }
         }
 
-        val vulkanDriversId = listRatPackagesId("VulkanDriver-", "AdrenoToolsDriver-")
+        val vulkanDriversId = listRatPackagesId("VulkanDriver", "AdrenoToolsDriver")
 
         selectedDriverSpinner.apply {
-            val vulkanDrivers = listRatPackages("VulkanDriver-", "AdrenoToolsDriver-").map { it.name + " " + it.version }
+            val vulkanDrivers = listRatPackages("VulkanDriver", "AdrenoToolsDriver").map { it.name + " " + it.version }
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, vulkanDrivers)
             val index = vulkanDriversId.indexOf(getVulkanDriver(selectedGameName))
             setSelection(if (index == -1) 0 else index)
@@ -277,8 +279,8 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         }
 
         selectedDXVKSpinner.apply {
-            val dxvkVersions = listRatPackages("DXVK-").map { it.name + " " + it.version }
-            val dxvkVersionsId = listRatPackagesId("DXVK-")
+            val dxvkVersions = listRatPackages("DXVK").map { it.name + " " + it.version }
+            val dxvkVersionsId = listRatPackagesId("DXVK")
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, dxvkVersions)
             val index = dxvkVersionsId.indexOf(getDXVKVersion(selectedGameName))
             setSelection(if (index == -1) 0 else index)
@@ -299,10 +301,10 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         }
 
         selectedWineD3DSpinner.apply {
-            val wineD3DVersions = listRatPackages("WineD3D-").map { it.name + " " + it.version }
-            val wineD3DVersionsId = listRatPackagesId("WineD3D-")
+            val wineD3DVersions = listRatPackages("WineD3D").map { it.name + " " + it.version }
+            val wineD3DVersionsId = listRatPackagesId("WineD3D")
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, wineD3DVersions)
-            val index = wineD3DVersionsId.indexOf(getDXVKVersion(selectedGameName))
+            val index = wineD3DVersionsId.indexOf(getWineD3DVersion(selectedGameName))
             setSelection(if (index == -1) 0 else index)
 
             onItemSelectedListener = object : OnItemSelectedListener {
@@ -321,10 +323,10 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         }
 
         selectedVKD3DSpinner.apply {
-            val vkd3dVersions = listRatPackages("VKD3D-").map { it.name + " " + it.version }
-            val vkd3dVersionsId = listRatPackagesId("VKD3D-")
+            val vkd3dVersions = listRatPackages("VKD3D").map { it.name + " " + it.version }
+            val vkd3dVersionsId = listRatPackagesId("VKD3D")
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, vkd3dVersions)
-            val index = vkd3dVersionsId.indexOf(getDXVKVersion(selectedGameName))
+            val index = vkd3dVersionsId.indexOf(getVKD3DVersion(selectedGameName))
             setSelection(if (index == -1) 0 else index)
 
             onItemSelectedListener = object : OnItemSelectedListener {
