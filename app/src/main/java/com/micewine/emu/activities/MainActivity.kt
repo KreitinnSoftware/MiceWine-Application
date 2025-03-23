@@ -76,6 +76,7 @@ import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.HighlightState
 import com.micewine.emu.core.RatPackageManager
+import com.micewine.emu.core.RatPackageManager.checkPackageInstalled
 import com.micewine.emu.core.RatPackageManager.installADToolsDriver
 import com.micewine.emu.core.RatPackageManager.installRat
 import com.micewine.emu.core.RatPackageManager.installablePackagesCategories
@@ -244,7 +245,10 @@ class MainActivity : AppCompatActivity() {
                             AskInstallRatPackageFragment(RAT_PACKAGE).show(supportFragmentManager, "")
                         } else if (file.name.endsWith(".zip")) {
                             adToolsDriverCandidate = RatPackageManager.AdrenoToolsPackage(file.path)
-                            AskInstallRatPackageFragment(ADTOOLS_DRIVER_PACKAGE).show(supportFragmentManager, "")
+
+                            if (adToolsDriverCandidate?.name != null) {
+                                AskInstallRatPackageFragment(ADTOOLS_DRIVER_PACKAGE).show(supportFragmentManager, "")
+                            }
                         }
                     } else if (file.isDirectory) {
                         fileManagerCwd = file.path
@@ -269,24 +273,25 @@ class MainActivity : AppCompatActivity() {
 
                 ACTION_INSTALL_RAT -> {
                     lifecycleScope.launch {
-                        val ratFile: RatPackageManager.RatPackage = if (intent.getStringExtra("ratFile") == "") {
-                            ratCandidate!!
-                        } else {
-                            RatPackageManager.RatPackage(intent.getStringExtra("ratFile")!!)
-                        }
+                        val ratFile = ratCandidate!!
 
-                        if (!(ratFile.architecture == Build.SUPPORTED_ABIS[0].replace("arm64-v8a", "aarch64") || ratFile.architecture == "any") && ratFile.category != "Wine") {
+                        if (!(ratFile.architecture == deviceArch || ratFile.architecture == "any") && ratFile.category != "Wine") {
                             Toast.makeText(context, R.string.invalid_architecture_rat_file, Toast.LENGTH_SHORT).show()
                             return@launch
                         }
 
                         if (ratFile.category == "rootfs") {
-                            Toast.makeText(context, "You cannot install rootfs after installation.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, R.string.error_install_rootfs_file_manager, Toast.LENGTH_SHORT).show()
                             return@launch
                         }
 
                         if (ratFile.category !in installablePackagesCategories) {
-                            Toast.makeText(context, "You cannot install other packages than Vulkan Drivers Box64 or Wine.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, R.string.unknown_package_category, Toast.LENGTH_SHORT).show()
+                            return@launch
+                        }
+
+                        if (checkPackageInstalled(ratFile.name!!, ratFile.category!!, ratFile.version!!)) {
+                            Toast.makeText(context, R.string.package_already_installed, Toast.LENGTH_SHORT).show()
                             return@launch
                         }
 
@@ -306,13 +311,14 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 ACTION_INSTALL_ADTOOLS_DRIVER -> {
-                    val adToolsDriverFile: RatPackageManager.AdrenoToolsPackage = if (intent.getStringExtra("adToolsDriverFile") == "") {
-                        adToolsDriverCandidate!!
-                    } else {
-                        RatPackageManager.AdrenoToolsPackage(intent.getStringExtra("adToolsDriverFile")!!)
-                    }
+                    val adToolsDriverFile = adToolsDriverCandidate!!
 
                     lifecycleScope.launch {
+                        if (checkPackageInstalled(adToolsDriverFile.name + " (AdrenoTools)", "AdrenoToolsDriver", adToolsDriverFile.version!!)) {
+                            Toast.makeText(context, R.string.package_already_installed, Toast.LENGTH_SHORT).show()
+                            return@launch
+                        }
+
                         withContext(Dispatchers.Default) {
                             setupDone = false
 
@@ -853,7 +859,7 @@ class MainActivity : AppCompatActivity() {
                 return@withContext
             }
 
-            if (ratFile.architecture != Build.SUPPORTED_ABIS[0].replace("arm64-v8a", "aarch64")) {
+            if (ratFile.architecture != deviceArch) {
                 abortSetup = true
 
                 runOnUiThread {
@@ -1010,6 +1016,7 @@ class MainActivity : AppCompatActivity() {
         val appRootDir = File("/data/data/com.micewine.emu/files")
         var ratPackagesDir = File("$appRootDir/packages")
         var appBuiltinRootfs: Boolean = false
+        var deviceArch = Build.SUPPORTED_ABIS[0].replace("arm64-v8a", "aarch64")
         private val unixUsername = runCommandWithOutput("whoami").replace("\n", "")
         var customRootFSPath: String? = null
         var usrDir = File("$appRootDir/usr")

@@ -30,7 +30,7 @@ class RatManagerFragment(private val prefix: String, private val type: Int, priv
 
     private fun setAdapter() {
         recyclerView?.setAdapter(
-            AdapterRatPackage(ratList, requireContext())
+            AdapterRatPackage(ratList, requireActivity())
         )
 
         ratList.clear()

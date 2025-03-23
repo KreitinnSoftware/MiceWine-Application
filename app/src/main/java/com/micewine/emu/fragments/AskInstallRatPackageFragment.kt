@@ -41,15 +41,11 @@ class AskInstallRatPackageFragment(private val packageType: Int) : DialogFragmen
         buttonContinue.setOnClickListener {
             if (packageType == RAT_PACKAGE) {
                 context?.sendBroadcast(
-                    Intent(ACTION_INSTALL_RAT).apply {
-                        putExtra("ratFile", "")
-                    }
+                    Intent(ACTION_INSTALL_RAT)
                 )
             } else if (packageType == ADTOOLS_DRIVER_PACKAGE) {
                 context?.sendBroadcast(
-                    Intent(ACTION_INSTALL_ADTOOLS_DRIVER).apply {
-                        putExtra("adToolsDriverFile", "")
-                    }
+                    Intent(ACTION_INSTALL_ADTOOLS_DRIVER)
                 )
             }
 

@@ -176,8 +176,13 @@ object RatPackageManager {
 
         File("$appRootDir/packages").listFiles()?.forEach { file ->
             if (file.isDirectory && (file.name.startsWith(type) || file.name.startsWith(anotherType))) {
-                val lines = File("$file/pkg-header").readLines()
+                val pkgHeader = File("$file/pkg-header")
+                if (!pkgHeader.exists()) {
+                    file.deleteRecursively()
+                    return@forEach
+                }
 
+                val lines = pkgHeader.readLines()
                 var pkgName = lines[0].substringAfter("=")
 
                 if (file.name.startsWith("AdrenoToolsDriver-")) {
@@ -228,6 +233,16 @@ object RatPackageManager {
         return null
     }
 
+    fun checkPackageInstalled(name: String, category: String, version: String): Boolean {
+        listRatPackages().forEach {
+            if (it.name == name && it.category == category && it.version == version) {
+                return true
+            }
+        }
+
+        return false
+    }
+
     fun installADToolsDriver(adrenoToolsPackage: AdrenoToolsPackage) {
         progressBarIsIndeterminate = false
 
@@ -269,15 +284,18 @@ object RatPackageManager {
         var adrenoToolsFile: ZipFile = ZipFile(path)
 
         init {
-            adrenoToolsFile.getInputStream(adrenoToolsFile.getFileHeader("meta.json")).use { inputStream ->
-                val json = inputStream.reader().readLines().joinToString("\n")
-                val meta = Gson().fromJson(json, AdrenoToolsMetaInfo::class.java)
+            val metaHeader = if (adrenoToolsFile.isValidZipFile) adrenoToolsFile.getFileHeader("meta.json") else null
+            if (metaHeader != null) {
+                adrenoToolsFile.getInputStream(metaHeader).use { inputStream ->
+                    val json = inputStream.reader().readLines().joinToString("\n")
+                    val meta = Gson().fromJson(json, AdrenoToolsMetaInfo::class.java)
 
-                name = meta.name
-                version = meta.driverVersion
-                description = meta.description
-                driverLib = meta.libraryName
-                author = meta.author
+                    name = meta.name
+                    version = meta.driverVersion
+                    description = meta.description
+                    driverLib = meta.libraryName
+                    author = meta.author
+                }
             }
         }
     }
@@ -303,14 +321,18 @@ object RatPackageManager {
         init {
             if (ratPath != null) {
                 ratFile = ZipFile(ratPath)
-                ratFile?.getInputStream(ratFile?.getFileHeader("pkg-header")).use { inputStream ->
-                    val lines = inputStream?.reader()?.readLines()!!
 
-                    name = lines[0].substringAfter("=")
-                    category = lines[1].substringAfter("=")
-                    version = lines[2].substringAfter("=")
-                    architecture = lines[3].substringAfter("=")
-                    driverLib = lines[4].substringAfter("=")
+                val ratHeader = if (ratFile?.isValidZipFile!!) ratFile?.getFileHeader("pkg-header") else null
+                if (ratHeader != null) {
+                    ratFile?.getInputStream(ratHeader).use { inputStream ->
+                        val lines = inputStream?.reader()?.readLines()!!
+
+                        name = lines[0].substringAfter("=")
+                        category = lines[1].substringAfter("=")
+                        version = lines[2].substringAfter("=")
+                        architecture = lines[3].substringAfter("=")
+                        driverLib = lines[4].substringAfter("=")
+                    }
                 }
             }
         }

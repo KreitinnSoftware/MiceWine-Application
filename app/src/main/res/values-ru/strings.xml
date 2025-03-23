@@ -186,4 +186,9 @@
     <string name="debug_settings_title">调试设置</string>
     <string name="debug_settings_description">更改调试设置</string>
     <string name="wine_log_level_description">设置 Wine 日志级别</string>
+    <string name="rat_downloader_title">Rat Загрузчик Пакетов</string>
+    <string name="rat_downloader_description">Скачать пакеты Rat из репозитория</string>
+    <string name="package_already_installed">Пакет уже установлен</string>
+    <string name="unknown_package_category">Неизвестная категория пакета</string>
+    <string name="error_install_rootfs_file_manager">Вы не можете установить RootFS после установки.</string>
 </resources>

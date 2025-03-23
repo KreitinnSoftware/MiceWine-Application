@@ -191,4 +191,9 @@
     <string name="debug_settings_title">Configurações de Depuração</string>
     <string name="debug_settings_description">Alterar Configurações de Depuração</string>
     <string name="wine_log_level_description">Definir Nível de Log do Wine</string>
+    <string name="rat_downloader_title">Baixador de Pacotes Rat</string>
+    <string name="rat_downloader_description">Baixe Pacotes Rat do Repositório</string>
+    <string name="package_already_installed">Pacote já instalado</string>
+    <string name="unknown_package_category">Categoria de Pacote Desconhecida</string>
+    <string name="error_install_rootfs_file_manager">Você não pode instalar o RootFS após a instalação.</string>
 </resources>

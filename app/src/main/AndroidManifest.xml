@@ -50,6 +50,11 @@
             android:exported="false">
         </activity>
         <activity
+            android:name=".activities.RatDownloaderActivity"
+            android:theme="@style/Theme.MiceWine"
+            android:exported="false">
+        </activity>
+        <activity
             android:name=".activities.MainActivity"
             android:configChanges="fontScale|orientation|screenSize|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|screenLayout|touchscreen|uiMode|smallestScreenSize|density"
             android:exported="true"

@@ -190,4 +190,9 @@
     <string name="debug_settings_title">调试设置</string>
     <string name="debug_settings_description">更改调试设置</string>
     <string name="wine_log_level_description">设置 Wine 日志级别</string>
+    <string name="rat_downloader_title">Rat 软件包下载器</string>
+    <string name="rat_downloader_description">从存储库下载 Rat 软件包</string>
+    <string name="package_already_installed">软件包已安装</string>
+    <string name="unknown_package_category">未知的软件包类别</string>
+    <string name="error_install_rootfs_file_manager">安装后无法再次安装 RootFS。</string>
 </resources>

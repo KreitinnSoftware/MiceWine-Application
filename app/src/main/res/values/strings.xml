@@ -214,4 +214,9 @@
     <string name="debug_settings_title">Debug Settings</string>
     <string name="debug_settings_description">Change Debug Settings</string>
     <string name="wine_log_level_description">Set Wine Log Level</string>
+    <string name="rat_downloader_title">Rat Package Downloader</string>
+    <string name="rat_downloader_description">Download Rat Packages from Repository</string>
+    <string name="package_already_installed">Package Already Installed</string>
+    <string name="unknown_package_category">Unknown Package Category</string>
+    <string name="error_install_rootfs_file_manager">You cannot install RootFS after installation.</string>
 </resources>

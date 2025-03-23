@@ -1,6 +1,6 @@
 package com.micewine.emu.adapters
 
-import android.content.Context
+import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.TextView
 import androidx.preference.PreferenceManager
@@ -17,13 +18,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
+import com.micewine.emu.activities.MainActivity.Companion.tmpDir
+import com.micewine.emu.core.RatPackageManager
+import com.micewine.emu.core.RatPackageManager.installRat
+import com.micewine.emu.fragments.RatDownloaderFragment.Companion.downloadPackage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
-
-class AdapterRatPackage(private val settingsList: MutableList<Item>, private val context: Context) :
+class AdapterRatPackage(private val settingsList: MutableList<Item>, private val activity: Activity, private val repositoryPackage: Boolean = false) :
     RecyclerView.Adapter<AdapterRatPackage.ViewHolder>() {
 
-    val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
+    val preferences = PreferenceManager.getDefaultSharedPreferences(activity)!!
     private var selectedItemId = -1
 
     private fun textAsBitmap(text: String, size: Float, textColor: Int): Bitmap {
@@ -31,7 +39,7 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
             textSize = size
             color = textColor
             textAlign = Paint.Align.LEFT
-            typeface = context.resources.getFont(R.font.quicksand)
+            typeface = activity.resources.getFont(R.font.quicksand)
         }
         val baseline = -paint.ascent()
         val width = (paint.measureText(text) + 0.5F).toInt()
@@ -53,6 +61,17 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
         val sList = settingsList[position]
         var packagePrefix: String? = null
         var selectedItem: String? = null
+
+        if (repositoryPackage) {
+            if (sList.isInstalled) {
+                holder.downloadRatPackageButton.isEnabled = false
+                holder.downloadRatPackageButton.setImageResource(android.R.drawable.checkbox_on_background)
+            }
+        } else {
+            holder.downloadRatPackageButton.visibility = View.GONE
+        }
+
+        holder.progressBar.visibility = View.GONE
 
         when (sList.type) {
             VK_DRIVER -> {
@@ -143,6 +162,36 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
                 settingsList.removeAt(holder.adapterPosition)
                 notifyItemRemoved(holder.adapterPosition)
             }
+
+            downloadRatPackageButton.setOnClickListener {
+                CoroutineScope(Dispatchers.IO).launch {
+                    tmpDir.deleteRecursively()
+                    tmpDir.mkdirs()
+
+                    withContext(Dispatchers.IO) {
+                        val success = downloadPackage(sList.repoRatName!!, progressBar, activity)
+                        if (success && File("$tmpDir/${sList.repoRatName}").exists()) {
+                            activity.runOnUiThread {
+                                progressBar.isIndeterminate = true
+                                progressBar.visibility = View.VISIBLE
+                            }
+
+                            installRat(RatPackageManager.RatPackage("$tmpDir/${sList.repoRatName}"), activity)
+
+                            activity.runOnUiThread {
+                                holder.downloadRatPackageButton.isEnabled = false
+                                holder.downloadRatPackageButton.setImageResource(android.R.drawable.checkbox_on_background)
+
+                                progressBar.isIndeterminate = false
+                                progressBar.visibility = View.GONE
+                            }
+                        }
+
+                        tmpDir.deleteRecursively()
+                        tmpDir.mkdirs()
+                    }
+                }
+            }
         }
     }
 
@@ -156,6 +205,8 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
         val settingsDescription: TextView = itemView.findViewById(R.id.rat_package_description)
         val imageView: ImageView = itemView.findViewById(R.id.image_view)
         val deleteRatPackageButton: ImageButton = itemView.findViewById(R.id.rat_package_delete)
+        val downloadRatPackageButton: ImageView = itemView.findViewById(R.id.rat_package_download)
+        val progressBar: ProgressBar = itemView.findViewById(R.id.progressBar)
 
         init {
             itemView.setOnClickListener(this)
@@ -165,7 +216,7 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
         }
     }
 
-    class Item(var titleSettings: String, var descriptionSettings: String, var itemFolderId: String, var type: Int, var externalPackage: Boolean)
+    class Item(var titleSettings: String, var descriptionSettings: String, var itemFolderId: String, var type: Int, var externalPackage: Boolean, var repoRatName: String? = null, var isInstalled: Boolean = false)
 
     companion object {
         const val VK_DRIVER = 1

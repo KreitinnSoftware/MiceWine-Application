@@ -12,6 +12,7 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ACTION_PREFERENCE_SELECT
 import com.micewine.emu.activities.PresetManagerActivity
+import com.micewine.emu.activities.RatDownloaderActivity
 import com.micewine.emu.activities.RatManagerActivity
 import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
@@ -77,6 +78,11 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
 
                 context.getString(R.string.rat_manager_title) -> {
                     val intent = Intent(context, RatManagerActivity::class.java)
+                    context.startActivity(intent)
+                }
+
+                context.getString(R.string.rat_downloader_title) -> {
+                    val intent = Intent(context, RatDownloaderActivity::class.java)
                     context.startActivity(intent)
                 }
 
