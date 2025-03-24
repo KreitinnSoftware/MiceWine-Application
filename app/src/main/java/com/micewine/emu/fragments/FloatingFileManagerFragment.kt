@@ -44,7 +44,9 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
 
         fileManagerCwd = "/storage/emulated/0"
 
-        refreshFiles(operationType)
+        fmOperationType = operationType
+
+        refreshFiles()
 
         val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create()
 
@@ -147,12 +149,13 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
         private val fileList: MutableList<AdapterFiles.FileList> = mutableListOf()
         var calledSetup: Boolean = false
         var outputFile: String? = null
+        var fmOperationType = -1
 
         const val OPERATION_SELECT_RAT = 0
         const val OPERATION_EXPORT_PRESET = 1
         const val OPERATION_IMPORT_PRESET = 2
 
-        fun refreshFiles(operationType: Int) {
+        fun refreshFiles() {
             recyclerView?.adapter?.notifyItemRangeRemoved(0, fileList.count())
 
             fileList.clear()
@@ -169,7 +172,7 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
 
             File(fileManagerCwd!!).listFiles()?.sorted()?.forEach {
                 if (it.isFile) {
-                    when (operationType) {
+                    when (fmOperationType) {
                         OPERATION_SELECT_RAT -> {
                             if (it.name.endsWith(".rat")) {
                                 addToAdapter(it)

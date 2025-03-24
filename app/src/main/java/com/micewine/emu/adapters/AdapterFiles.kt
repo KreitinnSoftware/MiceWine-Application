@@ -18,7 +18,6 @@ import com.micewine.emu.activities.MainActivity.Companion.fileManagerDefaultDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.core.WineWrapper.extractIcon
-import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.OPERATION_EXPORT_PRESET
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.outputFile
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.utils.DriveUtils
@@ -139,7 +138,7 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                 if (settingsModel.file.name == "..") {
                     fileManagerCwd = File(fileManagerCwd!!).parent!!
 
-                    refreshFiles(OPERATION_EXPORT_PRESET)
+                    refreshFiles()
                 } else if (settingsModel.file.isFile) {
                     if (settingsModel.file.name.contains(".rat")) {
                         customRootFSPath = settingsModel.file.path
@@ -149,7 +148,7 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                 } else if (settingsModel.file.isDirectory) {
                     fileManagerCwd = settingsModel.file.path
 
-                    refreshFiles(OPERATION_EXPORT_PRESET)
+                    refreshFiles()
                 }
             } else {
                 val intent = Intent(ACTION_SELECT_FILE_MANAGER).apply {

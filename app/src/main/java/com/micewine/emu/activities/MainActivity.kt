@@ -72,6 +72,8 @@ import com.micewine.emu.activities.RatManagerActivity.Companion.generateICDFile
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.adapters.AdapterBottomNavigation
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
+import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
+import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.HighlightState
@@ -87,14 +89,17 @@ import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.core.WineWrapper.getCpuHexMask
 import com.micewine.emu.core.WineWrapper.getSanitizedPath
 import com.micewine.emu.databinding.ActivityMainBinding
-import com.micewine.emu.fragments.AskInstallRatPackageFragment
-import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ADTOOLS_DRIVER_PACKAGE
-import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.RAT_PACKAGE
-import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.adToolsDriverCandidate
-import com.micewine.emu.fragments.AskInstallRatPackageFragment.Companion.ratCandidate
+import com.micewine.emu.fragments.AskInstallPackageFragment
+import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.ADTOOLS_DRIVER_PACKAGE
+import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.MWP_PRESET_PACKAGE
+import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.RAT_PACKAGE
+import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.adToolsDriverCandidate
+import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.mwpPresetCandidate
+import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.ratCandidate
 import com.micewine.emu.fragments.Box64PresetManagerFragment
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Mapping
 import com.micewine.emu.fragments.ControllerPresetManagerFragment
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.fragments.DeleteItemFragment
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_GAME_ITEM
@@ -241,12 +246,33 @@ class MainActivity : AppCompatActivity() {
                             EditGamePreferencesFragment(FILE_MANAGER_START_PREFERENCES, exeFile!!).show(supportFragmentManager, "")
                         } else if (file.name.endsWith("rat")) {
                             ratCandidate = RatPackageManager.RatPackage(file.path)
-                            AskInstallRatPackageFragment(RAT_PACKAGE).show(supportFragmentManager, "")
+
+                            if (ratCandidate?.name != null) {
+                                AskInstallPackageFragment(RAT_PACKAGE).show(supportFragmentManager, "")
+                            }
                         } else if (file.name.endsWith(".zip")) {
                             adToolsDriverCandidate = RatPackageManager.AdrenoToolsPackage(file.path)
 
                             if (adToolsDriverCandidate?.name != null) {
-                                AskInstallRatPackageFragment(ADTOOLS_DRIVER_PACKAGE).show(supportFragmentManager, "")
+                                AskInstallPackageFragment(ADTOOLS_DRIVER_PACKAGE).show(supportFragmentManager, "")
+                            }
+                        } else if (file.name.endsWith(".mwp")) {
+                            val mwpLines = file.readLines()
+
+                            if (mwpLines.isNotEmpty()) {
+                                when (mwpLines[0]) {
+                                    "controllerPreset" -> {
+                                        mwpPresetCandidate = Pair(PHYSICAL_CONTROLLER, file.path)
+                                    }
+                                    "virtualControllerPreset" -> {
+                                        mwpPresetCandidate = Pair(VIRTUAL_CONTROLLER, file.path)
+                                    }
+                                    "box64Preset" -> {
+                                        mwpPresetCandidate = Pair(BOX64_PRESET, file.path)
+                                    }
+                                }
+
+                                AskInstallPackageFragment(MWP_PRESET_PACKAGE).show(supportFragmentManager, "")
                             }
                         }
                     } else if (file.isDirectory) {
