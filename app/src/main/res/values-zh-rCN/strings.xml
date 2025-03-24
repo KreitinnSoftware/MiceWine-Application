@@ -195,4 +195,6 @@
     <string name="package_already_installed">软件包已安装</string>
     <string name="unknown_package_category">未知的软件包类别</string>
     <string name="error_install_rootfs_file_manager">安装后无法再次安装 RootFS。</string>
+    <string name="driver_info_title">驱动程序信息</string>
+    <string name="driver_info_description">获取 Vulkan 驱动程序信息</string>
 </resources>

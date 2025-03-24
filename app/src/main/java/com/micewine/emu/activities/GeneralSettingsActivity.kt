@@ -16,6 +16,7 @@ import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.databinding.ActivityGeneralSettingsBinding
 import com.micewine.emu.fragments.Box64SettingsFragment
 import com.micewine.emu.fragments.DebugSettingsFragment
+import com.micewine.emu.fragments.DriverInfoFragment
 import com.micewine.emu.fragments.DriversSettingsFragment
 import com.micewine.emu.fragments.EnvVarsSettingsFragment
 import com.micewine.emu.fragments.GeneralSettingsFragment
@@ -26,6 +27,7 @@ class GeneralSettingsActivity : AppCompatActivity() {
     private var backButton: ImageButton? = null
     private val box64SettingsFragment = Box64SettingsFragment()
     private val debugSettingsFragment = DebugSettingsFragment()
+    private val driverInfoFragment = DriverInfoFragment()
     private val driversSettingsFragment = DriversSettingsFragment()
     private val environmentVariablesSettings = EnvVarsSettingsFragment()
     private val soundSettingsFragment = SoundSettingsFragment()
@@ -51,6 +53,12 @@ class GeneralSettingsActivity : AppCompatActivity() {
                         generalSettingsToolbar?.title = getString(R.string.driver_settings_title)
 
                         fragmentLoader(driversSettingsFragment, false)
+                    }
+
+                    getString(R.string.driver_info_title) -> {
+                        generalSettingsToolbar?.title = getString(R.string.driver_info_title)
+
+                        fragmentLoader(driverInfoFragment, false)
                     }
 
                     getString(R.string.env_settings_title) -> {

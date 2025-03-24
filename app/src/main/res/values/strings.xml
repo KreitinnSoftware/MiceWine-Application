@@ -219,4 +219,6 @@
     <string name="package_already_installed">Package Already Installed</string>
     <string name="unknown_package_category">Unknown Package Category</string>
     <string name="error_install_rootfs_file_manager">You cannot install RootFS after installation.</string>
+    <string name="driver_info_title">Driver Info</string>
+    <string name="driver_info_description">Get Vulkan Info for Drivers</string>
 </resources>

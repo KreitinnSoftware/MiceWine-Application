@@ -13,7 +13,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 object ShellLoader {
-    fun runCommandWithOutput(cmd: String): String {
+    fun runCommandWithOutput(cmd: String, enableStdErr: Boolean = false): String {
         try {
             val shell = Runtime.getRuntime().exec("/system/bin/sh")
             val os = DataOutputStream(shell.outputStream).apply {
@@ -22,6 +22,7 @@ object ShellLoader {
             }
 
             val stdout = BufferedReader(InputStreamReader(shell.inputStream))
+            val stderr = BufferedReader(InputStreamReader(shell.errorStream))
             val output = StringBuilder()
 
             val stdoutThread = Thread {
@@ -38,9 +39,27 @@ object ShellLoader {
                     }
                 }
             }
+            val stderrThread = Thread {
+                if (enableStdErr) {
+                    try {
+                        var stdErr: String?
+                        while (stderr.readLine().also { stdErr = it } != null) {
+                            output.append("$stdErr\n")
+                        }
+                    } catch (_: IOException) {
+                    } finally {
+                        try {
+                            stderr.close()
+                        } catch (_: IOException) {
+                        }
+                    }
+                }
+            }
 
             stdoutThread.start()
+            stderrThread.start()
             stdoutThread.join()
+            stderrThread.join()
 
             os.close()
 

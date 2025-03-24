@@ -196,4 +196,6 @@
     <string name="package_already_installed">Pacote já instalado</string>
     <string name="unknown_package_category">Categoria de Pacote Desconhecida</string>
     <string name="error_install_rootfs_file_manager">Você não pode instalar o RootFS após a instalação.</string>
+    <string name="driver_info_title">Informações do Driver</string>
+    <string name="driver_info_description">Obtenha informações do Vulkan para Drivers</string>
 </resources>

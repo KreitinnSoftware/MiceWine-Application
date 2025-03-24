@@ -703,6 +703,8 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+        lifecycleScope.launch { runXServer(":0") }
+
         if (!setupDone) {
             if (appBuiltinRootfs) {
                 SetupFragment().show(supportFragmentManager , "")
@@ -812,7 +814,7 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun runXServer(display: String) {
         withContext(Dispatchers.IO) {
-            if (runningXServer) {
+            if (runningXServer && !setupDone) {
                 return@withContext
             }
 
@@ -821,6 +823,8 @@ class MainActivity : AppCompatActivity() {
             runCommand(
                 "env CLASSPATH=${getClassPath(this@MainActivity)} /system/bin/app_process / com.micewine.emu.CmdEntryPoint $display &> /dev/null"
             )
+
+            runningXServer = false
         }
     }
 

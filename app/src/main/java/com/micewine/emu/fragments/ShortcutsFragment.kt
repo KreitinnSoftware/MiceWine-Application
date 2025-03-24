@@ -49,11 +49,12 @@ import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
 import com.micewine.emu.adapters.AdapterGame
 import com.micewine.emu.core.HighlightState
+import com.micewine.emu.core.RatPackageManager.listRatPackagesId
 import com.micewine.emu.databinding.FragmentShortcutsBinding
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
+import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_WINE_PREFIX
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.preferences
-import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.max
@@ -425,7 +426,7 @@ class ShortcutsFragment : Fragment() {
         fun getVKD3DVersion(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return "VKD3D-2.8"
+            if (index == -1) return listRatPackagesId("VKD3D").first()
 
             return gameList[index].vkd3dVersion
         }
@@ -443,7 +444,7 @@ class ShortcutsFragment : Fragment() {
         fun getWineD3DVersion(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return "WineD3D-(10.0)"
+            if (index == -1) return listRatPackagesId("WineD3D").first()
 
             return gameList[index].wineD3DVersion
         }
@@ -461,7 +462,7 @@ class ShortcutsFragment : Fragment() {
         fun getDXVKVersion(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return "DXVK-1.10.3-async"
+            if (index == -1) return listRatPackagesId("DXVK").first()
 
             return gameList[index].dxvkVersion
         }
@@ -521,7 +522,7 @@ class ShortcutsFragment : Fragment() {
         fun getVulkanDriver(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return ""
+            if (index == -1) return listRatPackagesId("VulkanDriver").first()
 
             return gameList[index].vulkanDriver
         }
@@ -615,12 +616,12 @@ class ShortcutsFragment : Fragment() {
                     "default",
                     "16:9",
                     "1280x720",
-                    "",
+                    listRatPackagesId("VulkanDriver").first(),
                     MESA_DRIVER,
                     "DXVK",
-                    "",
-                    "",
-                    "",
+                    listRatPackagesId("DXVK").first(),
+                    listRatPackagesId("WineD3D").first(),
+                    listRatPackagesId("VKD3D").first(),
                     true,
                     false,
                     availableCPUs.joinToString(","),
