@@ -80,9 +80,7 @@ class VirtualControllerPresetManagerFragment : Fragment() {
 
             if (index == -1) return
 
-            presetList[index].buttons.clear()
-            presetList[index].analogs.clear()
-            presetList[index].dpads.clear()
+            presetList[index] = VirtualControllerPreset(name, mutableListOf(), mutableListOf(), mutableListOf())
 
             buttonList.forEach {
                 presetList[index].buttons.add(it)
