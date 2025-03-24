@@ -292,7 +292,6 @@ class ShortcutsFragment : Fragment() {
 
         gameListNames.clear()
 
-        gameList = getGameList(requireContext())
         gameList.forEach {
             addToAdapter(it.name, it.exePath, it.exeArguments, it.iconPath)
         }
@@ -320,7 +319,7 @@ class ShortcutsFragment : Fragment() {
 
         fun initialize(context: Context) {
             preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
-            gameList = getGameList(context)
+            gameList = getGameList()
         }
 
         fun putEnableXInput(name: String, enabled: Boolean) {
@@ -426,7 +425,7 @@ class ShortcutsFragment : Fragment() {
         fun getVKD3DVersion(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return listRatPackagesId("VKD3D").first()
+            if (index == -1) return ""
 
             return gameList[index].vkd3dVersion
         }
@@ -444,7 +443,7 @@ class ShortcutsFragment : Fragment() {
         fun getWineD3DVersion(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return listRatPackagesId("WineD3D").first()
+            if (index == -1) return ""
 
             return gameList[index].wineD3DVersion
         }
@@ -462,7 +461,7 @@ class ShortcutsFragment : Fragment() {
         fun getDXVKVersion(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return listRatPackagesId("DXVK").first()
+            if (index == -1) return ""
 
             return gameList[index].dxvkVersion
         }
@@ -522,7 +521,7 @@ class ShortcutsFragment : Fragment() {
         fun getVulkanDriver(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return listRatPackagesId("VulkanDriver").first()
+            if (index == -1) return ""
 
             return gameList[index].vulkanDriver
         }
@@ -635,7 +634,9 @@ class ShortcutsFragment : Fragment() {
 
             saveShortcuts()
 
-            recyclerView?.adapter?.notifyItemInserted(gameListNames.size)
+            recyclerView?.post {
+                recyclerView?.adapter?.notifyItemInserted(gameListNames.size)
+            }
         }
 
         fun removeGameFromList(name: String) {
@@ -711,18 +712,12 @@ class ShortcutsFragment : Fragment() {
             }
         }
 
-        private fun getGameList(context: Context): MutableList<GameItem> {
+        private fun getGameList(): MutableList<GameItem> {
             val json = preferences?.getString("gameList", "")
             val listType = object : TypeToken<MutableList<GameItem>>() {}.type
             val gameList = gson.fromJson<MutableList<GameItem>>(json, listType)
 
-            if (gameList == null) {
-                addGameToList(context.getString(R.string.desktop_mode_init), context.getString(R.string.desktop_mode_init), "")
-
-                return getGameList(context)
-            }
-
-            return gameList
+            return gameList ?: mutableListOf()
         }
 
         fun addGameToLauncher(context: Context, name: String) {

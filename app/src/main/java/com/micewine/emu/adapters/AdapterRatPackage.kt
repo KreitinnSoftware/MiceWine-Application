@@ -85,6 +85,9 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
                 selectedItem = preferences.getString(SELECTED_BOX64, "")
                 packagePrefix = "Box64-"
 
+                if (repositoryPackage) {
+                    holder.radioButton.visibility = View.GONE
+                }
                 holder.imageView.setImageResource(R.drawable.ic_box64)
             }
             WINE -> {

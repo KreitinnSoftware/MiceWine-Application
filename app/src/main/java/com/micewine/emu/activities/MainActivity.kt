@@ -126,7 +126,6 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineVirtualDesktop
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.SoundSettingsFragment.Companion.generatePAFile
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
@@ -891,6 +890,8 @@ class MainActivity : AppCompatActivity() {
 
             File("$usrDir/icons").mkdirs()
 
+            addGameToList(getString(R.string.desktop_mode_init), getString(R.string.desktop_mode_init), "")
+
             dialogTitleText = getString(R.string.creating_wine_prefix)
             progressBarIsIndeterminate = true
 
@@ -898,10 +899,7 @@ class MainActivity : AppCompatActivity() {
 
             setSharedVars(this@MainActivity)
 
-            putVulkanDriver(getString(R.string.desktop_mode_init), File("$appRootDir/packages").listFiles()?.filter { it.name.startsWith("VulkanDriver-") }!!.map { it.name }[0])
-
             val wine = File("$ratPackagesDir").listFiles()?.first { it.isDirectory && it.name.startsWith("Wine-") }?.name
-
             val createWinePrefixIntent = Intent(ACTION_CREATE_WINE_PREFIX).apply {
                 putExtra("winePrefix", winePrefix?.path)
                 putExtra("wine", wine!!)
