@@ -14,6 +14,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.getNativeResolution
 import com.micewine.emu.activities.VirtualControllerOverlayMapper.Companion.ACTION_EDIT_VIRTUAL_BUTTON
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogDownKeyName
@@ -107,7 +108,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     }
 
     fun saveOnPreferences() {
-        putMapping(clickedPresetName, buttonList, analogList, dpadList)
+        putMapping(clickedPresetName, getNativeResolution(context), buttonList, analogList, dpadList)
     }
 
     init {

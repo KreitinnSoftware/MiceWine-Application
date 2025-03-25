@@ -105,7 +105,7 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
                 saveButton.visibility = View.GONE
 
                 Thread {
-                    while (outputFile == null) {
+                    while (outputFile == null || !isAdded) {
                         Thread.sleep(16)
                     }
 

@@ -60,15 +60,15 @@ class Box64PresetManagerFragment : Fragment() {
         recyclerView?.setAdapter(AdapterPreset(presetListNames, requireContext(), requireActivity().supportFragmentManager))
 
         presetListNames.clear()
-
-        presetList = getBox64Presets()
         presetList.forEach {
             addToAdapter(it[0], BOX64_PRESET, true)
         }
     }
 
     private fun addToAdapter(titleSettings: String, type: Int, userPreset: Boolean) {
-        presetListNames.add(AdapterPreset.Item(titleSettings, type, userPreset))
+        presetListNames.add(
+            AdapterPreset.Item(titleSettings, type, userPreset)
+        )
     }
 
     companion object {

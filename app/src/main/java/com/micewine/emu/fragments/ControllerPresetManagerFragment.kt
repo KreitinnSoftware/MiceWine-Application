@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,15 +69,15 @@ class ControllerPresetManagerFragment : Fragment() {
         recyclerView?.setAdapter(AdapterPreset(presetListNames, requireContext(), requireActivity().supportFragmentManager))
 
         presetListNames.clear()
-
-        presetList = getControllerPresets()
         presetList.forEach {
             addToAdapter(it[0], PHYSICAL_CONTROLLER, true)
         }
     }
 
     private fun addToAdapter(titleSettings: String, type: Int, userPreset: Boolean) {
-        presetListNames.add(AdapterPreset.Item(titleSettings, type, userPreset))
+        presetListNames.add(
+            AdapterPreset.Item(titleSettings, type, userPreset)
+        )
     }
 
     companion object {

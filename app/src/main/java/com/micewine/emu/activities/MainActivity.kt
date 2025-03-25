@@ -1387,10 +1387,16 @@ class MainActivity : AppCompatActivity() {
         )
 
         @Suppress("DEPRECATION")
-        private fun getNativeResolution(activity: Activity): String {
+        fun getNativeResolution(context: Context): String {
+            val windowManager = context.getSystemService(WindowManager::class.java)
             val displayMetrics = DisplayMetrics()
-            activity.windowManager.defaultDisplay.getRealMetrics(displayMetrics)
-            return "${displayMetrics.widthPixels}x${displayMetrics.heightPixels}"
+            windowManager.defaultDisplay.getRealMetrics(displayMetrics)
+
+            if (displayMetrics.widthPixels > displayMetrics.heightPixels) {
+                return "${displayMetrics.widthPixels}x${displayMetrics.heightPixels}"
+            } else {
+                return "${displayMetrics.heightPixels}x${displayMetrics.widthPixels}"
+            }
         }
 
         private fun getPercentOfResolution(original: String, percent: Int): String {
