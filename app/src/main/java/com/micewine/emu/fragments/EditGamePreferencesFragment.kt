@@ -158,7 +158,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         }
 
         val controllerProfilesNames: List<String> = getControllerPresets().map { it[0] }
-        val virtualControllerProfilesNames: List<String> = getVirtualControllerPresets().map { it.name }
+        val virtualControllerProfilesNames: List<String> = getVirtualControllerPresets(requireContext()).map { it.name }
         val box64ProfilesNames: List<String> = getBox64Presets().map { it[0] }
 
         selectedDisplayModeSpinner.apply {
