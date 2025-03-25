@@ -257,7 +257,6 @@ object ControllerUtils {
 
                 true
             }
-
             KEYCODE_BUTTON_A -> {
                 if (enableXInput) {
                     aPressed = pressed
@@ -267,7 +266,6 @@ object ControllerUtils {
 
                 true
             }
-
             KEYCODE_BUTTON_B -> {
                 if (enableXInput) {
                     bPressed = pressed
@@ -277,7 +275,6 @@ object ControllerUtils {
 
                 true
             }
-
             KEYCODE_BUTTON_X -> {
                 if (enableXInput) {
                     xPressed = pressed
@@ -287,7 +284,6 @@ object ControllerUtils {
 
                 true
             }
-
             KEYCODE_BUTTON_START -> {
                 if (enableXInput) {
                     startPressed = pressed
@@ -297,7 +293,6 @@ object ControllerUtils {
 
                 true
             }
-
             KEYCODE_BUTTON_SELECT -> {
                 if (enableXInput) {
                     selectPressed = pressed
@@ -307,7 +302,6 @@ object ControllerUtils {
 
                 true
             }
-
             KEYCODE_BUTTON_R1 -> {
                 if (enableXInput) {
                     r1Pressed = pressed
@@ -317,7 +311,6 @@ object ControllerUtils {
 
                 true
             }
-
             KEYCODE_BUTTON_R2 -> {
                 if (enableXInput) {
                     rt[0] = if (pressed) 2 else 0
@@ -329,7 +322,6 @@ object ControllerUtils {
 
                 true
             }
-
             KEYCODE_BUTTON_L1 -> {
                 if (enableXInput) {
                     l1Pressed = pressed
@@ -339,7 +331,6 @@ object ControllerUtils {
 
                 true
             }
-
             KEYCODE_BUTTON_L2 -> {
                 if (enableXInput) {
                     lt[0] = if (pressed) 2 else 0
@@ -351,7 +342,6 @@ object ControllerUtils {
 
                 true
             }
-
             KEYCODE_BUTTON_THUMBR -> {
                 if (enableXInput) {
                     thumbRPressed = pressed
@@ -361,7 +351,6 @@ object ControllerUtils {
 
                 true
             }
-
             KEYCODE_BUTTON_THUMBL -> {
                 if (enableXInput) {
                     thumbLPressed = pressed

@@ -14,6 +14,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.getNativeResolution
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_DOWN
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT_DOWN
@@ -22,10 +23,27 @@ import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_DOWN
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_UP
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_UP
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.aPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.bPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.dpadStatus
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.l1Pressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.lt
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.lx
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.ly
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.r1Pressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.rt
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.rx
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.ry
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.selectPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.startPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.thumbLPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.thumbRPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.xPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.yPressed
 import com.micewine.emu.input.InputStub.BUTTON_UNDEFINED
 import com.micewine.emu.views.OverlayView.Companion.SHAPE_CIRCLE
+import com.micewine.emu.views.OverlayView.Companion.SHAPE_DPAD
 import com.micewine.emu.views.OverlayView.Companion.SHAPE_RECTANGLE
-import com.micewine.emu.views.OverlayView.Companion.SHAPE_SQUARE
 import com.micewine.emu.views.OverlayView.Companion.detectClick
 import kotlin.math.sqrt
 
@@ -59,12 +77,12 @@ class XInputOverlayView @JvmOverloads constructor(
     private val buttonList: MutableList<VirtualXInputButton> = mutableListOf()
     private val analogList: MutableList<VirtualXInputAnalog> = mutableListOf()
 
-    private val aButtonIcon = getBitmapFromVectorDrawable(context, R.drawable.a_button, 180, 180)
-    private val bButtonIcon = getBitmapFromVectorDrawable(context, R.drawable.a_button, 180, 180)
-    private val xButtonIcon = getBitmapFromVectorDrawable(context, R.drawable.a_button, 180, 180)
-    private val yButtonIcon = getBitmapFromVectorDrawable(context, R.drawable.a_button, 180, 180)
-
-    private fun getBitmapFromVectorDrawable(context: Context, drawableId: Int, width: Int, height: Int): Bitmap {
+    private fun getBitmapFromVectorDrawable(
+        context: Context,
+        drawableId: Int,
+        width: Int,
+        height: Int
+    ): Bitmap {
         val drawable = ContextCompat.getDrawable(context, drawableId) as VectorDrawable
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -73,27 +91,241 @@ class XInputOverlayView @JvmOverloads constructor(
         return bitmap
     }
 
+    private fun textAsBitmap(
+        text: String,
+        textSize: Float,
+        textColor: Int,
+        width: Int,
+        height: Int,
+        context: Context
+    ): Bitmap {
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.textSize = textSize
+            this.color = textColor
+            this.textAlign = Paint.Align.CENTER
+            typeface = context.resources.getFont(R.font.quicksand)
+        }
+
+        val image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(image)
+
+        val xPos = width / 2f
+        val yPos = (height / 2f) - ((paint.descent() + paint.ascent()) / 2)
+
+        canvas.drawText(text, xPos, yPos, paint)
+        return image
+    }
+
+    private fun adjustButtons() {
+        val nativeResolution = getNativeResolution(context)
+        val baseResolution = "2400x1080" // My Device Resolution
+
+        if (baseResolution != nativeResolution) {
+            val nativeSplit = nativeResolution.split("x").map { it.toFloat() }
+            val processedSplit = baseResolution.split("x").map { it.toFloat() }
+
+            val multiplierX = nativeSplit[0] / processedSplit[0] * 100F
+            val multiplierY = nativeSplit[1] / processedSplit[1] * 100F
+
+            buttonList.forEach {
+                it.x = (it.x / 100F * multiplierX)
+                it.y = (it.y / 100F * multiplierY)
+            }
+            analogList.forEach {
+                it.x = (it.x / 100F * multiplierX)
+                it.y = (it.y / 100F * multiplierY)
+            }
+            dpadList.forEach {
+                it.x = (it.x / 100F * multiplierX)
+                it.y = (it.y / 100F * multiplierY)
+            }
+        }
+    }
+
     init {
         buttonList.add(
             VirtualXInputButton(
-                A_BUTTON, width - 150F, 100F, 180F, 0, false, SHAPE_CIRCLE
+                A_BUTTON,
+                2065F,
+                910F,
+                180F,
+                0,
+                false,
+                SHAPE_CIRCLE,
+                textAsBitmap("A", 150F, Color.WHITE, 180, 180, context)
             )
         )
         buttonList.add(
             VirtualXInputButton(
-                B_BUTTON, 200F, 100F, 180F, 0, false, SHAPE_CIRCLE
+                B_BUTTON,
+                2205F,
+                735F,
+                180F,
+                0,
+                false,
+                SHAPE_CIRCLE,
+                textAsBitmap("B", 150F, Color.WHITE, 180, 180, context)
             )
         )
         buttonList.add(
             VirtualXInputButton(
-                X_BUTTON, 100F, 100F, 180F, 0, false, SHAPE_CIRCLE
+                X_BUTTON,
+                1925F,
+                735F,
+                180F,
+                0,
+                false,
+                SHAPE_CIRCLE,
+                textAsBitmap("X", 150F, Color.WHITE, 180, 180, context)
             )
         )
         buttonList.add(
             VirtualXInputButton(
-                Y_BUTTON, 200F, 100F, 180F, 0, false, SHAPE_CIRCLE
+                Y_BUTTON,
+                2065F,
+                560F,
+                180F,
+                0,
+                false,
+                SHAPE_CIRCLE,
+                textAsBitmap("Y", 150F, Color.WHITE, 180, 180, context)
             )
         )
+        buttonList.add(
+            VirtualXInputButton(
+                START_BUTTON,
+                1330F,
+                980F,
+                100F,
+                0,
+                false,
+                SHAPE_CIRCLE,
+                getBitmapFromVectorDrawable(context, R.drawable.start_button, 100, 100)
+            )
+        )
+        buttonList.add(
+            VirtualXInputButton(
+                SELECT_BUTTON,
+                1120F,
+                980F,
+                100F,
+                0,
+                false,
+                SHAPE_CIRCLE,
+                getBitmapFromVectorDrawable(context, R.drawable.select_button, 100, 100)
+            )
+        )
+        buttonList.add(
+            VirtualXInputButton(
+                LB_BUTTON,
+                280F,
+                280F,
+                180F,
+                0,
+                false,
+                SHAPE_RECTANGLE,
+                textAsBitmap("LB", 80F, Color.WHITE, 180, 180, context)
+            )
+        )
+        buttonList.add(
+            VirtualXInputButton(
+                LT_BUTTON,
+                280F,
+                140F,
+                180F,
+                0,
+                false,
+                SHAPE_RECTANGLE,
+                textAsBitmap("LT", 80F, Color.WHITE, 180, 180, context)
+            )
+        )
+        buttonList.add(
+            VirtualXInputButton(
+                RB_BUTTON,
+                2065F,
+                280F,
+                180F,
+                0,
+                false,
+                SHAPE_RECTANGLE,
+                textAsBitmap("RB", 80F, Color.WHITE, 180, 180, context)
+            )
+        )
+        buttonList.add(
+            VirtualXInputButton(
+                RT_BUTTON,
+                2065F,
+                140F,
+                180F,
+                0,
+                false,
+                SHAPE_RECTANGLE,
+                textAsBitmap("RT", 80F, Color.WHITE, 180, 180, context)
+            )
+        )
+        buttonList.add(
+            VirtualXInputButton(
+                LS_BUTTON,
+                940F,
+                980F,
+                140F,
+                0,
+                false,
+                SHAPE_CIRCLE,
+                textAsBitmap("LS", 80F, Color.WHITE, 140, 140, context)
+            )
+        )
+        buttonList.add(
+            VirtualXInputButton(
+                RS_BUTTON,
+                1500F,
+                980F,
+                140F,
+                0,
+                false,
+                SHAPE_CIRCLE,
+                textAsBitmap("RS", 80F, Color.WHITE, 140, 140, context)
+            )
+        )
+        analogList.add(
+            VirtualXInputAnalog(
+                LEFT_ANALOG,
+                280F,
+                840F,
+                275F,
+                false,
+                0,
+                0F,
+                0F
+            )
+        )
+        analogList.add(
+            VirtualXInputAnalog(
+                RIGHT_ANALOG,
+                1750F,
+                210F,
+                275F,
+                false,
+                0,
+                0F,
+                0F
+            )
+        )
+        dpadList.add(
+            VirtualXInputDPad(
+                dpadList.count() + 1,
+                640F,
+                260F,
+                250F,
+                0,
+                false,
+                0F,
+                0F,
+                0
+            )
+        )
+
+        adjustButtons()
     }
 
     private fun drawDPad(path: Path, pressed: Boolean, canvas: Canvas) {
@@ -119,15 +351,6 @@ class XInputOverlayView @JvmOverloads constructor(
                 SHAPE_CIRCLE -> {
                     canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
                 }
-                SHAPE_SQUARE -> {
-                    canvas.drawRect(
-                        it.x - it.radius / 2,
-                        it.y - it.radius / 2,
-                        it.x + it.radius / 2,
-                        it.y + it.radius / 2,
-                        buttonPaint
-                    )
-                }
                 SHAPE_RECTANGLE -> {
                     canvas.drawRect(
                         it.x - it.radius / 2,
@@ -139,7 +362,9 @@ class XInputOverlayView @JvmOverloads constructor(
                 }
             }
 
+            canvas.drawBitmap(it.bitmap, it.x - it.radius / 2, it.y - it.radius / 2, buttonPaint)
         }
+
         analogList.forEach {
             paint.color = if (it.isPressed) Color.GRAY else Color.WHITE
             buttonPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
@@ -171,7 +396,10 @@ class XInputOverlayView @JvmOverloads constructor(
                     moveTo(it.x - 20, it.y)
                     lineTo(it.x - 20 - it.radius / 4, it.y - it.radius / 4)
                     lineTo(it.x - 20 - it.radius / 4 - it.radius / 2, it.y - it.radius / 4)
-                    lineTo(it.x - 20 - it.radius / 4 - it.radius / 2, it.y - it.radius / 4 + it.radius / 2)
+                    lineTo(
+                        it.x - 20 - it.radius / 4 - it.radius / 2,
+                        it.y - it.radius / 4 + it.radius / 2
+                    )
                     lineTo(it.x - 20 - it.radius / 4, it.y - it.radius / 4 + it.radius / 2)
                     lineTo(it.x - 20, it.y)
                     close()
@@ -182,7 +410,10 @@ class XInputOverlayView @JvmOverloads constructor(
                     moveTo(it.x, it.y - 20)
                     lineTo(it.x - it.radius / 4, it.y - 20 - it.radius / 4)
                     lineTo(it.x - it.radius / 4, it.y - 20 - it.radius / 4 - it.radius / 2)
-                    lineTo(it.x - it.radius / 4 + it.radius / 2, it.y - 20 - it.radius / 4 - it.radius / 2)
+                    lineTo(
+                        it.x - it.radius / 4 + it.radius / 2,
+                        it.y - 20 - it.radius / 4 - it.radius / 2
+                    )
                     lineTo(it.x - it.radius / 4 + it.radius / 2, it.y - 20 - it.radius / 4)
                     lineTo(it.x, it.y - 20)
                     close()
@@ -193,7 +424,10 @@ class XInputOverlayView @JvmOverloads constructor(
                     moveTo(it.x + 20, it.y)
                     lineTo(it.x + 20 + it.radius / 4, it.y - it.radius / 4)
                     lineTo(it.x + 20 + it.radius / 4 + it.radius / 2, it.y - it.radius / 4)
-                    lineTo(it.x + 20 + it.radius / 4 + it.radius / 2, it.y - it.radius / 4 + it.radius / 2)
+                    lineTo(
+                        it.x + 20 + it.radius / 4 + it.radius / 2,
+                        it.y - it.radius / 4 + it.radius / 2
+                    )
                     lineTo(it.x + 20 + it.radius / 4, it.y - it.radius / 4 + it.radius / 2)
                     lineTo(it.x + 20, it.y)
                     close()
@@ -204,19 +438,38 @@ class XInputOverlayView @JvmOverloads constructor(
                     moveTo(it.x, it.y + 20)
                     lineTo(it.x - it.radius / 4, it.y + 20 + it.radius / 4)
                     lineTo(it.x - it.radius / 4, it.y + 20 + it.radius / 4 + it.radius / 2)
-                    lineTo(it.x - it.radius / 4 + it.radius / 2, it.y + 20 + it.radius / 4 + it.radius / 2)
+                    lineTo(
+                        it.x - it.radius / 4 + it.radius / 2,
+                        it.y + 20 + it.radius / 4 + it.radius / 2
+                    )
                     lineTo(it.x - it.radius / 4 + it.radius / 2, it.y + 20 + it.radius / 4)
                     lineTo(it.x, it.y + 20)
                     close()
                 }
 
-                drawDPad(dpadUp, it.dpadStatus in listOf(DPAD_UP, DPAD_RIGHT_UP, DPAD_LEFT_UP), canvas)
+                drawDPad(
+                    dpadUp,
+                    it.dpadStatus in listOf(DPAD_UP, DPAD_RIGHT_UP, DPAD_LEFT_UP),
+                    canvas
+                )
 
-                drawDPad(dpadDown, it.dpadStatus in listOf(DPAD_DOWN, DPAD_RIGHT_DOWN, DPAD_LEFT_DOWN), canvas)
+                drawDPad(
+                    dpadDown,
+                    it.dpadStatus in listOf(DPAD_DOWN, DPAD_RIGHT_DOWN, DPAD_LEFT_DOWN),
+                    canvas
+                )
 
-                drawDPad(dpadLeft, it.dpadStatus in listOf(DPAD_LEFT, DPAD_LEFT_DOWN, DPAD_LEFT_UP), canvas)
+                drawDPad(
+                    dpadLeft,
+                    it.dpadStatus in listOf(DPAD_LEFT, DPAD_LEFT_DOWN, DPAD_LEFT_UP),
+                    canvas
+                )
 
-                drawDPad(dpadRight, it.dpadStatus in listOf(DPAD_RIGHT, DPAD_RIGHT_DOWN, DPAD_RIGHT_UP), canvas)
+                drawDPad(
+                    dpadRight,
+                    it.dpadStatus in listOf(DPAD_RIGHT, DPAD_RIGHT_DOWN, DPAD_RIGHT_UP),
+                    canvas
+                )
             }
         }
     }
@@ -230,6 +483,7 @@ class XInputOverlayView @JvmOverloads constructor(
                         it.isPressed = true
                         it.fingerId = event.actionIndex
 
+                        handleButton(it, true)
 
                         return@forEach
                     }
@@ -247,12 +501,20 @@ class XInputOverlayView @JvmOverloads constructor(
                         it.fingerX = posX
                         it.fingerY = posY
 
+                        when (it.id) {
+                            LEFT_ANALOG -> {
+                                virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), lx, ly)
+                            }
+                            RIGHT_ANALOG -> {
+                                virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), rx, ry)
+                            }
+                        }
 
                         return@forEach
                     }
                 }
                 dpadList.forEach {
-                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, 3)) {
+                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_DPAD)) {
                         val posX = event.getX(event.actionIndex) - it.x
                         val posY = event.getY(event.actionIndex) - it.y
 
@@ -274,9 +536,10 @@ class XInputOverlayView @JvmOverloads constructor(
                             (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT_DOWN
                             (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_LEFT_UP
 
-                            else -> it.dpadStatus = -1
+                            else -> it.dpadStatus = 0
                         }
 
+                        dpadStatus = it.dpadStatus
 
                         return@forEach
                     }
@@ -292,6 +555,7 @@ class XInputOverlayView @JvmOverloads constructor(
                     buttonList.forEach {
                         if (it.fingerId == i) {
                             it.isPressed = true
+                            handleButton(it, true)
 
                             isFingerPressingButton = true
                         }
@@ -303,6 +567,15 @@ class XInputOverlayView @JvmOverloads constructor(
 
                             it.fingerX = posX
                             it.fingerY = posY
+
+                            when (it.id) {
+                                LEFT_ANALOG -> {
+                                    virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), lx, ly)
+                                }
+                                RIGHT_ANALOG -> {
+                                    virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), rx, ry)
+                                }
+                            }
 
                             isFingerPressingButton = true
                         }
@@ -327,9 +600,10 @@ class XInputOverlayView @JvmOverloads constructor(
                                 (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT_DOWN
                                 (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_LEFT_UP
 
-                                else -> it.dpadStatus = -1
+                                else -> it.dpadStatus = 0
                             }
 
+                            dpadStatus = it.dpadStatus
                         }
                     }
 
@@ -354,6 +628,7 @@ class XInputOverlayView @JvmOverloads constructor(
                         it.fingerId = -1
                     }
                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
+                        handleButton(it, false)
                     }
                 }
                 analogList.forEach {
@@ -363,6 +638,15 @@ class XInputOverlayView @JvmOverloads constructor(
                         it.fingerY = 0F
 
                         it.isPressed = false
+
+                        when (it.id) {
+                            LEFT_ANALOG -> {
+                                virtualAxis(0F, 0F, lx, ly)
+                            }
+                            RIGHT_ANALOG -> {
+                                virtualAxis(0F, 0F, rx, ry)
+                            }
+                        }
                     }
                 }
                 dpadList.forEach {
@@ -372,7 +656,9 @@ class XInputOverlayView @JvmOverloads constructor(
                         it.fingerY = 0F
 
                         it.isPressed = false
-                        it.dpadStatus = -1
+                        it.dpadStatus = 0
+
+                        dpadStatus = 0
                     }
                 }
 
@@ -382,19 +668,29 @@ class XInputOverlayView @JvmOverloads constructor(
             MotionEvent.ACTION_UP -> {
                 buttonList.forEach {
                     it.fingerId = -1
+                    handleButton(it, false)
                 }
                 analogList.forEach {
                     it.fingerX = 0F
                     it.fingerY = 0F
                     it.isPressed = false
 
+                    when (it.id) {
+                        LEFT_ANALOG -> {
+                            virtualAxis(0F, 0F, lx, ly)
+                        }
+                        RIGHT_ANALOG -> {
+                            virtualAxis(0F, 0F, rx, ry)
+                        }
+                    }
                 }
                 dpadList.forEach {
                     it.fingerX = 0F
                     it.fingerY = 0F
                     it.isPressed = false
-                    it.dpadStatus = -1
+                    it.dpadStatus = 0
 
+                    dpadStatus = 0
                 }
 
                 invalidate()
@@ -404,6 +700,71 @@ class XInputOverlayView @JvmOverloads constructor(
         return true
     }
 
+    private fun virtualAxis(
+        axisX: Float,
+        axisY: Float,
+        x: ByteArray,
+        y: ByteArray,
+    ) {
+        val lxStr = ((axisX.coerceIn(-1F, 1F) + 1) / 2 * 255).toInt().toString().padStart(3, '0')
+        val lyStr = ((-axisY.coerceIn(-1F, 1F) + 1) / 2 * 255).toInt().toString().padStart(3, '0')
+
+        x[0] = lxStr[0].digitToInt().toByte()
+        x[1] = lxStr[1].digitToInt().toByte()
+        x[2] = lxStr[2].digitToInt().toByte()
+
+        y[0] = lyStr[0].digitToInt().toByte()
+        y[1] = lyStr[1].digitToInt().toByte()
+        y[2] = lyStr[2].digitToInt().toByte()
+    }
+
+    private fun handleButton(button: VirtualXInputButton, pressed: Boolean) {
+        button.isPressed = pressed
+
+        when (button.id) {
+            A_BUTTON -> {
+                aPressed = pressed
+            }
+            B_BUTTON -> {
+                bPressed = pressed
+            }
+            X_BUTTON -> {
+                xPressed = pressed
+            }
+            Y_BUTTON -> {
+                yPressed = pressed
+            }
+            START_BUTTON -> {
+                startPressed = pressed
+            }
+            SELECT_BUTTON -> {
+                selectPressed = pressed
+            }
+            LB_BUTTON -> {
+                l1Pressed = pressed
+            }
+            LT_BUTTON -> {
+                lt[0] = if (pressed) 2 else 0
+                lt[1] = if (pressed) 5 else 0
+                lt[2] = if (pressed) 5 else 0
+            }
+            RB_BUTTON -> {
+                r1Pressed = pressed
+            }
+            RT_BUTTON -> {
+                rt[0] = if (pressed) 2 else 0
+                rt[1] = if (pressed) 5 else 0
+                rt[2] = if (pressed) 5 else 0
+            }
+            LS_BUTTON -> {
+                thumbLPressed = pressed
+            }
+            RS_BUTTON -> {
+                thumbRPressed = pressed
+            }
+        }
+    }
+
     class VirtualXInputButton(
         var id: Int,
         var x: Float,
@@ -411,7 +772,8 @@ class XInputOverlayView @JvmOverloads constructor(
         var radius: Float,
         var fingerId: Int,
         var isPressed: Boolean,
-        var shape: Int
+        var shape: Int,
+        var bitmap: Bitmap
     )
 
     class VirtualXInputDPad(
@@ -431,18 +793,26 @@ class XInputOverlayView @JvmOverloads constructor(
         var x: Float,
         var y: Float,
         var radius: Float,
-        var type: Int,
         var isPressed: Boolean,
         var fingerId: Int,
         var fingerX: Float,
-        var fingerY: Float,
-        var deadZone: Float
+        var fingerY: Float
     )
 
     companion object {
-        const val A_BUTTON = 0
-        const val B_BUTTON = 1
-        const val X_BUTTON = 2
-        const val Y_BUTTON = 3
+        const val A_BUTTON = 1
+        const val B_BUTTON = 2
+        const val X_BUTTON = 3
+        const val Y_BUTTON = 4
+        const val START_BUTTON = 5
+        const val SELECT_BUTTON = 6
+        const val LB_BUTTON = 7
+        const val LT_BUTTON = 8
+        const val RB_BUTTON = 9
+        const val RT_BUTTON = 10
+        const val LEFT_ANALOG = 11
+        const val RIGHT_ANALOG = 12
+        const val LS_BUTTON = 13
+        const val RS_BUTTON = 14
     }
 }
