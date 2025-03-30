@@ -1,5 +1,6 @@
 package com.micewine.emu.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
@@ -18,6 +19,7 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.SpinnerAdapter
 import android.widget.TextView
@@ -34,6 +36,7 @@ import com.micewine.emu.activities.MainActivity.Companion.resolutions4_3
 import com.micewine.emu.activities.MainActivity.Companion.selectedCpuAffinity
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
+import com.micewine.emu.controller.ControllerUtils.getGameControllerNames
 import com.micewine.emu.core.RatPackageManager.listRatPackages
 import com.micewine.emu.core.RatPackageManager.listRatPackagesId
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Presets
@@ -42,15 +45,16 @@ import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.editGameFromList
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getEnableXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameExeArguments
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameIcon
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
@@ -58,13 +62,14 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineVirtualDesktop
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDisplaySettings
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.putEnableXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineESync
@@ -77,6 +82,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
     private var preferences: SharedPreferences? = null
     private var imageView: ImageView? = null
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.fragment_edit_game_preferences, null)
@@ -95,31 +101,48 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         val wineESyncSwitch = view.findViewById<MaterialSwitch>(R.id.wineESync)
         val wineServicesSwitch = view.findViewById<MaterialSwitch>(R.id.wineServices)
         val enableWineVirtualDesktopSwitch = view.findViewById<MaterialSwitch>(R.id.enableWineVirtualDesktop)
-        val enableXInputSwitch = view.findViewById<MaterialSwitch>(R.id.enableXInput)
+        val enableController0XInputSwitch = view.findViewById<MaterialSwitch>(R.id.enableController0XInput)
+        val enableController1XInputSwitch = view.findViewById<MaterialSwitch>(R.id.enableController1XInput)
+        val enableController2XInputSwitch = view.findViewById<MaterialSwitch>(R.id.enableController2XInput)
+        val enableController3XInputSwitch = view.findViewById<MaterialSwitch>(R.id.enableController3XInput)
         val cpuAffinitySpinner = view.findViewById<Spinner>(R.id.cpuAffinity)
-        val selectedControllerProfileSpinner = view.findViewById<Spinner>(R.id.selectedControllerProfile)
+        val controller0Layout = view.findViewById<LinearLayout>(R.id.controller0Layout)
+        val controller1Layout = view.findViewById<LinearLayout>(R.id.controller1Layout)
+        val controller2Layout = view.findViewById<LinearLayout>(R.id.controller2Layout)
+        val controller3Layout = view.findViewById<LinearLayout>(R.id.controller3Layout)
+        val connectedController0 = view.findViewById<TextView>(R.id.controller0)
+        val selectedController0ProfileSpinner = view.findViewById<Spinner>(R.id.selectedController0Profile)
+        val connectedController1 = view.findViewById<TextView>(R.id.controller1)
+        val selectedController1ProfileSpinner = view.findViewById<Spinner>(R.id.selectedController1Profile)
+        val connectedController2 = view.findViewById<TextView>(R.id.controller2)
+        val selectedController2ProfileSpinner = view.findViewById<Spinner>(R.id.selectedController2Profile)
+        val connectedController3 = view.findViewById<TextView>(R.id.controller3)
+        val noControllersConnectedText = view.findViewById<TextView>(R.id.noControllersConnected)
+        val selectedController3ProfileSpinner = view.findViewById<Spinner>(R.id.selectedController3Profile)
+        val enableVirtualControllerXInputSwitch = view.findViewById<MaterialSwitch>(R.id.enableVirtualControllerXInput)
         val selectedVirtualControllerProfileSpinner = view.findViewById<Spinner>(R.id.selectedVirtualControllerProfile)
         val selectedBox64ProfileSpinner = view.findViewById<Spinner>(R.id.selectedBox64Profile)
 
         imageView = view.findViewById(R.id.imageView)
 
-        if (type == EDIT_GAME_PREFERENCES) {
-            val imageBitmap = getGameIcon(selectedGameName)
-
-            if (imageBitmap != null) {
-                imageView?.setImageBitmap(
-                    resizeBitmap(
-                        imageBitmap, imageView?.layoutParams?.width!!, imageView?.layoutParams?.height!!
+        when (type) {
+            EDIT_GAME_PREFERENCES -> {
+                val imageBitmap = getGameIcon(selectedGameName)
+                if (imageBitmap != null) {
+                    imageView?.setImageBitmap(
+                        resizeBitmap(
+                            imageBitmap, imageView?.layoutParams?.width!!, imageView?.layoutParams?.height!!
+                        )
                     )
-                )
+                }
             }
-        } else if (type == FILE_MANAGER_START_PREFERENCES) {
-            val iconFile = File("$usrDir/icons/${exePath?.nameWithoutExtension}-icon")
-
-            if (iconFile.exists() && iconFile.length() > 0) {
-                imageView?.setImageBitmap(BitmapFactory.decodeFile(iconFile.path))
-            } else {
-                imageView?.setImageResource(R.drawable.ic_log)
+            FILE_MANAGER_START_PREFERENCES -> {
+                val iconFile = File("$usrDir/icons/${exePath?.nameWithoutExtension}-icon")
+                if (iconFile.exists() && iconFile.length() > 0) {
+                    imageView?.setImageBitmap(BitmapFactory.decodeFile(iconFile.path))
+                } else {
+                    imageView?.setImageResource(R.drawable.ic_log)
+                }
             }
         }
 
@@ -127,35 +150,40 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
 
         preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
-        if (type == EDIT_GAME_PREFERENCES) {
-            editTextNewName.setText(selectedGameName)
-            editTextArguments.setText(getGameExeArguments(selectedGameName))
+        when (type) {
+            EDIT_GAME_PREFERENCES -> {
+                editTextNewName.setText(selectedGameName)
+                editTextArguments.setText(getGameExeArguments(selectedGameName))
 
-            if (selectedGameName == getString(R.string.desktop_mode_init)) {
-                editTextNewName.isEnabled = false
-                editTextArguments.isEnabled = false
-                enableWineVirtualDesktopSwitch.isEnabled = false
-                enableWineVirtualDesktopSwitch.isChecked = true
+                if (selectedGameName == getString(R.string.desktop_mode_init)) {
+                    editTextNewName.isEnabled = false
+                    editTextArguments.isEnabled = false
+                    enableWineVirtualDesktopSwitch.isEnabled = false
+                    enableWineVirtualDesktopSwitch.isChecked = true
 
-                imageView?.setImageBitmap(
-                    resizeBitmap(
-                        BitmapFactory.decodeResource(requireActivity().resources, R.drawable.default_icon), imageView?.layoutParams?.width!!, imageView?.layoutParams?.height!!
+                    imageView?.setImageBitmap(
+                        resizeBitmap(
+                            BitmapFactory.decodeResource(requireActivity().resources, R.drawable.default_icon), imageView?.layoutParams?.width!!, imageView?.layoutParams?.height!!
+                        )
                     )
-                )
-            }
+                }
 
-            imageView?.setOnClickListener {
-                requireActivity().sendBroadcast(
-                    Intent(ACTION_SELECT_ICON)
-                )
+                imageView?.setOnClickListener {
+                    requireActivity().sendBroadcast(
+                        Intent(ACTION_SELECT_ICON)
+                    )
+                }
             }
-        } else if (type == FILE_MANAGER_START_PREFERENCES) {
-            editTextNewName.setText(exePath?.nameWithoutExtension)
-            editTextNewName.isEnabled = false
-            editTextArguments.setText("")
+            FILE_MANAGER_START_PREFERENCES -> {
+                editTextNewName.setText(exePath?.nameWithoutExtension)
+                editTextNewName.isEnabled = false
+                editTextArguments.setText("")
 
-            selectedGameName = ""
+                selectedGameName = ""
+            }
         }
+
+
 
         val controllerProfilesNames: List<String> = getControllerPresets().map { it[0] }
         val virtualControllerProfilesNames: List<String> = getVirtualControllerPresets(requireContext()).map { it.name }
@@ -182,11 +210,9 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                         "16:9" -> {
                             resolutionList = resolutions16_9
                         }
-
                         "4:3" -> {
                             resolutionList = resolutions4_3
                         }
-
                         "Native" -> {
                             resolutionList = getNativeResolutions(requireActivity()).toTypedArray()
                         }
@@ -263,7 +289,6 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                             selectedWineD3DSpinner.isEnabled = false
                             selectedDXVKSpinner.isEnabled = true
                         }
-
                         "WineD3D" -> {
                             selectedDXVKSpinner.isEnabled = false
                             selectedWineD3DSpinner.isEnabled = true
@@ -370,21 +395,81 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             }
         }
 
-        enableXInputSwitch.apply {
-            isChecked = getEnableXInput(selectedGameName)
-
-            setOnClickListener {
-                putEnableXInput(selectedGameName, isChecked)
-            }
-        }
-
         cpuAffinitySpinner.apply {
             adapter = CPUAffinityAdapter(requireActivity(), availableCPUs, cpuAffinitySpinner, type)
         }
 
-        selectedControllerProfileSpinner.apply {
+        val connectedControllers = getGameControllerNames()
+        val controllerTextViews = listOf(connectedController0, connectedController1, connectedController2, connectedController3)
+        val controllerLayoutViews = listOf(controller0Layout, controller1Layout, controller2Layout, controller3Layout)
+
+        controllerLayoutViews.forEachIndexed { index, layout ->
+            layout.visibility = if (connectedControllers.size > index) View.VISIBLE else View.GONE
+        }
+
+        noControllersConnectedText.visibility = if (connectedControllers.isEmpty()) View.VISIBLE else View.GONE
+
+        connectedControllers.forEachIndexed { index, controller ->
+            if (index < controllerTextViews.size) {
+                controllerTextViews[index].text = "$index: ${controller.name}"
+            }
+        }
+
+        enableController0XInputSwitch.apply {
+            isChecked = getControllerXInput(selectedGameName, 0)
+            selectedController0ProfileSpinner.isEnabled = !isChecked
+
+            setOnClickListener {
+                selectedController0ProfileSpinner.isEnabled = !isChecked
+
+                putControllerXInput(selectedGameName, isChecked, 0)
+            }
+        }
+        enableController1XInputSwitch.apply {
+            isChecked = getControllerXInput(selectedGameName, 1)
+            selectedController1ProfileSpinner.isEnabled = !isChecked
+
+            setOnClickListener {
+                selectedController1ProfileSpinner.isEnabled = !isChecked
+
+                putControllerXInput(selectedGameName, isChecked, 1)
+            }
+        }
+        enableController2XInputSwitch.apply {
+            isChecked = getControllerXInput(selectedGameName, 2)
+            selectedController2ProfileSpinner.isEnabled = !isChecked
+
+            setOnClickListener {
+                selectedController2ProfileSpinner.isEnabled = !isChecked
+
+                putControllerXInput(selectedGameName, isChecked, 2)
+            }
+        }
+        enableController3XInputSwitch.apply {
+            isChecked = getControllerXInput(selectedGameName, 3)
+            selectedController3ProfileSpinner.isEnabled = !isChecked
+
+            setOnClickListener {
+                selectedController3ProfileSpinner.isEnabled = !isChecked
+
+                putControllerXInput(selectedGameName, isChecked, 3)
+            }
+        }
+
+        enableVirtualControllerXInputSwitch.apply {
+            isChecked = getVirtualControllerXInput(selectedGameName)
+            selectedVirtualControllerProfileSpinner.isEnabled = !isChecked
+
+            setOnClickListener {
+                selectedVirtualControllerProfileSpinner.isEnabled = !isChecked
+
+                putVirtualControllerXInput(selectedGameName, isChecked)
+            }
+        }
+
+        selectedController0ProfileSpinner.apply {
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, controllerProfilesNames)
-            setSelection(controllerProfilesNames.indexOf(getControllerPreset(selectedGameName)))
+            setSelection(controllerProfilesNames.indexOf(getControllerPreset(selectedGameName, 0)))
 
             onItemSelectedListener = object : OnItemSelectedListener {
                 override fun onItemSelected(
@@ -393,7 +478,61 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putControllerPreset(selectedGameName, controllerProfilesNames[position])
+                    putControllerPreset(selectedGameName, controllerProfilesNames[position], 0)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+        }
+        selectedController1ProfileSpinner.apply {
+            adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, controllerProfilesNames)
+            setSelection(controllerProfilesNames.indexOf(getControllerPreset(selectedGameName, 1)))
+
+            onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    putControllerPreset(selectedGameName, controllerProfilesNames[position], 1)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+        }
+        selectedController2ProfileSpinner.apply {
+            adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, controllerProfilesNames)
+            setSelection(controllerProfilesNames.indexOf(getControllerPreset(selectedGameName, 2)))
+
+            onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    putControllerPreset(selectedGameName, controllerProfilesNames[position], 2)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+        }
+        selectedController3ProfileSpinner.apply {
+            adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, controllerProfilesNames)
+            setSelection(controllerProfilesNames.indexOf(getControllerPreset(selectedGameName, 3)))
+
+            onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    putControllerPreset(selectedGameName, controllerProfilesNames[position], 3)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -457,7 +596,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     putExtra("box64Preset", selectedBox64ProfileSpinner.selectedItem.toString())
                     putExtra("displayResolution", selectedDisplayResolutionSpinner.selectedItem.toString())
                     putExtra("virtualControllerPreset", selectedVirtualControllerProfileSpinner.selectedItem.toString())
-                    putExtra("controllerPreset", selectedControllerProfileSpinner.selectedItem.toString())
+                    putExtra("controllerPreset", selectedController0ProfileSpinner.selectedItem.toString())
                     putExtra("d3dxRenderer", selectedD3DXRendererSpinner.selectedItem.toString())
                     putExtra("wineD3D", selectedWineD3DSpinner.selectedItem.toString())
                     putExtra("dxvk", selectedDXVKSpinner.selectedItem.toString())
@@ -465,7 +604,6 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     putExtra("esync", wineESyncSwitch.isChecked)
                     putExtra("services", wineServicesSwitch.isChecked)
                     putExtra("virtualDesktop", enableWineVirtualDesktopSwitch.isChecked)
-                    putExtra("xinput", enableXInputSwitch.isChecked)
                     putExtra("cpuAffinity", selectedCpuAffinity)
                 }
 

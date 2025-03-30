@@ -193,4 +193,5 @@
     <string name="error_install_rootfs_file_manager">Вы не можете установить RootFS после установки.</string>
     <string name="driver_info_title">Информация о драйвере</string>
     <string name="driver_info_description">Получить информацию о Vulkan для драйверов</string>
+    <string name="controller_settings">Настройки контроллера</string>
 </resources>

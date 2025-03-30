@@ -322,24 +322,6 @@ class ShortcutsFragment : Fragment() {
             gameList = getGameList()
         }
 
-        fun putEnableXInput(name: String, enabled: Boolean) {
-            val index = gameList.indexOfFirst { it.name == name }
-
-            if (index == -1) return
-
-            gameList[index].enableXInput = enabled
-
-            saveShortcuts()
-        }
-
-        fun getEnableXInput(name: String): Boolean {
-            val index = gameList.indexOfFirst { it.name == name }
-
-            if (index == -1) return false
-
-            return gameList[index].enableXInput
-        }
-
         fun putWineVirtualDesktop(name: String, enabled: Boolean) {
             val index = gameList.indexOfFirst { it.name == name }
 
@@ -563,22 +545,58 @@ class ShortcutsFragment : Fragment() {
             return gameList[index].box64Preset
         }
 
-        fun putControllerPreset(name: String, presetName: String) {
+        fun putControllerXInput(name: String, enabled: Boolean, controllerIndex: Int) {
             val index = gameList.indexOfFirst { it.name == name }
 
             if (index == -1) return
 
-            gameList[index].controllerPreset = presetName
+            gameList[index].controllersEnableXInput[controllerIndex] = enabled
 
             saveShortcuts()
         }
 
-        fun getControllerPreset(name: String): String {
+        fun getControllerXInput(name: String, controllerIndex: Int): Boolean {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return false
+
+            return gameList[index].controllersEnableXInput[controllerIndex]
+        }
+
+        fun putControllerPreset(name: String, presetName: String, controllerIndex: Int) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].controllersPreset[controllerIndex] = presetName
+
+            saveShortcuts()
+        }
+
+        fun getControllerPreset(name: String, controllerIndex: Int): String {
             val index = gameList.indexOfFirst { it.name == name }
 
             if (index == -1) return "default"
 
-            return gameList[index].controllerPreset
+            return gameList[index].controllersPreset[controllerIndex]
+        }
+
+        fun putVirtualControllerXInput(name: String, enabled: Boolean) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].virtualControllerEnableXInput = enabled
+
+            saveShortcuts()
+        }
+
+        fun getVirtualControllerXInput(name: String): Boolean {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return false
+
+            return gameList[index].virtualControllerEnableXInput
         }
 
         fun putVirtualControllerPreset(name: String, presetName: String) {
@@ -611,8 +629,10 @@ class ShortcutsFragment : Fragment() {
                     "",
                     icon,
                     "default",
+                    mutableListOf("default", "default", "default", "default"),
+                    mutableListOf(false, false, false, false),
                     "default",
-                    "default",
+                    false,
                     "16:9",
                     "1280x720",
                     listRatPackagesId("VulkanDriver").first(),
@@ -757,8 +777,10 @@ class ShortcutsFragment : Fragment() {
             var exeArguments: String,
             var iconPath: String,
             var box64Preset: String,
-            var controllerPreset: String,
+            var controllersPreset: MutableList<String>,
+            var controllersEnableXInput: MutableList<Boolean>,
             var virtualControllerPreset: String,
+            var virtualControllerEnableXInput: Boolean,
             var displayMode: String,
             var displayResolution: String,
             var vulkanDriver: String,

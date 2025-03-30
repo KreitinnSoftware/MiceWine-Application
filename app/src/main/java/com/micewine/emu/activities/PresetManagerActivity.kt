@@ -21,7 +21,7 @@ import com.micewine.emu.R
 import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetType
-import com.micewine.emu.controller.ControllerUtils.getGameControllerNames
+import com.micewine.emu.controller.ControllerUtils.connectedPhysicalControllers
 import com.micewine.emu.databinding.ActivityPresetManagerBinding
 import com.micewine.emu.fragments.Box64PresetManagerFragment
 import com.micewine.emu.fragments.Box64SettingsFragment
@@ -93,10 +93,8 @@ class PresetManagerActivity : AppCompatActivity() {
 
                 findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.controller_mapper_title)
 
-                val connectedControllers = getGameControllerNames()
-
-                if (connectedControllers.isNotEmpty()) {
-                    controllerConnected?.text = getString(R.string.connected_controller, connectedControllers[0])
+                if (connectedPhysicalControllers.isNotEmpty()) {
+                    controllerConnected?.text = getString(R.string.connected_controller, connectedPhysicalControllers.joinToString(", ") { it.name })
                 } else {
                     controllerConnected?.text = getString(R.string.no_controllers_connected)
                 }

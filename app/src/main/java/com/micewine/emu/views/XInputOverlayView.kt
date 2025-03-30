@@ -23,23 +23,7 @@ import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_DOWN
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_UP
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_UP
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.aPressed
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.bPressed
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.dpadStatus
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.l1Pressed
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.lt
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.lx
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.ly
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.r1Pressed
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.rt
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.rx
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.ry
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.selectPressed
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.startPressed
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.thumbLPressed
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.thumbRPressed
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.xPressed
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.yPressed
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.connectedControllers
 import com.micewine.emu.input.InputStub.BUTTON_UNDEFINED
 import com.micewine.emu.views.OverlayView.Companion.SHAPE_CIRCLE
 import com.micewine.emu.views.OverlayView.Companion.SHAPE_DPAD
@@ -476,224 +460,338 @@ class XInputOverlayView @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        when (event.actionMasked) {
-            MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_DOWN -> {
-                buttonList.forEach {
-                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
-                        it.isPressed = true
-                        it.fingerId = event.actionIndex
-
-                        handleButton(it, true)
-
-                        return@forEach
-                    }
-                }
-                analogList.forEach {
-                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_CIRCLE)) {
-                        val posX = event.getX(event.actionIndex) - it.x
-                        val posY = event.getY(event.actionIndex) - it.y
-
-                        it.fingerX = posX
-                        it.fingerY = posY
-                        it.isPressed = true
-                        it.fingerId = event.actionIndex
-
-                        it.fingerX = posX
-                        it.fingerY = posY
-
-                        when (it.id) {
-                            LEFT_ANALOG -> {
-                                virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), lx, ly)
-                            }
-                            RIGHT_ANALOG -> {
-                                virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), rx, ry)
-                            }
-                        }
-
-                        return@forEach
-                    }
-                }
-                dpadList.forEach {
-                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_DPAD)) {
-                        val posX = event.getX(event.actionIndex) - it.x
-                        val posY = event.getY(event.actionIndex) - it.y
-
-                        it.fingerX = posX
-                        it.fingerY = posY
-                        it.isPressed = true
-                        it.fingerId = event.actionIndex
-
-                        it.fingerX = posX
-                        it.fingerY = posY
-
-                        when {
-                            (posX / it.radius > 0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = DPAD_RIGHT
-                            (posX / it.radius < -0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT
-                            (posY / it.radius > 0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DPAD_DOWN
-                            (posY / it.radius < -0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DPAD_UP
-                            (posX / it.radius > 0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_RIGHT_DOWN
-                            (posX / it.radius > 0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_RIGHT_UP
-                            (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT_DOWN
-                            (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_LEFT_UP
-
-                            else -> it.dpadStatus = 0
-                        }
-
-                        dpadStatus = it.dpadStatus
-
-                        return@forEach
-                    }
-                }
-
-                invalidate()
-            }
-
-            MotionEvent.ACTION_MOVE -> {
-                for (i in 0 until event.pointerCount) {
-                    var isFingerPressingButton = false
-
+        if (virtualXInputControllerId != -1) {
+            when (event.actionMasked) {
+                MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_DOWN -> {
                     buttonList.forEach {
-                        if (it.fingerId == i) {
+                        if (detectClick(
+                                event,
+                                event.actionIndex,
+                                it.x,
+                                it.y,
+                                it.radius,
+                                it.shape
+                            )
+                        ) {
                             it.isPressed = true
+                            it.fingerId = event.actionIndex
+
                             handleButton(it, true)
 
-                            isFingerPressingButton = true
+                            return@forEach
                         }
                     }
                     analogList.forEach {
-                        if (it.isPressed && it.fingerId == i) {
-                            val posX = event.getX(i) - it.x
-                            val posY = event.getY(i) - it.y
+                        if (detectClick(
+                                event,
+                                event.actionIndex,
+                                it.x,
+                                it.y,
+                                it.radius,
+                                SHAPE_CIRCLE
+                            )
+                        ) {
+                            val posX = event.getX(event.actionIndex) - it.x
+                            val posY = event.getY(event.actionIndex) - it.y
+
+                            it.fingerX = posX
+                            it.fingerY = posY
+                            it.isPressed = true
+                            it.fingerId = event.actionIndex
 
                             it.fingerX = posX
                             it.fingerY = posY
 
                             when (it.id) {
                                 LEFT_ANALOG -> {
-                                    virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), lx, ly)
+                                    virtualAxis(
+                                        posX / (it.radius / 4),
+                                        posY / (it.radius / 4),
+                                        connectedControllers[virtualXInputControllerId].lx,
+                                        connectedControllers[virtualXInputControllerId].ly
+                                    )
                                 }
+
                                 RIGHT_ANALOG -> {
-                                    virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), rx, ry)
+                                    virtualAxis(
+                                        posX / (it.radius / 4),
+                                        posY / (it.radius / 4),
+                                        connectedControllers[virtualXInputControllerId].rx,
+                                        connectedControllers[virtualXInputControllerId].ry
+                                    )
                                 }
                             }
 
-                            isFingerPressingButton = true
+                            return@forEach
                         }
                     }
                     dpadList.forEach {
-                        if (it.isPressed && it.fingerId == i) {
-                            val posX = event.getX(i) - it.x
-                            val posY = event.getY(i) - it.y
+                        if (detectClick(
+                                event,
+                                event.actionIndex,
+                                it.x,
+                                it.y,
+                                it.radius,
+                                SHAPE_DPAD
+                            )
+                        ) {
+                            val posX = event.getX(event.actionIndex) - it.x
+                            val posY = event.getY(event.actionIndex) - it.y
+
+                            it.fingerX = posX
+                            it.fingerY = posY
+                            it.isPressed = true
+                            it.fingerId = event.actionIndex
 
                             it.fingerX = posX
                             it.fingerY = posY
 
-                            isFingerPressingButton = true
-
                             when {
-                                (posX / it.radius > 0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = DPAD_RIGHT
-                                (posX / it.radius < -0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT
-                                (posY / it.radius > 0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DPAD_DOWN
-                                (posY / it.radius < -0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DPAD_UP
-                                (posX / it.radius > 0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_RIGHT_DOWN
-                                (posX / it.radius > 0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_RIGHT_UP
-                                (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT_DOWN
-                                (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_LEFT_UP
+                                (posX / it.radius > 0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus =
+                                    DPAD_RIGHT
+
+                                (posX / it.radius < -0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus =
+                                    DPAD_LEFT
+
+                                (posY / it.radius > 0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus =
+                                    DPAD_DOWN
+
+                                (posY / it.radius < -0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus =
+                                    DPAD_UP
+
+                                (posX / it.radius > 0.25) && (posY / it.radius > 0.25) -> it.dpadStatus =
+                                    DPAD_RIGHT_DOWN
+
+                                (posX / it.radius > 0.25) && (posY / it.radius < -0.25) -> it.dpadStatus =
+                                    DPAD_RIGHT_UP
+
+                                (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus =
+                                    DPAD_LEFT_DOWN
+
+                                (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus =
+                                    DPAD_LEFT_UP
 
                                 else -> it.dpadStatus = 0
                             }
 
-                            dpadStatus = it.dpadStatus
+                            connectedControllers[virtualXInputControllerId].dpadStatus = it.dpadStatus
+
+                            return@forEach
                         }
                     }
 
-                    if (!isFingerPressingButton) {
-                        if (event.historySize > 0) {
-                            val deltaX = event.getX(i) - event.getHistoricalX(i, 0)
-                            val deltaY = event.getY(i) - event.getHistoricalY(i, 0)
+                    invalidate()
+                }
 
-                            if ((deltaX > 0.08 || deltaX < -0.08) && (deltaY > 0.08 || deltaY < -0.08)) {
-                                lorieView.sendMouseEvent(deltaX, deltaY, BUTTON_UNDEFINED, false, true)
+                MotionEvent.ACTION_MOVE -> {
+                    for (i in 0 until event.pointerCount) {
+                        var isFingerPressingButton = false
+
+                        buttonList.forEach {
+                            if (it.fingerId == i) {
+                                it.isPressed = true
+                                handleButton(it, true)
+
+                                isFingerPressingButton = true
+                            }
+                        }
+                        analogList.forEach {
+                            if (it.isPressed && it.fingerId == i) {
+                                val posX = event.getX(i) - it.x
+                                val posY = event.getY(i) - it.y
+
+                                it.fingerX = posX
+                                it.fingerY = posY
+
+                                when (it.id) {
+                                    LEFT_ANALOG -> {
+                                        virtualAxis(
+                                            posX / (it.radius / 4),
+                                            posY / (it.radius / 4),
+                                            connectedControllers[virtualXInputControllerId].lx,
+                                            connectedControllers[virtualXInputControllerId].ly
+                                        )
+                                    }
+
+                                    RIGHT_ANALOG -> {
+                                        virtualAxis(
+                                            posX / (it.radius / 4),
+                                            posY / (it.radius / 4),
+                                            connectedControllers[virtualXInputControllerId].rx,
+                                            connectedControllers[virtualXInputControllerId].ry
+                                        )
+                                    }
+                                }
+
+                                isFingerPressingButton = true
+                            }
+                        }
+                        dpadList.forEach {
+                            if (it.isPressed && it.fingerId == i) {
+                                val posX = event.getX(i) - it.x
+                                val posY = event.getY(i) - it.y
+
+                                it.fingerX = posX
+                                it.fingerY = posY
+
+                                isFingerPressingButton = true
+
+                                when {
+                                    (posX / it.radius > 0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus =
+                                        DPAD_RIGHT
+
+                                    (posX / it.radius < -0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus =
+                                        DPAD_LEFT
+
+                                    (posY / it.radius > 0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus =
+                                        DPAD_DOWN
+
+                                    (posY / it.radius < -0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus =
+                                        DPAD_UP
+
+                                    (posX / it.radius > 0.25) && (posY / it.radius > 0.25) -> it.dpadStatus =
+                                        DPAD_RIGHT_DOWN
+
+                                    (posX / it.radius > 0.25) && (posY / it.radius < -0.25) -> it.dpadStatus =
+                                        DPAD_RIGHT_UP
+
+                                    (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus =
+                                        DPAD_LEFT_DOWN
+
+                                    (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus =
+                                        DPAD_LEFT_UP
+
+                                    else -> it.dpadStatus = 0
+                                }
+
+                                connectedControllers[virtualXInputControllerId].dpadStatus = it.dpadStatus
+                            }
+                        }
+
+                        if (!isFingerPressingButton) {
+                            if (event.historySize > 0) {
+                                val deltaX = event.getX(i) - event.getHistoricalX(i, 0)
+                                val deltaY = event.getY(i) - event.getHistoricalY(i, 0)
+
+                                if ((deltaX > 0.08 || deltaX < -0.08) && (deltaY > 0.08 || deltaY < -0.08)) {
+                                    lorieView.sendMouseEvent(
+                                        deltaX,
+                                        deltaY,
+                                        BUTTON_UNDEFINED,
+                                        false,
+                                        true
+                                    )
+                                }
                             }
                         }
                     }
+
+                    invalidate()
                 }
 
-                invalidate()
-            }
-
-            MotionEvent.ACTION_POINTER_UP -> {
-                buttonList.forEach {
-                    if (it.fingerId == event.actionIndex) {
-                        it.fingerId = -1
+                MotionEvent.ACTION_POINTER_UP -> {
+                    buttonList.forEach {
+                        if (it.fingerId == event.actionIndex) {
+                            it.fingerId = -1
+                        }
+                        if (detectClick(
+                                event,
+                                event.actionIndex,
+                                it.x,
+                                it.y,
+                                it.radius,
+                                it.shape
+                            )
+                        ) {
+                            handleButton(it, false)
+                        }
                     }
-                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
+                    analogList.forEach {
+                        if (it.fingerId == event.actionIndex) {
+                            it.fingerId = -1
+                            it.fingerX = 0F
+                            it.fingerY = 0F
+
+                            it.isPressed = false
+
+                            when (it.id) {
+                                LEFT_ANALOG -> {
+                                    virtualAxis(
+                                        0F,
+                                        0F,
+                                        connectedControllers[virtualXInputControllerId].lx,
+                                        connectedControllers[virtualXInputControllerId].ly
+                                    )
+                                }
+
+                                RIGHT_ANALOG -> {
+                                    virtualAxis(
+                                        0F,
+                                        0F,
+                                        connectedControllers[virtualXInputControllerId].rx,
+                                        connectedControllers[virtualXInputControllerId].ry
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    dpadList.forEach {
+                        if (it.fingerId == event.actionIndex) {
+                            it.fingerId = -1
+                            it.fingerX = 0F
+                            it.fingerY = 0F
+
+                            it.isPressed = false
+                            it.dpadStatus = 0
+
+                            connectedControllers[virtualXInputControllerId].dpadStatus = 0
+                        }
+                    }
+
+                    invalidate()
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    buttonList.forEach {
+                        it.fingerId = -1
                         handleButton(it, false)
                     }
-                }
-                analogList.forEach {
-                    if (it.fingerId == event.actionIndex) {
-                        it.fingerId = -1
+                    analogList.forEach {
                         it.fingerX = 0F
                         it.fingerY = 0F
-
                         it.isPressed = false
 
                         when (it.id) {
                             LEFT_ANALOG -> {
-                                virtualAxis(0F, 0F, lx, ly)
+                                virtualAxis(
+                                    0F,
+                                    0F,
+                                    connectedControllers[virtualXInputControllerId].lx,
+                                    connectedControllers[virtualXInputControllerId].ly
+                                )
                             }
+
                             RIGHT_ANALOG -> {
-                                virtualAxis(0F, 0F, rx, ry)
+                                virtualAxis(
+                                    0F,
+                                    0F,
+                                    connectedControllers[virtualXInputControllerId].rx,
+                                    connectedControllers[virtualXInputControllerId].ry
+                                )
                             }
                         }
                     }
-                }
-                dpadList.forEach {
-                    if (it.fingerId == event.actionIndex) {
-                        it.fingerId = -1
+                    dpadList.forEach {
                         it.fingerX = 0F
                         it.fingerY = 0F
-
                         it.isPressed = false
                         it.dpadStatus = 0
 
-                        dpadStatus = 0
+                        connectedControllers[virtualXInputControllerId].dpadStatus = 0
                     }
+
+                    invalidate()
                 }
-
-                invalidate()
-            }
-
-            MotionEvent.ACTION_UP -> {
-                buttonList.forEach {
-                    it.fingerId = -1
-                    handleButton(it, false)
-                }
-                analogList.forEach {
-                    it.fingerX = 0F
-                    it.fingerY = 0F
-                    it.isPressed = false
-
-                    when (it.id) {
-                        LEFT_ANALOG -> {
-                            virtualAxis(0F, 0F, lx, ly)
-                        }
-                        RIGHT_ANALOG -> {
-                            virtualAxis(0F, 0F, rx, ry)
-                        }
-                    }
-                }
-                dpadList.forEach {
-                    it.fingerX = 0F
-                    it.fingerY = 0F
-                    it.isPressed = false
-                    it.dpadStatus = 0
-
-                    dpadStatus = 0
-                }
-
-                invalidate()
             }
         }
 
@@ -723,44 +821,44 @@ class XInputOverlayView @JvmOverloads constructor(
 
         when (button.id) {
             A_BUTTON -> {
-                aPressed = pressed
+                connectedControllers[virtualXInputControllerId].aPressed = pressed
             }
             B_BUTTON -> {
-                bPressed = pressed
+                connectedControllers[virtualXInputControllerId].bPressed = pressed
             }
             X_BUTTON -> {
-                xPressed = pressed
+                connectedControllers[virtualXInputControllerId].xPressed = pressed
             }
             Y_BUTTON -> {
-                yPressed = pressed
+                connectedControllers[virtualXInputControllerId].yPressed = pressed
             }
             START_BUTTON -> {
-                startPressed = pressed
+                connectedControllers[virtualXInputControllerId].startPressed = pressed
             }
             SELECT_BUTTON -> {
-                selectPressed = pressed
+                connectedControllers[virtualXInputControllerId].selectPressed = pressed
             }
             LB_BUTTON -> {
-                l1Pressed = pressed
+                connectedControllers[virtualXInputControllerId].lbPressed = pressed
             }
             LT_BUTTON -> {
-                lt[0] = if (pressed) 2 else 0
-                lt[1] = if (pressed) 5 else 0
-                lt[2] = if (pressed) 5 else 0
+                connectedControllers[virtualXInputControllerId].lt[0] = if (pressed) 2 else 0
+                connectedControllers[virtualXInputControllerId].lt[1] = if (pressed) 5 else 0
+                connectedControllers[virtualXInputControllerId].lt[2] = if (pressed) 5 else 0
             }
             RB_BUTTON -> {
-                r1Pressed = pressed
+                connectedControllers[virtualXInputControllerId].rbPressed = pressed
             }
             RT_BUTTON -> {
-                rt[0] = if (pressed) 2 else 0
-                rt[1] = if (pressed) 5 else 0
-                rt[2] = if (pressed) 5 else 0
+                connectedControllers[virtualXInputControllerId].rt[0] = if (pressed) 2 else 0
+                connectedControllers[virtualXInputControllerId].rt[1] = if (pressed) 5 else 0
+                connectedControllers[virtualXInputControllerId].rt[2] = if (pressed) 5 else 0
             }
             LS_BUTTON -> {
-                thumbLPressed = pressed
+                connectedControllers[virtualXInputControllerId].lsPressed = pressed
             }
             RS_BUTTON -> {
-                thumbRPressed = pressed
+                connectedControllers[virtualXInputControllerId].rsPressed = pressed
             }
         }
     }
@@ -814,5 +912,7 @@ class XInputOverlayView @JvmOverloads constructor(
         const val RIGHT_ANALOG = 12
         const val LS_BUTTON = 13
         const val RS_BUTTON = 14
+
+        var virtualXInputControllerId = -1
     }
 }

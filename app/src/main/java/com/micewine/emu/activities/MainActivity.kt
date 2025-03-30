@@ -8,11 +8,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
+import android.hardware.input.InputManager
 import android.os.Build
 import android.os.Bundle
 import android.os.storage.StorageManager
 import android.util.DisplayMetrics
 import android.view.ContextMenu
+import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -74,6 +76,11 @@ import com.micewine.emu.adapters.AdapterBottomNavigation
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
+import com.micewine.emu.controller.ControllerUtils
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.disconnectController
+import com.micewine.emu.controller.ControllerUtils.connectedPhysicalControllers
+import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
+import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.HighlightState
@@ -125,7 +132,6 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getEnableXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
@@ -164,8 +170,6 @@ class MainActivity : AppCompatActivity() {
                     val driverType = intent.getIntExtra("driverType", MESA_DRIVER)
                     val box64Preset = intent.getStringExtra("box64Preset") ?: "default"
                     val displayResolution = intent.getStringExtra("displayResolution") ?: "1280x720"
-                    val virtualControllerPreset = intent.getStringExtra("virtualControllerPreset") ?: "default"
-                    val controllerPreset = intent.getStringExtra("controllerPreset") ?: "default"
                     val d3dxRenderer = intent.getStringExtra("d3dxRenderer") ?: "DXVK"
                     val wineD3D = intent.getStringExtra("wineD3D") ?: listRatPackages("WineD3D-").map { it.name + " " + it.version }.first()
                     val dxvk = intent.getStringExtra("dxvk") ?: listRatPackages("DXVK-").map { it.name + " " + it.version }.first()
@@ -173,10 +177,9 @@ class MainActivity : AppCompatActivity() {
                     val esync = intent.getBooleanExtra("esync", true)
                     val services = intent.getBooleanExtra("services", false)
                     val virtualDesktop = intent.getBooleanExtra("virtualDesktop", false)
-                    val xinput = intent.getBooleanExtra("xinput", false)
                     val cpuAffinity = intent.getStringExtra("cpuAffinity") ?: availableCPUs.joinToString(",")
 
-                    setSharedVars(this@MainActivity, d3dxRenderer, wineD3D, dxvk, vkd3d, displayResolution, esync, services, virtualDesktop, xinput, cpuAffinity)
+                    setSharedVars(this@MainActivity, d3dxRenderer, wineD3D, dxvk, vkd3d, displayResolution, esync, services, virtualDesktop)
 
                     tmpDir.deleteRecursively()
                     tmpDir.mkdirs()
@@ -197,11 +200,8 @@ class MainActivity : AppCompatActivity() {
 
                     val driverPath = File("$ratPackagesDir/$driverName/pkg-header").readLines()[4].substringAfter("=")
 
-                    setSharedVars(this@MainActivity, d3dxRenderer, wineD3D, dxvk, vkd3d, displayResolution, esync, services, virtualDesktop, xinput, cpuAffinity, (driverType == ADRENO_TOOLS_DRIVER), driverPath)
+                    setSharedVars(this@MainActivity, d3dxRenderer, wineD3D, dxvk, vkd3d, displayResolution, esync, services, virtualDesktop, cpuAffinity, (driverType == ADRENO_TOOLS_DRIVER), driverPath)
                     setBox64Preset(this@MainActivity, box64Preset)
-
-                    selectedControllerPreset = controllerPreset
-                    selectedVirtualControllerPreset = virtualControllerPreset
 
                     lifecycleScope.launch { runXServer(":0") }
                     lifecycleScope.launch { runWine(exePath, exeArguments) }
@@ -403,6 +403,41 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    private var inputManager: InputManager? = null
+    private val inputDeviceListener: InputManager.InputDeviceListener = object : InputManager.InputDeviceListener {
+        override fun onInputDeviceAdded(deviceId: Int) {
+            InputDevice.getDevice(deviceId)
+        }
+
+        override fun onInputDeviceChanged(deviceId: Int) {
+            val inputDevice = InputDevice.getDevice(deviceId) ?: return
+
+            if ((inputDevice.sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD) ||
+                (inputDevice.sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK)
+            ) {
+                if (connectedPhysicalControllers.indexOfFirst { it.id == deviceId } == -1) {
+                    connectedPhysicalControllers.add(
+                        ControllerUtils.PhysicalController(
+                            inputDevice.name,
+                            deviceId,
+                            -1,
+                            -1
+                        )
+                    )
+                }
+
+                prepareButtonsAxisValues()
+            }
+        }
+
+        override fun onInputDeviceRemoved(deviceId: Int) {
+            val index = connectedPhysicalControllers.indexOfFirst { it.id == deviceId }
+            if (index == -1) return
+
+            disconnectController(connectedPhysicalControllers[index].virtualXInputId)
+            connectedPhysicalControllers.removeAt(index)
+        }
+    }
 
     private var appToolbar: MaterialToolbar? = null
     private var bottomNavigation: BottomNavigationView? = null
@@ -420,6 +455,14 @@ class MainActivity : AppCompatActivity() {
         VirtualControllerPresetManagerFragment.initialize(this)
         Box64PresetManagerFragment.initialize(this)
         ShortcutsFragment.initialize(this)
+        ControllerUtils.initialize(this)
+
+        lifecycleScope.launch {
+            controllerMouseEmulation()
+        }
+
+        inputManager = getSystemService(INPUT_SERVICE) as InputManager
+        inputManager?.registerInputDeviceListener(inputDeviceListener, null)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
@@ -723,6 +766,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         binding = null
         unregisterReceiver(receiver)
+        inputManager?.unregisterInputDeviceListener(inputDeviceListener)
     }
 
     override fun onResume() {
@@ -1112,8 +1156,6 @@ class MainActivity : AppCompatActivity() {
         var fpsLimit: Int = 0
         var paSink: String? = null
         var selectedResolution: String? = null
-        var selectedControllerPreset: String? = null
-        var selectedVirtualControllerPreset: String? = null
         var useAdrenoTools: Boolean = false
         var adrenoToolsDriverFile: File? = null
 
@@ -1200,7 +1242,6 @@ class MainActivity : AppCompatActivity() {
                           esync: Boolean? = null,
                           services: Boolean? = null,
                           virtualDesktop: Boolean? = null,
-                          xinput: Boolean? = null,
                           cpuAffinity: String? = null,
                           adrenoTools: Boolean? = null,
                           adrenoToolsDriverPath: String? = null
@@ -1232,7 +1273,6 @@ class MainActivity : AppCompatActivity() {
             selectedResolution = displayResolution ?: getDisplaySettings(selectedGameName)[1]
             wineESync = esync ?: getWineESync(selectedGameName)
             wineServices = services ?: getWineServices(selectedGameName)
-            enableXInput = xinput ?: getEnableXInput(selectedGameName)
             enableWineVirtualDesktop = virtualDesktop ?: getWineVirtualDesktop(selectedGameName)
             selectedCpuAffinity = cpuAffinity ?: getCpuAffinity(selectedGameName)
 
@@ -1392,10 +1432,10 @@ class MainActivity : AppCompatActivity() {
             val displayMetrics = DisplayMetrics()
             windowManager.defaultDisplay.getRealMetrics(displayMetrics)
 
-            if (displayMetrics.widthPixels > displayMetrics.heightPixels) {
-                return "${displayMetrics.widthPixels}x${displayMetrics.heightPixels}"
+            return if (displayMetrics.widthPixels > displayMetrics.heightPixels) {
+                "${displayMetrics.widthPixels}x${displayMetrics.heightPixels}"
             } else {
-                return "${displayMetrics.heightPixels}x${displayMetrics.widthPixels}"
+                "${displayMetrics.heightPixels}x${displayMetrics.widthPixels}"
             }
         }
 

@@ -197,4 +197,5 @@
     <string name="error_install_rootfs_file_manager">安装后无法再次安装 RootFS。</string>
     <string name="driver_info_title">驱动程序信息</string>
     <string name="driver_info_description">获取 Vulkan 驱动程序信息</string>
+    <string name="controller_settings">控制器设置</string>
 </resources>

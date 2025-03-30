@@ -12,6 +12,7 @@ import android.view.View
 import androidx.preference.PreferenceManager
 import com.micewine.emu.LorieView
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY
+import com.micewine.emu.controller.ControllerUtils
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_DOWN
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT_DOWN
@@ -440,7 +441,7 @@ class OverlayView @JvmOverloads constructor(
     }
 
     private fun virtualAxis(axisX: Float, axisY: Float, upKeyCodes: List<Int>, downKeyCodes: List<Int>, leftKeyCodes: List<Int>, rightKeyCodes: List<Int>, deadZone: Float) {
-        handleAxis(lorieView, axisX, axisY, axisX < deadZone && axisX > -deadZone, axisY < deadZone && axisY > -deadZone, rightKeyCodes, leftKeyCodes, downKeyCodes, upKeyCodes, deadZone)
+        handleAxis(axisX, axisY, ControllerUtils.Analog(false, upKeyCodes, downKeyCodes, leftKeyCodes, rightKeyCodes), deadZone)
     }
 
     private fun handleButton(button: VirtualButton, pressed: Boolean) {

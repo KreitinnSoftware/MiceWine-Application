@@ -292,25 +292,6 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                android:text="@string/enable_xinput_title">
-            </TextView>
-
-            <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/enableXInput"
-                android:theme="@style/Theme.MiceWine"
-                android:gravity="center_vertical"
-                android:layout_marginStart="4dp"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent">
-            </com.google.android.material.materialswitch.MaterialSwitch>
-
-            <TextView
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="4dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textStyle="bold"
                 android:text="@string/cpu_affinity_title">
             </TextView>
 
@@ -327,7 +308,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:text="@string/others">
+                android:text="@string/controller_settings">
             </TextView>
 
             <TextView
@@ -340,12 +321,188 @@
                 android:text="@string/selected_controller_profile">
             </TextView>
 
-            <Spinner
-                android:id="@+id/selectedControllerProfile"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/noControllersConnected"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-            </Spinner>
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="8dp"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:text="@string/no_controllers_connected">
+            </TextView>
+
+            <LinearLayout
+                android:id="@+id/controller0Layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/controller0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="6dp"
+                    android:textSize="14sp"
+                    android:textStyle="bold">
+                </TextView>
+
+                <TextView
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:text="@string/enable_xinput_title">
+                </TextView>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/enableController0XInput"
+                    android:theme="@style/Theme.MiceWine"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="6dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                </com.google.android.material.materialswitch.MaterialSwitch>
+
+                <Spinner
+                    android:id="@+id/selectedController0Profile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                </Spinner>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/controller1Layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/controller1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="6dp"
+                    android:textSize="14sp"
+                    android:textStyle="bold">
+                </TextView>
+
+                <TextView
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:text="@string/enable_xinput_title">
+                </TextView>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/enableController1XInput"
+                    android:theme="@style/Theme.MiceWine"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="6dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                </com.google.android.material.materialswitch.MaterialSwitch>
+
+                <Spinner
+                    android:id="@+id/selectedController1Profile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                </Spinner>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/controller2Layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/controller2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="6dp"
+                    android:textSize="14sp"
+                    android:textStyle="bold">
+                </TextView>
+
+                <TextView
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:text="@string/enable_xinput_title">
+                </TextView>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/enableController2XInput"
+                    android:theme="@style/Theme.MiceWine"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="6dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                </com.google.android.material.materialswitch.MaterialSwitch>
+
+                <Spinner
+                    android:id="@+id/selectedController2Profile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                </Spinner>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/controller3Layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/controller3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="6dp"
+                    android:textSize="14sp"
+                    android:textStyle="bold">
+                </TextView>
+
+                <TextView
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:text="@string/enable_xinput_title">
+                </TextView>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/enableController3XInput"
+                    android:theme="@style/Theme.MiceWine"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="6dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                </com.google.android.material.materialswitch.MaterialSwitch>
+
+                <Spinner
+                    android:id="@+id/selectedController3Profile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                </Spinner>
+
+            </LinearLayout>
 
             <TextView
                 android:layout_marginTop="20dp"
@@ -357,12 +514,40 @@
                 android:text="@string/selected_virtual_controller_profile">
             </TextView>
 
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:text="@string/enable_xinput_title">
+            </TextView>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/enableVirtualControllerXInput"
+                android:theme="@style/Theme.MiceWine"
+                android:gravity="center_vertical"
+                android:layout_marginStart="6dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+            </com.google.android.material.materialswitch.MaterialSwitch>
+
             <Spinner
                 android:id="@+id/selectedVirtualControllerProfile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp">
             </Spinner>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/others">
+            </TextView>
 
             <TextView
                 android:layout_marginTop="20dp"

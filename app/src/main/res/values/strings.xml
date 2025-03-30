@@ -221,4 +221,5 @@
     <string name="error_install_rootfs_file_manager">You cannot install RootFS after installation.</string>
     <string name="driver_info_title">Driver Info</string>
     <string name="driver_info_description">Get Vulkan Info for Drivers</string>
+    <string name="controller_settings">Controller Settings</string>
 </resources>
