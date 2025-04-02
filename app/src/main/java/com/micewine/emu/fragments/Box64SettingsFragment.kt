@@ -100,9 +100,7 @@ class Box64SettingsFragment : Fragment() {
                 titleId,
                 descriptionId,
                 valuesArray,
-                null,
                 type,
-                "$defaultValue",
                 keyId
             )
         )

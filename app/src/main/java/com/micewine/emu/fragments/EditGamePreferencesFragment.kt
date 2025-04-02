@@ -60,7 +60,6 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineVirtualDesktop
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.putBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putCpuAffinity
@@ -183,8 +182,6 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             }
         }
 
-
-
         val controllerProfilesNames: List<String> = getControllerPresets().map { it[0] }
         val virtualControllerProfilesNames: List<String> = getVirtualControllerPresets(requireContext()).map { it.name }
         val box64ProfilesNames: List<String> = getBox64Presets().map { it[0] }
@@ -221,7 +218,8 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     selectedDisplayResolutionSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, resolutionList!!)
                     selectedDisplayResolutionSpinner.setSelection(resolutionList.indexOf(displaySettings[1]))
 
-                    putDisplaySettings(selectedGameName, selectedItem, getDisplaySettings(selectedGameName)[1])
+                    temporarySettings.displayMode = selectedItem
+                    temporarySettings.displayResolution = getDisplaySettings(selectedGameName)[1]
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -239,7 +237,8 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                 ) {
                     val selectedItem = parent?.getItemAtPosition(position).toString()
 
-                    putDisplaySettings(selectedGameName, getDisplaySettings(selectedGameName)[0], selectedItem)
+                    temporarySettings.displayMode = getDisplaySettings(selectedGameName)[0]
+                    temporarySettings.displayResolution = selectedItem
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -262,7 +261,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putVulkanDriver(selectedGameName, vulkanDriversId[position])
+                    temporarySettings.vulkanDriver = vulkanDriversId[position]
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -295,7 +294,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                         }
                     }
 
-                    putD3DXRenderer(selectedGameName, selectedItem)
+                    temporarySettings.d3dxRenderer = selectedItem
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -317,7 +316,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putDXVKVersion(selectedGameName, dxvkVersionsId[position])
+                    temporarySettings.dxvk = dxvkVersionsId[position]
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -339,7 +338,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putWineD3DVersion(selectedGameName, wineD3DVersionsId[position])
+                    temporarySettings.wineD3D = wineD3DVersionsId[position]
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -361,7 +360,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putVKD3DVersion(selectedGameName, vkd3dVersionsId[position])
+                    temporarySettings.vkd3d = vkd3dVersionsId[position]
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -373,7 +372,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             isChecked = getWineESync(selectedGameName)
 
             setOnClickListener {
-                putWineESync(selectedGameName, isChecked)
+                temporarySettings.wineESync = isChecked
             }
         }
 
@@ -381,7 +380,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             isChecked = getWineServices(selectedGameName)
 
             setOnClickListener {
-                putWineServices(selectedGameName, isChecked)
+                temporarySettings.wineServices = isChecked
             }
         }
 
@@ -390,7 +389,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                 isChecked = getWineVirtualDesktop(selectedGameName)
 
                 setOnClickListener {
-                    putWineVirtualDesktop(selectedGameName, isChecked)
+                    temporarySettings.wineVirtualDesktop = isChecked
                 }
             }
         }
@@ -422,7 +421,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             setOnClickListener {
                 selectedController0ProfileSpinner.isEnabled = !isChecked
 
-                putControllerXInput(selectedGameName, isChecked, 0)
+                temporarySettings.controllerXInput[0] = isChecked
             }
         }
         enableController1XInputSwitch.apply {
@@ -432,7 +431,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             setOnClickListener {
                 selectedController1ProfileSpinner.isEnabled = !isChecked
 
-                putControllerXInput(selectedGameName, isChecked, 1)
+                temporarySettings.controllerXInput[1] = isChecked
             }
         }
         enableController2XInputSwitch.apply {
@@ -442,7 +441,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             setOnClickListener {
                 selectedController2ProfileSpinner.isEnabled = !isChecked
 
-                putControllerXInput(selectedGameName, isChecked, 2)
+                temporarySettings.controllerXInput[2] = isChecked
             }
         }
         enableController3XInputSwitch.apply {
@@ -452,7 +451,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             setOnClickListener {
                 selectedController3ProfileSpinner.isEnabled = !isChecked
 
-                putControllerXInput(selectedGameName, isChecked, 3)
+                temporarySettings.controllerXInput[3] = isChecked
             }
         }
 
@@ -463,7 +462,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             setOnClickListener {
                 selectedVirtualControllerProfileSpinner.isEnabled = !isChecked
 
-                putVirtualControllerXInput(selectedGameName, isChecked)
+                temporarySettings.virtualXInputController = isChecked
             }
         }
 
@@ -478,7 +477,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putControllerPreset(selectedGameName, controllerProfilesNames[position], 0)
+                    temporarySettings.controllerPreset[0] = controllerProfilesNames[position]
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -496,7 +495,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putControllerPreset(selectedGameName, controllerProfilesNames[position], 1)
+                    temporarySettings.controllerPreset[1] = controllerProfilesNames[position]
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -514,7 +513,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putControllerPreset(selectedGameName, controllerProfilesNames[position], 2)
+                    temporarySettings.controllerPreset[2] = controllerProfilesNames[position]
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -532,7 +531,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putControllerPreset(selectedGameName, controllerProfilesNames[position], 3)
+                    temporarySettings.controllerPreset[3] = controllerProfilesNames[position]
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -551,7 +550,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putVirtualControllerPreset(selectedGameName, virtualControllerProfilesNames[position])
+                    temporarySettings.virtualControllerPreset = virtualControllerProfilesNames[position]
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -570,7 +569,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     position: Int,
                     id: Long
                 ) {
-                    putBox64Preset(selectedGameName, box64ProfilesNames[position])
+                    temporarySettings.box64Preset = box64ProfilesNames[position]
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -585,6 +584,31 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
 
                 if (newName == "") {
                     return@setOnClickListener
+                }
+
+                temporarySettings.let {
+                    putDisplaySettings(selectedGameName, it.displayMode, it.displayResolution)
+                    putVulkanDriver(selectedGameName, it.vulkanDriver)
+                    putD3DXRenderer(selectedGameName, it.d3dxRenderer)
+                    putDXVKVersion(selectedGameName, it.dxvk)
+                    putWineD3DVersion(selectedGameName, it.wineD3D)
+                    putVKD3DVersion(selectedGameName, it.vkd3d)
+                    putWineESync(selectedGameName, it.wineESync)
+                    putWineServices(selectedGameName, it.wineServices)
+                    putWineVirtualDesktop(selectedGameName, it.wineVirtualDesktop)
+                    putCpuAffinity(selectedGameName, it.cpuAffinity)
+                    putVirtualControllerPreset(selectedGameName, it.virtualControllerPreset)
+                    putVirtualControllerXInput(selectedGameName, it.virtualXInputController)
+
+                    putControllerXInput(selectedGameName, it.controllerXInput[0], 0)
+                    putControllerXInput(selectedGameName, it.controllerXInput[1], 1)
+                    putControllerXInput(selectedGameName, it.controllerXInput[2], 2)
+                    putControllerXInput(selectedGameName, it.controllerXInput[3], 3)
+
+                    putControllerPreset(selectedGameName, it.controllerPreset[0], 0)
+                    putControllerPreset(selectedGameName, it.controllerPreset[1], 1)
+                    putControllerPreset(selectedGameName, it.controllerPreset[2], 2)
+                    putControllerPreset(selectedGameName, it.controllerPreset[3], 3)
                 }
 
                 editGameFromList(selectedGameName, newName, newArguments)
@@ -645,6 +669,27 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         const val EDIT_GAME_PREFERENCES = 0
         const val FILE_MANAGER_START_PREFERENCES = 1
 
+        val temporarySettings = TemporarySettings()
+
+        class TemporarySettings(
+            var displayMode: String = "",
+            var displayResolution: String = "",
+            var vulkanDriver: String = "",
+            var d3dxRenderer: String = "",
+            var dxvk: String = "",
+            var wineD3D: String = "",
+            var vkd3d: String = "",
+            var wineESync: Boolean = false,
+            var wineServices: Boolean = false,
+            var wineVirtualDesktop: Boolean = false,
+            var cpuAffinity: String = getCpuAffinity(""),
+            var virtualControllerPreset: String = "",
+            var virtualXInputController: Boolean = false,
+            var controllerXInput: BooleanArray = booleanArrayOf(false, false, false, false),
+            var controllerPreset: MutableList<String> = mutableListOf("", "", "", ""),
+            var box64Preset: String = "",
+        )
+
         class CPUAffinityAdapter(
             val activity: Activity,
             private val arrayElements: Array<String>,
@@ -680,7 +725,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                 val view = p1 ?: inflater.inflate(android.R.layout.simple_spinner_item, p2, false)
 
                 view.findViewById<TextView>(android.R.id.text1).apply {
-                    text = getCpuAffinity(selectedGameName)
+                    text = temporarySettings.cpuAffinity
                 }
 
                 return view
@@ -702,9 +747,8 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                 val inflater = activity.layoutInflater
                 val view = inflater.inflate(R.layout.item_checkbox, p2, false)
                 val checkBox = view.findViewById<CheckBox>(R.id.checkbox)
-                val cpuAffinity = getCpuAffinity(selectedGameName)
 
-                checked[p0] = cpuAffinity.contains(arrayElements[p0]) == true
+                checked[p0] = temporarySettings.cpuAffinity.contains(arrayElements[p0]) == true
 
                 checkBox.isChecked = checked[p0]
                 checkBox.text = arrayElements[p0]
@@ -726,7 +770,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     }
 
                     if (type == EDIT_GAME_PREFERENCES) {
-                        putCpuAffinity(selectedGameName, builder.toString())
+                        temporarySettings.cpuAffinity = builder.toString()
                     } else if (type == FILE_MANAGER_START_PREFERENCES) {
                         selectedCpuAffinity = builder.toString()
                     }
