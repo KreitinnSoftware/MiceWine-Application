@@ -42,22 +42,17 @@ class PresetManagerActivity : AppCompatActivity() {
     private var addPresetFAB: FloatingActionButton? = null
     private var importPresetFAB: FloatingActionButton? = null
     private var preferences: SharedPreferences? = null
-    private val controllerPresetFragment = ControllerPresetManagerFragment()
-    private val controllerMapperFragment = ControllerMapperFragment()
-    private val virtualControllerMapperFragment = VirtualControllerPresetManagerFragment()
-    private val box64PresetManagerFragment = Box64PresetManagerFragment()
-    private val box64SettingsFragment = Box64SettingsFragment()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 ACTION_EDIT_CONTROLLER_MAPPING -> {
-                    fragmentLoader(controllerMapperFragment, false)
+                    fragmentLoader(ControllerMapperFragment(), false)
 
                     addPresetFAB?.visibility = View.GONE
                     importPresetFAB?.visibility = View.GONE
                 }
                 ACTION_EDIT_BOX64_PRESET -> {
-                    fragmentLoader(box64SettingsFragment, false)
+                    fragmentLoader(Box64SettingsFragment(), false)
 
                     addPresetFAB?.visibility = View.GONE
                     importPresetFAB?.visibility = View.GONE
@@ -85,11 +80,12 @@ class PresetManagerActivity : AppCompatActivity() {
         addPresetFAB = findViewById(R.id.addPresetFAB)
         importPresetFAB = findViewById(R.id.importPresetFAB)
 
-        val intent = intent?.getIntExtra("presetType", -1)
+        val presetType = intent?.getIntExtra("presetType", -1)
+        val editShortcut = intent?.getBooleanExtra("editShortcut", false)
 
-        when (intent) {
+        when (presetType) {
             PHYSICAL_CONTROLLER -> {
-                fragmentLoader(controllerPresetFragment, true)
+                fragmentLoader(ControllerPresetManagerFragment(editShortcut!!), true)
 
                 findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.controller_mapper_title)
 
@@ -108,7 +104,7 @@ class PresetManagerActivity : AppCompatActivity() {
                 }
             }
             VIRTUAL_CONTROLLER -> {
-                fragmentLoader(virtualControllerMapperFragment, true)
+                fragmentLoader(VirtualControllerPresetManagerFragment(editShortcut!!), true)
 
                 findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.virtual_controller_mapper_title)
 
@@ -123,7 +119,7 @@ class PresetManagerActivity : AppCompatActivity() {
                 }
             }
             BOX64_PRESET -> {
-                fragmentLoader(box64PresetManagerFragment, true)
+                fragmentLoader(Box64PresetManagerFragment(), true)
 
                 findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.box64_preset_manager_title)
 

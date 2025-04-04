@@ -57,7 +57,7 @@ class DriverInfoFragment : Fragment() {
                     driverFile = File("$ratPackagesDir/$driverId/pkg-header").readLines()[4].substringAfter("=")
                 }
                 
-                setSharedVars(requireActivity(), null, null, null, null, null, null, null, null, null, (driverId.contains("AdrenoToolsDriver")), adrenoToolsDriverPath)
+                setSharedVars(requireActivity(), null, null, null, null, null, null, null, null, null, null, null, (driverId.contains("AdrenoToolsDriver")), adrenoToolsDriverPath)
 
                 generateICDFile(driverFile, File("$appRootDir/vulkan_icd.json"))
 

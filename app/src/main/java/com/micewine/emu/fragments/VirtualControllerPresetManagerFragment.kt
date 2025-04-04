@@ -25,7 +25,7 @@ import com.micewine.emu.views.OverlayViewCreator.Companion.GRID_SIZE
 import java.io.File
 import kotlin.math.roundToInt
 
-class VirtualControllerPresetManagerFragment : Fragment() {
+class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) : Fragment() {
     private var rootView: View? = null
 
     override fun onCreateView(
@@ -36,7 +36,7 @@ class VirtualControllerPresetManagerFragment : Fragment() {
         rootView = inflater.inflate(R.layout.fragment_general_settings, container, false)
         recyclerView = rootView?.findViewById(R.id.recyclerViewGeneralSettings)
 
-        initialize(requireContext())
+        initialize(requireContext(), editShortcut)
         setAdapter()
 
         return rootView
@@ -53,7 +53,7 @@ class VirtualControllerPresetManagerFragment : Fragment() {
 
     private fun addToAdapter(titleSettings: String, type: Int, userPreset: Boolean) {
         presetListNames.add(
-            AdapterPreset.Item(titleSettings, type, userPreset)
+            AdapterPreset.Item(titleSettings, type, userPreset, editShortcut)
         )
     }
 
@@ -62,12 +62,14 @@ class VirtualControllerPresetManagerFragment : Fragment() {
         private val presetListNames: MutableList<AdapterPreset.Item> = mutableListOf()
         private var presetList: MutableList<VirtualControllerPreset> = mutableListOf()
         var preferences: SharedPreferences? = null
+        private var editShortcut: Boolean = false
 
         private val gson = Gson()
 
-        fun initialize(context: Context) {
+        fun initialize(context: Context, boolean: Boolean = false) {
             preferences = PreferenceManager.getDefaultSharedPreferences(context)
             presetList = getVirtualControllerPresets(context)
+            editShortcut = boolean
         }
 
         fun getMapping(name: String): VirtualControllerPreset? {
@@ -108,7 +110,7 @@ class VirtualControllerPresetManagerFragment : Fragment() {
 
             presetList.add(defaultPreset)
             presetListNames.add(
-                AdapterPreset.Item(name, VIRTUAL_CONTROLLER, true)
+                AdapterPreset.Item(name, VIRTUAL_CONTROLLER, true, editShortcut)
             )
 
             recyclerView?.adapter?.notifyItemInserted(presetListNames.size)

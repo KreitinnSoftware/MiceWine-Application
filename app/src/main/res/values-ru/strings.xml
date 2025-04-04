@@ -99,6 +99,7 @@
     <string name="controller_preset_create_text">Введите имя</string>
     <string name="remove_last_preset_error">Последний пресет не может быть удален</string>
     <string name="edit_game_icon">Изменить иконку</string>
+    <string name="edit">Редактировать</string>
     <string name="add_game_to_home">Создать ярлык в лаунчере</string>
     <string name="cancel_text">Отменить</string>
     <string name="remove_game_item_warning">Вы уверены, что хотите удалить?</string>
@@ -194,4 +195,5 @@
     <string name="driver_info_title">Информация о драйвере</string>
     <string name="driver_info_description">Получить информацию о Vulkan для драйверов</string>
     <string name="controller_settings">Настройки контроллера</string>
+    <string name="selected_box64">Выбран Box64</string>
 </resources>

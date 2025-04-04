@@ -556,6 +556,23 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textStyle="bold"
+                android:text="@string/selected_box64">
+            </TextView>
+
+            <Spinner
+                android:id="@+id/selectedBox64"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+            </Spinner>
+
+            <TextView
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 android:text="@string/selected_box64_profile">
             </TextView>
 

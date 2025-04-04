@@ -253,6 +253,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             findViewById<MaterialButton>(R.id.editVirtualControllerMapping).setOnClickListener {
                 val intent = Intent(context, PresetManagerActivity::class.java).apply {
                     putExtra("presetType", VIRTUAL_CONTROLLER)
+                    putExtra("editShortcut", true)
                 }
                 startActivity(intent)
             }
@@ -260,6 +261,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             findViewById<MaterialButton>(R.id.editControllerMapping).setOnClickListener {
                 val intent = Intent(context, PresetManagerActivity::class.java).apply {
                     putExtra("presetType", PHYSICAL_CONTROLLER)
+                    putExtra("editShortcut", true)
                 }
                 startActivity(intent)
             }
@@ -551,11 +553,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         lorieView!!.requestFocus()
         lorieView!!.requestLayout()
 
-        if (selectedGameName == getString(R.string.desktop_mode_init)) {
-            overlayView?.loadPreset(null)
-        } else {
-            overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
-        }
+        overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
 
         prepareButtonsAxisValues()
     }

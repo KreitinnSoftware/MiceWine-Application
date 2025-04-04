@@ -17,6 +17,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VULKAN_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.core.RatPackageManager
@@ -78,7 +79,12 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
 
         when (sList.type) {
             VK_DRIVER -> {
-                holder.radioButton.visibility = View.GONE
+                selectedItem = preferences.getString(SELECTED_VULKAN_DRIVER, "")
+                packagePrefix = "VulkanDriver-"
+
+                if (repositoryPackage) {
+                    holder.radioButton.visibility = View.GONE
+                }
                 holder.imageView.setImageResource(R.drawable.ic_gpu)
             }
             BOX64 -> {
@@ -135,6 +141,9 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
                         BOX64 -> {
                             putString(SELECTED_BOX64, sList.itemFolderId)
                         }
+                        VK_DRIVER -> {
+                            putString(SELECTED_VULKAN_DRIVER, sList.itemFolderId)
+                        }
                     }
 
                     apply()
@@ -157,6 +166,9 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
                         when (sList.type) {
                             BOX64 -> {
                                 putString(SELECTED_BOX64, firstPackage)
+                            }
+                            VK_DRIVER -> {
+                                putString(SELECTED_VULKAN_DRIVER, firstPackage)
                             }
                         }
 

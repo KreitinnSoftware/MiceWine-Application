@@ -66,6 +66,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_ME
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_TU_DEBUG_PRESET
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VULKAN_DRIVER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL_DEFAULT_VALUE
@@ -128,6 +129,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.ADRENO_TOOLS_DRIVE
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.MESA_DRIVER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToLauncher
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToList
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Version
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
@@ -166,8 +168,9 @@ class MainActivity : AppCompatActivity() {
                 ACTION_RUN_WINE -> {
                     val exePath = intent.getStringExtra("exePath")!!
                     val exeArguments = intent.getStringExtra("exeArguments") ?: ""
-                    val driverName = intent.getStringExtra("driverName") ?: listRatPackages("VulkanDriver-").map { it.name + " " + it.version }.first()
-                    val driverType = intent.getIntExtra("driverType", MESA_DRIVER)
+                    var driverName = intent.getStringExtra("driverName") ?: "Global"
+                    var driverType = intent.getIntExtra("driverType", MESA_DRIVER)
+                    var box64Version = intent.getStringExtra("box64Version") ?: "Global"
                     val box64Preset = intent.getStringExtra("box64Preset") ?: "default"
                     val displayResolution = intent.getStringExtra("displayResolution") ?: "1280x720"
                     val d3dxRenderer = intent.getStringExtra("d3dxRenderer") ?: "DXVK"
@@ -179,10 +182,18 @@ class MainActivity : AppCompatActivity() {
                     val virtualDesktop = intent.getBooleanExtra("virtualDesktop", false)
                     val cpuAffinity = intent.getStringExtra("cpuAffinity") ?: availableCPUs.joinToString(",")
 
-                    setSharedVars(this@MainActivity, d3dxRenderer, wineD3D, dxvk, vkd3d, displayResolution, esync, services, virtualDesktop)
-
                     tmpDir.deleteRecursively()
                     tmpDir.mkdirs()
+
+                    if (driverName == "Global") {
+                        driverName = preferences?.getString(SELECTED_VULKAN_DRIVER, "").toString()
+                        driverType = if (driverName.startsWith("AdrenoToolsDriver-")) ADRENO_TOOLS_DRIVER else MESA_DRIVER
+                    }
+                    if (box64Version == "Global") {
+                        box64Version = preferences?.getString(SELECTED_BOX64, "").toString()
+                    }
+
+                    setSharedVars(this@MainActivity, box64Version, box64Preset, d3dxRenderer, wineD3D, dxvk, vkd3d, displayResolution, esync, services, virtualDesktop)
 
                     val driverLibPath: String = when (driverType) {
                         MESA_DRIVER -> {
@@ -200,8 +211,7 @@ class MainActivity : AppCompatActivity() {
 
                     val driverPath = File("$ratPackagesDir/$driverName/pkg-header").readLines()[4].substringAfter("=")
 
-                    setSharedVars(this@MainActivity, d3dxRenderer, wineD3D, dxvk, vkd3d, displayResolution, esync, services, virtualDesktop, cpuAffinity, (driverType == ADRENO_TOOLS_DRIVER), driverPath)
-                    setBox64Preset(this@MainActivity, box64Preset)
+                    setSharedVars(this@MainActivity, box64Version, box64Preset, d3dxRenderer, wineD3D, dxvk, vkd3d, displayResolution, esync, services, virtualDesktop, cpuAffinity, (driverType == ADRENO_TOOLS_DRIVER), driverPath)
 
                     lifecycleScope.launch { runXServer(":0") }
                     lifecycleScope.launch { runWine(exePath, exeArguments) }
@@ -1234,6 +1244,8 @@ class MainActivity : AppCompatActivity() {
 
         @Suppress("DEPRECATION")
         fun setSharedVars(activity: Activity,
+                          box64Version: String? = null,
+                          box64Preset: String? = null,
                           d3dxRenderer: String? = null,
                           wineD3D: String? = null,
                           dxvk: String? = null,
@@ -1256,10 +1268,10 @@ class MainActivity : AppCompatActivity() {
             appLang = activity.resources.getString(R.string.app_lang)
             appBuiltinRootfs = activity.assets.list("")?.contains("rootfs.zip")!!
 
-            selectedBox64 = preferences.getString(SELECTED_BOX64, "")
+            selectedBox64 = box64Version ?: getBox64Version(selectedGameName)
             box64LogLevel = preferences.getString(BOX64_LOG, BOX64_LOG_DEFAULT_VALUE)
 
-            setBox64Preset(activity, null)
+            setBox64Preset(activity, box64Preset)
 
             enableDRI3 = preferences.getBoolean(ENABLE_DRI3, ENABLE_DRI3_DEFAULT_VALUE)
             enableMangoHUD = preferences.getBoolean(ENABLE_MANGOHUD, ENABLE_MANGOHUD_DEFAULT_VALUE)
@@ -1304,7 +1316,7 @@ class MainActivity : AppCompatActivity() {
             paSink = preferences.getString(PA_SINK, PA_SINK_DEFAULT_VALUE)?.toLowerCase(Locale.getDefault())
         }
 
-        fun setBox64Preset(activity: Activity, name: String?) {
+        private fun setBox64Preset(activity: Activity, name: String?) {
             val preferences = PreferenceManager.getDefaultSharedPreferences(activity)!!
             var selectedBox64Preset = name ?: preferences.getString(SELECTED_BOX64_PRESET_KEY, "default")!!
 

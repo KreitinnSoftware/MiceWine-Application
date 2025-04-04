@@ -199,4 +199,5 @@
     <string name="driver_info_title">Informações do Driver</string>
     <string name="driver_info_description">Obtenha informações do Vulkan para Drivers</string>
     <string name="controller_settings">Configurações do Controle</string>
+    <string name="selected_box64">Box64 Selecionado</string>
 </resources>

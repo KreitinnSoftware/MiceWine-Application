@@ -14,8 +14,13 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.EmulationActivity
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VULKAN_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_RUN_WINE
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.ADRENO_TOOLS_DRIVER
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.MESA_DRIVER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Version
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
@@ -28,6 +33,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineVirtualDesktop
+import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.preferences
 import java.io.File
 
 class AdapterGame(private val gameList: MutableList<GameItem>, private val activity: Activity) : RecyclerView.Adapter<AdapterGame.ViewHolder>() {
@@ -110,11 +116,24 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val activ
 
             val intent = Intent(activity, EmulationActivity::class.java)
 
+            var driverName = getVulkanDriver(selectedGameName)
+            var driverType = getVulkanDriverType(selectedGameName)
+            if (driverName == "Global") {
+                driverName = preferences?.getString(SELECTED_VULKAN_DRIVER, "").toString()
+                driverType = if (driverName.startsWith("AdrenoToolsDriver-")) ADRENO_TOOLS_DRIVER else MESA_DRIVER
+            }
+
+            var box64Version = getBox64Version(selectedGameName)
+            if (box64Version == "Global") {
+                box64Version = preferences?.getString(SELECTED_BOX64, "").toString()
+            }
+
             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                 putExtra("exePath", exePath)
                 putExtra("exeArguments", exeArguments)
-                putExtra("driverName", getVulkanDriver(selectedGameName))
-                putExtra("driverType", getVulkanDriverType(selectedGameName))
+                putExtra("driverName", driverName)
+                putExtra("driverType", driverType)
+                putExtra("box64Version", box64Version)
                 putExtra("box64Preset", getBox64Preset(selectedGameName))
                 putExtra("displayResolution", getDisplaySettings(selectedGameName)[1])
                 putExtra("virtualControllerPreset", getVirtualControllerPreset(selectedGameName))

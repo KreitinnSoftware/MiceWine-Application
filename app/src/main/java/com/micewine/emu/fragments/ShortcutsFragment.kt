@@ -527,6 +527,24 @@ class ShortcutsFragment : Fragment() {
             return listOf(gameList[index].displayMode, gameList[index].displayResolution)
         }
 
+        fun putBox64Version(name: String, box64VersionId: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].box64Version = box64VersionId
+
+            saveShortcuts()
+        }
+
+        fun getBox64Version(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return ""
+
+            return gameList[index].box64Version
+        }
+
         fun putBox64Preset(name: String, presetName: String) {
             val index = gameList.indexOfFirst { it.name == name }
 
@@ -628,6 +646,7 @@ class ShortcutsFragment : Fragment() {
                     path,
                     "",
                     icon,
+                    "Global",
                     "default",
                     mutableListOf("default", "default", "default", "default"),
                     mutableListOf(false, false, false, false),
@@ -635,7 +654,7 @@ class ShortcutsFragment : Fragment() {
                     false,
                     "16:9",
                     "1280x720",
-                    listRatPackagesId("VulkanDriver").first(),
+                    "Global",
                     MESA_DRIVER,
                     "DXVK",
                     listRatPackagesId("DXVK").first(),
@@ -776,6 +795,7 @@ class ShortcutsFragment : Fragment() {
             var exePath: String,
             var exeArguments: String,
             var iconPath: String,
+            var box64Version: String,
             var box64Preset: String,
             var controllersPreset: MutableList<String>,
             var controllersEnableXInput: MutableList<Boolean>,

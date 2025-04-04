@@ -105,7 +105,7 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                 } catch (_: ShellLinkException) {
                     holder.icon.setImageResource(R.drawable.ic_log)
                 }
-            } else if (fileExtension == "rat") {
+            } else if (fileExtension == "rat" || fileExtension == "mwp") {
                 holder.icon.setImageResource(R.drawable.ic_rat_package)
             } else {
                 holder.icon.setImageResource(R.drawable.ic_log)

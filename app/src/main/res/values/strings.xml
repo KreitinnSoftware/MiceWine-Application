@@ -222,4 +222,5 @@
     <string name="driver_info_title">Driver Info</string>
     <string name="driver_info_description">Get Vulkan Info for Drivers</string>
     <string name="controller_settings">Controller Settings</string>
+    <string name="selected_box64">Selected Box64</string>
 </resources>
