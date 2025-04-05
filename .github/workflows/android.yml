@@ -40,6 +40,21 @@ jobs:
       if: env.BRANCH != 'master' || github.event_name == 'pull_request'
       run: ./gradlew assembleDebug
 
+    - name: "Get Keystore for Signing"
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64_MICEWINE }}" | base64 -d > micewine-key.jks
+
+    - name: "Sign APK (Release)"
+      if: env.BRANCH == 'master' && github.event_name != 'pull_request'
+      run: |
+        $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks micewine-key.jks --ks-key-alias ${{ secrets.KEYSTORE_ALIAS }} --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} --out app-release.apk app/build/outputs/apk/debug/app-release.apk 
+
+    
+    - name: "Sign APK (Debug)"
+      if: env.BRANCH != 'master' || github.event_name == 'pull_request'
+      run: |
+        $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks micewine-key.jks --ks-key-alias ${{ secrets.KEYSTORE_ALIAS }} --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} --out app-debug.apk app/build/outputs/apk/debug/app-debug.apk 
+
     - name: "Get Short SHA"
       run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
@@ -52,12 +67,12 @@ jobs:
       with:
         name: "MiceWine Application (${{ env.VERSION }})"
         tag_name: ${{ env.SHORT_SHA }}
-        prerelease: true
-        files: ./app/build/outputs/apk/release/app-release.apk
+        prerelease: false
+        files: ./app-release.apk
     
     - name: "Upload Artifact"
       if: env.BRANCH != 'master' || github.event_name == 'pull_request'
       uses: actions/upload-artifact@v4
       with:
         name: MiceWine-Application-(git-${{ env.SHORT_SHA }})
-        path: ./app/build/outputs/apk/debug/app-debug.apk
+        path: ./app-debug.apk
