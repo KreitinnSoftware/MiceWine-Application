@@ -484,6 +484,13 @@ class MainActivity : AppCompatActivity() {
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
 
+        // On future here will have a code for check if app is updated and do specific data conversion if needed
+
+        preferences!!.edit().apply {
+            putString(APP_VERSION, BuildConfig.VERSION_NAME)
+            apply()
+        }
+
         bottomNavigation = findViewById(R.id.bottom_navigation)
         bottomNavigation?.setOnItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
@@ -1183,6 +1190,7 @@ class MainActivity : AppCompatActivity() {
         const val CPU_COUNTER_DEFAULT_VALUE = false
         const val ENABLE_DEBUG_INFO = "debugInfo"
         const val ENABLE_DEBUG_INFO_DEFAULT_VALUE = true
+        const val APP_VERSION = "appVersion"
 
         fun setupWinePrefix(winePrefix: File, wine: String) {
             if (!winePrefix.exists()) {
