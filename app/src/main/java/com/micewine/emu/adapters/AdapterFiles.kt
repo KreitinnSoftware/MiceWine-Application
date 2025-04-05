@@ -18,11 +18,11 @@ import com.micewine.emu.activities.MainActivity.Companion.fileManagerDefaultDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.core.WineWrapper.extractIcon
-import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.OPERATION_EXPORT_PRESET
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.outputFile
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.utils.DriveUtils
 import mslinks.ShellLink
+import mslinks.ShellLinkException
 import java.io.File
 import kotlin.math.round
 
@@ -41,6 +41,8 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
         } else {
             holder.fileName.text = sList.file.name
         }
+
+        holder.fileName.isSelected = true
 
         if (sList.file.isDirectory) {
             holder.icon.setImageResource(R.drawable.ic_folder)
@@ -82,26 +84,29 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                     holder.icon.setImageResource(R.drawable.ic_log)
                 }
             } else if (fileExtension == "lnk") {
-                val shell = ShellLink(sList.file)
-                val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
+                try {
+                    val shell = ShellLink(sList.file)
+                    val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
+                    if (drive != null) {
+                        val filePath = File(drive.getUnixPath())
 
-                if (drive != null) {
-                    val filePath = File(drive.getUnixPath())
+                        val output = File("$usrDir/icons/${filePath.nameWithoutExtension}-icon")
 
-                    val output = File("$usrDir/icons/${filePath.nameWithoutExtension}-icon")
+                        extractIcon(filePath, output.path)
 
-                    extractIcon(filePath, output.path)
-
-                    if (output.exists() && output.length() > 0) {
-                        holder.icon.setImageBitmap(BitmapFactory.decodeFile(output.path))
+                        if (output.exists() && output.length() > 0) {
+                            holder.icon.setImageBitmap(BitmapFactory.decodeFile(output.path))
+                        } else {
+                            holder.icon.setImageResource(R.drawable.ic_log)
+                        }
                     } else {
                         holder.icon.setImageResource(R.drawable.ic_log)
                     }
-                } else {
+                } catch (_: ShellLinkException) {
                     holder.icon.setImageResource(R.drawable.ic_log)
                 }
-            } else if (fileExtension == "rat") {
-                holder.icon.setImageResource(R.drawable.icon_grayscale)
+            } else if (fileExtension == "rat" || fileExtension == "mwp") {
+                holder.icon.setImageResource(R.drawable.ic_rat_package)
             } else {
                 holder.icon.setImageResource(R.drawable.ic_log)
             }
@@ -133,7 +138,7 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                 if (settingsModel.file.name == "..") {
                     fileManagerCwd = File(fileManagerCwd!!).parent!!
 
-                    refreshFiles(OPERATION_EXPORT_PRESET)
+                    refreshFiles()
                 } else if (settingsModel.file.isFile) {
                     if (settingsModel.file.name.contains(".rat")) {
                         customRootFSPath = settingsModel.file.path
@@ -143,7 +148,7 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                 } else if (settingsModel.file.isDirectory) {
                     fileManagerCwd = settingsModel.file.path
 
-                    refreshFiles(OPERATION_EXPORT_PRESET)
+                    refreshFiles()
                 }
             } else {
                 val intent = Intent(ACTION_SELECT_FILE_MANAGER).apply {

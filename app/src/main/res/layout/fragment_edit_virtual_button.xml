@@ -9,41 +9,61 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         android:orientation="vertical">
 
-        <LinearLayout
+        <TextView
+            android:text="@string/button_size"
+            android:textSize="16sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:orientation="vertical">
+            android:importantForAutofill="no">
+        </TextView>
 
-            <TextView
-                android:text="@string/button_size"
-                android:textSize="16sp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAutofill="no">
-            </TextView>
+        <TextView
+            android:id="@+id/radiusSeekbarValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:padding="8dp">
+        </TextView>
 
-            <TextView
-                android:id="@+id/radiusSeekbarValue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:padding="8dp">
-            </TextView>
+        <SeekBar
+            android:id="@+id/radiusSeekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp">
+        </SeekBar>
 
-            <SeekBar
-                android:id="@+id/radiusSeekbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="2dp">
-            </SeekBar>
+        <TextView
+            android:id="@+id/shapeText"
+            android:text="@string/shape_text"
+            android:textSize="16sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:importantForAutofill="no">
+        </TextView>
 
-        </LinearLayout>
+        <Spinner
+            android:id="@+id/shapeSpinner"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </Spinner>
+
+        <TextView
+            android:id="@+id/buttonMappingText"
+            android:text="@string/button_mapping_text"
+            android:textSize="16sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:importantForAutofill="no">
+        </TextView>
 
         <Spinner
             android:id="@+id/buttonSpinner"
+            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         </Spinner>

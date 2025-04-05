@@ -1,24 +1,18 @@
 package com.micewine.emu.adapters
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.SeekBar
-import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CHECKBOX
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_MODE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SEEKBAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SWITCH
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
@@ -48,8 +42,6 @@ class AdapterSettingsBox64Preset(
         }
 
         val mapping = getBox64Mapping(clickedPresetName, sList.key)
-
-        Log.v("Kratos", mapping[0])
 
         when (sList.type) {
             SWITCH -> {
@@ -127,5 +119,11 @@ class AdapterSettingsBox64Preset(
         }
     }
 
-    class Box64ListSpinner(var titleSettings: Int, var descriptionSettings: Int, var spinnerOptions: Array<String>?, var seekBarMaxMinValues: Array<Int>?, var type: Int, var defaultValue: String, var key: String)
+    class Box64ListSpinner(
+        var titleSettings: Int,
+        var descriptionSettings: Int,
+        var spinnerOptions: Array<String>?,
+        var type: Int,
+        var key: String
+    )
 }

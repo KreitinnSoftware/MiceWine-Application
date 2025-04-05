@@ -17,52 +17,86 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:orientation="horizontal">
-
-        <RadioButton
-            android:id="@+id/radio_button"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-        </RadioButton>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:padding="10dp"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/preset_title"
+            <RadioButton
+                android:id="@+id/radio_button"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="0dp"
-                android:text="Title Settings"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                tools:ignore="HardcodedText" />
+                android:layout_height="match_parent">
+            </RadioButton>
 
-            <TextView
-                android:id="@+id/rat_package_description"
-                android:layout_width="wrap_content"
+            <ImageView
+                android:id="@+id/image_view"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="16dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_settings_outline">
+            </ImageView>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:ellipsize="marquee"
-                android:text="Description Settings"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textSize="15sp"
-                tools:ignore="HardcodedText" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/preset_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="0dp"
+                    android:text="Title Settings"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/rat_package_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="marquee"
+                    android:text="Description Settings"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textSize="15sp"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/rat_package_delete"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:src="@android:drawable/ic_menu_delete">
+            </ImageButton>
+
+            <ImageButton
+                android:id="@+id/rat_package_download"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:src="@drawable/ic_download">
+            </ImageButton>
+
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/rat_package_delete"
-            android:layout_width="50dp"
-            android:layout_height="match_parent"
-            android:importantForAccessibility="no"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:src="@android:drawable/ic_menu_delete">
-        </ImageButton>
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            style="?android:attr/progressBarStyleHorizontal">
+        </ProgressBar>
 
     </LinearLayout>
 

@@ -5,12 +5,22 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.preference.PreferenceManager
 import com.micewine.emu.LorieView
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY
+import com.micewine.emu.controller.ControllerUtils
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_DOWN
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT_DOWN
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT_UP
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_DOWN
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_UP
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_UP
 import com.micewine.emu.controller.ControllerUtils.KEYBOARD
 import com.micewine.emu.controller.ControllerUtils.MOUSE
 import com.micewine.emu.controller.ControllerUtils.handleAxis
@@ -32,13 +42,11 @@ class OverlayView @JvmOverloads constructor(
         textAlign = Paint.Align.CENTER
         isFakeBoldText = true
     }
-
     private val buttonPaint: Paint = Paint().apply {
         strokeWidth = 8F
         color = Color.WHITE
         style = Paint.Style.STROKE
     }
-
     private val textPaint: Paint = Paint().apply {
         color = Color.WHITE
         textAlign = Paint.Align.CENTER
@@ -47,6 +55,10 @@ class OverlayView @JvmOverloads constructor(
 
     private var lorieView: LorieView = LorieView(context)
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val dpadUp: Path = Path()
+    private val dpadDown: Path = Path()
+    private val dpadLeft: Path = Path()
+    private val dpadRight: Path = Path()
 
     fun loadPreset(name: String?) {
         var mapping = getMapping(name ?: preferences.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, "default")!!)
@@ -55,6 +67,7 @@ class OverlayView @JvmOverloads constructor(
 
         buttonList.clear()
         analogList.clear()
+        dpadList.clear()
 
         mapping?.buttons?.forEach {
             when (it.keyName) {
@@ -81,7 +94,6 @@ class OverlayView @JvmOverloads constructor(
 
             buttonList.add(it)
         }
-
         mapping?.analogs?.forEach {
             it.upKeyCodes = getXKeyScanCodes(it.upKeyName)
             it.downKeyCodes = getXKeyScanCodes(it.downKeyName)
@@ -90,6 +102,22 @@ class OverlayView @JvmOverloads constructor(
 
             analogList.add(it)
         }
+        mapping?.dpads?.forEach {
+            it.upKeyCodes = getXKeyScanCodes(it.upKeyName)
+            it.downKeyCodes = getXKeyScanCodes(it.downKeyName)
+            it.leftKeyCodes = getXKeyScanCodes(it.leftKeyName)
+            it.rightKeyCodes = getXKeyScanCodes(it.rightKeyName)
+
+            dpadList.add(it)
+        }
+    }
+
+    private fun drawDPad(path: Path, pressed: Boolean, canvas: Canvas) {
+        buttonPaint.color = if (pressed) Color.GRAY else Color.WHITE
+        buttonPaint.alpha = 150
+        textPaint.color = buttonPaint.color
+
+        canvas.drawPath(path, buttonPaint)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -101,11 +129,34 @@ class OverlayView @JvmOverloads constructor(
 
             textPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
 
-            canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
             paint.textSize = it.radius / 4
+
+            when (it.shape) {
+                SHAPE_CIRCLE -> {
+                    canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
+                }
+                SHAPE_SQUARE -> {
+                    canvas.drawRect(
+                        it.x - it.radius / 2,
+                        it.y - it.radius / 2,
+                        it.x + it.radius / 2,
+                        it.y + it.radius / 2,
+                        buttonPaint
+                    )
+                }
+                SHAPE_RECTANGLE -> {
+                    canvas.drawRect(
+                        it.x - it.radius / 2,
+                        it.y - it.radius / 4,
+                        it.x + it.radius / 2,
+                        it.y + it.radius / 4,
+                        buttonPaint
+                    )
+                }
+            }
+
             canvas.drawText(it.keyName, it.x, it.y + 10, textPaint)
         }
-
         analogList.forEach {
             paint.color = if (it.isPressed) Color.GRAY else Color.WHITE
             buttonPaint.color = if (it.isPressed) Color.GRAY else Color.WHITE
@@ -129,6 +180,65 @@ class OverlayView @JvmOverloads constructor(
 
             canvas.drawCircle(analogX, analogY, it.radius / 4, paint)
         }
+        dpadList.forEach {
+            canvas.apply {
+                dpadLeft.apply {
+                    reset()
+                    moveTo(it.x - 20, it.y)
+                    lineTo(it.x - 20 - it.radius / 4, it.y - it.radius / 4)
+                    lineTo(it.x - 20 - it.radius / 4 - it.radius / 2, it.y - it.radius / 4)
+                    lineTo(it.x - 20 - it.radius / 4 - it.radius / 2, it.y - it.radius / 4 + it.radius / 2)
+                    lineTo(it.x - 20 - it.radius / 4, it.y - it.radius / 4 + it.radius / 2)
+                    lineTo(it.x - 20, it.y)
+                    close()
+                }
+
+                dpadUp.apply {
+                    reset()
+                    moveTo(it.x, it.y - 20)
+                    lineTo(it.x - it.radius / 4, it.y - 20 - it.radius / 4)
+                    lineTo(it.x - it.radius / 4, it.y - 20 - it.radius / 4 - it.radius / 2)
+                    lineTo(it.x - it.radius / 4 + it.radius / 2, it.y - 20 - it.radius / 4 - it.radius / 2)
+                    lineTo(it.x - it.radius / 4 + it.radius / 2, it.y - 20 - it.radius / 4)
+                    lineTo(it.x, it.y - 20)
+                    close()
+                }
+
+                dpadRight.apply {
+                    reset()
+                    moveTo(it.x + 20, it.y)
+                    lineTo(it.x + 20 + it.radius / 4, it.y - it.radius / 4)
+                    lineTo(it.x + 20 + it.radius / 4 + it.radius / 2, it.y - it.radius / 4)
+                    lineTo(it.x + 20 + it.radius / 4 + it.radius / 2, it.y - it.radius / 4 + it.radius / 2)
+                    lineTo(it.x + 20 + it.radius / 4, it.y - it.radius / 4 + it.radius / 2)
+                    lineTo(it.x + 20, it.y)
+                    close()
+                }
+
+                dpadDown.apply {
+                    reset()
+                    moveTo(it.x, it.y + 20)
+                    lineTo(it.x - it.radius / 4, it.y + 20 + it.radius / 4)
+                    lineTo(it.x - it.radius / 4, it.y + 20 + it.radius / 4 + it.radius / 2)
+                    lineTo(it.x - it.radius / 4 + it.radius / 2, it.y + 20 + it.radius / 4 + it.radius / 2)
+                    lineTo(it.x - it.radius / 4 + it.radius / 2, it.y + 20 + it.radius / 4)
+                    lineTo(it.x, it.y + 20)
+                    close()
+                }
+
+                drawDPad(dpadUp, it.dpadStatus in listOf(DPAD_UP, DPAD_RIGHT_UP, DPAD_LEFT_UP), canvas)
+                drawText(it.upKeyName, it.x, it.y - it.radius / 2, textPaint)
+
+                drawDPad(dpadDown, it.dpadStatus in listOf(DPAD_DOWN, DPAD_RIGHT_DOWN, DPAD_LEFT_DOWN), canvas)
+                drawText(it.downKeyName, it.x, it.y + it.radius / 2 + 20, textPaint)
+
+                drawDPad(dpadLeft, it.dpadStatus in listOf(DPAD_LEFT, DPAD_LEFT_DOWN, DPAD_LEFT_UP), canvas)
+                drawText(it.leftKeyName, it.x - it.radius / 2 - 20, it.y + 10, textPaint)
+
+                drawDPad(dpadRight, it.dpadStatus in listOf(DPAD_RIGHT, DPAD_RIGHT_DOWN, DPAD_RIGHT_UP), canvas)
+                drawText(it.rightKeyName, it.x + it.radius / 2 + 20, it.y + 10, textPaint)
+            }
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -136,7 +246,7 @@ class OverlayView @JvmOverloads constructor(
         when (event.actionMasked) {
             MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_DOWN -> {
                 buttonList.forEach {
-                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
                         it.isPressed = true
                         it.fingerId = event.actionIndex
 
@@ -145,9 +255,8 @@ class OverlayView @JvmOverloads constructor(
                         return@forEach
                     }
                 }
-
                 analogList.forEach {
-                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_CIRCLE)) {
                         val posX = event.getX(event.actionIndex) - it.x
                         val posY = event.getY(event.actionIndex) - it.y
 
@@ -159,7 +268,39 @@ class OverlayView @JvmOverloads constructor(
                         it.fingerX = posX
                         it.fingerY = posY
 
-                        virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), it.upKeyCodes!!, it.downKeyCodes!!, it.leftKeyCodes!!, it.rightKeyCodes!!, it.deadZone)
+                        virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4),
+                            it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes, it.deadZone)
+
+                        return@forEach
+                    }
+                }
+                dpadList.forEach {
+                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_DPAD)) {
+                        val posX = event.getX(event.actionIndex) - it.x
+                        val posY = event.getY(event.actionIndex) - it.y
+
+                        it.fingerX = posX
+                        it.fingerY = posY
+                        it.isPressed = true
+                        it.fingerId = event.actionIndex
+
+                        it.fingerX = posX
+                        it.fingerY = posY
+
+                        when {
+                            (posX / it.radius > 0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = DPAD_RIGHT
+                            (posX / it.radius < -0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT
+                            (posY / it.radius > 0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DPAD_DOWN
+                            (posY / it.radius < -0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DPAD_UP
+                            (posX / it.radius > 0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_RIGHT_DOWN
+                            (posX / it.radius > 0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_RIGHT_UP
+                            (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT_DOWN
+                            (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_LEFT_UP
+
+                            else -> it.dpadStatus = -1
+                        }
+
+                        virtualAxis(posX / it.radius, posY / it.radius, it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes, 0.25F)
 
                         return@forEach
                     }
@@ -180,7 +321,6 @@ class OverlayView @JvmOverloads constructor(
                             isFingerPressingButton = true
                         }
                     }
-
                     analogList.forEach {
                         if (it.isPressed && it.fingerId == i) {
                             val posX = event.getX(i) - it.x
@@ -189,9 +329,35 @@ class OverlayView @JvmOverloads constructor(
                             it.fingerX = posX
                             it.fingerY = posY
 
-                            virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), it.upKeyCodes!!, it.downKeyCodes!!, it.leftKeyCodes!!, it.rightKeyCodes!!, it.deadZone)
+                            virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes, it.deadZone)
 
                             isFingerPressingButton = true
+                        }
+                    }
+                    dpadList.forEach {
+                        if (it.isPressed && it.fingerId == i) {
+                            val posX = event.getX(i) - it.x
+                            val posY = event.getY(i) - it.y
+
+                            it.fingerX = posX
+                            it.fingerY = posY
+
+                            isFingerPressingButton = true
+
+                            when {
+                                (posX / it.radius > 0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = DPAD_RIGHT
+                                (posX / it.radius < -0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT
+                                (posY / it.radius > 0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DPAD_DOWN
+                                (posY / it.radius < -0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DPAD_UP
+                                (posX / it.radius > 0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_RIGHT_DOWN
+                                (posX / it.radius > 0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_RIGHT_UP
+                                (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT_DOWN
+                                (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_LEFT_UP
+
+                                else -> it.dpadStatus = -1
+                            }
+
+                            virtualAxis(posX / it.radius, posY / it.radius, it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes, 0.25F)
                         }
                     }
 
@@ -215,11 +381,10 @@ class OverlayView @JvmOverloads constructor(
                     if (it.fingerId == event.actionIndex) {
                         it.fingerId = -1
                     }
-                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
                         handleButton(it, false)
                     }
                 }
-
                 analogList.forEach {
                     if (it.fingerId == event.actionIndex) {
                         it.fingerId = -1
@@ -228,7 +393,19 @@ class OverlayView @JvmOverloads constructor(
 
                         it.isPressed = false
 
-                        virtualAxis(0F, 0F, it.upKeyCodes!!, it.downKeyCodes!!, it.leftKeyCodes!!, it.rightKeyCodes!!, it.deadZone)
+                        virtualAxis(0F, 0F, it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes, it.deadZone)
+                    }
+                }
+                dpadList.forEach {
+                    if (it.fingerId == event.actionIndex) {
+                        it.fingerId = -1
+                        it.fingerX = 0F
+                        it.fingerY = 0F
+
+                        it.isPressed = false
+                        it.dpadStatus = -1
+
+                        virtualAxis(0F, 0F, it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes, 0.25F)
                     }
                 }
 
@@ -240,13 +417,20 @@ class OverlayView @JvmOverloads constructor(
                     it.fingerId = -1
                     handleButton(it, false)
                 }
-
                 analogList.forEach {
                     it.fingerX = 0F
                     it.fingerY = 0F
                     it.isPressed = false
 
-                    virtualAxis(0F, 0F, it.upKeyCodes!!, it.downKeyCodes!!, it.leftKeyCodes!!, it.rightKeyCodes!!, it.deadZone)
+                    virtualAxis(0F, 0F, it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes, it.deadZone)
+                }
+                dpadList.forEach {
+                    it.fingerX = 0F
+                    it.fingerY = 0F
+                    it.isPressed = false
+                    it.dpadStatus = -1
+
+                    virtualAxis(0F, 0F, it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes, 0.25F)
                 }
 
                 invalidate()
@@ -257,7 +441,7 @@ class OverlayView @JvmOverloads constructor(
     }
 
     private fun virtualAxis(axisX: Float, axisY: Float, upKeyCodes: List<Int>, downKeyCodes: List<Int>, leftKeyCodes: List<Int>, rightKeyCodes: List<Int>, deadZone: Float) {
-        handleAxis(lorieView, axisX, axisY, axisX < deadZone && axisX > -deadZone, axisY < deadZone && axisY > -deadZone, rightKeyCodes, leftKeyCodes, downKeyCodes, upKeyCodes, deadZone)
+        handleAxis(axisX, axisY, ControllerUtils.Analog(false, upKeyCodes, downKeyCodes, leftKeyCodes, rightKeyCodes), deadZone)
     }
 
     private fun handleButton(button: VirtualButton, pressed: Boolean) {
@@ -277,7 +461,28 @@ class OverlayView @JvmOverloads constructor(
         var keyName: String,
         var keyCodes: List<Int>?,
         var fingerId: Int,
-        var isPressed: Boolean
+        var isPressed: Boolean,
+        var shape: Int
+    )
+
+    class VirtualDPad(
+        var id: Int,
+        var x: Float,
+        var y: Float,
+        var radius: Float,
+        var upKeyName: String,
+        var upKeyCodes: List<Int>,
+        var downKeyName: String,
+        var downKeyCodes: List<Int>,
+        var leftKeyName: String,
+        var leftKeyCodes: List<Int>,
+        var rightKeyName: String,
+        var rightKeyCodes: List<Int>,
+        var fingerId: Int,
+        var isPressed: Boolean,
+        var fingerX: Float,
+        var fingerY: Float,
+        var dpadStatus: Int
     )
 
     class VirtualAnalog(
@@ -288,25 +493,43 @@ class OverlayView @JvmOverloads constructor(
         var fingerY: Float,
         var radius: Float,
         var upKeyName: String,
-        var upKeyCodes: List<Int>?,
+        var upKeyCodes: List<Int>,
         var downKeyName: String,
-        var downKeyCodes: List<Int>?,
+        var downKeyCodes: List<Int>,
         var leftKeyName: String,
-        var leftKeyCodes: List<Int>?,
+        var leftKeyCodes: List<Int>,
         var rightKeyName: String,
-        var rightKeyCodes: List<Int>?,
+        var rightKeyCodes: List<Int>,
         var isPressed: Boolean,
         var fingerId: Int,
         var deadZone: Float
     )
 
     companion object {
+        const val SHAPE_CIRCLE = 0
+        const val SHAPE_SQUARE = 1
+        const val SHAPE_RECTANGLE = 2
+        const val SHAPE_DPAD = 3
+
         val buttonList = mutableListOf<VirtualButton>()
         val analogList = mutableListOf<VirtualAnalog>()
+        val dpadList = mutableListOf<VirtualDPad>()
 
-        fun detectClick(event: MotionEvent, index: Int, x: Float, y: Float, radius: Float): Boolean {
-            return (event.getX(index) >= x - radius / 2 && event.getX(index) <= (x + (radius / 2))) &&
-                    (event.getY(index) >= y - radius / 2 && event.getY(index) <= (y + (radius / 2)))
+        fun detectClick(event: MotionEvent, index: Int, x: Float, y: Float, radius: Float, shape: Int): Boolean {
+            return when (shape) {
+                SHAPE_RECTANGLE -> {
+                    (event.getX(index) >= x - radius / 2 && event.getX(index) <= (x + (radius / 2))) &&
+                            (event.getY(index) >= y - radius / 4 && event.getY(index) <= (y + (radius / 4)))
+                }
+
+                SHAPE_DPAD -> {
+                    (event.getX(index) >= x - radius - 20 && event.getX(index) <= (x + (radius - 20))) &&
+                            (event.getY(index) >= y - radius - 20 && event.getY(index) <= (y + (radius - 20)))
+                }
+
+                else -> (event.getX(index) >= x - radius / 2 && event.getX(index) <= (x + (radius / 2))) &&
+                        (event.getY(index) >= y - radius / 2 && event.getY(index) <= (y + (radius / 2)))
+            }
         }
     }
 }

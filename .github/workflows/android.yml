@@ -2,11 +2,9 @@ name: Android CI
 
 on:
   push:
-    branches: [ "master" ]
     paths-ignore:
       - '**.md'
   pull_request:
-    branches: [ "master" ]
     paths-ignore:
       - '**.md'
 
@@ -16,22 +14,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Clone repository
+    - name: "Clone repository"
       uses: actions/checkout@v4
       with:
         submodules: recursive
         
-    - name: set up JDK 17
+    - name: "set up JDK 17"
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
 
-    - name: Grant execute permission for gradlew
+    - name: "Get Branch Name"
+      run: echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+    - name: "Grant execute permission for gradlew"
       run: chmod +x gradlew
-    - name: Build with Gradle
+
+    - name: "Build Release"
+      if: env.BRANCH == 'master' && github.event_name != 'pull_request'
+      run: ./gradlew assembleRelease
+
+    - name: "Build Debug"
+      if: env.BRANCH != 'master' || github.event_name == 'pull_request'
       run: ./gradlew assembleDebug
+
+    - name: "Get Keystore for Signing"
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64_MICEWINE }}" | base64 -d > micewine-key.jks
+
+    - name: "Sign APK (Release)"
+      if: env.BRANCH == 'master' && github.event_name != 'pull_request'
+      run: |
+        $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks micewine-key.jks --ks-key-alias ${{ secrets.KEYSTORE_ALIAS }} --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} --out app-release.apk app/build/outputs/apk/debug/app-release.apk 
+
+    
+    - name: "Sign APK (Debug)"
+      if: env.BRANCH != 'master' || github.event_name == 'pull_request'
+      run: |
+        $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks micewine-key.jks --ks-key-alias ${{ secrets.KEYSTORE_ALIAS }} --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} --out app-debug.apk app/build/outputs/apk/debug/app-debug.apk 
 
     - name: "Get Short SHA"
       run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
@@ -40,10 +62,17 @@ jobs:
       run: echo "VERSION=$(echo $(cat app/build.gradle.kts | grep versionName | cut -d "=" -f 2 | sed "s/\"//g"))" >> $GITHUB_ENV
           
     - name: "Create Release"
+      if: env.BRANCH == 'master' && github.event_name != 'pull_request'
       uses: softprops/action-gh-release@v2
       with:
-        name: "MiceWine Application ${{ env.VERSION }}-(git-${{ env.SHORT_SHA }})"
+        name: "MiceWine Application (${{ env.VERSION }})"
         tag_name: ${{ env.SHORT_SHA }}
-        prerelease: true
-        files: ./app/build/outputs/apk/debug/app-debug.apk
+        prerelease: false
+        files: ./app-release.apk
     
+    - name: "Upload Artifact"
+      if: env.BRANCH != 'master' || github.event_name == 'pull_request'
+      uses: actions/upload-artifact@v4
+      with:
+        name: MiceWine-Application-(git-${{ env.SHORT_SHA }})
+        path: ./app-debug.apk

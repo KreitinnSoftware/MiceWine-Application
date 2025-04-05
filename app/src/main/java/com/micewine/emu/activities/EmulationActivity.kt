@@ -3,8 +3,6 @@ package com.micewine.emu.activities
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -29,13 +27,11 @@ import android.view.Window
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
-import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -43,7 +39,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.button.MaterialButton
@@ -58,6 +53,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANG
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.FPS_LIMIT
 import com.micewine.emu.activities.MainActivity.Companion.enableCpuCounter
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
+import com.micewine.emu.activities.MainActivity.Companion.enableXInput
 import com.micewine.emu.activities.MainActivity.Companion.getCpuInfo
 import com.micewine.emu.activities.MainActivity.Companion.getMemoryInfo
 import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
@@ -66,17 +62,23 @@ import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUD
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
+import com.micewine.emu.controller.ControllerUtils
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.connectController
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.disconnectController
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.gamePadServerRunning
 import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
-import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
+import com.micewine.emu.fragments.LogViewerFragment
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerXInput
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.TouchInputHandler
 import com.micewine.emu.views.OverlayView
+import com.micewine.emu.views.XInputOverlayView
+import com.micewine.emu.views.XInputOverlayView.Companion.virtualXInputControllerId
 import kotlinx.coroutines.launch
 
 @SuppressLint("ApplySharedPref")
@@ -111,6 +113,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     private var drawerLayout: DrawerLayout? = null
     private var logsNavigationView: NavigationView? = null
     private var overlayView: OverlayView? = null
+    private var xInputOverlayView: XInputOverlayView? = null
 
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,10 +137,14 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
         }
 
-        prepareButtonsAxisValues(this, getControllerPreset(selectedGameName))
+        prepareButtonsAxisValues()
+
+        if (!gamePadServerRunning) {
+            ControllerUtils.GamePadServer().startServer()
+        }
 
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
-        val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        val imManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
         window.setFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, 0)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -148,39 +155,16 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         logsNavigationView = findViewById(R.id.NavigationViewLogs)
 
-        val headerView: View = logsNavigationView!!.getHeaderView(0)
-
-        val observer: Observer<String>
-        val logTextView = headerView.findViewById<TextView>(R.id.logsTextView)
-        val scrollView = headerView.findViewById<ScrollView>(R.id.scrollView)
-        val closeButton = headerView.findViewById<MaterialButton>(R.id.closeButton)
-        val copyButton = headerView.findViewById<MaterialButton>(R.id.copyButton)
-        val clipboard: ClipboardManager? = ContextCompat.getSystemService(this, ClipboardManager::class.java)
-
-        observer = Observer { out: String? ->
-            if (out != null) {
-                logTextView.append("$out")
-                scrollView.fullScroll(ScrollView.FOCUS_UP)
-            }
-        }
-
-        sharedLogs?.logsTextHead?.observe(this, observer)
-
-        scrollView.fullScroll(ScrollView.FOCUS_UP)
-
-        closeButton.setOnClickListener {
-            drawerLayout?.closeDrawers()
-        }
-
-        copyButton.setOnClickListener {
-            val clip = ClipData.newPlainText("MiceWine Logs", logTextView.text)
-            clipboard?.setPrimaryClip(clip)
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.logViewerContent, LogViewerFragment())
+            commit()
         }
 
         val lorieView = findViewById<LorieView>(R.id.lorieView)
         val lorieParent = lorieView.parent as View
 
         overlayView = findViewById(R.id.overlayView)
+        xInputOverlayView = findViewById(R.id.xInputOverlayView)
 
         if (selectedGameName == getString(R.string.desktop_mode_init)) {
             overlayView?.loadPreset(null)
@@ -189,24 +173,19 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
 
         overlayView?.visibility = View.INVISIBLE
-
-        lifecycleScope.launch {
-            controllerMouseEmulation(lorieView)
-        }
+        xInputOverlayView?.visibility = View.INVISIBLE
 
         val headerViewMain: View = findViewById<NavigationView>(R.id.NavigationView).getHeaderView(0).apply {
             findViewById<MaterialButton>(R.id.exitButton).setOnClickListener {
                 runCommand("pkill -9 wine")
                 runCommand("pkill -9 .exe")
 
-                logTextView.text = ""
-
                 finishAffinity()
             }
 
             findViewById<MaterialButton>(R.id.openKeyboardButton).setOnClickListener {
                 @Suppress("DEPRECATION")
-                inputManager.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
+                imManager.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
 
                 lorieView.requestFocus()
 
@@ -241,13 +220,27 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
 
             findViewById<MaterialSwitch>(R.id.openCloseOverlaySwitch).apply {
-                isChecked = overlayView?.isVisible!!
+                isChecked = if (enableXInput) {
+                    xInputOverlayView?.isVisible!!
+                } else {
+                    overlayView?.isVisible!!
+                }
 
                 setOnClickListener {
-                    if (overlayView?.isVisible!!) {
-                        overlayView?.visibility = View.INVISIBLE
+                    if (getVirtualControllerXInput(selectedGameName)) {
+                        if (xInputOverlayView?.isVisible!!) {
+                            xInputOverlayView?.visibility = View.INVISIBLE
+                            disconnectController(virtualXInputControllerId)
+                        } else {
+                            xInputOverlayView?.visibility = View.VISIBLE
+                            virtualXInputControllerId = connectController()
+                        }
                     } else {
-                        overlayView?.visibility = View.VISIBLE
+                        if (overlayView?.isVisible!!) {
+                            overlayView?.visibility = View.INVISIBLE
+                        } else {
+                            overlayView?.visibility = View.VISIBLE
+                        }
                     }
                 }
             }
@@ -260,6 +253,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             findViewById<MaterialButton>(R.id.editVirtualControllerMapping).setOnClickListener {
                 val intent = Intent(context, PresetManagerActivity::class.java).apply {
                     putExtra("presetType", VIRTUAL_CONTROLLER)
+                    putExtra("editShortcut", true)
                 }
                 startActivity(intent)
             }
@@ -267,6 +261,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             findViewById<MaterialButton>(R.id.editControllerMapping).setOnClickListener {
                 val intent = Intent(context, PresetManagerActivity::class.java).apply {
                     putExtra("presetType", PHYSICAL_CONTROLLER)
+                    putExtra("editShortcut", true)
                 }
                 startActivity(intent)
             }
@@ -321,7 +316,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                         }
                     }
 
-                    inputManager.hideSoftInputFromWindow(window.decorView.windowToken, 0)
+                    imManager.hideSoftInputFromWindow(window.decorView.windowToken, 0)
 
                     return@OnKeyListener true
                 }
@@ -336,7 +331,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                         drawerLayout?.closeDrawers()
                     }
 
-                    inputManager.hideSoftInputFromWindow(window.decorView.windowToken, 0)
+                    imManager.hideSoftInputFromWindow(window.decorView.windowToken, 0)
                 }
             } else if (k == KeyEvent.KEYCODE_VOLUME_DOWN) {
                 audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
@@ -346,7 +341,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 return@OnKeyListener true
             }
 
-            checkControllerButtons(lorieView, e)
+            checkControllerButtons(e)
             mInputHandler!!.sendKeyEvent(e)
         }
 
@@ -370,7 +365,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                             drawerLayout?.closeDrawers()
                         }
 
-                        inputManager.hideSoftInputFromWindow(window.decorView.windowToken, 0)
+                        imManager.hideSoftInputFromWindow(window.decorView.windowToken, 0)
 
                         return@setOnTouchListener true
                     }
@@ -427,6 +422,12 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
         })
 
+        lorieView.setOnFocusChangeListener { _, _ ->
+            if (!lorieView.isInLayout) {
+                lorieView.requestLayout()
+            }
+        }
+
         registerReceiver(receiver, object : IntentFilter() {
             init {
                 addAction(ACTION_START)
@@ -457,11 +458,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
-        checkControllerAxis(lorieView!!, event!!)
+        checkControllerAxis(event!!)
 
         return true
     }
-
 
     override fun onDestroy() {
         unregisterReceiver(receiver)
@@ -553,13 +553,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         lorieView!!.requestFocus()
         lorieView!!.requestLayout()
 
-        if (selectedGameName == getString(R.string.desktop_mode_init)) {
-            overlayView?.loadPreset(null)
-        } else {
-            overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
-        }
+        overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
 
-        prepareButtonsAxisValues(this, getControllerPreset(selectedGameName))
+        prepareButtonsAxisValues()
     }
 
     public override fun onPause() {
@@ -602,9 +598,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         lorieView?.requestFocus()
     }
 
-    /** @noinspection NullableProblems
-     */
-    @SuppressLint("WrongConstant")
     override fun onApplyWindowInsets(v: View, insets: WindowInsets): WindowInsets {
         handler.postDelayed({ lorieView!!.triggerCallback() }, 100)
         return insets

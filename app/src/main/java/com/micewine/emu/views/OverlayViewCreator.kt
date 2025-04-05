@@ -7,12 +7,14 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.drawable.VectorDrawable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.getNativeResolution
 import com.micewine.emu.activities.VirtualControllerOverlayMapper.Companion.ACTION_EDIT_VIRTUAL_BUTTON
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogDownKeyName
@@ -21,11 +23,17 @@ import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAn
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogUpKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonRadius
+import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonShape
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getMapping
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.putMapping
+import com.micewine.emu.views.OverlayView.Companion.SHAPE_CIRCLE
+import com.micewine.emu.views.OverlayView.Companion.SHAPE_RECTANGLE
+import com.micewine.emu.views.OverlayView.Companion.SHAPE_SQUARE
 import com.micewine.emu.views.OverlayView.Companion.analogList
 import com.micewine.emu.views.OverlayView.Companion.buttonList
 import com.micewine.emu.views.OverlayView.Companion.detectClick
+import com.micewine.emu.views.OverlayView.Companion.dpadList
+import kotlin.math.roundToInt
 
 class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0): View(context, attrs, defStyleAttr) {
     private val editButton: CircleButton = CircleButton(0F, 0F, 150F)
@@ -64,28 +72,43 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
         textSize = 40F
     }
 
+    private val gridPaint = Paint().apply {
+        color = Color.BLACK
+        strokeWidth = 10F
+        isAntiAlias = true
+        alpha = 200
+    }
+
     private var selectedButton = 0
     private var selectedVAxis = 0
+    private var selectedDPad = 0
+    private val dpadUp: Path = Path()
+    private val dpadDown: Path = Path()
+    private val dpadLeft: Path = Path()
+    private val dpadRight: Path = Path()
 
     private fun loadFromPreferences() {
         val mapping = getMapping(clickedPresetName)
 
         buttonList.clear()
         analogList.clear()
+        dpadList.clear()
 
         mapping?.buttons?.forEach {
             buttonList.add(it)
         }
-
         mapping?.analogs?.forEach {
             analogList.add(it)
+        }
+        mapping?.dpads?.forEach {
+            dpadList.add(it)
         }
 
         reorderButtonsAnalogsIDs()
     }
 
     fun saveOnPreferences() {
-        putMapping(clickedPresetName, buttonList, analogList)
+        putMapping(clickedPresetName, getNativeResolution(context), buttonList, analogList, dpadList)
     }
 
     init {
@@ -102,15 +125,49 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+        for (i in 0..width) {
+            if (i % GRID_SIZE == 0) {
+                canvas.drawLine(i.toFloat(), 0F, i.toFloat(), height.toFloat(), gridPaint)
+            }
+        }
+
+        for (i in 0..height) {
+            if (i % GRID_SIZE == 0) {
+                canvas.drawLine(0F, i.toFloat(), width.toFloat(), i.toFloat(), gridPaint)
+            }
+        }
+
         buttonList.forEach {
             buttonPaint.color = if (lastSelectedButton == it.id && lastSelectedType == BUTTON) Color.GRAY else Color.WHITE
             textPaint.color = buttonPaint.color
 
             buttonPaint.alpha = 220
 
-            canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
-
             paint.textSize = it.radius / 4
+
+            when (it.shape) {
+                SHAPE_CIRCLE -> {
+                    canvas.drawCircle(it.x, it.y, it.radius / 2, buttonPaint)
+                }
+                SHAPE_SQUARE -> {
+                    canvas.drawRect(
+                        it.x - it.radius / 2,
+                        it.y - it.radius / 2,
+                        it.x + it.radius / 2,
+                        it.y + it.radius / 2,
+                        buttonPaint
+                    )
+                }
+                SHAPE_RECTANGLE -> {
+                    canvas.drawRect(
+                        it.x - it.radius / 2,
+                        it.y - it.radius / 4,
+                        it.x + it.radius / 2,
+                        it.y + it.radius / 4,
+                        buttonPaint
+                    )
+                }
+            }
 
             drawText(it.keyName, it.x, it.y + 10, canvas)
         }
@@ -142,6 +199,70 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                 drawBitmap(removeIcon, removeButton.x - removeButton.radius / 4, removeButton.y - removeButton.radius / 4, whitePaint)
             }
         }
+
+        dpadList.forEach {
+            buttonPaint.color = if (lastSelectedButton == it.id && lastSelectedType == DPAD) Color.GRAY else Color.WHITE
+            whitePaint.color = buttonPaint.color
+
+            whitePaint.alpha = 220
+            buttonPaint.alpha = 220
+
+            canvas.apply {
+                dpadLeft.apply {
+                    reset()
+                    moveTo(it.x - 20, it.y)
+                    lineTo(it.x - 20 - it.radius / 4, it.y - it.radius / 4)
+                    lineTo(it.x - 20 - it.radius / 4 - it.radius / 2, it.y - it.radius / 4)
+                    lineTo(it.x - 20 - it.radius / 4 - it.radius / 2, it.y - it.radius / 4 + it.radius / 2)
+                    lineTo(it.x - 20 - it.radius / 4, it.y - it.radius / 4 + it.radius / 2)
+                    lineTo(it.x - 20, it.y)
+                    close()
+                }
+
+                dpadUp.apply {
+                    reset()
+                    moveTo(it.x, it.y - 20)
+                    lineTo(it.x - it.radius / 4, it.y - 20 - it.radius / 4)
+                    lineTo(it.x - it.radius / 4, it.y - 20 - it.radius / 4 - it.radius / 2)
+                    lineTo(it.x - it.radius / 4 + it.radius / 2, it.y - 20 - it.radius / 4 - it.radius / 2)
+                    lineTo(it.x - it.radius / 4 + it.radius / 2, it.y - 20 - it.radius / 4)
+                    lineTo(it.x, it.y - 20)
+                    close()
+                }
+
+                dpadRight.apply {
+                    reset()
+                    moveTo(it.x + 20, it.y)
+                    lineTo(it.x + 20 + it.radius / 4, it.y - it.radius / 4)
+                    lineTo(it.x + 20 + it.radius / 4 + it.radius / 2, it.y - it.radius / 4)
+                    lineTo(it.x + 20 + it.radius / 4 + it.radius / 2, it.y - it.radius / 4 + it.radius / 2)
+                    lineTo(it.x + 20 + it.radius / 4, it.y - it.radius / 4 + it.radius / 2)
+                    lineTo(it.x + 20, it.y)
+                    close()
+                }
+
+                dpadDown.apply {
+                    reset()
+                    moveTo(it.x, it.y + 20)
+                    lineTo(it.x - it.radius / 4, it.y + 20 + it.radius / 4)
+                    lineTo(it.x - it.radius / 4, it.y + 20 + it.radius / 4 + it.radius / 2)
+                    lineTo(it.x - it.radius / 4 + it.radius / 2, it.y + 20 + it.radius / 4 + it.radius / 2)
+                    lineTo(it.x - it.radius / 4 + it.radius / 2, it.y + 20 + it.radius / 4)
+                    lineTo(it.x, it.y + 20)
+                    close()
+                }
+
+                drawPath(dpadLeft, buttonPaint)
+                drawPath(dpadRight, buttonPaint)
+                drawPath(dpadUp, buttonPaint)
+                drawPath(dpadDown, buttonPaint)
+
+                drawText(it.upKeyName, it.x, it.y - it.radius / 2, canvas)
+                drawText(it.downKeyName, it.x, it.y + it.radius / 2 + 20, canvas)
+                drawText(it.leftKeyName, it.x - it.radius / 2 - 20, it.y + 10, canvas)
+                drawText(it.rightKeyName, it.x + it.radius / 2 + 20, it.y + 10, canvas)
+            }
+        }
     }
 
     fun addButton(buttonData: OverlayView.VirtualButton) {
@@ -154,13 +275,20 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
         invalidate()
     }
 
+    fun addDPad(buttonData: OverlayView.VirtualDPad) {
+        dpadList.add(buttonData)
+        invalidate()
+    }
+
     private fun reorderButtonsAnalogsIDs() {
         buttonList.forEachIndexed { i, button ->
             button.id = i + 1
         }
-
         analogList.forEachIndexed { i, analog ->
             analog.id = i + 1
+        }
+        dpadList.forEachIndexed { i, virtualDPad ->
+            virtualDPad.id = i + 1
         }
     }
 
@@ -168,12 +296,12 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     override fun onTouchEvent(event: MotionEvent): Boolean {
          when (event.actionMasked) {
              MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
-                 if (!detectClick(event, event.actionIndex, editButton.x, editButton.y, editButton.radius) && !detectClick(event, event.actionIndex, removeButton.x, removeButton.y, removeButton.radius)) {
+                 if (!detectClick(event, event.actionIndex, editButton.x, editButton.y, editButton.radius, SHAPE_CIRCLE) && !detectClick(event, event.actionIndex, removeButton.x, removeButton.y, removeButton.radius, SHAPE_CIRCLE)) {
                      lastSelectedButton = 0
                  }
 
                  buttonList.forEach {
-                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
                          if (selectedButton == 0) {
                              selectedButton = it.id
                              lastSelectedType = BUTTON
@@ -181,12 +309,20 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                          }
                      }
                  }
-
                  analogList.forEach {
-                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_SQUARE)) {
                          if (selectedVAxis == 0) {
                              selectedVAxis = it.id
                              lastSelectedType = ANALOG
+                             lastSelectedButton = it.id
+                         }
+                     }
+                 }
+                 dpadList.forEach {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_SQUARE)) {
+                         if (selectedDPad == 0) {
+                             selectedDPad = it.id
+                             lastSelectedType = DPAD
                              lastSelectedButton = it.id
                          }
                      }
@@ -197,26 +333,39 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
              MotionEvent.ACTION_MOVE -> {
                  buttonList.forEach {
-                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
                          if (selectedButton > 0) {
                              buttonList[buttonList.indexOfFirst { i ->
                                  i.id == selectedButton
                              }].apply {
-                                 x = event.getX(event.actionIndex)
-                                 y = event.getY(event.actionIndex)
+                                 x = (event.getX(event.actionIndex) / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
+                                 y = (event.getY(event.actionIndex) / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
                              }
                          }
                      }
                  }
 
                  analogList.forEach {
-                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_CIRCLE)) {
                          if (selectedVAxis > 0) {
                              analogList[analogList.indexOfFirst { i ->
                                  i.id == selectedVAxis
                              }].apply {
-                                 x = event.getX(event.actionIndex)
-                                 y = event.getY(event.actionIndex)
+                                 x = (event.getX(event.actionIndex) / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
+                                 y = (event.getY(event.actionIndex) / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
+                             }
+                         }
+                     }
+                 }
+
+                 dpadList.forEach {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_SQUARE)) {
+                         if (selectedDPad > 0) {
+                             dpadList[dpadList.indexOfFirst { i ->
+                                 i.id == selectedDPad
+                             }].apply {
+                                 x = (event.getX(event.actionIndex) / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
+                                 y = (event.getY(event.actionIndex) / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
                              }
                          }
                      }
@@ -227,7 +376,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
              MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_UP -> {
                  buttonList.forEach {
-                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
                          if (selectedButton == it.id) {
                              selectedButton = 0
                          }
@@ -235,17 +384,26 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                  }
 
                  analogList.forEach {
-                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius)) {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_CIRCLE)) {
                          if (selectedVAxis == it.id) {
                              selectedVAxis = 0
                          }
                      }
                  }
 
-                 if (detectClick(event, event.actionIndex, editButton.x, editButton.y, editButton.radius) && lastSelectedButton > 0) {
+                 dpadList.forEach {
+                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_SQUARE)) {
+                         if (selectedDPad == it.id) {
+                             selectedDPad = 0
+                         }
+                     }
+                 }
+
+                 if (detectClick(event, event.actionIndex, editButton.x, editButton.y, editButton.radius, SHAPE_CIRCLE) && lastSelectedButton > 0) {
                      if (buttonList.isNotEmpty() && lastSelectedType == BUTTON) {
                          selectedButtonKeyName = buttonList[lastSelectedButton - 1].keyName
                          selectedButtonRadius = buttonList[lastSelectedButton - 1].radius.toInt()
+                         selectedButtonShape = buttonList[lastSelectedButton - 1].shape
                      }
 
                      if (analogList.isNotEmpty() && lastSelectedType == ANALOG) {
@@ -256,18 +414,30 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                          selectedButtonRadius = analogList[lastSelectedButton - 1].radius.toInt()
                      }
 
+                     if (dpadList.isNotEmpty() && lastSelectedType == DPAD) {
+                         selectedAnalogUpKeyName = dpadList[lastSelectedButton - 1].upKeyName
+                         selectedAnalogDownKeyName = dpadList[lastSelectedButton - 1].downKeyName
+                         selectedAnalogLeftKeyName = dpadList[lastSelectedButton - 1].leftKeyName
+                         selectedAnalogRightKeyName = dpadList[lastSelectedButton - 1].rightKeyName
+                         selectedButtonRadius = dpadList[lastSelectedButton - 1].radius.toInt()
+                     }
+
                      context.sendBroadcast(
                          Intent(ACTION_EDIT_VIRTUAL_BUTTON)
                      )
                  }
 
-                 if (detectClick(event, event.actionIndex, removeButton.x, removeButton.y, removeButton.radius) && lastSelectedButton > 0) {
+                 if (detectClick(event, event.actionIndex, removeButton.x, removeButton.y, removeButton.radius, SHAPE_CIRCLE) && lastSelectedButton > 0) {
                      if (buttonList.isNotEmpty() && lastSelectedType == BUTTON) {
                          buttonList.removeAt(lastSelectedButton - 1)
                      }
 
                      if (analogList.isNotEmpty() && lastSelectedType == ANALOG) {
                          analogList.removeAt(lastSelectedButton - 1)
+                     }
+
+                     if (dpadList.isNotEmpty() && lastSelectedType == DPAD) {
+                         dpadList.removeAt(lastSelectedButton - 1)
                      }
 
                      lastSelectedButton = 0
@@ -290,6 +460,8 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     companion object {
         const val BUTTON = 0
         const val ANALOG = 1
+        const val DPAD = 2
+        const val GRID_SIZE = 35
 
         var lastSelectedButton = 0
         var lastSelectedType = BUTTON

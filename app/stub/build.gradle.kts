@@ -12,7 +12,10 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        debug {
+            isMinifyEnabled = false
+        }
+        release {
             isMinifyEnabled = false
         }
     }

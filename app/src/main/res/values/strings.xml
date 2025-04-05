@@ -202,4 +202,25 @@
     <string name="sound_settings_title">Sound Settings</string>
     <string name="sound_settings_description">Manage Sound Settings</string>
     <string name="select_audio_sink">Select PulseAudio Sink</string>
+    <string name="others">Others</string>
+    <string name="enable_xinput_title">Enable XInput GamePad</string>
+    <string name="enable_wine_virtual_desktop">Enable Wine Virtual Desktop</string>
+    <string name="shape_text">Shape</string>
+    <string name="button_mapping_text">Button Mapping</string>
+    <string name="add_virtual_dpad">Add Virtual DPad</string>
+    <string name="rat_manager_title">Rat Package Manager</string>
+    <string name="rat_manager_description">Manage Installed Rat Packages</string>
+    <string name="grant_files_permission_error">Grant Files Permission for Continue</string>
+    <string name="debug_settings_title">Debug Settings</string>
+    <string name="debug_settings_description">Change Debug Settings</string>
+    <string name="wine_log_level_description">Set Wine Log Level</string>
+    <string name="rat_downloader_title">Rat Package Downloader</string>
+    <string name="rat_downloader_description">Download Rat Packages from Repository</string>
+    <string name="package_already_installed">Package Already Installed</string>
+    <string name="unknown_package_category">Unknown Package Category</string>
+    <string name="error_install_rootfs_file_manager">You cannot install RootFS after installation.</string>
+    <string name="driver_info_title">Driver Info</string>
+    <string name="driver_info_description">Get Vulkan Info for Drivers</string>
+    <string name="controller_settings">Controller Settings</string>
+    <string name="selected_box64">Selected Box64</string>
 </resources>

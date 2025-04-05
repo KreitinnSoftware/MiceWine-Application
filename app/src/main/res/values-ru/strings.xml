@@ -99,6 +99,7 @@
     <string name="controller_preset_create_text">Введите имя</string>
     <string name="remove_last_preset_error">Последний пресет не может быть удален</string>
     <string name="edit_game_icon">Изменить иконку</string>
+    <string name="edit">Редактировать</string>
     <string name="add_game_to_home">Создать ярлык в лаунчере</string>
     <string name="cancel_text">Отменить</string>
     <string name="remove_game_item_warning">Вы уверены, что хотите удалить?</string>
@@ -174,4 +175,25 @@
     <string name="sound_settings_title">Настройки звука</string>
     <string name="sound_settings_description">Управление настройками звука</string>
     <string name="select_audio_sink">Выберите аудиовыход PulseAudio</string>
+    <string name="others">Другие</string>
+    <string name="enable_xinput_title">Включить геймпад XInput</string>
+    <string name="enable_wine_virtual_desktop">Включить виртуальный рабочий стол Wine</string>
+    <string name="shape_text">Форма</string>
+    <string name="button_mapping_text">Настройка кнопок</string>
+    <string name="add_virtual_dpad">Добавить виртуальный DPad</string>
+    <string name="rat_manager_title">Менеджер пакетов Rat</string>
+    <string name="rat_manager_description">Управление установленными пакетами Rat</string>
+    <string name="grant_files_permission_error">Предоставьте разрешение на файлы, чтобы продолжить</string>
+    <string name="debug_settings_title">调试设置</string>
+    <string name="debug_settings_description">更改调试设置</string>
+    <string name="wine_log_level_description">设置 Wine 日志级别</string>
+    <string name="rat_downloader_title">Rat Загрузчик Пакетов</string>
+    <string name="rat_downloader_description">Скачать пакеты Rat из репозитория</string>
+    <string name="package_already_installed">Пакет уже установлен</string>
+    <string name="unknown_package_category">Неизвестная категория пакета</string>
+    <string name="error_install_rootfs_file_manager">Вы не можете установить RootFS после установки.</string>
+    <string name="driver_info_title">Информация о драйвере</string>
+    <string name="driver_info_description">Получить информацию о Vulkan для драйверов</string>
+    <string name="controller_settings">Настройки контроллера</string>
+    <string name="selected_box64">Выбран Box64</string>
 </resources>

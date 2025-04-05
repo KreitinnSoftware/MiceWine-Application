@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,7 +48,7 @@ import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
 import java.io.File
 import java.util.Collections
 
-class ControllerPresetManagerFragment : Fragment() {
+class ControllerPresetManagerFragment(private val editShortcut: Boolean) : Fragment() {
     private var rootView: View? = null
 
     override fun onCreateView(
@@ -60,25 +59,27 @@ class ControllerPresetManagerFragment : Fragment() {
         rootView = inflater.inflate(R.layout.fragment_general_settings, container, false)
         recyclerView = rootView?.findViewById(R.id.recyclerViewGeneralSettings)
 
-        initialize(requireContext())
+        initialize(requireContext(), editShortcut)
         setAdapter()
 
         return rootView
     }
 
     private fun setAdapter() {
-        recyclerView?.setAdapter(AdapterPreset(presetListNames, requireContext(), requireActivity().supportFragmentManager))
+        recyclerView?.setAdapter(
+            AdapterPreset(presetListNames, requireContext(), requireActivity().supportFragmentManager)
+        )
 
         presetListNames.clear()
-
-        presetList = getControllerPresets()
         presetList.forEach {
             addToAdapter(it[0], PHYSICAL_CONTROLLER, true)
         }
     }
 
     private fun addToAdapter(titleSettings: String, type: Int, userPreset: Boolean) {
-        presetListNames.add(AdapterPreset.Item(titleSettings, type, userPreset))
+        presetListNames.add(
+            AdapterPreset.Item(titleSettings, type, userPreset, editShortcut)
+        )
     }
 
     companion object {
@@ -86,6 +87,7 @@ class ControllerPresetManagerFragment : Fragment() {
         private val presetListNames: MutableList<AdapterPreset.Item> = mutableListOf()
         private var presetList: MutableList<MutableList<String>> = mutableListOf()
         private var preferences: SharedPreferences? = null
+        private var editShortcut: Boolean = false
 
         private val gson = Gson()
 
@@ -118,9 +120,10 @@ class ControllerPresetManagerFragment : Fragment() {
             MOUSE_SENSIBILITY to 26
         )
 
-        fun initialize(context: Context) {
+        fun initialize(context: Context, boolean: Boolean = false) {
             preferences = PreferenceManager.getDefaultSharedPreferences(context)
             presetList = getControllerPresets()
+            editShortcut = boolean
         }
 
         fun getMouseSensibility(name: String): Int {
@@ -204,7 +207,7 @@ class ControllerPresetManagerFragment : Fragment() {
 
             presetList.add(defaultPreset)
             presetListNames.add(
-                AdapterPreset.Item(name, PHYSICAL_CONTROLLER, true)
+                AdapterPreset.Item(name, PHYSICAL_CONTROLLER, true, editShortcut)
             )
 
             recyclerView?.adapter?.notifyItemInserted(presetListNames.size)

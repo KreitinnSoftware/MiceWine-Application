@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.micewine.emu.activities.MainActivity.Companion.adrenoToolsDriverFile
 import com.micewine.emu.activities.MainActivity.Companion.appLang
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.box64Avx
@@ -32,16 +33,17 @@ import com.micewine.emu.activities.MainActivity.Companion.box64ShowBt
 import com.micewine.emu.activities.MainActivity.Companion.box64ShowSegv
 import com.micewine.emu.activities.MainActivity.Companion.box64Sse42
 import com.micewine.emu.activities.MainActivity.Companion.enableDRI3
-import com.micewine.emu.activities.MainActivity.Companion.enableMangoHUD
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedBox64
 import com.micewine.emu.activities.MainActivity.Companion.selectedDXVKHud
+import com.micewine.emu.activities.MainActivity.Companion.selectedGLProfile
 import com.micewine.emu.activities.MainActivity.Companion.selectedMesaVkWsiPresentMode
 import com.micewine.emu.activities.MainActivity.Companion.selectedTuDebugPreset
-import com.micewine.emu.activities.MainActivity.Companion.selectedGLProfile
 import com.micewine.emu.activities.MainActivity.Companion.selectedWine
+import com.micewine.emu.activities.MainActivity.Companion.strBoolToNumStr
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
+import com.micewine.emu.activities.MainActivity.Companion.useAdrenoTools
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.activities.MainActivity.Companion.wineESync
 import com.micewine.emu.activities.MainActivity.Companion.wineLogLevel
@@ -149,6 +151,15 @@ object EnvVars {
             vars.add("WINEDEBUG=-all")
         }
 
-        vars.add("WINEESYNC=$wineESync")
+        vars.add("WINE_Z_DISK=$appRootDir")
+        vars.add("WINEESYNC=${strBoolToNumStr(wineESync)}")
+
+        if (useAdrenoTools) {
+            vars.add("USE_ADRENOTOOLS=1")
+            vars.add("ADRENOTOOLS_CUSTOM_DRIVER_DIR=${adrenoToolsDriverFile?.parent}/")
+            vars.add("ADRENOTOOLS_CUSTOM_DRIVER_NAME=${adrenoToolsDriverFile?.name}")
+            // Workaround for dlopen error (at least on my device)
+            vars.add("LD_PRELOAD=/system/lib64/libEGL.so:/system/lib64/libGLESv1_CM.so")
+        }
     }
 }

@@ -1,6 +1,5 @@
 package com.micewine.emu.fragments
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -34,14 +33,16 @@ class GeneralSettingsFragment : Fragment() {
 
         settingsList.clear()
 
-        addToAdapter(R.string.wine_settings_title, R.string.wine_settings_description, R.drawable.ic_wine)
+        addToAdapter(R.string.debug_settings_title, R.string.debug_settings_description, R.drawable.ic_settings_outline)
         addToAdapter(R.string.sound_settings_title, R.string.sound_settings_description, R.drawable.ic_sound)
-        addToAdapter(R.string.display_settings_title, R.string.display_settings_description, R.drawable.ic_display)
         addToAdapter(R.string.driver_settings_title, R.string.driver_settings_description, R.drawable.ic_gpu)
+        addToAdapter(R.string.driver_info_title, R.string.driver_info_description, R.drawable.ic_gpu)
         addToAdapter(R.string.env_settings_title, R.string.env_settings_description, R.drawable.ic_globe)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, icon: Int) {
-        settingsList.add(SettingsList(context?.getString(titleId)!!, context?.getString(descriptionId)!!, icon))
+        settingsList.add(
+            SettingsList(context?.getString(titleId)!!, context?.getString(descriptionId)!!, icon)
+        )
     }
 }
