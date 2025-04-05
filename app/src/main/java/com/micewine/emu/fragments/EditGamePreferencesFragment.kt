@@ -635,7 +635,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     putExtra("exePath", exePath?.path)
                     putExtra("exeArguments", editTextArguments.text.toString())
                     putExtra("driverName", vulkanDriversId[selectedDriverSpinner.selectedItemPosition])
-                    putExtra("box64Version", selectedBox64Spinner.selectedItem.toString())
+                    putExtra("box64Version", box64VersionsId[selectedBox64Spinner.selectedItemPosition])
                     putExtra("box64Preset", selectedBox64ProfileSpinner.selectedItem.toString())
                     putExtra("displayResolution", selectedDisplayResolutionSpinner.selectedItem.toString())
                     putExtra("virtualControllerPreset", selectedVirtualControllerProfileSpinner.selectedItem.toString())
