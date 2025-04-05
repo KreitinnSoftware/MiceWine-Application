@@ -540,7 +540,7 @@ class ShortcutsFragment : Fragment() {
         fun getBox64Version(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return ""
+            if (index == -1) return listRatPackagesId("Box64-").firstOrNull() ?: ""
 
             return gameList[index].box64Version
         }
