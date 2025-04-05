@@ -321,7 +321,7 @@ object ControllerUtils {
 
     fun checkControllerButtons(e: KeyEvent): Boolean {
         val pressed = e.action == KeyEvent.ACTION_DOWN
-        val physicalController = connectedPhysicalControllers.first { it.id == e.deviceId }
+        val physicalController = connectedPhysicalControllers.firstOrNull { it.id == e.deviceId } ?: return false
 
         when (e.keyCode) {
             KEYCODE_BUTTON_Y -> {
