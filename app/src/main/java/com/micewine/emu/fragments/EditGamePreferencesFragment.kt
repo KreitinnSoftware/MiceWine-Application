@@ -228,7 +228,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     selectedDisplayResolutionSpinner.setSelection(resolutionList.indexOf(displaySettings[1]))
 
                     temporarySettings.displayMode = selectedItem
-                    temporarySettings.displayResolution = getDisplaySettings(selectedGameName)[1]
+                    temporarySettings.displayResolution = resolutionList.first()
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -245,7 +245,6 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                 ) {
                     val selectedItem = parent?.getItemAtPosition(position).toString()
 
-                    temporarySettings.displayMode = getDisplaySettings(selectedGameName)[0]
                     temporarySettings.displayResolution = selectedItem
                 }
 
@@ -702,7 +701,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             var wineVirtualDesktop: Boolean = getWineVirtualDesktop(""),
             var cpuAffinity: String = getCpuAffinity(""),
             var virtualControllerPreset: String = "",
-            var virtualXInputController: Boolean = false,
+            var virtualXInputController: Boolean = getVirtualControllerXInput(""),
             var controllerXInput: BooleanArray = booleanArrayOf(false, false, false, false),
             var controllerPreset: MutableList<String> = mutableListOf("", "", "", ""),
             var box64Version: String = getBox64Version(""),
