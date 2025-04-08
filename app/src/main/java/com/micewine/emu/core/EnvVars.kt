@@ -159,7 +159,7 @@ object EnvVars {
             vars.add("ADRENOTOOLS_CUSTOM_DRIVER_DIR=${adrenoToolsDriverFile?.parent}/")
             vars.add("ADRENOTOOLS_CUSTOM_DRIVER_NAME=${adrenoToolsDriverFile?.name}")
             // Workaround for dlopen error (at least on my device)
-            vars.add("LD_PRELOAD=/system/lib64/libEGL.so:/system/lib64/libGLESv1_CM.so")
+            vars.add("LD_PRELOAD=/system/lib64/libEGL.so:/system/lib64/libGLESv1_CM.so:/system/lib64/libsec-ims.so")
         }
     }
 }
