@@ -689,8 +689,8 @@ object ControllerUtils {
                 if (index == -1) return
 
                 handleAxis(axisX, axisY, connectedPhysicalControllers[index].keyboardMapping.leftAnalog, connectedPhysicalControllers[index].deadZone)
-                handleAxis(axisX, axisY, connectedPhysicalControllers[index].keyboardMapping.rightAnalog, connectedPhysicalControllers[index].deadZone)
-                handleAxis(axisX, axisY, connectedPhysicalControllers[index].keyboardMapping.dPad, connectedPhysicalControllers[index].deadZone)
+                handleAxis(axisZ, axisRZ, connectedPhysicalControllers[index].keyboardMapping.rightAnalog, connectedPhysicalControllers[index].deadZone)
+                handleAxis(axisHatX, axisHatY, connectedPhysicalControllers[index].keyboardMapping.dPad, connectedPhysicalControllers[index].deadZone)
             }
         }
     }
