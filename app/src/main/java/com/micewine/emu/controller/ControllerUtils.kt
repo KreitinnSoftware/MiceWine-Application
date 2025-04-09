@@ -101,7 +101,6 @@ object ControllerUtils {
     }
 
     suspend fun controllerMouseEmulation() {
-
         withContext(Dispatchers.IO) {
             while (true) {
                 val mouseSensibility = getMouseSensibility(getControllerPreset(selectedGameName, lastUsedControllerIndex)).toFloat() / 100
@@ -294,8 +293,9 @@ object ControllerUtils {
 
         deviceIds.forEach { deviceId ->
             InputDevice.getDevice(deviceId)?.let { device ->
-                if ((device.sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD) ||
-                    (device.sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK)
+                if (((device.sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD) ||
+                    (device.sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK)) &&
+                    (!device.name.contains("uinput"))
                 ) {
                     devices.add(
                         PhysicalController(

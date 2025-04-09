@@ -422,8 +422,9 @@ class MainActivity : AppCompatActivity() {
         override fun onInputDeviceChanged(deviceId: Int) {
             val inputDevice = InputDevice.getDevice(deviceId) ?: return
 
-            if ((inputDevice.sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD) ||
-                (inputDevice.sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK)
+            if (((inputDevice.sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD) ||
+                (inputDevice.sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK)) &&
+                (!inputDevice.name.contains("uinput"))
             ) {
                 if (connectedPhysicalControllers.indexOfFirst { it.id == deviceId } == -1) {
                     connectedPhysicalControllers.add(
