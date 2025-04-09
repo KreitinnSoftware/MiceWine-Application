@@ -689,23 +689,33 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         val temporarySettings = TemporarySettings()
 
         class TemporarySettings(
-            var displayMode: String = getDisplaySettings("")[0],
-            var displayResolution: String = getDisplaySettings("")[1],
-            var vulkanDriver: String = "",
-            var d3dxRenderer: String = "",
-            var dxvk: String = "",
-            var wineD3D: String = "",
-            var vkd3d: String = "",
-            var wineESync: Boolean = getWineESync(""),
-            var wineServices: Boolean = getWineServices(""),
-            var wineVirtualDesktop: Boolean = getWineVirtualDesktop(""),
-            var cpuAffinity: String = getCpuAffinity(""),
-            var virtualControllerPreset: String = "",
-            var virtualXInputController: Boolean = getVirtualControllerXInput(""),
-            var controllerXInput: BooleanArray = booleanArrayOf(false, false, false, false),
-            var controllerPreset: MutableList<String> = mutableListOf("", "", "", ""),
-            var box64Version: String = getBox64Version(""),
-            var box64Preset: String = getBox64Preset(""),
+            var displayMode: String = getDisplaySettings(selectedGameName)[0],
+            var displayResolution: String = getDisplaySettings(selectedGameName)[1],
+            var vulkanDriver: String = getVulkanDriver(selectedGameName),
+            var d3dxRenderer: String = getD3DXRenderer(selectedGameName),
+            var dxvk: String = getDXVKVersion(selectedGameName),
+            var wineD3D: String = getWineD3DVersion(selectedGameName),
+            var vkd3d: String = getVKD3DVersion(selectedGameName),
+            var wineESync: Boolean = getWineESync(selectedGameName),
+            var wineServices: Boolean = getWineServices(selectedGameName),
+            var wineVirtualDesktop: Boolean = getWineVirtualDesktop(selectedGameName),
+            var cpuAffinity: String = getCpuAffinity(selectedGameName),
+            var virtualControllerPreset: String = getVirtualControllerPreset(selectedGameName),
+            var virtualXInputController: Boolean = getVirtualControllerXInput(selectedGameName),
+            var controllerXInput: BooleanArray = booleanArrayOf(
+                getControllerXInput(selectedGameName, 0),
+                getControllerXInput(selectedGameName, 1),
+                getControllerXInput(selectedGameName, 2),
+                getControllerXInput(selectedGameName, 3)
+            ),
+            var controllerPreset: MutableList<String> = mutableListOf(
+                getControllerPreset(selectedGameName, 0),
+                getControllerPreset(selectedGameName, 1),
+                getControllerPreset(selectedGameName, 2),
+                getControllerPreset(selectedGameName, 3)
+            ),
+            var box64Version: String = getBox64Version(selectedGameName),
+            var box64Preset: String = getBox64Preset(selectedGameName),
         )
 
         class CPUAffinityAdapter(

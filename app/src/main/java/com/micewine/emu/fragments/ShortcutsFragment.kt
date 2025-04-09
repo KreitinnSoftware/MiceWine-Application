@@ -594,7 +594,7 @@ class ShortcutsFragment : Fragment() {
         fun getControllerPreset(name: String, controllerIndex: Int): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return "default"
+            if (index == -1 || controllerIndex == -1) return "default"
 
             return gameList[index].controllersPreset[controllerIndex]
         }
