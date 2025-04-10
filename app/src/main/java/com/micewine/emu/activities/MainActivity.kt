@@ -84,6 +84,7 @@ import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
+import com.micewine.emu.core.EnvVars.sharedPreferences
 import com.micewine.emu.core.HighlightState
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.RatPackageManager.checkPackageInstalled
@@ -146,7 +147,9 @@ import com.micewine.emu.utils.DriveUtils
 import com.micewine.emu.utils.FilePathResolver
 import io.ByteWriter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mslinks.LinkTargetIDList
 import mslinks.ShellLink
@@ -1192,6 +1195,7 @@ class MainActivity : AppCompatActivity() {
         const val ENABLE_DEBUG_INFO = "debugInfo"
         const val ENABLE_DEBUG_INFO_DEFAULT_VALUE = true
         const val APP_VERSION = "appVersion"
+        const val ADRENOTOOLS_LD_PRELOAD_WORKAROUND = "adrenoToolsLdPreload"
 
         fun setupWinePrefix(winePrefix: File, wine: String) {
             if (!winePrefix.exists()) {
@@ -1267,8 +1271,6 @@ class MainActivity : AppCompatActivity() {
                           adrenoTools: Boolean? = null,
                           adrenoToolsDriverPath: String? = null
         ) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
-
             if (adrenoTools == true) {
                 useAdrenoTools = true
                 adrenoToolsDriverFile = File(adrenoToolsDriverPath!!)
@@ -1278,13 +1280,13 @@ class MainActivity : AppCompatActivity() {
             appBuiltinRootfs = activity.assets.list("")?.contains("rootfs.zip")!!
 
             selectedBox64 = box64Version ?: getBox64Version(selectedGameName)
-            box64LogLevel = preferences.getString(BOX64_LOG, BOX64_LOG_DEFAULT_VALUE)
+            box64LogLevel = sharedPreferences.getString(BOX64_LOG, BOX64_LOG_DEFAULT_VALUE)
 
-            setBox64Preset(activity, box64Preset)
+            setBox64Preset(box64Preset)
 
-            enableDRI3 = preferences.getBoolean(ENABLE_DRI3, ENABLE_DRI3_DEFAULT_VALUE)
-            enableMangoHUD = preferences.getBoolean(ENABLE_MANGOHUD, ENABLE_MANGOHUD_DEFAULT_VALUE)
-            wineLogLevel = preferences.getString(WINE_LOG_LEVEL, WINE_LOG_LEVEL_DEFAULT_VALUE)
+            enableDRI3 = sharedPreferences.getBoolean(ENABLE_DRI3, ENABLE_DRI3_DEFAULT_VALUE)
+            enableMangoHUD = sharedPreferences.getBoolean(ENABLE_MANGOHUD, ENABLE_MANGOHUD_DEFAULT_VALUE)
+            wineLogLevel = sharedPreferences.getString(WINE_LOG_LEVEL, WINE_LOG_LEVEL_DEFAULT_VALUE)
 
             selectedD3DXRenderer = d3dxRenderer ?: getD3DXRenderer(selectedGameName)
             selectedWineD3D = wineD3D ?: getWineD3DVersion(selectedGameName)
@@ -1297,22 +1299,22 @@ class MainActivity : AppCompatActivity() {
             enableWineVirtualDesktop = virtualDesktop ?: getWineVirtualDesktop(selectedGameName)
             selectedCpuAffinity = cpuAffinity ?: getCpuAffinity(selectedGameName)
 
-            selectedGLProfile = preferences.getString(SELECTED_GL_PROFILE, SELECTED_GL_PROFILE_DEFAULT_VALUE)
-            selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET, SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE)
-            selectedMesaVkWsiPresentMode = preferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE, SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE)
-            selectedTuDebugPreset = preferences.getString(SELECTED_TU_DEBUG_PRESET, SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE)
+            selectedGLProfile = sharedPreferences.getString(SELECTED_GL_PROFILE, SELECTED_GL_PROFILE_DEFAULT_VALUE)
+            selectedDXVKHud = sharedPreferences.getString(SELECTED_DXVK_HUD_PRESET, SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE)
+            selectedMesaVkWsiPresentMode = sharedPreferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE, SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE)
+            selectedTuDebugPreset = sharedPreferences.getString(SELECTED_TU_DEBUG_PRESET, SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE)
 
-            enableRamCounter = preferences.getBoolean(RAM_COUNTER, RAM_COUNTER_DEFAULT_VALUE)
-            enableCpuCounter = preferences.getBoolean(CPU_COUNTER, CPU_COUNTER_DEFAULT_VALUE)
-            enableDebugInfo = preferences.getBoolean(ENABLE_DEBUG_INFO, ENABLE_DEBUG_INFO_DEFAULT_VALUE)
+            enableRamCounter = sharedPreferences.getBoolean(RAM_COUNTER, RAM_COUNTER_DEFAULT_VALUE)
+            enableCpuCounter = sharedPreferences.getBoolean(CPU_COUNTER, CPU_COUNTER_DEFAULT_VALUE)
+            enableDebugInfo = sharedPreferences.getBoolean(ENABLE_DEBUG_INFO, ENABLE_DEBUG_INFO_DEFAULT_VALUE)
 
             screenFpsLimit = (activity.getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay.refreshRate.toInt()
-            fpsLimit = preferences.getInt(FPS_LIMIT, screenFpsLimit)
+            fpsLimit = sharedPreferences.getInt(FPS_LIMIT, screenFpsLimit)
 
             vulkanDriverDeviceName = getVulkanDriverInfo("deviceName") + if (useAdrenoTools) " (AdrenoTools)" else ""
             vulkanDriverDriverVersion = getVulkanDriverInfo("driverVersion").split(" ")[0]
 
-            winePrefix = File("$winePrefixesDir/${preferences.getString(SELECTED_WINE_PREFIX, "default")}")
+            winePrefix = File("$winePrefixesDir/${sharedPreferences.getString(SELECTED_WINE_PREFIX, "default")}")
             wineDisksFolder = File("$winePrefix/dosdevices/")
 
             val winePrefixConfigFile = File("$winePrefix/config")
@@ -1322,14 +1324,13 @@ class MainActivity : AppCompatActivity() {
 
             fileManagerDefaultDir = wineDisksFolder!!.path
 
-            paSink = preferences.getString(PA_SINK, PA_SINK_DEFAULT_VALUE)?.toLowerCase(Locale.getDefault())
+            paSink = sharedPreferences.getString(PA_SINK, PA_SINK_DEFAULT_VALUE)?.toLowerCase(Locale.getDefault())
         }
 
-        private fun setBox64Preset(activity: Activity, name: String?) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(activity)!!
-            var selectedBox64Preset = name ?: preferences.getString(SELECTED_BOX64_PRESET_KEY, "default")!!
+        private fun setBox64Preset(name: String?) {
+            var selectedBox64Preset = name ?: sharedPreferences.getString(SELECTED_BOX64_PRESET_KEY, "default")!!
 
-            if (name == "--") selectedBox64Preset = preferences.getString(SELECTED_BOX64_PRESET_KEY, "default")!!
+            if (name == "--") selectedBox64Preset = sharedPreferences.getString(SELECTED_BOX64_PRESET_KEY, "default")!!
 
             box64Mmap32 = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_MMAP32)[0])
             box64Avx = getBox64Mapping(selectedBox64Preset, BOX64_AVX)[0]
@@ -1376,8 +1377,69 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        private fun getVulkanDriverInfo(info: String): String {
-            return runCommandWithOutput("echo $(${getEnv()} DISPLAY= vulkaninfo | grep $info | cut -d '=' -f 2)")
+        private fun getVulkanDriverInfo(info: String, stdErr: Boolean = false): String {
+            return runCommandWithOutput("echo $(${getEnv()} DISPLAY= vulkaninfo | grep $info | cut -d '=' -f 2)", stdErr)
+        }
+
+        private val driverWorkaroundLdPreload = StringBuilder()
+        private var findingLdPreloadWorkaround = false
+
+        fun getLdPreloadWorkaround(): String {
+            fun locateLibraryBySymbol(symbol: String): String {
+                return runBlocking {
+                    val libFiles = File("/system/lib64").listFiles()?.filter { it.isFile && it.extension == "so" } ?: return@runBlocking ""
+                    val result = libFiles.map {
+                        async(Dispatchers.IO) {
+                            val readElf = runCommandWithOutput("echo $(readelf --dyn-syms $it | grep $symbol)")
+                            if (readElf.contains(symbol)) {
+                                val implementsSymbol = !readElf.contains("FUNC GLOBAL DEFAULT UND")
+                                if (implementsSymbol) {
+                                    return@async "${it.path}:"
+                                }
+                            }
+
+                            return@async null
+                        }
+                    }
+
+                    result.firstNotNullOfOrNull { it.await() } ?: ""
+                }
+            }
+
+            if (findingLdPreloadWorkaround) {
+                return "LD_PRELOAD=$driverWorkaroundLdPreload"
+            }
+
+            val savedLdPreload = sharedPreferences.getString(ADRENOTOOLS_LD_PRELOAD_WORKAROUND, "")
+            if (!savedLdPreload.isNullOrEmpty()) {
+                return "LD_PRELOAD=$savedLdPreload"
+            }
+
+            driverWorkaroundLdPreload.clear()
+
+            findingLdPreloadWorkaround = true
+
+            while (true) {
+                val res = getVulkanDriverInfo("", true)
+                if (res.contains("cannot locate symbol")) {
+                    val symbolName = res.split("\"")[1]
+                    driverWorkaroundLdPreload.append(locateLibraryBySymbol(symbolName))
+                } else if (res.contains("cannot find")) {
+                    val libName = res.split("\"")[1]
+                    driverWorkaroundLdPreload.append("/system/lib64/$libName:")
+                } else {
+                    break
+                }
+            }
+
+            findingLdPreloadWorkaround = false
+
+            sharedPreferences.edit().apply {
+                putString(ADRENOTOOLS_LD_PRELOAD_WORKAROUND, "$driverWorkaroundLdPreload")
+                apply()
+            }
+
+            return "LD_PRELOAD=$driverWorkaroundLdPreload"
         }
 
         @Throws(IOException::class)

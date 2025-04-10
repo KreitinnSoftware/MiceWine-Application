@@ -33,6 +33,7 @@ import com.micewine.emu.activities.MainActivity.Companion.box64ShowBt
 import com.micewine.emu.activities.MainActivity.Companion.box64ShowSegv
 import com.micewine.emu.activities.MainActivity.Companion.box64Sse42
 import com.micewine.emu.activities.MainActivity.Companion.enableDRI3
+import com.micewine.emu.activities.MainActivity.Companion.getLdPreloadWorkaround
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedBox64
@@ -51,7 +52,7 @@ import com.micewine.emu.fragments.EnvVarsSettingsFragment.Companion.ENV_VARS_KEY
 import com.micewine.emu.fragments.EnvironmentVariable
 
 object EnvVars {
-    private lateinit var sharedPreferences: SharedPreferences
+    lateinit var sharedPreferences: SharedPreferences
 
     fun initialize(context: Context) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -159,7 +160,7 @@ object EnvVars {
             vars.add("ADRENOTOOLS_CUSTOM_DRIVER_DIR=${adrenoToolsDriverFile?.parent}/")
             vars.add("ADRENOTOOLS_CUSTOM_DRIVER_NAME=${adrenoToolsDriverFile?.name}")
             // Workaround for dlopen error (at least on my device)
-            vars.add("LD_PRELOAD=/system/lib64/libEGL.so:/system/lib64/libGLESv1_CM.so")
+            vars.add(getLdPreloadWorkaround())
         }
     }
 }
