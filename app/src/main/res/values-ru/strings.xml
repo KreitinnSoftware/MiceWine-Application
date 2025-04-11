@@ -196,4 +196,5 @@
     <string name="driver_info_description">Получить информацию о Vulkan для драйверов</string>
     <string name="controller_settings">Настройки контроллера</string>
     <string name="selected_box64">Выбран Box64</string>
+    <string name="install">Установить</string>
 </resources>

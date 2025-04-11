@@ -15,6 +15,8 @@ import android.graphics.Rect
 import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -48,12 +50,15 @@ import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
 import com.micewine.emu.adapters.AdapterGame
+import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.core.HighlightState
 import com.micewine.emu.core.RatPackageManager.listRatPackagesId
 import com.micewine.emu.databinding.FragmentShortcutsBinding
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
 import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
+import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_GAME_ITEM
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_WINE_PREFIX
+import com.micewine.emu.fragments.EditGamePreferencesFragment.Companion.EDIT_GAME_PREFERENCES
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.preferences
 import kotlinx.coroutines.launch
 import java.io.File
@@ -247,6 +252,8 @@ class ShortcutsFragment : Fragment() {
             ): Boolean {
                 if (target.adapterPosition == 0 || viewHolder.adapterPosition == 0) return false
 
+                requireActivity().closeContextMenu()
+
                 val fromPosition = viewHolder.adapterPosition
                 val toPosition = target.adapterPosition
 
@@ -263,7 +270,7 @@ class ShortcutsFragment : Fragment() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-            override fun isLongPressDragEnabled(): Boolean = true
+            override fun isLongPressDragEnabled(): Boolean = false
             override fun isItemViewSwipeEnabled(): Boolean = false
         }
 
@@ -274,6 +281,43 @@ class ShortcutsFragment : Fragment() {
     private fun dpToPx(dp: Int, context: Context): Float {
         val density = context.resources.displayMetrics.density
         return dp * density
+    }
+
+    override fun onCreateContextMenu(
+        menu: ContextMenu,
+        v: View,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+
+        if (selectedGameName == getString(R.string.desktop_mode_init)) {
+            requireActivity().menuInflater.inflate(R.menu.game_list_context_menu_lite, menu)
+        } else {
+            requireActivity().menuInflater.inflate(R.menu.game_list_context_menu, menu)
+        }
+
+        val index = gameListNames.indexOfFirst { it.name == selectedGameName }
+        if (index == 0) return
+
+        val viewHolder = recyclerView?.findViewHolderForAdapterPosition(gameListNames.indexOfFirst { it.name == selectedGameName }) ?: return
+
+        itemTouchHelper?.startDrag(viewHolder)
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.addToLauncher -> {
+                addGameToLauncher(requireContext(), selectedGameName)
+            }
+            R.id.removeGameItem -> {
+                DeleteItemFragment(DELETE_GAME_ITEM, requireContext()).show(requireActivity().supportFragmentManager, "")
+            }
+            R.id.editGameItem -> {
+                EditGamePreferencesFragment(EDIT_GAME_PREFERENCES).show(requireActivity().supportFragmentManager, "")
+            }
+        }
+
+        return super.onContextItemSelected(item)
     }
 
     class GridSpacingItemDecoration(private val spacing: Int) : RecyclerView.ItemDecoration() {

@@ -200,4 +200,5 @@
     <string name="driver_info_description">获取 Vulkan 驱动程序信息</string>
     <string name="controller_settings">控制器设置</string>
     <string name="selected_box64">已选择 Box64</string>
+    <string name="install">安装</string>
 </resources>

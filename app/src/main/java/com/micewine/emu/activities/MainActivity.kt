@@ -271,7 +271,6 @@ class MainActivity : AppCompatActivity() {
                             }
                         } else if (file.name.endsWith(".mwp")) {
                             val mwpLines = file.readLines()
-
                             if (mwpLines.isNotEmpty()) {
                                 when (mwpLines[0]) {
                                     "controllerPreset" -> {
@@ -600,88 +599,6 @@ class MainActivity : AppCompatActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
-    override fun onCreateContextMenu(
-        menu: ContextMenu?,
-        v: View?,
-        menuInfo: ContextMenu.ContextMenuInfo?
-    ) {
-        if (selectedFragmentId == 0) {
-            if (selectedGameName == getString(R.string.desktop_mode_init)) {
-                menuInflater.inflate(R.menu.game_list_context_menu_lite, menu)
-            } else {
-                menuInflater.inflate(R.menu.game_list_context_menu, menu)
-            }
-        } else if (selectedFragmentId == 2) {
-            if (File(selectedFile).isDirectory) {
-                menuInflater.inflate(R.menu.file_list_context_menu_folder, menu)
-            } else {
-                menuInflater.inflate(R.menu.file_list_context_menu, menu)
-            }
-        }
-    }
-
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.addToLauncher -> {
-                addGameToLauncher(this, selectedGameName)
-            }
-
-            R.id.removeGameItem -> {
-                DeleteItemFragment(DELETE_GAME_ITEM, this).show(supportFragmentManager, "")
-            }
-
-            R.id.editGameItem -> {
-                EditGamePreferencesFragment(EDIT_GAME_PREFERENCES).show(supportFragmentManager, "")
-            }
-
-            R.id.addToHome -> {
-                if (selectedFile.endsWith("exe")) {
-                    val output = "$usrDir/icons/${File(selectedFile).nameWithoutExtension}-icon"
-
-                    WineWrapper.extractIcon(File(selectedFile), output)
-
-                    addGameToList(selectedFile, File(selectedFile).nameWithoutExtension, output)
-                } else if (selectedFile.endsWith(".bat") || selectedFile.endsWith(".msi")) {
-                    addGameToList(selectedFile, File(selectedFile).nameWithoutExtension, "")
-                } else {
-                    Toast.makeText(this, getString(R.string.incompatible_selected_file), Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            R.id.createLnk -> {
-                exportLnkAction(selectedFile)
-            }
-
-            R.id.executeExe -> {
-                val fileExtension = File(selectedFile).extension.lowercase()
-
-                if (fileExtension  == "exe" || fileExtension == "bat" || fileExtension == "msi"  || fileExtension == "lnk") {
-                    val runWineIntent = Intent(ACTION_RUN_WINE).apply {
-                        putExtra("exePath", selectedFile)
-                    }
-
-                    sendBroadcast(runWineIntent)
-
-                    val emulationActivityIntent = Intent(this@MainActivity, EmulationActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-                    }
-
-                    startActivityIfNeeded(emulationActivityIntent, 0)
-                }
-            }
-
-            R.id.deleteFile -> {
-                DeleteItemFragment(DELETE_GAME_ITEM, this).show(supportFragmentManager, "")
-            }
-
-            R.id.renameFile -> {
-                RenameFragment(RENAME_FILE, File(selectedFile).name).show(supportFragmentManager, "")
-            }
-        }
-
-        return super.onContextItemSelected(item)
-    }
-
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(
         requestCode: Int, resultCode: Int, data: Intent?
@@ -770,17 +687,6 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(
             Intent.createChooser(intent, ""), 0
         )
-    }
-
-    @Suppress("DEPRECATION")
-    private fun exportLnkAction(exePath: String) {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/x-ms-shortcut"
-            putExtra(Intent.EXTRA_TITLE, "${File(exePath).nameWithoutExtension}.lnk")
-        }
-
-        startActivityForResult(intent, EXPORT_LNK_ACTION)
     }
 
     override fun onDestroy() {
