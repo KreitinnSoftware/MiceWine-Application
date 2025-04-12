@@ -13,12 +13,10 @@ import android.os.Build
 import android.os.Bundle
 import android.os.storage.StorageManager
 import android.util.DisplayMetrics
-import android.view.ContextMenu
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -110,16 +108,11 @@ import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64M
 import com.micewine.emu.fragments.ControllerPresetManagerFragment
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
-import com.micewine.emu.fragments.DeleteItemFragment
-import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_GAME_ITEM
 import com.micewine.emu.fragments.EditGamePreferencesFragment
-import com.micewine.emu.fragments.EditGamePreferencesFragment.Companion.EDIT_GAME_PREFERENCES
 import com.micewine.emu.fragments.EditGamePreferencesFragment.Companion.FILE_MANAGER_START_PREFERENCES
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.fragments.FloatingFileManagerFragment
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.OPERATION_SELECT_RAT
-import com.micewine.emu.fragments.RenameFragment
-import com.micewine.emu.fragments.RenameFragment.Companion.RENAME_FILE
 import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
@@ -128,14 +121,19 @@ import com.micewine.emu.fragments.ShortcutsFragment
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.ACTION_UPDATE_WINE_PREFIX_SPINNER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.ADRENO_TOOLS_DRIVER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.MESA_DRIVER
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToLauncher
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToList
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Version
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getExeArguments
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getExePath
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriverType
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
@@ -541,8 +539,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        onNewIntent(intent)
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (winePrefix?.exists() == true) {
                 WineWrapper.clearDrives()
@@ -553,6 +549,10 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+
+        if (savedInstanceState == null) {
+            onNewIntent(intent)
         }
     }
 
@@ -909,22 +909,48 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
-        val exePath = intent.getStringExtra("exePath")
-        val exeArguments = intent.getStringExtra("exeArguments")
+        val shortcutName = intent.getStringExtra("shortcutName")
 
-        val emulationActivityIntent = Intent(this, EmulationActivity::class.java)
+        if (shortcutName != null) {
+            val emulationActivityIntent = Intent(this, EmulationActivity::class.java)
 
-        if (exePath != null) {
-            if (File(exePath).exists()) {
-                sendBroadcast(
-                    Intent(ACTION_RUN_WINE).apply {
-                        putExtra("exePath", exePath)
-                        putExtra("exeArguments", exeArguments)
-                    }
-                )
+            selectedGameName = shortcutName
 
-                startActivity(emulationActivityIntent)
+            var driverName = getVulkanDriver(shortcutName)
+            var driverType = getVulkanDriverType(shortcutName)
+            if (driverName == "Global") {
+                driverName = sharedPreferences.getString(SELECTED_VULKAN_DRIVER, "").toString()
+                driverType = if (driverName.startsWith("AdrenoToolsDriver-")) ADRENO_TOOLS_DRIVER else MESA_DRIVER
             }
+
+            var box64Version = getBox64Version(shortcutName)
+            if (box64Version == "Global") {
+                box64Version = sharedPreferences.getString(SELECTED_BOX64, "").toString()
+            }
+
+            val runWineIntent = Intent(ACTION_RUN_WINE).apply {
+                putExtra("exePath", getExePath(shortcutName))
+                putExtra("exeArguments", getExeArguments(shortcutName))
+                putExtra("driverName", driverName)
+                putExtra("driverType", driverType)
+                putExtra("box64Version", box64Version)
+                putExtra("box64Preset", getBox64Preset(shortcutName))
+                putExtra("displayResolution", getDisplaySettings(shortcutName)[1])
+                putExtra("virtualControllerPreset", getVirtualControllerPreset(shortcutName))
+                putExtra("d3dxRenderer", getD3DXRenderer(shortcutName))
+                putExtra("wineD3D", getWineD3DVersion(shortcutName))
+                putExtra("dxvk", getDXVKVersion(shortcutName))
+                putExtra("vkd3d", getVKD3DVersion(shortcutName))
+                putExtra("esync", getWineESync(shortcutName))
+                putExtra("services", getWineServices(shortcutName))
+                putExtra("virtualDesktop", getWineVirtualDesktop(shortcutName))
+                putExtra("cpuAffinity", getCpuAffinity(shortcutName))
+            }
+
+            sendBroadcast(runWineIntent)
+            startActivity(emulationActivityIntent)
+
+            return
         }
 
         intent.data?.let { uri ->
@@ -932,16 +958,9 @@ class MainActivity : AppCompatActivity() {
 
             if (filePath != null) {
                 if (File(filePath).exists()) {
-                    sendBroadcast(
-                        Intent(ACTION_RUN_WINE).apply {
-                            putExtra("exePath", filePath)
-                            putExtra("exeArguments", exeArguments)
-                        }
-                    )
+                    EditGamePreferencesFragment(FILE_MANAGER_START_PREFERENCES, File(filePath)).show(supportFragmentManager, "")
                 }
             }
-
-            startActivity(emulationActivityIntent)
         }
     }
 

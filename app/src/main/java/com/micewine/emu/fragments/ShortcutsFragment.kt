@@ -679,6 +679,42 @@ class ShortcutsFragment : Fragment() {
             return gameList[index].virtualControllerPreset
         }
 
+        fun putExeArguments(name: String, exeArguments: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].exeArguments = exeArguments
+
+            saveShortcuts()
+        }
+
+        fun getExeArguments(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return ""
+
+            return gameList[index].exeArguments
+        }
+
+        fun putExePath(name: String, exePath: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].exePath = exePath
+
+            saveShortcuts()
+        }
+
+        fun getExePath(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return ""
+
+            return gameList[index].exePath
+        }
+
         fun addGameToList(path: String, prettyName: String, icon: String) {
             val gameExists = gameList.any { it.name == prettyName }
 
@@ -810,12 +846,11 @@ class ShortcutsFragment : Fragment() {
             if (shortcutManager!!.isRequestPinShortcutSupported) {
                 val intent = Intent(context, MainActivity::class.java).apply {
                     action = Intent.ACTION_VIEW
-                    putExtra("exePath", gameList[index].exePath)
-                    putExtra("exeArguments", gameList[index].exeArguments)
+                    putExtra("shortcutName", name)
                 }
 
-                val pinShortcutInfo = ShortcutInfo.Builder(context, gameList[index].name)
-                    .setShortLabel(gameList[index].name)
+                val pinShortcutInfo = ShortcutInfo.Builder(context, name)
+                    .setShortLabel(name)
                     .setIcon(
                         if (File(gameList[index].iconPath).exists()) {
                             Icon.createWithBitmap(BitmapFactory.decodeFile(gameList[index].iconPath))
