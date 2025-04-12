@@ -2,13 +2,26 @@
 
     <style name="Base.Theme.MiceWine" parent="Theme.Material3.DynamicColors.Light.NoActionBar">
         <item name="android:statusBarColor">@android:color/darker_gray</item>
+        <item name="android:colorBackground">#FFFFFF</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnBackground">#000000</item>
+        <item name="colorOnSurface">#000000</item>
         <item name="popupMenuBackground">@drawable/menu_bg</item>
     </style>
 
-    <color name="textColor">@color/black</color>
+    <color name="textColor">#000000</color>
 
     <style name="Base.Theme.MiceWine.FullScreen" parent="Theme.Material3.DynamicColors.Light.NoActionBar">
         <item name="android:statusBarColor">@android:color/darker_gray</item>
+        <item name="android:colorBackground">#FFFFFF</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnBackground">#000000</item>
+        <item name="colorOnSurface">#000000</item>
+        <item name="colorPrimary">#FFFFFF</item>
+        <item name="colorOnPrimary">#000000</item>
+
+        <item name="colorPrimaryContainer">#FFFFFF</item>
+        <item name="colorOnPrimaryContainer">#000000</item>
         <item name="popupMenuBackground">@drawable/menu_bg</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
@@ -16,4 +29,5 @@
 
     <style name="Theme.MiceWine" parent="Base.Theme.MiceWine" />
     <style name="Theme.MiceWine.FullScreen" parent="Base.Theme.MiceWine.FullScreen" />
+
 </resources>

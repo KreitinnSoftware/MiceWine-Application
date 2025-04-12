@@ -224,4 +224,5 @@
     <string name="controller_settings">Controller Settings</string>
     <string name="selected_box64">Selected Box64</string>
     <string name="install">Install</string>
+    <string name="export_log">Export Log</string>
 </resources>

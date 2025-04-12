@@ -197,4 +197,5 @@
     <string name="controller_settings">Настройки контроллера</string>
     <string name="selected_box64">Выбран Box64</string>
     <string name="install">Установить</string>
+    <string name="export_log">Экспорт лога</string>
 </resources>

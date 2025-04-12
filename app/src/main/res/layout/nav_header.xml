@@ -13,7 +13,7 @@
         android:layout_gravity="start"
         android:importantForAccessibility="no"
         android:layout_marginBottom="20dp"
-        android:src="@drawable/icon_grayscale"
+        android:src="@drawable/ic_launcher_round"
         tools:ignore="ImageContrastCheck">
     </ImageView>
 
