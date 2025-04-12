@@ -140,10 +140,10 @@ object EnvVars {
             vars.add("BOX64_DYNAREC_WAIT=$box64DynarecWait")
             vars.add("BOX64_DYNAREC_DIRTY=$box64DynarecDirty")
             vars.add("BOX64_DYNAREC_FORWARD=$box64DynarecForward")
-            vars.add("BOX64_SHOWSEGV=$box64ShowSegv")
-            vars.add("BOX64_SHOWBT=$box64ShowBt")
-            vars.add("BOX64_NOSIGSEGV=$box64NoSigSegv")
-            vars.add("BOX64_NOSIGILL=$box64NoSigill")
+            vars.add("BOX64_SHOWSEGV=${strBoolToNumStr(box64ShowSegv)}")
+            vars.add("BOX64_SHOWBT=${strBoolToNumStr(box64ShowBt)}")
+            vars.add("BOX64_NOSIGSEGV=${strBoolToNumStr(box64NoSigSegv)}")
+            vars.add("BOX64_NOSIGILL=${strBoolToNumStr(box64NoSigill)}")
         }
 
         vars.add("VKD3D_FEATURE_LEVEL=12_0")

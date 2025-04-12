@@ -47,6 +47,14 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGSEGV
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGSEGV_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWBT
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWBT_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3_DEFAULT_VALUE
@@ -1066,10 +1074,10 @@ class MainActivity : AppCompatActivity() {
         var box64DynarecWait: String? = null
         var box64DynarecDirty: String? = null
         var box64DynarecForward: String? = null
-        var box64ShowSegv: String? = null
-        var box64ShowBt: String? = null
-        var box64NoSigSegv: String? = null
-        var box64NoSigill: String? = null
+        var box64ShowSegv: Boolean = false
+        var box64ShowBt: Boolean = false
+        var box64NoSigSegv: Boolean = false
+        var box64NoSigill: Boolean = false
         var wineLogLevel: String? = null
         var selectedBox64: String? = null
         var selectedD3DXRenderer: String? = null
@@ -1206,6 +1214,11 @@ class MainActivity : AppCompatActivity() {
 
             selectedBox64 = box64Version ?: getBox64Version(selectedGameName)
             box64LogLevel = sharedPreferences.getString(BOX64_LOG, BOX64_LOG_DEFAULT_VALUE)
+
+            box64ShowSegv = sharedPreferences.getBoolean(BOX64_SHOWSEGV, BOX64_SHOWSEGV_DEFAULT_VALUE)
+            box64ShowBt = sharedPreferences.getBoolean(BOX64_SHOWBT, BOX64_SHOWBT_DEFAULT_VALUE)
+            box64NoSigill = sharedPreferences.getBoolean(BOX64_NOSIGILL, BOX64_NOSIGILL_DEFAULT_VALUE)
+            box64NoSigSegv = sharedPreferences.getBoolean(BOX64_NOSIGSEGV, BOX64_NOSIGSEGV_DEFAULT_VALUE)
 
             setBox64Preset(box64Preset)
 
