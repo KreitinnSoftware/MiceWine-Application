@@ -46,7 +46,6 @@ import com.micewine.emu.activities.MainActivity.Companion.copyFile
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterGame
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
-import com.micewine.emu.core.HighlightState
 import com.micewine.emu.core.RatPackageManager.listRatPackagesId
 import com.micewine.emu.databinding.FragmentShortcutsBinding
 import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
@@ -132,30 +131,6 @@ class ShortcutsFragment : Fragment() {
 
         setAdapter()
         setupDragAndDrop()
-
-        recyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                if (gameList.size > 1 && (recyclerView?.childCount ?: 0) > 1 &&
-                    !preferences!!.getBoolean(HIGHLIGHT_SHORTCUT_PREFERENCE_KEY, false) &&
-                    HighlightState.fromOrdinal(preferences!!.getInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, 0)) == HighlightState.HIGHLIGHT_DONE) {
-                    val secondItemView = recyclerView?.findViewHolderForAdapterPosition(1)?.itemView
-
-                    secondItemView?.let { view ->
-                        TapTargetView.showFor(requireActivity(),
-                            TapTarget.forView(view.findViewById(R.id.img_game), getString(R.string.highlight_shortcuts))
-                                .transparentTarget(true)
-                                .cancelable(true)
-                        )
-                    }
-                    recyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
-
-                    preferences!!.edit().apply {
-                        putBoolean(HIGHLIGHT_SHORTCUT_PREFERENCE_KEY, true)
-                        apply()
-                    }
-                }
-            }
-        })
 
         registerForContextMenu(recyclerView!!)
 

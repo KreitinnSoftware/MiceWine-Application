@@ -23,8 +23,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
-import com.getkeepsafe.taptargetview.TapTarget
-import com.getkeepsafe.taptargetview.TapTargetSequence
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
@@ -87,7 +85,6 @@ import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.EnvVars.sharedPreferences
-import com.micewine.emu.core.HighlightState
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.RatPackageManager.checkPackageInstalled
 import com.micewine.emu.core.RatPackageManager.installADToolsDriver
@@ -408,12 +405,6 @@ class MainActivity : AppCompatActivity() {
                             sendBroadcast(
                                 updateWinePrefixSpinnerIntent
                             )
-
-                            withContext(Dispatchers.Main) {
-                                runOnUiThread {
-                                    showHighlightSequence()
-                                }
-                            }
                         }
                     }
                 }
@@ -461,7 +452,6 @@ class MainActivity : AppCompatActivity() {
     private var viewPager: ViewPager2? = null
     private var runningXServer = false
     private var preferences: SharedPreferences? = null
-    private var currentState: HighlightState? = null
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -572,7 +562,6 @@ class MainActivity : AppCompatActivity() {
             )
         } else {
             setupDone = true
-            showHighlightSequence()
         }
     }
 
@@ -967,71 +956,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun showHighlightSequence() {
-        currentState = HighlightState.fromOrdinal(preferences!!.getInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, 0))
-        if (currentState == HighlightState.HIGHLIGHT_DONE) {
-            return
-        }
-        TapTargetSequence(this).targets(
-                TapTarget.forView(
-                    findViewById(R.id.nav_shortcuts),
-                    getString(R.string.highlight_nav_shortcuts)
-                ),
-
-                TapTarget.forView(
-                    findViewById(R.id.nav_settings),
-                    getString(R.string.highlight_nav_settings)
-                ),
-
-                TapTarget.forView(
-                    findViewById(R.id.nav_file_manager),
-                    getString(R.string.highlight_nav_files),
-                    getString(R.string.highlight_nav_files_description)
-                )
-            ).listener(object : TapTargetSequence.Listener {
-                override fun onSequenceFinish() {
-                }
-
-                override fun onSequenceStep(lastTarget: TapTarget, targetClicked: Boolean) {
-                    if (targetClicked) {
-                        when (currentState) {
-                            HighlightState.HIGHLIGHT_SHORTCUTS -> {
-                                bottomNavigation?.selectedItemId = R.id.nav_shortcuts
-                                currentState = HighlightState.HIGHLIGHT_SETTINGS
-                                preferences!!.edit().apply {
-                                    putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
-                                    apply()
-                                }
-                            }
-                            HighlightState.HIGHLIGHT_SETTINGS -> {
-                                bottomNavigation?.selectedItemId = R.id.nav_settings
-                                currentState = HighlightState.HIGHLIGHT_FILES
-                                preferences!!.edit().apply {
-                                    putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
-                                    apply()
-                                }
-                            }
-                            HighlightState.HIGHLIGHT_FILES -> {
-                                bottomNavigation?.selectedItemId = R.id.nav_file_manager
-                                currentState = HighlightState.HIGHLIGHT_DONE
-                                preferences!!.edit().apply {
-                                    putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
-                                    apply()
-                                }
-                            }
-                            else -> {
-                                return
-                            }
-                        }
-                    }
-                }
-
-                override fun onSequenceCanceled(lastTarget: TapTarget) {
-                }
-            })
-            .start()
     }
 
     companion object {
