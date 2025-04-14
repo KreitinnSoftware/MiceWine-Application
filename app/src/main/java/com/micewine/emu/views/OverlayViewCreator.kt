@@ -344,7 +344,6 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                          }
                      }
                  }
-
                  analogList.forEach {
                      if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_CIRCLE)) {
                          if (selectedVAxis > 0) {
@@ -357,7 +356,6 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                          }
                      }
                  }
-
                  dpadList.forEach {
                      if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_SQUARE)) {
                          if (selectedDPad > 0) {
@@ -382,7 +380,6 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                          }
                      }
                  }
-
                  analogList.forEach {
                      if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_CIRCLE)) {
                          if (selectedVAxis == it.id) {
@@ -390,7 +387,6 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
                          }
                      }
                  }
-
                  dpadList.forEach {
                      if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, SHAPE_SQUARE)) {
                          if (selectedDPad == it.id) {

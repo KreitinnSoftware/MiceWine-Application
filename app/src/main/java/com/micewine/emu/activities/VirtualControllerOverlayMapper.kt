@@ -25,6 +25,7 @@ import com.micewine.emu.views.OverlayView
 import com.micewine.emu.views.OverlayView.Companion.SHAPE_CIRCLE
 import com.micewine.emu.views.OverlayView.Companion.analogList
 import com.micewine.emu.views.OverlayView.Companion.buttonList
+import com.micewine.emu.views.OverlayView.Companion.dpadList
 import com.micewine.emu.views.OverlayViewCreator
 
 class VirtualControllerOverlayMapper : AppCompatActivity() {
@@ -104,7 +105,7 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
                 R.id.addDPad -> {
                     overlayView?.addDPad(
                         OverlayView.VirtualDPad(
-                            analogList.count() + 1,
+                            dpadList.count() + 1,
                             overlayView?.width!! / 2F,
                             overlayView?.height!! / 2F,
                             275F,
