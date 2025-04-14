@@ -48,8 +48,8 @@ import com.micewine.emu.activities.MainActivity.Companion.useAdrenoTools
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.activities.MainActivity.Companion.wineESync
 import com.micewine.emu.activities.MainActivity.Companion.wineLogLevel
+import com.micewine.emu.fragments.EnvVarsSettingsFragment
 import com.micewine.emu.fragments.EnvVarsSettingsFragment.Companion.ENV_VARS_KEY
-import com.micewine.emu.fragments.EnvironmentVariable
 
 object EnvVars {
     lateinit var sharedPreferences: SharedPreferences
@@ -65,9 +65,9 @@ object EnvVars {
 
         val savedVarsJson = sharedPreferences.getString(ENV_VARS_KEY, null)
         if (savedVarsJson != null) {
-            val type = object : TypeToken<List<EnvironmentVariable>>() {}.type
+            val type = object : TypeToken<List<EnvVarsSettingsFragment.EnvironmentVariable>>() {}.type
 
-            Gson().fromJson<List<EnvironmentVariable>>(savedVarsJson, type).forEach {
+            Gson().fromJson<List<EnvVarsSettingsFragment.EnvironmentVariable>>(savedVarsJson, type).forEach {
                 vars.add("${it.key}=${it.value}")
             }
         }

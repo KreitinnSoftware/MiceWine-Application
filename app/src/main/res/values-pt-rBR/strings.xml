@@ -164,6 +164,8 @@
     <string name="remove_last_wine_prefix_error">Você não pode remover o último prefixo</string>
     <string name="wine_manager_title">Gerenciador de Wine</string>
     <string name="wine_manager_description">Gerenciar Versões do Wine</string>
+    <string name="wine_prefix_manager_title">Gerenciador de Prefixos Wine</string>
+    <string name="wine_prefix_manager_description">Gerenciar Prefixos Wine</string>
     <string name="installing_drivers">Instalando Drivers…</string>
     <string name="installing_box64">Instalando Box64…</string>
     <string name="installing_wine">Instalando Wine…</string>

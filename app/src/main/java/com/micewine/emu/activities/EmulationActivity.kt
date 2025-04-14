@@ -60,8 +60,6 @@ import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
-import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
-import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.controller.ControllerUtils
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.connectController
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.disconnectController
@@ -71,6 +69,8 @@ import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.fragments.LogViewerFragment
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerXInput
@@ -160,34 +160,31 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             commit()
         }
 
-        val lorieView = findViewById<LorieView>(R.id.lorieView)
+        val lorieView = findViewById<LorieView>(R.id.lorieView).apply {
+            isFocusable = true
+        }
         val lorieParent = lorieView.parent as View
 
         overlayView = findViewById(R.id.overlayView)
         xInputOverlayView = findViewById(R.id.xInputOverlayView)
 
-        if (selectedGameName == getString(R.string.desktop_mode_init)) {
-            overlayView?.loadPreset(null)
-        } else {
-            overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
-        }
+        overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
 
         overlayView?.visibility = View.INVISIBLE
         xInputOverlayView?.visibility = View.INVISIBLE
 
         val headerViewMain: View = findViewById<NavigationView>(R.id.NavigationView).getHeaderView(0).apply {
             findViewById<MaterialButton>(R.id.exitButton).setOnClickListener {
-                runCommand("pkill -9 wine")
+                runCommand("pkill -9 wineserver")
                 runCommand("pkill -9 .exe")
 
                 finishAffinity()
             }
 
             findViewById<MaterialButton>(R.id.openKeyboardButton).setOnClickListener {
-                @Suppress("DEPRECATION")
-                imManager.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
-
                 lorieView.requestFocus()
+
+                imManager.showSoftInput(lorieView, 0)
 
                 drawerLayout?.closeDrawers()
             }
@@ -252,7 +249,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
             findViewById<MaterialButton>(R.id.editVirtualControllerMapping).setOnClickListener {
                 val intent = Intent(context, PresetManagerActivity::class.java).apply {
-                    putExtra("presetType", VIRTUAL_CONTROLLER)
+                    putExtra("presetType", VIRTUAL_CONTROLLER_PRESET)
                     putExtra("editShortcut", true)
                 }
                 startActivity(intent)
@@ -260,7 +257,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
             findViewById<MaterialButton>(R.id.editControllerMapping).setOnClickListener {
                 val intent = Intent(context, PresetManagerActivity::class.java).apply {
-                    putExtra("presetType", PHYSICAL_CONTROLLER)
+                    putExtra("presetType", CONTROLLER_PRESET)
                     putExtra("editShortcut", true)
                 }
                 startActivity(intent)
@@ -619,7 +616,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
     fun setExternalKeyboardConnected(connected: Boolean) {
         externalKeyboardConnected = connected
-        lorieView!!.requestFocus()
+        lorieView?.requestFocus()
     }
 
     companion object {

@@ -68,7 +68,7 @@
                 android:layout_height="match_parent"
                 android:importantForAccessibility="no"
                 style="@style/Widget.Material3.Button.TextButton"
-                android:src="@android:drawable/ic_menu_delete">
+                android:src="@drawable/ic_delete">
             </ImageButton>
 
             <ImageButton

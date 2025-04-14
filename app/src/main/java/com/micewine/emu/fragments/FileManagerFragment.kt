@@ -23,8 +23,6 @@ import com.micewine.emu.activities.MainActivity.Companion.fileManagerDefaultDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterFiles
-import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
-import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.FragmentFileManagerBinding
@@ -35,6 +33,8 @@ import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.adToolsDri
 import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.mwpPresetCandidate
 import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.ratCandidate
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_GAME_ITEM
 import com.micewine.emu.fragments.EditGamePreferencesFragment.Companion.FILE_MANAGER_START_PREFERENCES
 import com.micewine.emu.fragments.RenameFragment.Companion.RENAME_FILE
@@ -98,10 +98,10 @@ class FileManagerFragment : Fragment() {
                 if (mwpLines.isNotEmpty()) {
                     when (mwpLines[0]) {
                         "controllerPreset" -> {
-                            mwpPresetCandidate = Pair(PHYSICAL_CONTROLLER, file.path)
+                            mwpPresetCandidate = Pair(CONTROLLER_PRESET, file.path)
                         }
                         "virtualControllerPreset" -> {
-                            mwpPresetCandidate = Pair(VIRTUAL_CONTROLLER, file.path)
+                            mwpPresetCandidate = Pair(VIRTUAL_CONTROLLER_PRESET, file.path)
                         }
                         "box64Preset" -> {
                             mwpPresetCandidate = Pair(BOX64_PRESET, file.path)

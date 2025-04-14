@@ -2,94 +2,69 @@ package com.micewine.emu.fragments
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
-import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.ContextMenu
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.Spinner
-import androidx.appcompat.widget.SearchView
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity.INPUT_METHOD_SERVICE
 import androidx.core.content.edit
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.getkeepsafe.taptargetview.TapTarget
 import com.getkeepsafe.taptargetview.TapTargetView
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
 import com.micewine.emu.activities.MainActivity
 import com.micewine.emu.activities.MainActivity.Companion.copyFile
-import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
-import com.micewine.emu.activities.MainActivity.Companion.winePrefix
-import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
 import com.micewine.emu.adapters.AdapterGame
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.core.HighlightState
 import com.micewine.emu.core.RatPackageManager.listRatPackagesId
 import com.micewine.emu.databinding.FragmentShortcutsBinding
-import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
 import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_GAME_ITEM
-import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_WINE_PREFIX
 import com.micewine.emu.fragments.EditGamePreferencesFragment.Companion.EDIT_GAME_PREFERENCES
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.preferences
-import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.max
 
 class ShortcutsFragment : Fragment() {
     private var binding: FragmentShortcutsBinding? = null
     private var rootView: View? = null
-    private var layoutManager: GridLayoutManager? = null
+    private var appName: TextView? = null
+    private var searchItem: ImageButton? = null
+    private var backButton: ImageButton? = null
+    private var searchInput: TextInputEditText? = null
     private var itemTouchHelper: ItemTouchHelper? = null
-    private var selectedWinePrefixSpinner: Spinner? = null
-    private var createWinePrefixButton: ImageButton? = null
-    private var deleteWinePrefixButton: ImageButton? = null
-    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                ACTION_UPDATE_WINE_PREFIX_SPINNER -> {
-                    val prefixName = intent.getStringExtra("prefixName")
-                    val winePrefixes = winePrefixesDir.listFiles()?.map { it.name }?.toTypedArray() ?: emptyArray()
-
-                    selectedWinePrefixSpinner?.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, winePrefixes)
-
-                    if (prefixName == null) {
-                        selectedWinePrefixSpinner?.setSelection(0)
-                    } else {
-                        selectedWinePrefixSpinner?.setSelection(winePrefixes.indexOf(prefixName))
-                    }
-                }
-            }
-        }
-    }
+    private var imManager: InputMethodManager? = null
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreateView(
@@ -100,64 +75,62 @@ class ShortcutsFragment : Fragment() {
 
         recyclerView = rootView?.findViewById(R.id.recyclerViewGame)
 
+        appName = rootView?.findViewById(R.id.appName)
+        searchItem = rootView?.findViewById(R.id.searchItem)
+        backButton = rootView?.findViewById(R.id.backButton)
+        searchInput = rootView?.findViewById(R.id.searchInput)
+        imManager = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+
         initialize(requireContext())
 
-        layoutManager = recyclerView?.layoutManager as GridLayoutManager?
+        recyclerView?.layoutManager = FlexboxLayoutManager(requireContext()).apply {
+            flexDirection = FlexDirection.ROW
+            justifyContent = JustifyContent.CENTER
+            alignItems = AlignItems.FLEX_START
+            flexWrap = FlexWrap.WRAP
+        }
+        recyclerView?.addItemDecoration(
+            GridSpacingItemDecoration(10)
+        )
 
-        recyclerView?.layoutManager = GridLayoutManager(requireContext(), getSpanCount())
-        recyclerView?.addItemDecoration(GridSpacingItemDecoration(10))
+        searchItem?.setOnClickListener {
+            searchItem?.visibility = View.GONE
+            appName?.visibility = View.GONE
+
+            searchInput?.setText("")
+            searchInput?.visibility = View.VISIBLE
+            searchInput?.requestFocus()
+            imManager?.showSoftInput(searchInput, 0)
+
+            backButton?.visibility = View.VISIBLE
+        }
+
+        backButton?.setOnClickListener {
+            searchItem?.visibility = View.VISIBLE
+            appName?.visibility = View.VISIBLE
+
+            searchInput?.visibility = View.GONE
+            backButton?.visibility = View.GONE
+
+            imManager?.hideSoftInputFromWindow(requireActivity().window.decorView.windowToken, 0)
+
+            (recyclerView?.adapter as? AdapterGame)?.filterList("")
+        }
+
+        searchInput?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                (recyclerView?.adapter as? AdapterGame)?.filterList(p0.toString())
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+            }
+
+        })
 
         setAdapter()
-
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
-                inflater.inflate(R.menu.toolbar_menu, menu)
-
-                val searchItem = menu.findItem(R.id.action_search)
-                val searchView = searchItem.actionView as SearchView
-
-                searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                    override fun onQueryTextSubmit(query: String?): Boolean {
-                        return true
-                    }
-
-                    override fun onQueryTextChange(newText: String?): Boolean {
-                        val query = newText.orEmpty()
-
-                        val filteredList = if (query.isEmpty()) {
-                            gameList.map {
-                                AdapterGame.GameItem(
-                                    it.name,
-                                    it.exePath,
-                                    it.exeArguments,
-                                    it.iconPath
-                                )
-                            }
-                        } else {
-                            gameList.filter {
-                                it.name.contains(query, ignoreCase = true)
-                            }.map {
-                                AdapterGame.GameItem(
-                                    it.name,
-                                    it.exePath,
-                                    it.exeArguments,
-                                    it.iconPath
-                                )
-                            }
-                        }
-
-                        (recyclerView?.adapter as? AdapterGame)?.updateList(filteredList)
-
-                        return true
-                    }
-                })
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return true
-            }
-        }, viewLifecycleOwner)
-
         setupDragAndDrop()
 
         recyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
@@ -186,54 +159,10 @@ class ShortcutsFragment : Fragment() {
 
         registerForContextMenu(recyclerView!!)
 
-        selectedWinePrefixSpinner = rootView?.findViewById(R.id.selectedWinePrefixSpinner)
-
-        val winePrefixes = winePrefixesDir.listFiles()?.map { it.name }?.toTypedArray() ?: emptyArray()
-
-        selectedWinePrefixSpinner?.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, winePrefixes)
-        selectedWinePrefixSpinner?.setSelection(winePrefixes.indexOf(winePrefix?.name))
-        selectedWinePrefixSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                preferences!!.edit().apply {
-                    putString(SELECTED_WINE_PREFIX, parent?.selectedItem.toString())
-                    apply()
-                }
-
-                setSharedVars(requireActivity())
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
-        }
-
-        createWinePrefixButton = rootView?.findViewById(R.id.createWinePrefix)
-        createWinePrefixButton?.setOnClickListener {
-            lifecycleScope.launch {
-                setSharedVars(requireActivity())
-                CreatePresetFragment(WINEPREFIX_PRESET).show(requireActivity().supportFragmentManager, "")
-            }
-        }
-
-        deleteWinePrefixButton = rootView?.findViewById(R.id.deleteWinePrefix)
-        deleteWinePrefixButton?.setOnClickListener {
-            DeleteItemFragment(DELETE_WINE_PREFIX, requireContext()).show(requireActivity().supportFragmentManager, "")
-        }
-
-        activity?.registerReceiver(receiver, object : IntentFilter(ACTION_UPDATE_WINE_PREFIX_SPINNER) {})
-
         return rootView
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
 
-        recyclerView?.layoutManager = GridLayoutManager(requireContext(), getSpanCount())
-    }
 
     private fun setupDragAndDrop() {
         val callback = object : ItemTouchHelper.Callback() {
@@ -278,7 +207,7 @@ class ShortcutsFragment : Fragment() {
         itemTouchHelper?.attachToRecyclerView(recyclerView)
     }
 
-    private fun dpToPx(dp: Int, context: Context): Float {
+    private fun dpToPx(dp: Float, context: Context): Float {
         val density = context.resources.displayMetrics.density
         return dp * density
     }
@@ -332,7 +261,9 @@ class ShortcutsFragment : Fragment() {
     }
 
     private fun setAdapter() {
-        recyclerView?.setAdapter(AdapterGame(gameListNames, requireActivity()))
+        recyclerView?.setAdapter(
+            AdapterGame(gameListNames, 1F, requireActivity())
+        )
 
         gameListNames.clear()
 
@@ -342,11 +273,13 @@ class ShortcutsFragment : Fragment() {
     }
 
     private fun addToAdapter(name: String, exePath: String, exeArguments: String, iconPath: String) {
-        gameListNames.add(AdapterGame.GameItem(name, exePath, exeArguments, iconPath))
+        gameListNames.add(
+            AdapterGame.GameItem(name, exePath, exeArguments, iconPath)
+        )
     }
 
     private fun getSpanCount(): Int {
-        return max(1F, requireActivity().resources.displayMetrics.widthPixels / dpToPx(150, requireContext())).toInt()
+        return max(1F, requireActivity().resources.displayMetrics.widthPixels / dpToPx(138 * 1F, requireContext())).toInt()
     }
 
     companion object {

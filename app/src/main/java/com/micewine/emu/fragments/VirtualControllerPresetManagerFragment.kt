@@ -18,8 +18,8 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.getNativeResolution
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY
 import com.micewine.emu.adapters.AdapterPreset
-import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.views.OverlayView
 import com.micewine.emu.views.OverlayViewCreator.Companion.GRID_SIZE
 import java.io.File
@@ -47,7 +47,7 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
 
         presetListNames.clear()
         presetList.forEach {
-            addToAdapter(it.name, VIRTUAL_CONTROLLER, true)
+            addToAdapter(it.name, VIRTUAL_CONTROLLER_PRESET, true)
         }
     }
 
@@ -110,7 +110,7 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
 
             presetList.add(defaultPreset)
             presetListNames.add(
-                AdapterPreset.Item(name, VIRTUAL_CONTROLLER, true, editShortcut)
+                AdapterPreset.Item(name, VIRTUAL_CONTROLLER_PRESET, true, editShortcut)
             )
 
             recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
@@ -199,7 +199,7 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
 
             presetList.add(processed)
             presetListNames.add(
-                AdapterPreset.Item(processed.name, VIRTUAL_CONTROLLER, true)
+                AdapterPreset.Item(processed.name, VIRTUAL_CONTROLLER_PRESET, true)
             )
 
             recyclerView?.post {

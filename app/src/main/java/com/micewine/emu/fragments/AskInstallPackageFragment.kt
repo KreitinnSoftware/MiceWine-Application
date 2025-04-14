@@ -13,12 +13,12 @@ import androidx.preference.PreferenceManager
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_INSTALL_ADTOOLS_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_INSTALL_RAT
-import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
-import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.importBox64Preset
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.importControllerPreset
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.importVirtualControllerPreset
 
 class AskInstallPackageFragment(private val packageType: Int) : DialogFragment() {
@@ -64,10 +64,10 @@ class AskInstallPackageFragment(private val packageType: Int) : DialogFragment()
                 }
                 MWP_PRESET_PACKAGE -> {
                     when (mwpPresetCandidate?.first) {
-                        VIRTUAL_CONTROLLER -> {
+                        VIRTUAL_CONTROLLER_PRESET -> {
                             importVirtualControllerPreset(requireActivity(), mwpPresetCandidate?.second!!)
                         }
-                        PHYSICAL_CONTROLLER -> {
+                        CONTROLLER_PRESET -> {
                             importControllerPreset(requireActivity(), mwpPresetCandidate?.second!!)
                         }
                         BOX64_PRESET -> {

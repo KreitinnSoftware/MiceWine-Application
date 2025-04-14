@@ -42,6 +42,7 @@ class SettingsFragment : Fragment() {
             addToAdapter(R.string.box64_preset_manager_title, R.string.box64_preset_manager_description, R.drawable.ic_box64)
         }
 
+        addToAdapter(R.string.wine_prefix_manager_title, R.string.wine_prefix_manager_description, R.drawable.ic_wine)
         addToAdapter(R.string.rat_manager_title, R.string.rat_manager_description, R.drawable.ic_rat_package_grayscale)
         addToAdapter(R.string.rat_downloader_title, R.string.rat_downloader_description, R.drawable.ic_download)
     }

@@ -164,6 +164,8 @@
     <string name="remove_last_wine_prefix_error">您无法删除最后一个前缀</string>
     <string name="wine_manager_title">Wine 管理器</string>
     <string name="wine_manager_description">管理 Wine 版本</string>
+    <string name="wine_prefix_manager_title">Wine 前缀管理器</string>
+    <string name="wine_prefix_manager_description">管理 Wine 前缀</string>
     <string name="installing_drivers">正在安装驱动程序…</string>
     <string name="installing_box64">正在安装 Box64…</string>
     <string name="installing_wine">正在安装 Wine…</string>

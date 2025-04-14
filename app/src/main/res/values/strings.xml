@@ -187,6 +187,8 @@
     <string name="remove_last_wine_prefix_error">You cannot remove last prefix</string>
     <string name="wine_manager_title">Wine Manager</string>
     <string name="wine_manager_description">Manage Wine Versions</string>
+    <string name="wine_prefix_manager_title">Wine Prefix Manager</string>
+    <string name="wine_prefix_manager_description">Manage Wine Prefixes</string>
     <string name="installing_drivers">Installing Drivers…</string>
     <string name="installing_box64">Installing Box64…</string>
     <string name="installing_wine">Installing Wine…</string>

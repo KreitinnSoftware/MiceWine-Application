@@ -43,8 +43,8 @@ import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_Y_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_CONTROLLER_PRESET_KEY
 import com.micewine.emu.adapters.AdapterPreset
-import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
 import java.io.File
 import java.util.Collections
 
@@ -72,7 +72,7 @@ class ControllerPresetManagerFragment(private val editShortcut: Boolean) : Fragm
 
         presetListNames.clear()
         presetList.forEach {
-            addToAdapter(it[0], PHYSICAL_CONTROLLER, true)
+            addToAdapter(it[0], CONTROLLER_PRESET, true)
         }
     }
 
@@ -207,7 +207,7 @@ class ControllerPresetManagerFragment(private val editShortcut: Boolean) : Fragm
 
             presetList.add(defaultPreset)
             presetListNames.add(
-                AdapterPreset.Item(name, PHYSICAL_CONTROLLER, true, editShortcut)
+                AdapterPreset.Item(name, CONTROLLER_PRESET, true, editShortcut)
             )
 
             recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
@@ -270,7 +270,7 @@ class ControllerPresetManagerFragment(private val editShortcut: Boolean) : Fragm
 
             presetList.add(processed)
             presetListNames.add(
-                AdapterPreset.Item(processed[0], PHYSICAL_CONTROLLER, true)
+                AdapterPreset.Item(processed[0], CONTROLLER_PRESET, true)
             )
 
             activity.runOnUiThread {
