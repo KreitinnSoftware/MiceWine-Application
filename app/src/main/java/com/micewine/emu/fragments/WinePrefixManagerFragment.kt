@@ -95,15 +95,23 @@ class WinePrefixManagerFragment : Fragment() {
                 val wineUtils = File("$appRootDir/wine-utils")
                 val startMenu = File("$driveC/ProgramData/Microsoft/Windows/Start Menu")
                 val userSharedFolder = File("/storage/emulated/0/MiceWine")
-                val localAppData = File("$driveC/users/$unixUsername/AppData")
-                val localSavedGames = File("$driveC/users/$unixUsername/Saved Games")
+                val isProton = File("$driveC/users/steamuser").exists()
+
+                val wineUserDir: File = if (isProton) {
+                    File("$driveC/users/steamuser")
+                } else {
+                    File("$driveC/users/$unixUsername")
+                }
+
+                val localAppData = File("$wineUserDir/AppData")
+                val localSavedGames = File("$wineUserDir/Saved Games")
                 val system32 = File("$driveC/windows/system32")
                 val syswow64 = File("$driveC/windows/syswow64")
                 val winePrefixConfigFile = File("$winePrefix/config")
                 val wineFontsDirs = File("$winePrefix/drive_c/windows/Fonts")
 
                 winePrefix.mkdirs()
-                winePrefixConfigFile.writeText(wineId + "\n")
+                winePrefixConfigFile.writeText("$wineId\n$isProton\n")
 
                 selectedWine = wineId
 
