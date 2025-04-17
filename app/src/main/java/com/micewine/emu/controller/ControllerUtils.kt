@@ -95,6 +95,8 @@ object ControllerUtils {
     private const val LEFT_DOWN = 6
     private const val RIGHT_UP = 7
     private const val RIGHT_DOWN = 8
+    private const val SCROLL_UP = 9
+    private const val SCROLL_DOWN = 10
 
     fun initialize(context: Context) {
         lorieView = LorieView(context)
@@ -204,6 +206,12 @@ object ControllerUtils {
             }
             "M_Right" -> {
                 keyList = listOf(BUTTON_RIGHT, BUTTON_RIGHT, MOUSE)
+            }
+            "M_WheelUp" -> {
+                keyList = listOf(SCROLL_UP, SCROLL_UP, MOUSE)
+            }
+            "M_WheelDown" -> {
+                keyList = listOf(SCROLL_DOWN, SCROLL_DOWN, MOUSE)
             }
             "Mouse" -> {
                 keyList = listOf(MOUSE, MOUSE, MOUSE)
@@ -315,7 +323,17 @@ object ControllerUtils {
     private fun handleKey(pressed: Boolean, mapping: List<Int>) {
         when (mapping[2]) {
             KEYBOARD -> lorieView.sendKeyEvent(mapping[0], mapping[1], pressed)
-            MOUSE -> lorieView.sendMouseEvent(0F, 0F, mapping[0], pressed, true)
+            MOUSE -> {
+                when (mapping[0]) {
+                    SCROLL_UP -> {
+                        if (pressed) lorieView.sendMouseWheelEvent(0F, -10F)
+                    }
+                    SCROLL_DOWN -> {
+                        if (pressed) lorieView.sendMouseWheelEvent(0F, 10F)
+                    }
+                    else -> lorieView.sendMouseEvent(0F, 0F, mapping[0], pressed, true)
+                }
+            }
         }
     }
 
