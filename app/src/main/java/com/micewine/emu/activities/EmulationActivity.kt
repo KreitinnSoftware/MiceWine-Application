@@ -178,6 +178,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 runCommand("pkill -9 wineserver")
                 runCommand("pkill -9 .exe")
 
+                disconnectController(virtualXInputControllerId)
+
                 finishAffinity()
             }
 
@@ -230,7 +232,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                             disconnectController(virtualXInputControllerId)
                         } else {
                             xInputOverlayView?.visibility = View.VISIBLE
-                            virtualXInputControllerId = connectController()
+
+                            if (virtualXInputControllerId == -1) {
+                                virtualXInputControllerId = connectController()
+                            }
                         }
                     } else {
                         if (overlayView?.isVisible!!) {
