@@ -1309,7 +1309,7 @@ class MainActivity : AppCompatActivity() {
             "960x540", "1280x720",
             "1366x768", "1600x900",
             "1920x1080", "2560x1440",
-            "3840x2160"
+            "3840x2160", "7680x4320"
         )
 
         val resolutions4_3 = arrayOf(
