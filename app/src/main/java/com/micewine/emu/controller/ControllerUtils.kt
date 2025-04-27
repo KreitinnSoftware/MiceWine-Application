@@ -659,8 +659,8 @@ object ControllerUtils {
             MAPPING_TYPE_XINPUT -> {
                 val index = physicalController.virtualXInputId
                 if (index != -1) {
-                    val lxStr = ((axisX + 1) / 2 * 255).toInt().toString().padStart(3, '0')
-                    val lyStr = ((-axisY + 1) / 2 * 255).toInt().toString().padStart(3, '0')
+                    val lxStr = ((axisX + 1) / 2 * 255).toInt().coerceIn(0, 255).toString().padStart(3, '0')
+                    val lyStr = ((-axisY + 1) / 2 * 255).toInt().coerceIn(0, 255).toString().padStart(3, '0')
 
                     connectedControllers[index].lx[0] = lxStr[0].digitToInt().toByte()
                     connectedControllers[index].lx[1] = lxStr[1].digitToInt().toByte()
