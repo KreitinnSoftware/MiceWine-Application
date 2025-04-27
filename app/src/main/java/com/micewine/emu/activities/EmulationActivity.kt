@@ -460,8 +460,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
-        checkControllerAxis(event!!)
-
+        if (event != null) {
+            checkControllerAxis(event)
+        }
         return true
     }
 
