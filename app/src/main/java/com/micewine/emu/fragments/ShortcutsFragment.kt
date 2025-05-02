@@ -19,9 +19,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity.INPUT_METHOD_SERVICE
@@ -30,8 +28,6 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.getkeepsafe.taptargetview.TapTarget
-import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
@@ -569,7 +565,7 @@ class ShortcutsFragment : Fragment() {
             return gameList[index].virtualControllerEnableXInput
         }
 
-        fun putVirtualControllerPreset(name: String, presetName: String) {
+        fun putSelectedVirtualControllerPreset(name: String, presetName: String) {
             val index = gameList.indexOfFirst { it.name == name }
 
             if (index == -1) return
@@ -579,7 +575,7 @@ class ShortcutsFragment : Fragment() {
             saveShortcuts()
         }
 
-        fun getVirtualControllerPreset(name: String): String {
+        fun getSelectedVirtualControllerPreset(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
             if (index == -1) return "default"

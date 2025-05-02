@@ -15,7 +15,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.activities.PresetManagerActivity.Companion.ACTION_EDIT_BOX64_PRESET
 import com.micewine.emu.activities.PresetManagerActivity.Companion.ACTION_EDIT_CONTROLLER_MAPPING
 import com.micewine.emu.activities.VirtualControllerOverlayMapper
@@ -32,10 +31,10 @@ import com.micewine.emu.fragments.RenameFragment
 import com.micewine.emu.fragments.RenameFragment.Companion.RENAME_PRESET
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerPreset
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.getSelectedWinePrefix
 import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.putSelectedWinePrefix
 
@@ -73,11 +72,11 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
                     }
                 }
                 VIRTUAL_CONTROLLER_PRESET -> {
-                    if (sList.titleSettings == getVirtualControllerPreset(selectedGameName)) {
+                    if (sList.titleSettings == getSelectedVirtualControllerPreset(selectedGameName)) {
                         selectedPresetId = position
                     }
                     holder.radioButton.setOnClickListener {
-                        putVirtualControllerPreset(selectedGameName, holder.settingsName.text.toString())
+                        putSelectedVirtualControllerPreset(selectedGameName, holder.settingsName.text.toString())
                         selectedPresetId = holder.adapterPosition
                         notifyItemRangeChanged(0, settingsList.size)
                     }

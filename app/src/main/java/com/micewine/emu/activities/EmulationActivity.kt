@@ -64,15 +64,15 @@ import com.micewine.emu.controller.ControllerUtils
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.connectController
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.disconnectController
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.gamePadServerRunning
-import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
-import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
+import com.micewine.emu.controller.ControllerUtils.updateButtonsState
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
+import com.micewine.emu.controller.ControllerUtils.updateAxisState
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.fragments.LogViewerFragment
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerXInput
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.TouchInputHandler
@@ -130,7 +130,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 getCpuInfo()
             }
         }
-
         if (enableRamCounter) {
             lifecycleScope.launch {
                 getMemoryInfo(this@EmulationActivity)
@@ -168,7 +167,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         overlayView = findViewById(R.id.overlayView)
         xInputOverlayView = findViewById(R.id.xInputOverlayView)
 
-        overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
+        overlayView?.loadPreset(getSelectedVirtualControllerPreset(selectedGameName))
 
         overlayView?.visibility = View.INVISIBLE
         xInputOverlayView?.visibility = View.INVISIBLE
@@ -343,7 +342,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 return@OnKeyListener true
             }
 
-            checkControllerButtons(e)
+            updateButtonsState(e)
             mInputHandler!!.sendKeyEvent(e)
         }
 
@@ -461,7 +460,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
         if (event != null) {
-            checkControllerAxis(event)
+            updateAxisState(event)
         }
         return true
     }
@@ -556,7 +555,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         lorieView!!.requestFocus()
         lorieView!!.requestLayout()
 
-        overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
+        overlayView?.loadPreset(getSelectedVirtualControllerPreset(selectedGameName))
 
         prepareButtonsAxisValues()
     }

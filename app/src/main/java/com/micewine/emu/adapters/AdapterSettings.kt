@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
+import com.micewine.emu.activities.ControllerTestActivity
 import com.micewine.emu.activities.GeneralSettingsActivity
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ACTION_PREFERENCE_SELECT
 import com.micewine.emu.activities.PresetManagerActivity
@@ -85,6 +86,10 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
                 }
                 context.getString(R.string.rat_downloader_title) -> {
                     val intent = Intent(context, RatDownloaderActivity::class.java)
+                    context.startActivity(intent)
+                }
+                context.getString(R.string.controller_view_title) -> {
+                    val intent = Intent(context, ControllerTestActivity::class.java)
                     context.startActivity(intent)
                 }
                 else -> {

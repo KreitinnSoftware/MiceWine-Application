@@ -26,7 +26,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriverType
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
@@ -142,7 +142,7 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val size:
                 putExtra("box64Version", box64Version)
                 putExtra("box64Preset", getBox64Preset(selectedGameName))
                 putExtra("displayResolution", getDisplaySettings(selectedGameName)[1])
-                putExtra("virtualControllerPreset", getVirtualControllerPreset(selectedGameName))
+                putExtra("virtualControllerPreset", getSelectedVirtualControllerPreset(selectedGameName))
                 putExtra("d3dxRenderer", getD3DXRenderer(selectedGameName))
                 putExtra("wineD3D", getWineD3DVersion(selectedGameName))
                 putExtra("dxvk", getDXVKVersion(selectedGameName))

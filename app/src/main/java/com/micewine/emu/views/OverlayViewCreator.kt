@@ -24,8 +24,8 @@ import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAn
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonRadius
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedButtonShape
-import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getMapping
-import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.putMapping
+import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.putVirtualControllerPreset
 import com.micewine.emu.views.OverlayView.Companion.SHAPE_CIRCLE
 import com.micewine.emu.views.OverlayView.Companion.SHAPE_RECTANGLE
 import com.micewine.emu.views.OverlayView.Companion.SHAPE_SQUARE
@@ -88,7 +88,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     private val dpadRight: Path = Path()
 
     private fun loadFromPreferences() {
-        val mapping = getMapping(clickedPresetName)
+        val mapping = getVirtualControllerPreset(clickedPresetName)
 
         buttonList.clear()
         analogList.clear()
@@ -108,7 +108,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
     }
 
     fun saveOnPreferences() {
-        putMapping(clickedPresetName, getNativeResolution(context), buttonList, analogList, dpadList)
+        putVirtualControllerPreset(clickedPresetName, getNativeResolution(context), buttonList, analogList, dpadList)
     }
 
     init {

@@ -115,7 +115,7 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
                             outputFile = null
                         }
                         CONTROLLER_PRESET -> {
-                            importControllerPreset(requireActivity(), outputFile!!)
+                            importControllerPreset(outputFile!!)
                             outputFile = null
                         }
                         BOX64_PRESET -> {

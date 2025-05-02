@@ -68,7 +68,7 @@ class AskInstallPackageFragment(private val packageType: Int) : DialogFragment()
                             importVirtualControllerPreset(requireActivity(), mwpPresetCandidate?.second!!)
                         }
                         CONTROLLER_PRESET -> {
-                            importControllerPreset(requireActivity(), mwpPresetCandidate?.second!!)
+                            importControllerPreset(mwpPresetCandidate?.second!!)
                         }
                         BOX64_PRESET -> {
                             importBox64Preset(requireActivity(), mwpPresetCandidate?.second!!)

@@ -221,8 +221,8 @@ class PresetManagerActivity : AppCompatActivity() {
         const val AXIS_HAT_Y_PLUS_KEY = "axisHatY+"
         const val AXIS_HAT_Y_MINUS_KEY = "axisHatY-"
 
-        const val SELECTED_CONTROLLER_PRESET_KEY = "selectedControllerPreset"
-        const val SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY = "selectedVirtualControllerPreset"
+        const val SELECTED_CONTROLLER_PRESET = "selectedControllerPreset"
+        const val SELECTED_VIRTUAL_CONTROLLER_PRESET = "selectedVirtualControllerPreset"
         const val SELECTED_BOX64_PRESET = "selectedBox64Preset"
 
         const val ACTION_EDIT_CONTROLLER_MAPPING = "com.micewine.emu.ACTION_EDIT_CONTROLLER_MAPPING"

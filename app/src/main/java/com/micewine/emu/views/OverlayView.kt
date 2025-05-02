@@ -11,21 +11,22 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.preference.PreferenceManager
 import com.micewine.emu.LorieView
-import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.controller.ControllerUtils
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_DOWN
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT_DOWN
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT_UP
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_DOWN
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_UP
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_UP
+import com.micewine.emu.controller.ControllerUtils.DOWN
 import com.micewine.emu.controller.ControllerUtils.KEYBOARD
+import com.micewine.emu.controller.ControllerUtils.LEFT
+import com.micewine.emu.controller.ControllerUtils.LEFT_DOWN
+import com.micewine.emu.controller.ControllerUtils.LEFT_UP
 import com.micewine.emu.controller.ControllerUtils.MOUSE
+import com.micewine.emu.controller.ControllerUtils.RIGHT
+import com.micewine.emu.controller.ControllerUtils.RIGHT_DOWN
+import com.micewine.emu.controller.ControllerUtils.RIGHT_UP
+import com.micewine.emu.controller.ControllerUtils.UP
 import com.micewine.emu.controller.ControllerUtils.handleAxis
-import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
-import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getMapping
+import com.micewine.emu.controller.XKeyCodes.ButtonMapping
+import com.micewine.emu.controller.XKeyCodes.getMapping
+import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getVirtualControllerPreset
 import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
@@ -61,52 +62,38 @@ class OverlayView @JvmOverloads constructor(
     private val dpadRight: Path = Path()
 
     fun loadPreset(name: String?) {
-        var mapping = getMapping(name ?: preferences.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, "default")!!)
-
-        if (name == "--") mapping = getMapping(preferences.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, "default")!!)
+        val globalPreset = preferences.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET, "default") ?: "default"
+        val presetName = if (name == "--") { globalPreset } else { name ?: globalPreset }
+        val preset = getVirtualControllerPreset(presetName) ?: return
 
         buttonList.clear()
         analogList.clear()
         dpadList.clear()
 
-        mapping?.buttons?.forEach {
+        preset.buttons.forEach {
             when (it.keyName) {
-                "M_Left" -> {
-                    it.keyCodes = listOf(BUTTON_LEFT, BUTTON_LEFT, MOUSE)
-                }
-
-                "M_Middle" -> {
-                    it.keyCodes = listOf(BUTTON_MIDDLE, BUTTON_MIDDLE, MOUSE)
-                }
-
-                "M_Right" -> {
-                    it.keyCodes = listOf(BUTTON_RIGHT, BUTTON_RIGHT, MOUSE)
-                }
-
-                "Mouse" -> {
-                    it.keyCodes = listOf(MOUSE, MOUSE, MOUSE)
-                }
-
-                else -> {
-                    it.keyCodes = getXKeyScanCodes(it.keyName)
-                }
+                "M_Left" -> it.buttonMapping = ButtonMapping(it.keyName, BUTTON_LEFT, BUTTON_LEFT, MOUSE)
+                "M_Middle" -> it.buttonMapping = ButtonMapping(it.keyName, BUTTON_MIDDLE, BUTTON_MIDDLE, MOUSE)
+                "M_Right" -> it.buttonMapping = ButtonMapping(it.keyName, BUTTON_RIGHT, BUTTON_RIGHT, MOUSE)
+                "Mouse" -> it.buttonMapping = ButtonMapping(it.keyName, MOUSE, MOUSE, MOUSE)
+                else -> it.buttonMapping = getMapping(it.keyName)
             }
 
             buttonList.add(it)
         }
-        mapping?.analogs?.forEach {
-            it.upKeyCodes = getXKeyScanCodes(it.upKeyName)
-            it.downKeyCodes = getXKeyScanCodes(it.downKeyName)
-            it.leftKeyCodes = getXKeyScanCodes(it.leftKeyName)
-            it.rightKeyCodes = getXKeyScanCodes(it.rightKeyName)
+        preset.analogs.forEach {
+            it.upKeyCodes = getMapping(it.upKeyName)
+            it.downKeyCodes = getMapping(it.downKeyName)
+            it.leftKeyCodes = getMapping(it.leftKeyName)
+            it.rightKeyCodes = getMapping(it.rightKeyName)
 
             analogList.add(it)
         }
-        mapping?.dpads?.forEach {
-            it.upKeyCodes = getXKeyScanCodes(it.upKeyName)
-            it.downKeyCodes = getXKeyScanCodes(it.downKeyName)
-            it.leftKeyCodes = getXKeyScanCodes(it.leftKeyName)
-            it.rightKeyCodes = getXKeyScanCodes(it.rightKeyName)
+        preset.dpads.forEach {
+            it.upKeyCodes = getMapping(it.upKeyName)
+            it.downKeyCodes = getMapping(it.downKeyName)
+            it.leftKeyCodes = getMapping(it.leftKeyName)
+            it.rightKeyCodes = getMapping(it.rightKeyName)
 
             dpadList.add(it)
         }
@@ -226,16 +213,16 @@ class OverlayView @JvmOverloads constructor(
                     close()
                 }
 
-                drawDPad(dpadUp, it.dpadStatus in listOf(DPAD_UP, DPAD_RIGHT_UP, DPAD_LEFT_UP), canvas)
+                drawDPad(dpadUp, it.dpadStatus in listOf(UP, RIGHT_UP, LEFT_UP), canvas)
                 drawText(it.upKeyName, it.x, it.y - it.radius / 2, textPaint)
 
-                drawDPad(dpadDown, it.dpadStatus in listOf(DPAD_DOWN, DPAD_RIGHT_DOWN, DPAD_LEFT_DOWN), canvas)
+                drawDPad(dpadDown, it.dpadStatus in listOf(DOWN, RIGHT_DOWN, LEFT_DOWN), canvas)
                 drawText(it.downKeyName, it.x, it.y + it.radius / 2 + 20, textPaint)
 
-                drawDPad(dpadLeft, it.dpadStatus in listOf(DPAD_LEFT, DPAD_LEFT_DOWN, DPAD_LEFT_UP), canvas)
+                drawDPad(dpadLeft, it.dpadStatus in listOf(LEFT, LEFT_DOWN, LEFT_UP), canvas)
                 drawText(it.leftKeyName, it.x - it.radius / 2 - 20, it.y + 10, textPaint)
 
-                drawDPad(dpadRight, it.dpadStatus in listOf(DPAD_RIGHT, DPAD_RIGHT_DOWN, DPAD_RIGHT_UP), canvas)
+                drawDPad(dpadRight, it.dpadStatus in listOf(RIGHT, RIGHT_DOWN, RIGHT_UP), canvas)
                 drawText(it.rightKeyName, it.x + it.radius / 2 + 20, it.y + 10, textPaint)
             }
         }
@@ -268,8 +255,7 @@ class OverlayView @JvmOverloads constructor(
                         it.fingerX = posX
                         it.fingerY = posY
 
-                        virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4),
-                            it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes, it.deadZone)
+                        virtualAxis(posX / (it.radius / 4), posY / (it.radius / 4), it.upKeyCodes, it.downKeyCodes, it.leftKeyCodes, it.rightKeyCodes, it.deadZone)
 
                         return@forEach
                     }
@@ -288,14 +274,14 @@ class OverlayView @JvmOverloads constructor(
                         it.fingerY = posY
 
                         when {
-                            (posX / it.radius > 0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = DPAD_RIGHT
-                            (posX / it.radius < -0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT
-                            (posY / it.radius > 0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DPAD_DOWN
-                            (posY / it.radius < -0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DPAD_UP
-                            (posX / it.radius > 0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_RIGHT_DOWN
-                            (posX / it.radius > 0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_RIGHT_UP
-                            (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT_DOWN
-                            (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_LEFT_UP
+                            (posX / it.radius > 0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = RIGHT
+                            (posX / it.radius < -0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = LEFT
+                            (posY / it.radius > 0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DOWN
+                            (posY / it.radius < -0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = UP
+                            (posX / it.radius > 0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = RIGHT_DOWN
+                            (posX / it.radius > 0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = RIGHT_UP
+                            (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = LEFT_DOWN
+                            (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = LEFT_UP
 
                             else -> it.dpadStatus = -1
                         }
@@ -345,14 +331,14 @@ class OverlayView @JvmOverloads constructor(
                             isFingerPressingButton = true
 
                             when {
-                                (posX / it.radius > 0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = DPAD_RIGHT
-                                (posX / it.radius < -0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT
-                                (posY / it.radius > 0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DPAD_DOWN
-                                (posY / it.radius < -0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DPAD_UP
-                                (posX / it.radius > 0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_RIGHT_DOWN
-                                (posX / it.radius > 0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_RIGHT_UP
-                                (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = DPAD_LEFT_DOWN
-                                (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = DPAD_LEFT_UP
+                                (posX / it.radius > 0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = RIGHT
+                                (posX / it.radius < -0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus = LEFT
+                                (posY / it.radius > 0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = DOWN
+                                (posY / it.radius < -0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus = UP
+                                (posX / it.radius > 0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = RIGHT_DOWN
+                                (posX / it.radius > 0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = RIGHT_UP
+                                (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus = LEFT_DOWN
+                                (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus = LEFT_UP
 
                                 else -> it.dpadStatus = -1
                             }
@@ -440,16 +426,16 @@ class OverlayView @JvmOverloads constructor(
         return true
     }
 
-    private fun virtualAxis(axisX: Float, axisY: Float, upKeyCodes: List<Int>, downKeyCodes: List<Int>, leftKeyCodes: List<Int>, rightKeyCodes: List<Int>, deadZone: Float) {
-        handleAxis(axisX, axisY, ControllerUtils.Analog(false, upKeyCodes, downKeyCodes, leftKeyCodes, rightKeyCodes), deadZone)
+    private fun virtualAxis(axisX: Float, axisY: Float, upMapping: ButtonMapping, downMapping: ButtonMapping, leftMapping: ButtonMapping, rightMapping: ButtonMapping, deadZone: Float) {
+        handleAxis(axisX, axisY, ControllerUtils.Analog(false, upMapping, downMapping, leftMapping, rightMapping), deadZone)
     }
 
     private fun handleButton(button: VirtualButton, pressed: Boolean) {
         button.isPressed = pressed
 
-        when (button.keyCodes!![2]) {
-            KEYBOARD -> lorieView.sendKeyEvent(button.keyCodes!![0], button.keyCodes!![1], pressed)
-            MOUSE -> lorieView.sendMouseEvent(0F, 0F, button.keyCodes!![0], pressed, true)
+        when (button.buttonMapping.type) {
+            KEYBOARD -> lorieView.sendKeyEvent(button.buttonMapping.scanCode, button.buttonMapping.keyCode, pressed)
+            MOUSE -> lorieView.sendMouseEvent(0F, 0F, button.buttonMapping.scanCode, pressed, true)
         }
     }
 
@@ -459,7 +445,7 @@ class OverlayView @JvmOverloads constructor(
         var y: Float,
         var radius: Float,
         var keyName: String,
-        var keyCodes: List<Int>?,
+        var buttonMapping: ButtonMapping,
         var fingerId: Int,
         var isPressed: Boolean,
         var shape: Int
@@ -471,13 +457,13 @@ class OverlayView @JvmOverloads constructor(
         var y: Float,
         var radius: Float,
         var upKeyName: String,
-        var upKeyCodes: List<Int>,
+        var upKeyCodes: ButtonMapping,
         var downKeyName: String,
-        var downKeyCodes: List<Int>,
+        var downKeyCodes: ButtonMapping,
         var leftKeyName: String,
-        var leftKeyCodes: List<Int>,
+        var leftKeyCodes: ButtonMapping,
         var rightKeyName: String,
-        var rightKeyCodes: List<Int>,
+        var rightKeyCodes: ButtonMapping,
         var fingerId: Int,
         var isPressed: Boolean,
         var fingerX: Float,
@@ -493,13 +479,13 @@ class OverlayView @JvmOverloads constructor(
         var fingerY: Float,
         var radius: Float,
         var upKeyName: String,
-        var upKeyCodes: List<Int>,
+        var upKeyCodes: ButtonMapping,
         var downKeyName: String,
-        var downKeyCodes: List<Int>,
+        var downKeyCodes: ButtonMapping,
         var leftKeyName: String,
-        var leftKeyCodes: List<Int>,
+        var leftKeyCodes: ButtonMapping,
         var rightKeyName: String,
-        var rightKeyCodes: List<Int>,
+        var rightKeyCodes: ButtonMapping,
         var isPressed: Boolean,
         var fingerId: Int,
         var deadZone: Float

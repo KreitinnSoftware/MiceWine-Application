@@ -13,10 +13,12 @@ import android.os.Build
 import android.os.Bundle
 import android.os.storage.StorageManager
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -134,7 +136,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getExeArguments
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getExePath
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriverType
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
@@ -430,11 +432,11 @@ class MainActivity : AppCompatActivity() {
                             inputDevice.name,
                             deviceId,
                             -1,
-                            -1
+                            -1,
+                            inputDevice.motionRanges.any { it.axis == MotionEvent.AXIS_LTRIGGER } && inputDevice.motionRanges.any { it.axis == MotionEvent.AXIS_RTRIGGER }
                         )
                     )
                 }
-
                 prepareButtonsAxisValues()
             }
         }
@@ -492,17 +494,14 @@ class MainActivity : AppCompatActivity() {
                     selectedFragmentId = 0
                     viewPager?.currentItem = 0
                 }
-
                 R.id.nav_settings -> {
                     selectedFragmentId = 1
                     viewPager?.currentItem = 1
                 }
-
                 R.id.nav_file_manager -> {
                     selectedFragmentId = 2
                     viewPager?.currentItem = 2
                 }
-
                 R.id.nav_about -> {
                     selectedFragmentId = 3
                     viewPager?.currentItem = 3
@@ -930,7 +929,7 @@ class MainActivity : AppCompatActivity() {
                 putExtra("box64Version", box64Version)
                 putExtra("box64Preset", getBox64Preset(shortcutName))
                 putExtra("displayResolution", getDisplaySettings(shortcutName)[1])
-                putExtra("virtualControllerPreset", getVirtualControllerPreset(shortcutName))
+                putExtra("virtualControllerPreset", getSelectedVirtualControllerPreset(shortcutName))
                 putExtra("d3dxRenderer", getD3DXRenderer(shortcutName))
                 putExtra("wineD3D", getWineD3DVersion(shortcutName))
                 putExtra("dxvk", getDXVKVersion(shortcutName))
