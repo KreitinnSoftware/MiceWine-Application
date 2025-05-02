@@ -49,9 +49,12 @@ jobs:
 
     - name: "Get Version"
       run: echo "VERSION=$(echo $(cat app/build.gradle.kts | grep versionName | cut -d "=" -f 2 | sed "s/\"//g"))" >> $GITHUB_ENV
+      
+    - name: "Check If It's New Release"
+      run: if [ -n "$(git diff HEAD~1 HEAD app/build.gradle.kts | grep versionName)" ]; then echo "VERSION_CHANGED=1" >> $GITHUB_ENV; else echo "VERSION_CHANGED=0" >> $GITHUB_ENV; fi
           
     - name: "Create Release"
-      if: env.BRANCH == 'master' && github.event_name != 'pull_request'
+      if: env.VERSION_CHANGED == '1' && github.event_name != 'pull_request'
       uses: softprops/action-gh-release@v2
       with:
         name: "MiceWine Application (${{ env.VERSION }})"
@@ -60,7 +63,7 @@ jobs:
         files: ./app-debug.apk
     
     - name: "Upload Artifact"
-      if: env.BRANCH != 'master' || github.event_name == 'pull_request'
+      if: env.VERSION_CHANGED == '0' || github.event_name == 'pull_request'
       uses: actions/upload-artifact@v4
       with:
         name: MiceWine-Application-(git-${{ env.SHORT_SHA }})
