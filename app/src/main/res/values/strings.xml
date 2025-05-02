@@ -187,6 +187,8 @@
     <string name="remove_last_wine_prefix_error">You cannot remove last prefix</string>
     <string name="wine_manager_title">Wine Manager</string>
     <string name="wine_manager_description">Manage Wine Versions</string>
+    <string name="wine_prefix_manager_title">Wine Prefix Manager</string>
+    <string name="wine_prefix_manager_description">Manage Wine Prefixes</string>
     <string name="installing_drivers">Installing Drivers…</string>
     <string name="installing_box64">Installing Box64…</string>
     <string name="installing_wine">Installing Wine…</string>
@@ -223,4 +225,7 @@
     <string name="driver_info_description">Get Vulkan Info for Drivers</string>
     <string name="controller_settings">Controller Settings</string>
     <string name="selected_box64">Selected Box64</string>
+    <string name="install">Install</string>
+    <string name="export_log">Export Log</string>
+    <string name="controller_view_title">Test Controller</string>
 </resources>

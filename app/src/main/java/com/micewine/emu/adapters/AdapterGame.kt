@@ -26,7 +26,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriverType
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
@@ -35,32 +35,36 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineVirtualDesktop
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.preferences
 import java.io.File
+import kotlin.math.roundToInt
 
-class AdapterGame(private val gameList: MutableList<GameItem>, private val activity: Activity) : RecyclerView.Adapter<AdapterGame.ViewHolder>() {
+class AdapterGame(private val gameList: MutableList<GameItem>, private val size: Float, private val activity: Activity,) : RecyclerView.Adapter<AdapterGame.ViewHolder>() {
+    private var filteredList: MutableList<GameItem> = gameList
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_game_item, parent, false)
+        itemView.layoutParams.width = (itemView.layoutParams.width * size).roundToInt()
+        itemView.layoutParams.height = (itemView.layoutParams.height * size).roundToInt()
         return ViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val sList = gameList[position]
+        val sList = filteredList[position]
         holder.titleGame.text = sList.name
 
         val imageFile = File(sList.iconPath)
 
         if (imageFile.exists() && imageFile.length() > 0) {
             val imageBitmap = BitmapFactory.decodeFile(sList.iconPath)
-
             if (imageBitmap != null) {
                 holder.gameImage.setImageBitmap(
                     resizeBitmap(
-                        imageBitmap, holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height
+                        imageBitmap, holder.itemView.layoutParams.width - 10, holder.itemView.layoutParams.width - 10
                     )
                 )
             }
         } else if (sList.iconPath == "") {
             holder.gameImage.setImageBitmap(resizeBitmap(
-                BitmapFactory.decodeResource(activity.resources, R.drawable.default_icon), holder.gameImage.layoutParams.width, holder.gameImage.layoutParams.height)
+                BitmapFactory.decodeResource(activity.resources, R.drawable.default_icon), holder.itemView.layoutParams.width - 10, holder.itemView.layoutParams.width - 10)
             )
         } else {
             holder.gameImage.setImageBitmap(
@@ -70,13 +74,15 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val activ
     }
 
     override fun getItemCount(): Int {
-        return gameList.size
+        return filteredList.size
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateList(newList: List<GameItem>) {
-        gameList.clear()
-        gameList.addAll(newList)
+    fun filterList(name: String) {
+        filteredList = gameList.filter {
+            it.name.contains(name, true)
+        }.toMutableList()
+
         notifyDataSetChanged()
     }
 
@@ -136,7 +142,7 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val activ
                 putExtra("box64Version", box64Version)
                 putExtra("box64Preset", getBox64Preset(selectedGameName))
                 putExtra("displayResolution", getDisplaySettings(selectedGameName)[1])
-                putExtra("virtualControllerPreset", getVirtualControllerPreset(selectedGameName))
+                putExtra("virtualControllerPreset", getSelectedVirtualControllerPreset(selectedGameName))
                 putExtra("d3dxRenderer", getD3DXRenderer(selectedGameName))
                 putExtra("wineD3D", getWineD3DVersion(selectedGameName))
                 putExtra("dxvk", getDXVKVersion(selectedGameName))

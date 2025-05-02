@@ -16,10 +16,10 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.getNativeResolution
-import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.adapters.AdapterPreset
-import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.views.OverlayView
 import com.micewine.emu.views.OverlayViewCreator.Companion.GRID_SIZE
 import java.io.File
@@ -47,7 +47,7 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
 
         presetListNames.clear()
         presetList.forEach {
-            addToAdapter(it.name, VIRTUAL_CONTROLLER, true)
+            addToAdapter(it.name, VIRTUAL_CONTROLLER_PRESET, true)
         }
     }
 
@@ -72,17 +72,15 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
             editShortcut = boolean
         }
 
-        fun getMapping(name: String): VirtualControllerPreset? {
+        fun getVirtualControllerPreset(name: String): VirtualControllerPreset? {
             val index = presetList.indexOfFirst { it.name == name }
-
             if (index == -1) return null
 
             return presetList[index]
         }
 
-        fun putMapping(name: String, resolution: String, buttonList: MutableList<OverlayView.VirtualButton>, analogList: MutableList<OverlayView.VirtualAnalog>, dpadList: MutableList<OverlayView.VirtualDPad>) {
+        fun putVirtualControllerPreset(name: String, resolution: String, buttonList: MutableList<OverlayView.VirtualButton>, analogList: MutableList<OverlayView.VirtualAnalog>, dpadList: MutableList<OverlayView.VirtualDPad>) {
             val index = presetList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             presetList[index] = VirtualControllerPreset(name, resolution, mutableListOf(), mutableListOf(), mutableListOf())
@@ -110,7 +108,7 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
 
             presetList.add(defaultPreset)
             presetListNames.add(
-                AdapterPreset.Item(name, VIRTUAL_CONTROLLER, true, editShortcut)
+                AdapterPreset.Item(name, VIRTUAL_CONTROLLER_PRESET, true, editShortcut)
             )
 
             recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
@@ -128,7 +126,7 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
 
             if (index == selectedPresetId) {
                 preferences?.edit {
-                    putString(SELECTED_VIRTUAL_CONTROLLER_PRESET_KEY, presetListNames.first().titleSettings)
+                    putString(SELECTED_VIRTUAL_CONTROLLER_PRESET, presetListNames.first().titleSettings)
                     apply()
                 }
                 recyclerView?.adapter?.notifyItemChanged(0)
@@ -199,7 +197,7 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
 
             presetList.add(processed)
             presetListNames.add(
-                AdapterPreset.Item(processed.name, VIRTUAL_CONTROLLER, true)
+                AdapterPreset.Item(processed.name, VIRTUAL_CONTROLLER_PRESET, true)
             )
 
             recyclerView?.post {

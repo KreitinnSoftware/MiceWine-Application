@@ -93,9 +93,16 @@ object XKeyCodes {
         return keyNames
     }
 
-    fun getXKeyScanCodes(key: String): List<Int> {
+    fun getMapping(key: String): ButtonMapping {
         val scanCode = scanKeyCodes[key]?.first ?: 0
         val keyCode = scanKeyCodes[key]?.second ?: 0
-        return listOf(scanCode, keyCode, KEYBOARD)
+        return ButtonMapping(key, scanCode, keyCode, KEYBOARD)
     }
+
+    class ButtonMapping(
+        var name: String = "",
+        var scanCode: Int = -1,
+        var keyCode: Int = -1,
+        var type: Int = -1
+    )
 }

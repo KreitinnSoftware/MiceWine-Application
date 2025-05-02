@@ -3,7 +3,6 @@ package com.micewine.emu.fragments
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
@@ -16,22 +15,23 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.selectedFragmentId
 import com.micewine.emu.activities.MainActivity.Companion.setupDone
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
-import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
-import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
-import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetType
-import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.deleteBox64Preset
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.deleteControllerPreset
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
 import com.micewine.emu.fragments.FileManagerFragment.Companion.deleteFile
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
 import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.ACTION_UPDATE_WINE_PREFIX_SPINNER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.removeGameFromList
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.deleteVirtualControllerPreset
+import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.deleteWinePrefix
+import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.getWinePrefixes
+import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.putSelectedWinePrefix
 
 class DeleteItemFragment(private val deleteType: Int, private val context: Context) : DialogFragment() {
     private var preferences: SharedPreferences? = null
@@ -58,41 +58,11 @@ class DeleteItemFragment(private val deleteType: Int, private val context: Conte
                 }
                 DELETE_PRESET -> {
                     when (clickedPresetType) {
-                        PHYSICAL_CONTROLLER -> deleteControllerPreset(clickedPresetName)
-                        VIRTUAL_CONTROLLER -> deleteVirtualControllerPreset(clickedPresetName)
+                        CONTROLLER_PRESET -> deleteControllerPreset(clickedPresetName)
+                        VIRTUAL_CONTROLLER_PRESET -> deleteVirtualControllerPreset(clickedPresetName)
                         BOX64_PRESET -> deleteBox64Preset(clickedPresetName)
+                        WINEPREFIX_PRESET -> deleteWinePrefix(clickedPresetName)
                     }
-                }
-                DELETE_WINE_PREFIX -> {
-                    if (winePrefixesDir.listFiles()!!.count() == 1) {
-                        Toast.makeText(context, getText(R.string.remove_last_wine_prefix_error), Toast.LENGTH_LONG).show()
-                        dismiss()
-                        return@setOnClickListener
-                    }
-
-                    val firstPrefix = winePrefixesDir.listFiles()!!.first()
-
-                    preferences!!.edit().apply {
-                        putString(SELECTED_WINE_PREFIX, firstPrefix.name)
-                        apply()
-                    }
-
-                    Thread {
-                        setupDone = false
-
-                        SetupFragment().show(requireActivity().supportFragmentManager, "")
-
-                        dialogTitleText = getString(R.string.deleting_wine_prefix)
-                        progressBarIsIndeterminate = true
-
-                        runCommand("rm -rf $winePrefix")
-
-                        setupDone = true
-
-                        context.sendBroadcast(
-                            Intent(ACTION_UPDATE_WINE_PREFIX_SPINNER)
-                        )
-                    }.start()
                 }
             }
 
@@ -109,6 +79,5 @@ class DeleteItemFragment(private val deleteType: Int, private val context: Conte
     companion object {
         const val DELETE_GAME_ITEM = 0
         const val DELETE_PRESET = 1
-        const val DELETE_WINE_PREFIX = 2
     }
 }

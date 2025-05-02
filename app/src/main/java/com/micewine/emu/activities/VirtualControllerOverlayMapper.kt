@@ -18,13 +18,15 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 import com.micewine.emu.R
-import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
+import com.micewine.emu.controller.XKeyCodes.ButtonMapping
+import com.micewine.emu.controller.XKeyCodes.getMapping
 import com.micewine.emu.databinding.ActivityVirtualControllerMapperBinding
 import com.micewine.emu.fragments.EditVirtualButtonFragment
 import com.micewine.emu.views.OverlayView
 import com.micewine.emu.views.OverlayView.Companion.SHAPE_CIRCLE
 import com.micewine.emu.views.OverlayView.Companion.analogList
 import com.micewine.emu.views.OverlayView.Companion.buttonList
+import com.micewine.emu.views.OverlayView.Companion.dpadList
 import com.micewine.emu.views.OverlayViewCreator
 
 class VirtualControllerOverlayMapper : AppCompatActivity() {
@@ -65,7 +67,7 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
                             overlayView?.height!! / 2F,
                             180F,
                             "--",
-                            null,
+                            ButtonMapping("--"),
                             -1,
                             false,
                             SHAPE_CIRCLE
@@ -85,13 +87,13 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
                             0F,
                             275F,
                             "--",
-                            getXKeyScanCodes("--"),
+                            ButtonMapping("--"),
                             "--",
-                            getXKeyScanCodes("--"),
+                            ButtonMapping("--"),
                             "--",
-                            getXKeyScanCodes("--"),
+                            ButtonMapping("--"),
                             "--",
-                            getXKeyScanCodes("--"),
+                            ButtonMapping("--"),
                             false,
                             -1,
                             0.75F
@@ -104,18 +106,18 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
                 R.id.addDPad -> {
                     overlayView?.addDPad(
                         OverlayView.VirtualDPad(
-                            analogList.count() + 1,
+                            dpadList.count() + 1,
                             overlayView?.width!! / 2F,
                             overlayView?.height!! / 2F,
                             275F,
                             "--",
-                            getXKeyScanCodes("--"),
+                            getMapping("--"),
                             "--",
-                            getXKeyScanCodes("--"),
+                            getMapping("--"),
                             "--",
-                            getXKeyScanCodes("--"),
+                            getMapping("--"),
                             "--",
-                            getXKeyScanCodes("--"),
+                            getMapping("--"),
                             -1,
                             false,
                             0F,

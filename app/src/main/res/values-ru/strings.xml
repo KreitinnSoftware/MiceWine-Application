@@ -160,6 +160,8 @@
     <string name="remove_last_wine_prefix_error">Вы не можете удалить последний префикс</string>
     <string name="wine_manager_title">Менеджер Wine</string>
     <string name="wine_manager_description">Управление версиями Wine</string>
+    <string name="wine_prefix_manager_title">Менеджер префиксов Wine</string>
+    <string name="wine_prefix_manager_description">Управление префиксами Wine</string>
     <string name="installing_drivers">Установка драйверов…</string>
     <string name="installing_box64">Установка Box64…</string>
     <string name="installing_wine">Установка Wine…</string>
@@ -196,4 +198,6 @@
     <string name="driver_info_description">Получить информацию о Vulkan для драйверов</string>
     <string name="controller_settings">Настройки контроллера</string>
     <string name="selected_box64">Выбран Box64</string>
+    <string name="install">Установить</string>
+    <string name="export_log">Экспорт лога</string>
 </resources>

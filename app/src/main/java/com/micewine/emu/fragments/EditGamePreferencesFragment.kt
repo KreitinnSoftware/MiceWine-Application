@@ -38,7 +38,7 @@ import com.micewine.emu.activities.MainActivity.Companion.resolutions4_3
 import com.micewine.emu.activities.MainActivity.Companion.selectedCpuAffinity
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
-import com.micewine.emu.controller.ControllerUtils.getGameControllerNames
+import com.micewine.emu.controller.ControllerUtils.getConnectedControllers
 import com.micewine.emu.core.RatPackageManager.getPackageNameVersionById
 import com.micewine.emu.core.RatPackageManager.listRatPackages
 import com.micewine.emu.core.RatPackageManager.listRatPackagesId
@@ -57,7 +57,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameExeArguments
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameIcon
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
@@ -73,7 +73,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.putD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVKD3DVersion
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineD3DVersion
@@ -189,7 +189,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             }
         }
 
-        val controllerProfilesNames: List<String> = getControllerPresets().map { it[0] }
+        val controllerProfilesNames: List<String> = getControllerPresets().map { it.name }
         val virtualControllerProfilesNames: List<String> = getVirtualControllerPresets(requireContext()).map { it.name }
         val box64Versions: List<String> = listRatPackages("Box64-").map { it.name + " " + it.version }.toMutableList().apply { add(0, "Global: ${getPackageNameVersionById(preferences?.getString(SELECTED_BOX64, ""))}") }
         val box64VersionsId: List<String> = listRatPackagesId("Box64-").toMutableList().apply { add(0, "Global") }
@@ -399,7 +399,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             adapter = CPUAffinityAdapter(requireActivity(), availableCPUs, cpuAffinitySpinner, type)
         }
 
-        val connectedControllers = getGameControllerNames()
+        val connectedControllers = getConnectedControllers()
         val controllerTextViews = listOf(connectedController0, connectedController1, connectedController2, connectedController3)
         val controllerLayoutViews = listOf(controller0Layout, controller1Layout, controller2Layout, controller3Layout)
 
@@ -538,7 +538,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         }
         selectedVirtualControllerProfileSpinner.apply {
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, virtualControllerProfilesNames)
-            setSelection(virtualControllerProfilesNames.indexOf(getVirtualControllerPreset(selectedGameName)))
+            setSelection(virtualControllerProfilesNames.indexOf(getSelectedVirtualControllerPreset(selectedGameName)))
 
             onItemSelectedListener = object : OnItemSelectedListener {
                 override fun onItemSelected(
@@ -611,7 +611,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     putWineServices(selectedGameName, it.wineServices)
                     putWineVirtualDesktop(selectedGameName, it.wineVirtualDesktop)
                     putCpuAffinity(selectedGameName, it.cpuAffinity)
-                    putVirtualControllerPreset(selectedGameName, it.virtualControllerPreset)
+                    putSelectedVirtualControllerPreset(selectedGameName, it.virtualControllerPreset)
                     putVirtualControllerXInput(selectedGameName, it.virtualXInputController)
 
                     putControllerXInput(selectedGameName, it.controllerXInput[0], 0)
@@ -689,23 +689,33 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         val temporarySettings = TemporarySettings()
 
         class TemporarySettings(
-            var displayMode: String = getDisplaySettings("")[0],
-            var displayResolution: String = getDisplaySettings("")[1],
-            var vulkanDriver: String = "",
-            var d3dxRenderer: String = "",
-            var dxvk: String = "",
-            var wineD3D: String = "",
-            var vkd3d: String = "",
-            var wineESync: Boolean = getWineESync(""),
-            var wineServices: Boolean = getWineServices(""),
-            var wineVirtualDesktop: Boolean = getWineVirtualDesktop(""),
-            var cpuAffinity: String = getCpuAffinity(""),
-            var virtualControllerPreset: String = "",
-            var virtualXInputController: Boolean = getVirtualControllerXInput(""),
-            var controllerXInput: BooleanArray = booleanArrayOf(false, false, false, false),
-            var controllerPreset: MutableList<String> = mutableListOf("", "", "", ""),
-            var box64Version: String = getBox64Version(""),
-            var box64Preset: String = getBox64Preset(""),
+            var displayMode: String = getDisplaySettings(selectedGameName)[0],
+            var displayResolution: String = getDisplaySettings(selectedGameName)[1],
+            var vulkanDriver: String = getVulkanDriver(selectedGameName),
+            var d3dxRenderer: String = getD3DXRenderer(selectedGameName),
+            var dxvk: String = getDXVKVersion(selectedGameName),
+            var wineD3D: String = getWineD3DVersion(selectedGameName),
+            var vkd3d: String = getVKD3DVersion(selectedGameName),
+            var wineESync: Boolean = getWineESync(selectedGameName),
+            var wineServices: Boolean = getWineServices(selectedGameName),
+            var wineVirtualDesktop: Boolean = getWineVirtualDesktop(selectedGameName),
+            var cpuAffinity: String = getCpuAffinity(selectedGameName),
+            var virtualControllerPreset: String = getSelectedVirtualControllerPreset(selectedGameName),
+            var virtualXInputController: Boolean = getVirtualControllerXInput(selectedGameName),
+            var controllerXInput: BooleanArray = booleanArrayOf(
+                getControllerXInput(selectedGameName, 0),
+                getControllerXInput(selectedGameName, 1),
+                getControllerXInput(selectedGameName, 2),
+                getControllerXInput(selectedGameName, 3)
+            ),
+            var controllerPreset: MutableList<String> = mutableListOf(
+                getControllerPreset(selectedGameName, 0),
+                getControllerPreset(selectedGameName, 1),
+                getControllerPreset(selectedGameName, 2),
+                getControllerPreset(selectedGameName, 3)
+            ),
+            var box64Version: String = getBox64Version(selectedGameName),
+            var box64Preset: String = getBox64Preset(selectedGameName),
         )
 
         class CPUAffinityAdapter(

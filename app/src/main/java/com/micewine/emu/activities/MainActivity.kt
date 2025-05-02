@@ -13,21 +13,18 @@ import android.os.Build
 import android.os.Bundle
 import android.os.storage.StorageManager
 import android.util.DisplayMetrics
-import android.view.ContextMenu
+import android.util.Log
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
+import android.view.MotionEvent
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
-import com.getkeepsafe.taptargetview.TapTarget
-import com.getkeepsafe.taptargetview.TapTargetSequence
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
@@ -49,6 +46,14 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGSEGV
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGSEGV_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWBT
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWBT_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3_DEFAULT_VALUE
@@ -67,16 +72,13 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_ME
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_TU_DEBUG_PRESET
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VULKAN_DRIVER
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL_DEFAULT_VALUE
-import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateICDFile
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.adapters.AdapterBottomNavigation
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
-import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
-import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.controller.ControllerUtils
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.disconnectController
 import com.micewine.emu.controller.ControllerUtils.connectedPhysicalControllers
@@ -84,7 +86,7 @@ import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
-import com.micewine.emu.core.HighlightState
+import com.micewine.emu.core.EnvVars.sharedPreferences
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.RatPackageManager.checkPackageInstalled
 import com.micewine.emu.core.RatPackageManager.installADToolsDriver
@@ -108,17 +110,14 @@ import com.micewine.emu.fragments.Box64PresetManagerFragment
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Mapping
 import com.micewine.emu.fragments.ControllerPresetManagerFragment
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
-import com.micewine.emu.fragments.DeleteItemFragment
-import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_GAME_ITEM
 import com.micewine.emu.fragments.EditGamePreferencesFragment
-import com.micewine.emu.fragments.EditGamePreferencesFragment.Companion.EDIT_GAME_PREFERENCES
 import com.micewine.emu.fragments.EditGamePreferencesFragment.Companion.FILE_MANAGER_START_PREFERENCES
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.fragments.FloatingFileManagerFragment
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.OPERATION_SELECT_RAT
-import com.micewine.emu.fragments.RenameFragment
-import com.micewine.emu.fragments.RenameFragment.Companion.RENAME_FILE
 import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
@@ -127,14 +126,19 @@ import com.micewine.emu.fragments.ShortcutsFragment
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.ACTION_UPDATE_WINE_PREFIX_SPINNER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.ADRENO_TOOLS_DRIVER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.MESA_DRIVER
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToLauncher
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.addGameToList
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Version
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getExeArguments
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getExePath
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriverType
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
@@ -142,11 +146,16 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineVirtualDesk
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
 import com.micewine.emu.fragments.SoundSettingsFragment.Companion.generatePAFile
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
+import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.createWinePrefix
+import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.getSelectedWinePrefix
+import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.getWinePrefixFile
 import com.micewine.emu.utils.DriveUtils
 import com.micewine.emu.utils.FilePathResolver
 import io.ByteWriter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mslinks.LinkTargetIDList
 import mslinks.ShellLink
@@ -268,14 +277,13 @@ class MainActivity : AppCompatActivity() {
                             }
                         } else if (file.name.endsWith(".mwp")) {
                             val mwpLines = file.readLines()
-
                             if (mwpLines.isNotEmpty()) {
                                 when (mwpLines[0]) {
                                     "controllerPreset" -> {
-                                        mwpPresetCandidate = Pair(PHYSICAL_CONTROLLER, file.path)
+                                        mwpPresetCandidate = Pair(CONTROLLER_PRESET, file.path)
                                     }
                                     "virtualControllerPreset" -> {
-                                        mwpPresetCandidate = Pair(VIRTUAL_CONTROLLER, file.path)
+                                        mwpPresetCandidate = Pair(VIRTUAL_CONTROLLER_PRESET, file.path)
                                     }
                                     "box64Preset" -> {
                                         mwpPresetCandidate = Pair(BOX64_PRESET, file.path)
@@ -387,9 +395,7 @@ class MainActivity : AppCompatActivity() {
                         progressBarIsIndeterminate = true
 
                         withContext(Dispatchers.IO) {
-                            setupWinePrefix(
-                                File(winePrefix), wine
-                            )
+                            createWinePrefix(winePrefix, wine)
 
                             fileManagerCwd = fileManagerDefaultDir
                             setupDone = true
@@ -401,12 +407,6 @@ class MainActivity : AppCompatActivity() {
                             sendBroadcast(
                                 updateWinePrefixSpinnerIntent
                             )
-
-                            withContext(Dispatchers.Main) {
-                                runOnUiThread {
-                                    showHighlightSequence()
-                                }
-                            }
                         }
                     }
                 }
@@ -422,8 +422,9 @@ class MainActivity : AppCompatActivity() {
         override fun onInputDeviceChanged(deviceId: Int) {
             val inputDevice = InputDevice.getDevice(deviceId) ?: return
 
-            if ((inputDevice.sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD) ||
-                (inputDevice.sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK)
+            if (((inputDevice.sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD) ||
+                (inputDevice.sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK)) &&
+                (!inputDevice.name.contains("uinput"))
             ) {
                 if (connectedPhysicalControllers.indexOfFirst { it.id == deviceId } == -1) {
                     connectedPhysicalControllers.add(
@@ -431,11 +432,11 @@ class MainActivity : AppCompatActivity() {
                             inputDevice.name,
                             deviceId,
                             -1,
-                            -1
+                            -1,
+                            inputDevice.motionRanges.any { it.axis == MotionEvent.AXIS_LTRIGGER } && inputDevice.motionRanges.any { it.axis == MotionEvent.AXIS_RTRIGGER }
                         )
                     )
                 }
-
                 prepareButtonsAxisValues()
             }
         }
@@ -449,12 +450,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var appToolbar: MaterialToolbar? = null
     private var bottomNavigation: BottomNavigationView? = null
     private var viewPager: ViewPager2? = null
     private var runningXServer = false
     private var preferences: SharedPreferences? = null
-    private var currentState: HighlightState? = null
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -477,9 +476,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        appToolbar = findViewById(R.id.appToolbar)
-
-        setSupportActionBar(appToolbar)
         setSharedVars(this)
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -498,17 +494,14 @@ class MainActivity : AppCompatActivity() {
                     selectedFragmentId = 0
                     viewPager?.currentItem = 0
                 }
-
                 R.id.nav_settings -> {
                     selectedFragmentId = 1
                     viewPager?.currentItem = 1
                 }
-
                 R.id.nav_file_manager -> {
                     selectedFragmentId = 2
                     viewPager?.currentItem = 2
                 }
-
                 R.id.nav_about -> {
                     selectedFragmentId = 3
                     viewPager?.currentItem = 3
@@ -538,10 +531,8 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        onNewIntent(intent)
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (winePrefix?.exists() == true) {
+            if (getWinePrefixFile(winePrefix!!).exists()) {
                 WineWrapper.clearDrives()
 
                 (application.getSystemService(Context.STORAGE_SERVICE) as StorageManager).storageVolumes.forEach { volume ->
@@ -550,6 +541,10 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+
+        if (savedInstanceState == null) {
+            onNewIntent(intent)
         }
     }
 
@@ -566,7 +561,6 @@ class MainActivity : AppCompatActivity() {
             )
         } else {
             setupDone = true
-            showHighlightSequence()
         }
     }
 
@@ -594,88 +588,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         return super.onKeyDown(keyCode, event)
-    }
-
-    override fun onCreateContextMenu(
-        menu: ContextMenu?,
-        v: View?,
-        menuInfo: ContextMenu.ContextMenuInfo?
-    ) {
-        if (selectedFragmentId == 0) {
-            if (selectedGameName == getString(R.string.desktop_mode_init)) {
-                menuInflater.inflate(R.menu.game_list_context_menu_lite, menu)
-            } else {
-                menuInflater.inflate(R.menu.game_list_context_menu, menu)
-            }
-        } else if (selectedFragmentId == 2) {
-            if (File(selectedFile).isDirectory) {
-                menuInflater.inflate(R.menu.file_list_context_menu_folder, menu)
-            } else {
-                menuInflater.inflate(R.menu.file_list_context_menu, menu)
-            }
-        }
-    }
-
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.addToLauncher -> {
-                addGameToLauncher(this, selectedGameName)
-            }
-
-            R.id.removeGameItem -> {
-                DeleteItemFragment(DELETE_GAME_ITEM, this).show(supportFragmentManager, "")
-            }
-
-            R.id.editGameItem -> {
-                EditGamePreferencesFragment(EDIT_GAME_PREFERENCES).show(supportFragmentManager, "")
-            }
-
-            R.id.addToHome -> {
-                if (selectedFile.endsWith("exe")) {
-                    val output = "$usrDir/icons/${File(selectedFile).nameWithoutExtension}-icon"
-
-                    WineWrapper.extractIcon(File(selectedFile), output)
-
-                    addGameToList(selectedFile, File(selectedFile).nameWithoutExtension, output)
-                } else if (selectedFile.endsWith(".bat") || selectedFile.endsWith(".msi")) {
-                    addGameToList(selectedFile, File(selectedFile).nameWithoutExtension, "")
-                } else {
-                    Toast.makeText(this, getString(R.string.incompatible_selected_file), Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            R.id.createLnk -> {
-                exportLnkAction(selectedFile)
-            }
-
-            R.id.executeExe -> {
-                val fileExtension = File(selectedFile).extension.lowercase()
-
-                if (fileExtension  == "exe" || fileExtension == "bat" || fileExtension == "msi"  || fileExtension == "lnk") {
-                    val runWineIntent = Intent(ACTION_RUN_WINE).apply {
-                        putExtra("exePath", selectedFile)
-                    }
-
-                    sendBroadcast(runWineIntent)
-
-                    val emulationActivityIntent = Intent(this@MainActivity, EmulationActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-                    }
-
-                    startActivityIfNeeded(emulationActivityIntent, 0)
-                }
-            }
-
-            R.id.deleteFile -> {
-                DeleteItemFragment(DELETE_GAME_ITEM, this).show(supportFragmentManager, "")
-            }
-
-            R.id.renameFile -> {
-                RenameFragment(RENAME_FILE, File(selectedFile).name).show(supportFragmentManager, "")
-            }
-        }
-
-        return super.onContextItemSelected(item)
     }
 
     @Deprecated("Deprecated in Java")
@@ -768,17 +680,6 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    @Suppress("DEPRECATION")
-    private fun exportLnkAction(exePath: String) {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/x-ms-shortcut"
-            putExtra(Intent.EXTRA_TITLE, "${File(exePath).nameWithoutExtension}.lnk")
-        }
-
-        startActivityForResult(intent, EXPORT_LNK_ACTION)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         binding = null
@@ -800,7 +701,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun installDXWrapper(winePrefix: File) {
+    private fun installDXWrapper(prefixName: String) {
+        val winePrefix = getWinePrefixFile(prefixName)
+
         val driveC = File("$winePrefix/drive_c")
         val system32 = File("$driveC/windows/system32")
         val syswow64 = File("$driveC/windows/syswow64")
@@ -988,7 +891,7 @@ class MainActivity : AppCompatActivity() {
 
             val wine = File("$ratPackagesDir").listFiles()?.first { it.isDirectory && it.name.startsWith("Wine-") }?.name
             val createWinePrefixIntent = Intent(ACTION_CREATE_WINE_PREFIX).apply {
-                putExtra("winePrefix", winePrefix?.path)
+                putExtra("winePrefix", winePrefix)
                 putExtra("wine", wine!!)
             }
 
@@ -999,22 +902,48 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
-        val exePath = intent.getStringExtra("exePath")
-        val exeArguments = intent.getStringExtra("exeArguments")
+        val shortcutName = intent.getStringExtra("shortcutName")
 
-        val emulationActivityIntent = Intent(this, EmulationActivity::class.java)
+        if (shortcutName != null) {
+            val emulationActivityIntent = Intent(this, EmulationActivity::class.java)
 
-        if (exePath != null) {
-            if (File(exePath).exists()) {
-                sendBroadcast(
-                    Intent(ACTION_RUN_WINE).apply {
-                        putExtra("exePath", exePath)
-                        putExtra("exeArguments", exeArguments)
-                    }
-                )
+            selectedGameName = shortcutName
 
-                startActivity(emulationActivityIntent)
+            var driverName = getVulkanDriver(shortcutName)
+            var driverType = getVulkanDriverType(shortcutName)
+            if (driverName == "Global") {
+                driverName = sharedPreferences.getString(SELECTED_VULKAN_DRIVER, "").toString()
+                driverType = if (driverName.startsWith("AdrenoToolsDriver-")) ADRENO_TOOLS_DRIVER else MESA_DRIVER
             }
+
+            var box64Version = getBox64Version(shortcutName)
+            if (box64Version == "Global") {
+                box64Version = sharedPreferences.getString(SELECTED_BOX64, "").toString()
+            }
+
+            val runWineIntent = Intent(ACTION_RUN_WINE).apply {
+                putExtra("exePath", getExePath(shortcutName))
+                putExtra("exeArguments", getExeArguments(shortcutName))
+                putExtra("driverName", driverName)
+                putExtra("driverType", driverType)
+                putExtra("box64Version", box64Version)
+                putExtra("box64Preset", getBox64Preset(shortcutName))
+                putExtra("displayResolution", getDisplaySettings(shortcutName)[1])
+                putExtra("virtualControllerPreset", getSelectedVirtualControllerPreset(shortcutName))
+                putExtra("d3dxRenderer", getD3DXRenderer(shortcutName))
+                putExtra("wineD3D", getWineD3DVersion(shortcutName))
+                putExtra("dxvk", getDXVKVersion(shortcutName))
+                putExtra("vkd3d", getVKD3DVersion(shortcutName))
+                putExtra("esync", getWineESync(shortcutName))
+                putExtra("services", getWineServices(shortcutName))
+                putExtra("virtualDesktop", getWineVirtualDesktop(shortcutName))
+                putExtra("cpuAffinity", getCpuAffinity(shortcutName))
+            }
+
+            sendBroadcast(runWineIntent)
+            startActivity(emulationActivityIntent)
+
+            return
         }
 
         intent.data?.let { uri ->
@@ -1022,82 +951,10 @@ class MainActivity : AppCompatActivity() {
 
             if (filePath != null) {
                 if (File(filePath).exists()) {
-                    sendBroadcast(
-                        Intent(ACTION_RUN_WINE).apply {
-                            putExtra("exePath", filePath)
-                            putExtra("exeArguments", exeArguments)
-                        }
-                    )
+                    EditGamePreferencesFragment(FILE_MANAGER_START_PREFERENCES, File(filePath)).show(supportFragmentManager, "")
                 }
             }
-
-            startActivity(emulationActivityIntent)
         }
-    }
-
-    private fun showHighlightSequence() {
-        currentState = HighlightState.fromOrdinal(preferences!!.getInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, 0))
-        if (currentState == HighlightState.HIGHLIGHT_DONE) {
-            return
-        }
-        TapTargetSequence(this).targets(
-                TapTarget.forView(
-                    findViewById(R.id.nav_shortcuts),
-                    getString(R.string.highlight_nav_shortcuts)
-                ),
-
-                TapTarget.forView(
-                    findViewById(R.id.nav_settings),
-                    getString(R.string.highlight_nav_settings)
-                ),
-
-                TapTarget.forView(
-                    findViewById(R.id.nav_file_manager),
-                    getString(R.string.highlight_nav_files),
-                    getString(R.string.highlight_nav_files_description)
-                )
-            ).listener(object : TapTargetSequence.Listener {
-                override fun onSequenceFinish() {
-                }
-
-                override fun onSequenceStep(lastTarget: TapTarget, targetClicked: Boolean) {
-                    if (targetClicked) {
-                        when (currentState) {
-                            HighlightState.HIGHLIGHT_SHORTCUTS -> {
-                                bottomNavigation?.selectedItemId = R.id.nav_shortcuts
-                                currentState = HighlightState.HIGHLIGHT_SETTINGS
-                                preferences!!.edit().apply {
-                                    putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
-                                    apply()
-                                }
-                            }
-                            HighlightState.HIGHLIGHT_SETTINGS -> {
-                                bottomNavigation?.selectedItemId = R.id.nav_settings
-                                currentState = HighlightState.HIGHLIGHT_FILES
-                                preferences!!.edit().apply {
-                                    putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
-                                    apply()
-                                }
-                            }
-                            HighlightState.HIGHLIGHT_FILES -> {
-                                bottomNavigation?.selectedItemId = R.id.nav_file_manager
-                                currentState = HighlightState.HIGHLIGHT_DONE
-                                preferences!!.edit().apply {
-                                    putInt(HighlightState.HIGHLIGHT_PREFERENCE_KEY, currentState!!.ordinal)
-                                    apply()
-                                }
-                            }
-                            else -> {
-                                return
-                            }
-                        }
-                    }
-                }
-
-                override fun onSequenceCanceled(lastTarget: TapTarget) {
-                }
-            })
-            .start()
     }
 
     companion object {
@@ -1106,7 +963,7 @@ class MainActivity : AppCompatActivity() {
         var ratPackagesDir = File("$appRootDir/packages")
         var appBuiltinRootfs: Boolean = false
         var deviceArch = Build.SUPPORTED_ABIS[0].replace("arm64-v8a", "aarch64")
-        private val unixUsername = runCommandWithOutput("whoami").replace("\n", "")
+        val unixUsername = runCommandWithOutput("whoami").replace("\n", "")
         var customRootFSPath: String? = null
         var usrDir = File("$appRootDir/usr")
         var tmpDir = File("$usrDir/tmp")
@@ -1137,10 +994,10 @@ class MainActivity : AppCompatActivity() {
         var box64DynarecWait: String? = null
         var box64DynarecDirty: String? = null
         var box64DynarecForward: String? = null
-        var box64ShowSegv: String? = null
-        var box64ShowBt: String? = null
-        var box64NoSigSegv: String? = null
-        var box64NoSigill: String? = null
+        var box64ShowSegv: Boolean = false
+        var box64ShowBt: Boolean = false
+        var box64NoSigSegv: Boolean = false
+        var box64NoSigill: Boolean = false
         var wineLogLevel: String? = null
         var selectedBox64: String? = null
         var selectedD3DXRenderer: String? = null
@@ -1156,7 +1013,7 @@ class MainActivity : AppCompatActivity() {
         var totalCpuUsage = "???%"
         var winePrefixesDir: File = File("$appRootDir/winePrefixes")
         var wineDisksFolder: File? = null
-        var winePrefix: File? = null
+        var winePrefix: String? = null
         var wineESync: Boolean = false
         var wineServices: Boolean = false
         var selectedCpuAffinity: String? = null
@@ -1191,56 +1048,7 @@ class MainActivity : AppCompatActivity() {
         const val ENABLE_DEBUG_INFO = "debugInfo"
         const val ENABLE_DEBUG_INFO_DEFAULT_VALUE = true
         const val APP_VERSION = "appVersion"
-
-        fun setupWinePrefix(winePrefix: File, wine: String) {
-            if (!winePrefix.exists()) {
-                val driveC = File("$winePrefix/drive_c")
-                val wineUtils = File("$appRootDir/wine-utils")
-                val startMenu = File("$driveC/ProgramData/Microsoft/Windows/Start Menu")
-                val userSharedFolder = File("/storage/emulated/0/MiceWine")
-                val localAppData = File("$driveC/users/$unixUsername/AppData")
-                val localSavedGames = File("$driveC/users/$unixUsername/Saved Games")
-                val system32 = File("$driveC/windows/system32")
-                val syswow64 = File("$driveC/windows/syswow64")
-                val winePrefixConfigFile = File("$winePrefix/config")
-
-                winePrefix.mkdirs()
-                winePrefixConfigFile.writeText(wine + "\n")
-
-                selectedWine = wine
-
-                WineWrapper.wine("wineboot -i")
-
-                File("$appRootDir/wine-utils/CoreFonts").copyRecursively(File("$winePrefix/drive_c/windows/Fonts"), true)
-
-                localAppData.copyRecursively(File("$userSharedFolder/AppData"))
-                localAppData.deleteRecursively()
-
-                File("$userSharedFolder/AppData").mkdirs()
-
-                localSavedGames.deleteRecursively()
-
-                File("$userSharedFolder/Saved Games").mkdirs()
-
-                runCommand("ln -sf '$userSharedFolder/AppData' '$localAppData'")
-                runCommand("ln -sf '$userSharedFolder/Saved Games' '$localSavedGames'")
-
-                startMenu.deleteRecursively()
-
-                File("$wineUtils/Start Menu").copyRecursively(File("$startMenu"), true)
-                File("$wineUtils/Addons").copyRecursively(File("$driveC/Addons"), true)
-                File("$wineUtils/Addons/Windows").copyRecursively(File("$driveC/windows"), true)
-                File("$wineUtils/DirectX/x64").copyRecursively(system32, true)
-                File("$wineUtils/DirectX/x32").copyRecursively(syswow64, true)
-                File("$wineUtils/OpenAL/x64").copyRecursively(system32, true)
-                File("$wineUtils/OpenAL/x32").copyRecursively(syswow64, true)
-
-                WineWrapper.wine("regedit '$driveC/Addons/DefaultDLLsOverrides.reg'")
-                WineWrapper.wine("regedit '$driveC/Addons/Themes/DarkBlue/DarkBlue.reg'")
-                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Decorated /d N /f")
-                WineWrapper.wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Managed /d N /f")
-            }
-        }
+        const val ADRENOTOOLS_LD_PRELOAD_WORKAROUND = "adrenoToolsLdPreload"
 
         private fun strBoolToNumStr(strBool: String): String {
             return strBoolToNumStr(strBool.toBoolean())
@@ -1266,8 +1074,6 @@ class MainActivity : AppCompatActivity() {
                           adrenoTools: Boolean? = null,
                           adrenoToolsDriverPath: String? = null
         ) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
-
             if (adrenoTools == true) {
                 useAdrenoTools = true
                 adrenoToolsDriverFile = File(adrenoToolsDriverPath!!)
@@ -1277,13 +1083,18 @@ class MainActivity : AppCompatActivity() {
             appBuiltinRootfs = activity.assets.list("")?.contains("rootfs.zip")!!
 
             selectedBox64 = box64Version ?: getBox64Version(selectedGameName)
-            box64LogLevel = preferences.getString(BOX64_LOG, BOX64_LOG_DEFAULT_VALUE)
+            box64LogLevel = sharedPreferences.getString(BOX64_LOG, BOX64_LOG_DEFAULT_VALUE)
 
-            setBox64Preset(activity, box64Preset)
+            box64ShowSegv = sharedPreferences.getBoolean(BOX64_SHOWSEGV, BOX64_SHOWSEGV_DEFAULT_VALUE)
+            box64ShowBt = sharedPreferences.getBoolean(BOX64_SHOWBT, BOX64_SHOWBT_DEFAULT_VALUE)
+            box64NoSigill = sharedPreferences.getBoolean(BOX64_NOSIGILL, BOX64_NOSIGILL_DEFAULT_VALUE)
+            box64NoSigSegv = sharedPreferences.getBoolean(BOX64_NOSIGSEGV, BOX64_NOSIGSEGV_DEFAULT_VALUE)
 
-            enableDRI3 = preferences.getBoolean(ENABLE_DRI3, ENABLE_DRI3_DEFAULT_VALUE)
-            enableMangoHUD = preferences.getBoolean(ENABLE_MANGOHUD, ENABLE_MANGOHUD_DEFAULT_VALUE)
-            wineLogLevel = preferences.getString(WINE_LOG_LEVEL, WINE_LOG_LEVEL_DEFAULT_VALUE)
+            setBox64Preset(box64Preset)
+
+            enableDRI3 = sharedPreferences.getBoolean(ENABLE_DRI3, ENABLE_DRI3_DEFAULT_VALUE)
+            enableMangoHUD = sharedPreferences.getBoolean(ENABLE_MANGOHUD, ENABLE_MANGOHUD_DEFAULT_VALUE)
+            wineLogLevel = sharedPreferences.getString(WINE_LOG_LEVEL, WINE_LOG_LEVEL_DEFAULT_VALUE)
 
             selectedD3DXRenderer = d3dxRenderer ?: getD3DXRenderer(selectedGameName)
             selectedWineD3D = wineD3D ?: getWineD3DVersion(selectedGameName)
@@ -1296,39 +1107,38 @@ class MainActivity : AppCompatActivity() {
             enableWineVirtualDesktop = virtualDesktop ?: getWineVirtualDesktop(selectedGameName)
             selectedCpuAffinity = cpuAffinity ?: getCpuAffinity(selectedGameName)
 
-            selectedGLProfile = preferences.getString(SELECTED_GL_PROFILE, SELECTED_GL_PROFILE_DEFAULT_VALUE)
-            selectedDXVKHud = preferences.getString(SELECTED_DXVK_HUD_PRESET, SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE)
-            selectedMesaVkWsiPresentMode = preferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE, SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE)
-            selectedTuDebugPreset = preferences.getString(SELECTED_TU_DEBUG_PRESET, SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE)
+            selectedGLProfile = sharedPreferences.getString(SELECTED_GL_PROFILE, SELECTED_GL_PROFILE_DEFAULT_VALUE)
+            selectedDXVKHud = sharedPreferences.getString(SELECTED_DXVK_HUD_PRESET, SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE)
+            selectedMesaVkWsiPresentMode = sharedPreferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE, SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE)
+            selectedTuDebugPreset = sharedPreferences.getString(SELECTED_TU_DEBUG_PRESET, SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE)
 
-            enableRamCounter = preferences.getBoolean(RAM_COUNTER, RAM_COUNTER_DEFAULT_VALUE)
-            enableCpuCounter = preferences.getBoolean(CPU_COUNTER, CPU_COUNTER_DEFAULT_VALUE)
-            enableDebugInfo = preferences.getBoolean(ENABLE_DEBUG_INFO, ENABLE_DEBUG_INFO_DEFAULT_VALUE)
+            enableRamCounter = sharedPreferences.getBoolean(RAM_COUNTER, RAM_COUNTER_DEFAULT_VALUE)
+            enableCpuCounter = sharedPreferences.getBoolean(CPU_COUNTER, CPU_COUNTER_DEFAULT_VALUE)
+            enableDebugInfo = sharedPreferences.getBoolean(ENABLE_DEBUG_INFO, ENABLE_DEBUG_INFO_DEFAULT_VALUE)
 
             screenFpsLimit = (activity.getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay.refreshRate.toInt()
-            fpsLimit = preferences.getInt(FPS_LIMIT, screenFpsLimit)
+            fpsLimit = sharedPreferences.getInt(FPS_LIMIT, screenFpsLimit)
 
             vulkanDriverDeviceName = getVulkanDriverInfo("deviceName") + if (useAdrenoTools) " (AdrenoTools)" else ""
             vulkanDriverDriverVersion = getVulkanDriverInfo("driverVersion").split(" ")[0]
 
-            winePrefix = File("$winePrefixesDir/${preferences.getString(SELECTED_WINE_PREFIX, "default")}")
-            wineDisksFolder = File("$winePrefix/dosdevices/")
+            winePrefix = getSelectedWinePrefix()
+            wineDisksFolder = File("$winePrefixesDir/$winePrefix/dosdevices/")
 
-            val winePrefixConfigFile = File("$winePrefix/config")
+            val winePrefixConfigFile = File("$winePrefixesDir/$winePrefix/config")
             if (winePrefixConfigFile.exists()) {
                 selectedWine = winePrefixConfigFile.readLines()[0]
             }
 
             fileManagerDefaultDir = wineDisksFolder!!.path
 
-            paSink = preferences.getString(PA_SINK, PA_SINK_DEFAULT_VALUE)?.toLowerCase(Locale.getDefault())
+            paSink = sharedPreferences.getString(PA_SINK, PA_SINK_DEFAULT_VALUE)?.toLowerCase(Locale.getDefault())
         }
 
-        private fun setBox64Preset(activity: Activity, name: String?) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(activity)!!
-            var selectedBox64Preset = name ?: preferences.getString(SELECTED_BOX64_PRESET_KEY, "default")!!
+        private fun setBox64Preset(name: String?) {
+            var selectedBox64Preset = name ?: sharedPreferences.getString(SELECTED_BOX64_PRESET, "default")!!
 
-            if (name == "--") selectedBox64Preset = preferences.getString(SELECTED_BOX64_PRESET_KEY, "default")!!
+            if (name == "--") selectedBox64Preset = sharedPreferences.getString(SELECTED_BOX64_PRESET, "default")!!
 
             box64Mmap32 = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_MMAP32)[0])
             box64Avx = getBox64Mapping(selectedBox64Preset, BOX64_AVX)[0]
@@ -1375,8 +1185,69 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        private fun getVulkanDriverInfo(info: String): String {
-            return runCommandWithOutput("echo $(${getEnv()} DISPLAY= vulkaninfo | grep $info | cut -d '=' -f 2)")
+        private fun getVulkanDriverInfo(info: String, stdErr: Boolean = false): String {
+            return runCommandWithOutput("echo $(${getEnv()} DISPLAY= vulkaninfo | grep $info | cut -d '=' -f 2)", stdErr)
+        }
+
+        private val driverWorkaroundLdPreload = StringBuilder()
+        private var findingLdPreloadWorkaround = false
+
+        fun getLdPreloadWorkaround(): String {
+            fun locateLibraryBySymbol(symbol: String): String {
+                return runBlocking {
+                    val libFiles = File("/system/lib64").listFiles()?.filter { it.isFile && it.extension == "so" } ?: return@runBlocking ""
+                    val result = libFiles.map {
+                        async(Dispatchers.IO) {
+                            val readElf = runCommandWithOutput("echo $(readelf --dyn-syms $it | grep $symbol)")
+                            if (readElf.contains(symbol)) {
+                                val implementsSymbol = !readElf.contains("FUNC GLOBAL DEFAULT UND")
+                                if (implementsSymbol) {
+                                    return@async "${it.path}:"
+                                }
+                            }
+
+                            return@async null
+                        }
+                    }
+
+                    result.firstNotNullOfOrNull { it.await() } ?: ""
+                }
+            }
+
+            if (findingLdPreloadWorkaround) {
+                return "LD_PRELOAD=$driverWorkaroundLdPreload"
+            }
+
+            val savedLdPreload = sharedPreferences.getString(ADRENOTOOLS_LD_PRELOAD_WORKAROUND, "")
+            if (!savedLdPreload.isNullOrEmpty()) {
+                return "LD_PRELOAD=$savedLdPreload"
+            }
+
+            driverWorkaroundLdPreload.clear()
+
+            findingLdPreloadWorkaround = true
+
+            while (true) {
+                val res = getVulkanDriverInfo("", true)
+                if (res.contains("cannot locate symbol")) {
+                    val symbolName = res.split("\"")[1]
+                    driverWorkaroundLdPreload.append(locateLibraryBySymbol(symbolName))
+                } else if (res.contains("cannot find")) {
+                    val libName = res.split("\"")[1]
+                    driverWorkaroundLdPreload.append("/system/lib64/$libName:")
+                } else {
+                    break
+                }
+            }
+
+            findingLdPreloadWorkaround = false
+
+            sharedPreferences.edit().apply {
+                putString(ADRENOTOOLS_LD_PRELOAD_WORKAROUND, "$driverWorkaroundLdPreload")
+                apply()
+            }
+
+            return "LD_PRELOAD=$driverWorkaroundLdPreload"
         }
 
         @Throws(IOException::class)
@@ -1437,7 +1308,7 @@ class MainActivity : AppCompatActivity() {
             "960x540", "1280x720",
             "1366x768", "1600x900",
             "1920x1080", "2560x1440",
-            "3840x2160"
+            "3840x2160", "7680x4320"
         )
 
         val resolutions4_3 = arrayOf(

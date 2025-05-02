@@ -39,6 +39,12 @@
             android:exported="false">
         </activity>
         <activity
+            android:name=".activities.ControllerTestActivity"
+            android:theme="@style/Theme.MiceWine.FullScreen"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false">
+        </activity>
+        <activity
             android:name=".activities.VirtualControllerOverlayMapper"
             android:theme="@style/Theme.MiceWine.FullScreen"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"

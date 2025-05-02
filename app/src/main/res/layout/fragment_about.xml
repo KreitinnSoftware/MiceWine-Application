@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,7 +16,7 @@
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"
         app:strokeColor="?attr/colorOutline"
-        app:strokeWidth="1dp">
+        app:strokeWidth="4dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,13 +25,13 @@
             android:padding="20dp">
 
             <ImageView
-                android:layout_width="128dp"
-                android:layout_height="128dp"
+                android:layout_width="256dp"
+                android:layout_height="256dp"
                 android:layout_gravity="center"
                 android:layout_marginBottom="30dp"
                 android:contentDescription="@null"
                 android:scaleType="centerInside"
-                android:src="@drawable/icon_grayscale">
+                android:src="@drawable/ic_launcher_round">
             </ImageView>
 
             <com.google.android.material.textview.MaterialTextView
@@ -39,6 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/application_version"
+                android:textStyle="bold"
                 android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -47,6 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:textStyle="bold"
                 android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -56,6 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:text="@string/rootfs_version"
+                android:textStyle="bold"
                 android:textColor="?attr/colorOnBackground" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -64,42 +68,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:textColor="?attr/colorOnBackground" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/Box64VersionTitle"
-                style="@style/TextAppearance.Material3.TitleSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/box64_version"
-                android:textColor="?attr/colorOnBackground" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/Box64Version"
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textColor="?attr/colorOnBackground" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/WineVersionTitle"
-                style="@style/TextAppearance.Material3.TitleSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/wine_version"
-                android:textColor="?attr/colorOnBackground" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/WineVersion"
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:textStyle="bold"
                 android:textColor="?attr/colorOnBackground" />
 
         </LinearLayout>
+
     </com.google.android.material.card.MaterialCardView>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
