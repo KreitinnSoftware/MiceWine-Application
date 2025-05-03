@@ -223,7 +223,9 @@ class FileManagerFragment : Fragment() {
 
         @SuppressLint("SetTextI18n")
         fun refreshFiles() {
-            fragmentInstance?.currentFolderText?.text = fileManagerCwd!!.substringAfter("$wineDisksFolder/").replaceFirstChar { it.uppercase() }
+            var currentWorkingDir = (fileManagerCwd!!.substringAfter("$wineDisksFolder") + "/")
+            if (currentWorkingDir.length > 1) currentWorkingDir = currentWorkingDir.substring(1)
+            fragmentInstance?.currentFolderText?.text = currentWorkingDir.replaceFirstChar { it.uppercase() }
 
             if (recyclerView?.tag as? Boolean == true) return
 
