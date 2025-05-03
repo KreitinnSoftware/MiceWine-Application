@@ -190,7 +190,7 @@ object ControllerUtils {
             "M_Middle" -> ButtonMapping("M_Middle", BUTTON_MIDDLE, BUTTON_MIDDLE, MOUSE)
             "M_Right" -> ButtonMapping("M_Right", BUTTON_RIGHT, BUTTON_RIGHT, MOUSE)
             "M_WheelUp" -> ButtonMapping("M_WheelUp", SCROLL_UP, SCROLL_UP, MOUSE)
-            "M_WheelUp" -> ButtonMapping("M_WheelDown", SCROLL_DOWN, SCROLL_DOWN, MOUSE)
+            "M_WheelDown" -> ButtonMapping("M_WheelDown", SCROLL_DOWN, SCROLL_DOWN, MOUSE)
             "Mouse" -> ButtonMapping("Mouse", MOUSE, MOUSE, MOUSE)
             else -> getControllerPreset(preset, key) ?: ButtonMapping()
         }
