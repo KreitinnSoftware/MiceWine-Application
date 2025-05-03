@@ -296,15 +296,16 @@ object ControllerUtils {
         when (mapping.type) {
             KEYBOARD -> lorieView.sendKeyEvent(mapping.scanCode, mapping.keyCode, pressed)
             MOUSE -> {
-              when (mapping.scanCode) {
-                SCROLL_UP -> {
-                  if (pressed) lorieView.sendMouseWheelEvent(0F, -10F)
-                }
-                SCROLL_DOWN -> {
-                  if (pressed) lorieView.sendMouseWheelEvent(0F, 10F)
-                }
-                else -> {
-                  lorieView.sendMouseEvent(0F, 0F, mapping.scanCode, pressed, true)
+                when (mapping.scanCode) {
+                    SCROLL_UP -> {
+                        if (pressed) lorieView.sendMouseWheelEvent(0F, -10F)
+                    }
+                    SCROLL_DOWN -> {
+                        if (pressed) lorieView.sendMouseWheelEvent(0F, 10F)
+                    }
+                    else -> {
+                        lorieView.sendMouseEvent(0F, 0F, mapping.scanCode, pressed, true)
+                    }
                 }
             }
         }
