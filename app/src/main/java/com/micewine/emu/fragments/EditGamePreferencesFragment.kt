@@ -31,12 +31,14 @@ import com.micewine.emu.activities.EmulationActivity
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VULKAN_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_RUN_WINE
+import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_EXE_PATH
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_ICON
 import com.micewine.emu.activities.MainActivity.Companion.getNativeResolutions
 import com.micewine.emu.activities.MainActivity.Companion.resolutions16_9
 import com.micewine.emu.activities.MainActivity.Companion.resolutions4_3
 import com.micewine.emu.activities.MainActivity.Companion.selectedCpuAffinity
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
+import com.micewine.emu.activities.MainActivity.Companion.wineDisksFolder
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.controller.ControllerUtils.getConnectedControllers
 import com.micewine.emu.core.RatPackageManager.getPackageNameVersionById
@@ -45,7 +47,9 @@ import com.micewine.emu.core.RatPackageManager.listRatPackagesId
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Presets
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getControllerPresets
 import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.editGameFromList
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.ADRENO_TOOLS_DRIVER
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.MESA_DRIVER
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.setGameName
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Version
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
@@ -54,10 +58,11 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getExePath
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameExeArguments
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getGameIcon
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
@@ -72,8 +77,9 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.putCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDisplaySettings
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVKD3DVersion
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putExeArguments
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putSelectedVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineD3DVersion
@@ -84,14 +90,15 @@ import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Compani
 import java.io.File
 
 class EditGamePreferencesFragment(private val type: Int, private val exePath: File? = null) : DialogFragment() {
-    private var preferences: SharedPreferences? = null
-    private var imageView: ImageView? = null
+    private lateinit var preferences: SharedPreferences
+    private lateinit var imageView: ImageView
+    private lateinit var exePathText: TextView
 
     @SuppressLint("SetTextI18n")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val inflater = requireActivity().layoutInflater
-        val view = inflater.inflate(R.layout.fragment_edit_game_preferences, null)
+        val view = requireActivity().layoutInflater.inflate(R.layout.fragment_edit_game_preferences, null)
 
+        val selectExePath = view.findViewById<ImageView>(R.id.selectExePath)
         val editTextNewName = view.findViewById<EditText>(R.id.editTextNewName)
         val editTextArguments = view.findViewById<EditText>(R.id.appArgumentsEditText)
         val buttonContinue = view.findViewById<Button>(R.id.buttonContinue)
@@ -111,10 +118,6 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         val enableController2XInputSwitch = view.findViewById<MaterialSwitch>(R.id.enableController2XInput)
         val enableController3XInputSwitch = view.findViewById<MaterialSwitch>(R.id.enableController3XInput)
         val cpuAffinitySpinner = view.findViewById<Spinner>(R.id.cpuAffinity)
-        val controller0Layout = view.findViewById<LinearLayout>(R.id.controller0Layout)
-        val controller1Layout = view.findViewById<LinearLayout>(R.id.controller1Layout)
-        val controller2Layout = view.findViewById<LinearLayout>(R.id.controller2Layout)
-        val controller3Layout = view.findViewById<LinearLayout>(R.id.controller3Layout)
         val connectedController0 = view.findViewById<TextView>(R.id.controller0)
         val selectedController0ProfileSpinner = view.findViewById<Spinner>(R.id.selectedController0Profile)
         val connectedController1 = view.findViewById<TextView>(R.id.controller1)
@@ -122,7 +125,6 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         val connectedController2 = view.findViewById<TextView>(R.id.controller2)
         val selectedController2ProfileSpinner = view.findViewById<Spinner>(R.id.selectedController2Profile)
         val connectedController3 = view.findViewById<TextView>(R.id.controller3)
-        val noControllersConnectedText = view.findViewById<TextView>(R.id.noControllersConnected)
         val selectedController3ProfileSpinner = view.findViewById<Spinner>(R.id.selectedController3Profile)
         val enableVirtualControllerXInputSwitch = view.findViewById<MaterialSwitch>(R.id.enableVirtualControllerXInput)
         val selectedVirtualControllerProfileSpinner = view.findViewById<Spinner>(R.id.selectedVirtualControllerProfile)
@@ -130,14 +132,15 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         val selectedBox64ProfileSpinner = view.findViewById<Spinner>(R.id.selectedBox64Profile)
 
         imageView = view.findViewById(R.id.imageView)
+        exePathText = view.findViewById(R.id.appExePath)
 
         when (type) {
             EDIT_GAME_PREFERENCES -> {
                 val imageBitmap = getGameIcon(selectedGameName)
                 if (imageBitmap != null) {
-                    imageView?.setImageBitmap(
+                    imageView.setImageBitmap(
                         resizeBitmap(
-                            imageBitmap, imageView?.layoutParams?.width!!, imageView?.layoutParams?.height!!
+                            imageBitmap, imageView.layoutParams.width, imageView.layoutParams.height
                         )
                     )
                 }
@@ -145,9 +148,9 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             FILE_MANAGER_START_PREFERENCES -> {
                 val iconFile = File("$usrDir/icons/${exePath?.nameWithoutExtension}-icon")
                 if (iconFile.exists() && iconFile.length() > 0) {
-                    imageView?.setImageBitmap(BitmapFactory.decodeFile(iconFile.path))
+                    imageView.setImageBitmap(BitmapFactory.decodeFile(iconFile.path))
                 } else {
-                    imageView?.setImageResource(R.drawable.ic_log)
+                    imageView.setImageResource(R.drawable.ic_log)
                 }
             }
         }
@@ -160,6 +163,8 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             EDIT_GAME_PREFERENCES -> {
                 editTextNewName.setText(selectedGameName)
                 editTextArguments.setText(getGameExeArguments(selectedGameName))
+                exePathText.text = getExePath(selectedGameName).substringAfter("$wineDisksFolder/").replaceFirstChar { it.uppercase() }
+                exePathText.isSelected = true
 
                 if (selectedGameName == getString(R.string.desktop_mode_init)) {
                     editTextNewName.isEnabled = false
@@ -167,23 +172,32 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     enableWineVirtualDesktopSwitch.isEnabled = false
                     enableWineVirtualDesktopSwitch.isChecked = true
 
-                    imageView?.setImageBitmap(
+                    imageView.setImageBitmap(
                         resizeBitmap(
-                            BitmapFactory.decodeResource(requireActivity().resources, R.drawable.default_icon), imageView?.layoutParams?.width!!, imageView?.layoutParams?.height!!
+                            BitmapFactory.decodeResource(requireActivity().resources, R.drawable.default_icon), imageView.layoutParams.width, imageView.layoutParams.height
                         )
                     )
                 }
 
-                imageView?.setOnClickListener {
+                imageView.setOnClickListener {
                     requireActivity().sendBroadcast(
                         Intent(ACTION_SELECT_ICON)
+                    )
+                }
+
+                selectExePath.setOnClickListener {
+                    requireActivity().sendBroadcast(
+                        Intent(ACTION_SELECT_EXE_PATH)
                     )
                 }
             }
             FILE_MANAGER_START_PREFERENCES -> {
                 editTextNewName.setText(exePath?.nameWithoutExtension)
+                selectExePath.visibility = View.GONE
                 editTextNewName.isEnabled = false
                 editTextArguments.setText("")
+                exePathText.text = exePath!!.path.substringAfter("$wineDisksFolder/").replaceFirstChar { it.uppercase() }
+                exePathText.isSelected = true
 
                 selectedGameName = ""
             }
@@ -191,7 +205,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
 
         val controllerProfilesNames: List<String> = getControllerPresets().map { it.name }
         val virtualControllerProfilesNames: List<String> = getVirtualControllerPresets(requireContext()).map { it.name }
-        val box64Versions: List<String> = listRatPackages("Box64-").map { it.name + " " + it.version }.toMutableList().apply { add(0, "Global: ${getPackageNameVersionById(preferences?.getString(SELECTED_BOX64, ""))}") }
+        val box64Versions: List<String> = listRatPackages("Box64-").map { it.name + " " + it.version }.toMutableList().apply { add(0, "Global: ${getPackageNameVersionById(preferences.getString(SELECTED_BOX64, ""))}") }
         val box64VersionsId: List<String> = listRatPackagesId("Box64-").toMutableList().apply { add(0, "Global") }
         val box64ProfilesNames: List<String> = getBox64Presets().map { it[0] }
 
@@ -256,7 +270,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         val vulkanDriversId = listRatPackagesId("VulkanDriver", "AdrenoToolsDriver").toMutableList().apply { add(0, "Global") }
 
         selectedDriverSpinner.apply {
-            val vulkanDrivers = listRatPackages("VulkanDriver", "AdrenoToolsDriver").map { it.name + " " + it.version }.toMutableList().apply { add(0, "Global: ${getPackageNameVersionById(preferences?.getString(SELECTED_VULKAN_DRIVER, ""))}") }
+            val vulkanDrivers = listRatPackages("VulkanDriver", "AdrenoToolsDriver").map { it.name + " " + it.version }.toMutableList().apply { add(0, "Global: ${getPackageNameVersionById(preferences.getString(SELECTED_VULKAN_DRIVER, ""))}") }
             adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, vulkanDrivers)
             val index = vulkanDriversId.indexOf(getVulkanDriver(selectedGameName))
             setSelection(if (index == -1) 0 else index)
@@ -401,18 +415,9 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
 
         val connectedControllers = getConnectedControllers()
         val controllerTextViews = listOf(connectedController0, connectedController1, connectedController2, connectedController3)
-        val controllerLayoutViews = listOf(controller0Layout, controller1Layout, controller2Layout, controller3Layout)
 
-        controllerLayoutViews.forEachIndexed { index, layout ->
-            layout.visibility = if (connectedControllers.size > index) View.VISIBLE else View.GONE
-        }
-
-        noControllersConnectedText.visibility = if (connectedControllers.isEmpty()) View.VISIBLE else View.GONE
-
-        connectedControllers.forEachIndexed { index, controller ->
-            if (index < controllerTextViews.size) {
-                controllerTextViews[index].text = "$index: ${controller.name}"
-            }
+        for (index in 0..3) {
+            controllerTextViews[index].text = "$index: ${if (index < connectedControllers.size) connectedControllers[index].name else ""}"
         }
         enableController0XInputSwitch.apply {
             isChecked = getControllerXInput(selectedGameName, 0)
@@ -628,31 +633,42 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                     putBox64Preset(selectedGameName, it.box64Preset)
                 }
 
-                editGameFromList(selectedGameName, newName, newArguments)
+                putExeArguments(selectedGameName, newArguments)
+                setGameName(selectedGameName, newName)
             } else if (type == FILE_MANAGER_START_PREFERENCES) {
-                val runWineIntent = Intent(ACTION_RUN_WINE).apply {
-                    putExtra("exePath", exePath?.path)
-                    putExtra("exeArguments", editTextArguments.text.toString())
-                    putExtra("driverName", vulkanDriversId[selectedDriverSpinner.selectedItemPosition])
-                    putExtra("box64Version", box64VersionsId[selectedBox64Spinner.selectedItemPosition])
-                    putExtra("box64Preset", selectedBox64ProfileSpinner.selectedItem.toString())
-                    putExtra("displayResolution", selectedDisplayResolutionSpinner.selectedItem.toString())
-                    putExtra("virtualControllerPreset", selectedVirtualControllerProfileSpinner.selectedItem.toString())
-                    putExtra("controllerPreset", selectedController0ProfileSpinner.selectedItem.toString())
-                    putExtra("d3dxRenderer", selectedD3DXRendererSpinner.selectedItem.toString())
-                    putExtra("wineD3D", selectedWineD3DSpinner.selectedItem.toString())
-                    putExtra("dxvk", selectedDXVKSpinner.selectedItem.toString())
-                    putExtra("vkd3d", selectedVKD3DSpinner.selectedItem.toString())
-                    putExtra("esync", wineESyncSwitch.isChecked)
-                    putExtra("services", wineServicesSwitch.isChecked)
-                    putExtra("virtualDesktop", enableWineVirtualDesktopSwitch.isChecked)
-                    putExtra("cpuAffinity", selectedCpuAffinity)
-                }
+                temporarySettings.let {
+                    if (it.vulkanDriver == "Global") {
+                        it.vulkanDriver = preferences.getString(SELECTED_VULKAN_DRIVER, "").toString()
+                    }
+                    if (it.box64Version == "Global") {
+                        it.box64Version = preferences.getString(SELECTED_BOX64, "").toString()
+                    }
+                    val driverType = if (it.vulkanDriver.startsWith("AdrenoToolsDriver-")) ADRENO_TOOLS_DRIVER else MESA_DRIVER
 
-                requireActivity().sendBroadcast(runWineIntent)
-                requireActivity().startActivity(
-                    Intent(requireActivity(), EmulationActivity::class.java)
-                )
+                    val runWineIntent = Intent(ACTION_RUN_WINE).apply {
+                        putExtra("exePath", exePath?.path)
+                        putExtra("exeArguments", editTextArguments.text.toString())
+                        putExtra("driverName", it.vulkanDriver)
+                        putExtra("driverType", driverType)
+                        putExtra("box64Version", it.box64Version)
+                        putExtra("box64Preset", it.box64Preset)
+                        putExtra("displayResolution", it.displayResolution)
+                        putExtra("virtualControllerPreset", it.virtualControllerPreset)
+                        putExtra("d3dxRenderer", it.d3dxRenderer)
+                        putExtra("wineD3D", it.wineD3D)
+                        putExtra("dxvk", it.dxvk)
+                        putExtra("vkd3d", it.vkd3d)
+                        putExtra("esync", it.wineESync)
+                        putExtra("services", it.wineServices)
+                        putExtra("virtualDesktop", it.wineVirtualDesktop)
+                        putExtra("cpuAffinity", selectedCpuAffinity)
+                    }
+
+                    requireActivity().sendBroadcast(runWineIntent)
+                    requireActivity().startActivity(
+                        Intent(requireActivity(), EmulationActivity::class.java)
+                    )
+                }
             }
 
             dismiss()
@@ -662,20 +678,26 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             dismiss()
         }
 
+        parentFragmentManager.setFragmentResultListener("invalidate", this) { _, _ ->
+            exePathText.post {
+                exePathText.text = getExePath(selectedGameName).substringAfter("$wineDisksFolder/").replaceFirstChar { it.uppercase() }
+            }
+        }
+
         return dialog
     }
 
     override fun onResume() {
+        super.onResume()
+
         val imageBitmap = getGameIcon(selectedGameName)
         if (imageBitmap != null) {
-            imageView?.setImageBitmap(
+            imageView.setImageBitmap(
                 resizeBitmap(
-                    imageBitmap, imageView?.layoutParams?.width!!, imageView?.layoutParams?.height!!
+                    imageBitmap, imageView.layoutParams.width, imageView.layoutParams.height
                 )
             )
         }
-
-        super.onResume()
     }
 
     private fun resizeBitmap(originalBitmap: Bitmap, width: Int, height: Int): Bitmap {

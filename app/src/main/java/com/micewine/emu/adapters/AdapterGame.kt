@@ -123,16 +123,15 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val size:
             val intent = Intent(activity, EmulationActivity::class.java)
 
             var driverName = getVulkanDriver(selectedGameName)
-            var driverType = getVulkanDriverType(selectedGameName)
             if (driverName == "Global") {
                 driverName = preferences?.getString(SELECTED_VULKAN_DRIVER, "").toString()
-                driverType = if (driverName.startsWith("AdrenoToolsDriver-")) ADRENO_TOOLS_DRIVER else MESA_DRIVER
             }
-
             var box64Version = getBox64Version(selectedGameName)
             if (box64Version == "Global") {
                 box64Version = preferences?.getString(SELECTED_BOX64, "").toString()
             }
+
+            val driverType = if (driverName.startsWith("AdrenoToolsDriver-")) ADRENO_TOOLS_DRIVER else MESA_DRIVER
 
             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                 putExtra("exePath", exePath)

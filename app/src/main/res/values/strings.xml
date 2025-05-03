@@ -228,4 +228,5 @@
     <string name="install">Install</string>
     <string name="export_log">Export Log</string>
     <string name="controller_view_title">Test Controller</string>
+    <string name="exe_path">Executable Path</string>
 </resources>

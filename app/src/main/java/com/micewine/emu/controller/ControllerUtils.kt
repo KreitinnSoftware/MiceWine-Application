@@ -199,7 +199,6 @@ object ControllerUtils {
     fun prepareButtonsAxisValues() {
         connectedPhysicalControllers.forEachIndexed { index, it ->
             val presetName = getControllerPreset(selectedGameName, index)
-            Log.e("ControllerDebug", ":$presetName")
 
             if (getControllerXInput(selectedGameName, index)) {
                 it.mappingType = MAPPING_TYPE_XINPUT

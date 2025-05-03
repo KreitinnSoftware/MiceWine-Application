@@ -22,6 +22,7 @@ import com.micewine.emu.activities.MainActivity.Companion.fileManagerCwd
 import com.micewine.emu.activities.MainActivity.Companion.fileManagerDefaultDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
+import com.micewine.emu.activities.MainActivity.Companion.wineDisksFolder
 import com.micewine.emu.adapters.AdapterFiles
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.WineWrapper
@@ -222,7 +223,7 @@ class FileManagerFragment : Fragment() {
 
         @SuppressLint("SetTextI18n")
         fun refreshFiles() {
-            fragmentInstance?.currentFolderText?.text = (fileManagerCwd?.substringAfter("dosdevices")?.substringAfter("/") + "/").replaceFirstChar { it.uppercase() }
+            fragmentInstance?.currentFolderText?.text = fileManagerCwd!!.substringAfter("$wineDisksFolder/").replaceFirstChar { it.uppercase() }
 
             if (recyclerView?.tag as? Boolean == true) return
 

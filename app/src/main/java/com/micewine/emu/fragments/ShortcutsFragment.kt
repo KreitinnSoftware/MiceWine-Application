@@ -259,7 +259,6 @@ class ShortcutsFragment : Fragment() {
         private var gameListNames: MutableList<AdapterGame.GameItem> = mutableListOf()
         private var gameList: MutableList<GameItem> = mutableListOf()
 
-        const val HIGHLIGHT_SHORTCUT_PREFERENCE_KEY = "highlightedShortcut"
         const val ACTION_UPDATE_WINE_PREFIX_SPINNER = "com.micewine.emu.ACTION_UPDATE_WINE_PREFIX_SPINNER"
 
         const val MESA_DRIVER = 0
@@ -272,7 +271,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putWineVirtualDesktop(name: String, enabled: Boolean) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].wineVirtualDesktop = enabled
@@ -282,7 +280,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getWineVirtualDesktop(name: String): Boolean {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return false
 
             return gameList[index].wineVirtualDesktop
@@ -290,7 +287,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putCpuAffinity(name: String, cpuCores: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].cpuAffinityCores = cpuCores
@@ -300,7 +296,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getCpuAffinity(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return availableCPUs.joinToString(",")
 
             return gameList[index].cpuAffinityCores
@@ -308,7 +303,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putWineServices(name: String, enabled: Boolean) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].wineServices = enabled
@@ -318,7 +312,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getWineServices(name: String): Boolean {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return false
 
             return gameList[index].wineServices
@@ -326,7 +319,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putWineESync(name: String, enabled: Boolean) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].wineESync = enabled
@@ -336,7 +328,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getWineESync(name: String): Boolean {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return true
 
             return gameList[index].wineESync
@@ -344,7 +335,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putVKD3DVersion(name: String, vkd3dVersion: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].vkd3dVersion = vkd3dVersion
@@ -354,7 +344,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getVKD3DVersion(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return ""
 
             return gameList[index].vkd3dVersion
@@ -362,7 +351,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putWineD3DVersion(name: String, wineD3DVersion: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].wineD3DVersion = wineD3DVersion
@@ -372,7 +360,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getWineD3DVersion(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return ""
 
             return gameList[index].wineD3DVersion
@@ -380,7 +367,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putDXVKVersion(name: String, dxvkVersion: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].dxvkVersion = dxvkVersion
@@ -390,7 +376,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getDXVKVersion(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return ""
 
             return gameList[index].dxvkVersion
@@ -398,7 +383,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putD3DXRenderer(name: String, d3dxRenderer: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].d3dxRenderer = d3dxRenderer
@@ -408,7 +392,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getD3DXRenderer(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return "DXVK"
 
             return gameList[index].d3dxRenderer
@@ -416,7 +399,6 @@ class ShortcutsFragment : Fragment() {
 
         private fun putVulkanDriverType(name: String, driverType: Int) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].vulkanDriverType = driverType
@@ -426,7 +408,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getVulkanDriverType(name: String): Int {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return MESA_DRIVER
 
             return gameList[index].vulkanDriverType
@@ -434,7 +415,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putVulkanDriver(name: String, driverName: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].vulkanDriver = driverName
@@ -450,7 +430,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getVulkanDriver(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return ""
 
             return gameList[index].vulkanDriver
@@ -458,7 +437,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putDisplaySettings(name: String, displayMode: String, displayResolution: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].displayMode = displayMode
@@ -469,7 +447,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getDisplaySettings(name: String): List<String> {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return listOf("16:9", "1280x720")
 
             return listOf(gameList[index].displayMode, gameList[index].displayResolution)
@@ -477,7 +454,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putBox64Version(name: String, box64VersionId: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].box64Version = box64VersionId
@@ -487,7 +463,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getBox64Version(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return listRatPackagesId("Box64-").firstOrNull() ?: ""
 
             return gameList[index].box64Version
@@ -495,7 +470,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putBox64Preset(name: String, presetName: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].box64Preset = presetName
@@ -505,7 +479,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getBox64Preset(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return "default"
 
             return gameList[index].box64Preset
@@ -513,7 +486,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putControllerXInput(name: String, enabled: Boolean, controllerIndex: Int) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].controllersEnableXInput[controllerIndex] = enabled
@@ -523,7 +495,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getControllerXInput(name: String, controllerIndex: Int): Boolean {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return false
 
             return gameList[index].controllersEnableXInput[controllerIndex]
@@ -531,7 +502,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putControllerPreset(name: String, presetName: String, controllerIndex: Int) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].controllersPreset[controllerIndex] = presetName
@@ -541,7 +511,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getControllerPreset(name: String, controllerIndex: Int): String {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1 || controllerIndex == -1) return "default"
 
             return gameList[index].controllersPreset[controllerIndex]
@@ -549,7 +518,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putVirtualControllerXInput(name: String, enabled: Boolean) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].virtualControllerEnableXInput = enabled
@@ -559,7 +527,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getVirtualControllerXInput(name: String): Boolean {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return false
 
             return gameList[index].virtualControllerEnableXInput
@@ -567,7 +534,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putSelectedVirtualControllerPreset(name: String, presetName: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].virtualControllerPreset = presetName
@@ -577,7 +543,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getSelectedVirtualControllerPreset(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return "default"
 
             return gameList[index].virtualControllerPreset
@@ -585,7 +550,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putExeArguments(name: String, exeArguments: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].exeArguments = exeArguments
@@ -595,7 +559,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getExeArguments(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return ""
 
             return gameList[index].exeArguments
@@ -603,7 +566,6 @@ class ShortcutsFragment : Fragment() {
 
         fun putExePath(name: String, exePath: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].exePath = exePath
@@ -613,7 +575,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getExePath(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return ""
 
             return gameList[index].exePath
@@ -621,7 +582,6 @@ class ShortcutsFragment : Fragment() {
 
         fun addGameToList(path: String, prettyName: String, icon: String) {
             val gameExists = gameList.any { it.name == prettyName }
-
             if (gameExists) return
 
             gameList.add(
@@ -633,9 +593,9 @@ class ShortcutsFragment : Fragment() {
                     "Global",
                     "default",
                     mutableListOf("default", "default", "default", "default"),
-                    mutableListOf(false, false, false, false),
+                    mutableListOf(true, true, true, true),
                     "default",
-                    false,
+                    true,
                     "16:9",
                     "1280x720",
                     "Global",
@@ -664,7 +624,6 @@ class ShortcutsFragment : Fragment() {
 
         fun removeGameFromList(name: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList.removeAt(index)
@@ -675,15 +634,12 @@ class ShortcutsFragment : Fragment() {
             recyclerView?.adapter?.notifyItemRemoved(index)
         }
 
-        fun editGameFromList(name: String, newName: String, newArguments: String) {
+        fun setGameName(name: String, newName: String) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             gameList[index].name = newName
-            gameList[index].exeArguments = newArguments
             gameListNames[index].name = newName
-            gameListNames[index].exeArguments = newArguments
 
             saveShortcuts()
 
@@ -692,7 +648,6 @@ class ShortcutsFragment : Fragment() {
 
         fun setIconToGame(name: String, context: Context, uri: Uri) {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return
 
             createIconCache(context, uri, name)
@@ -707,7 +662,6 @@ class ShortcutsFragment : Fragment() {
 
         fun getGameIcon(name: String): Bitmap? {
             val index = gameList.indexOfFirst { it.name == name }
-
             if (index == -1) return null
 
             return BitmapFactory.decodeFile(gameList[index].iconPath)

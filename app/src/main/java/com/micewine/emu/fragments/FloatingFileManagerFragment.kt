@@ -17,6 +17,7 @@ import com.micewine.emu.activities.MainActivity.Companion.ACTION_SETUP
 import com.micewine.emu.activities.MainActivity.Companion.customRootFSPath
 import com.micewine.emu.activities.MainActivity.Companion.fileManagerCwd
 import com.micewine.emu.adapters.AdapterFiles
+import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetType
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.exportBox64Preset
@@ -26,11 +27,12 @@ import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.impo
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putExePath
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.exportVirtualControllerPreset
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.importVirtualControllerPreset
 import java.io.File
 
-class FloatingFileManagerFragment(private val operationType: Int) : DialogFragment() {
+class FloatingFileManagerFragment(private val operationType: Int, private val initialCwd: String = "/storage/emulated/0") : DialogFragment() {
     @SuppressLint("SetTextI18n")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater
@@ -42,8 +44,7 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
         recyclerView  = view.findViewById(R.id.recyclerViewFiles)
         recyclerView?.adapter = AdapterFiles(fileList, requireContext(), true)
 
-        fileManagerCwd = "/storage/emulated/0"
-
+        fileManagerCwd = initialCwd
         fmOperationType = operationType
 
         refreshFiles()
@@ -87,12 +88,15 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
                     when (clickedPresetType) {
                         VIRTUAL_CONTROLLER_PRESET -> {
                             exportVirtualControllerPreset(clickedPresetName, outputFile!!)
+                            outputFile = null
                         }
                         CONTROLLER_PRESET -> {
                             exportControllerPreset(clickedPresetName, outputFile!!)
+                            outputFile = null
                         }
                         BOX64_PRESET -> {
                             exportBox64Preset(requireContext(), clickedPresetName, outputFile!!)
+                            outputFile = null
                         }
                     }
 
@@ -123,6 +127,23 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
                             outputFile = null
                         }
                     }
+                    dismiss()
+                }.start()
+            }
+            OPERATION_SELECT_EXE -> {
+                selectRootFSFileText.visibility = View.GONE
+                editText.visibility = View.GONE
+                saveButton.visibility = View.GONE
+
+                Thread {
+                    while (outputFile == null || !isAdded) {
+                        Thread.sleep(16)
+                    }
+
+                    putExePath(selectedGameName, outputFile!!)
+                    outputFile = null
+
+                    parentFragmentManager.setFragmentResult("invalidate", Bundle())
 
                     dismiss()
                 }.start()
@@ -154,6 +175,7 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
         const val OPERATION_SELECT_RAT = 0
         const val OPERATION_EXPORT_PRESET = 1
         const val OPERATION_IMPORT_PRESET = 2
+        const val OPERATION_SELECT_EXE = 3
 
         fun refreshFiles() {
             recyclerView?.adapter?.notifyItemRangeRemoved(0, fileList.count())
@@ -199,6 +221,11 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
                                         }
                                     }
                                 }
+                            }
+                        }
+                        OPERATION_SELECT_EXE -> {
+                            if (it.name.endsWith(".exe")) {
+                                addToAdapter(it)
                             }
                         }
                         else -> {

@@ -13,7 +13,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.storage.StorageManager
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.Menu
@@ -117,6 +116,7 @@ import com.micewine.emu.fragments.EditGamePreferencesFragment
 import com.micewine.emu.fragments.EditGamePreferencesFragment.Companion.FILE_MANAGER_START_PREFERENCES
 import com.micewine.emu.fragments.FileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.fragments.FloatingFileManagerFragment
+import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.OPERATION_SELECT_EXE
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.OPERATION_SELECT_RAT
 import com.micewine.emu.fragments.SetupFragment
 import com.micewine.emu.fragments.SetupFragment.Companion.abortSetup
@@ -299,7 +299,6 @@ class MainActivity : AppCompatActivity() {
                         refreshFiles()
                     }
                 }
-
                 ACTION_SETUP -> {
                     lifecycleScope.launch {
                         var rootFSPath = ""
@@ -313,7 +312,6 @@ class MainActivity : AppCompatActivity() {
                         setupMiceWine(rootFSPath)
                     }
                 }
-
                 ACTION_INSTALL_RAT -> {
                     lifecycleScope.launch {
                         val ratFile = ratCandidate!!
@@ -352,7 +350,6 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-
                 ACTION_INSTALL_ADTOOLS_DRIVER -> {
                     val adToolsDriverFile = adToolsDriverCandidate!!
 
@@ -376,11 +373,12 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-
                 ACTION_SELECT_ICON -> {
                     openFilePicker()
                 }
-
+                ACTION_SELECT_EXE_PATH -> {
+                    FloatingFileManagerFragment(OPERATION_SELECT_EXE, wineDisksFolder!!.path).show(supportFragmentManager, "")
+                }
                 ACTION_CREATE_WINE_PREFIX -> {
                     val winePrefix = intent.getStringExtra("winePrefix")!!
                     val wine = intent.getStringExtra("wine")!!
@@ -527,6 +525,7 @@ class MainActivity : AppCompatActivity() {
                 addAction(ACTION_INSTALL_ADTOOLS_DRIVER)
                 addAction(ACTION_SELECT_FILE_MANAGER)
                 addAction(ACTION_SELECT_ICON)
+                addAction(ACTION_SELECT_EXE_PATH)
                 addAction(ACTION_CREATE_WINE_PREFIX)
             }
         })
@@ -654,9 +653,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-        }
-
-        else if (resultCode == Activity.RESULT_OK) {
+        } else if (resultCode == Activity.RESULT_OK) {
             data?.data?.also { uri ->
                 setIconToGame(selectedGameName, this, uri)
             }
@@ -910,16 +907,15 @@ class MainActivity : AppCompatActivity() {
             selectedGameName = shortcutName
 
             var driverName = getVulkanDriver(shortcutName)
-            var driverType = getVulkanDriverType(shortcutName)
             if (driverName == "Global") {
                 driverName = sharedPreferences.getString(SELECTED_VULKAN_DRIVER, "").toString()
-                driverType = if (driverName.startsWith("AdrenoToolsDriver-")) ADRENO_TOOLS_DRIVER else MESA_DRIVER
             }
-
             var box64Version = getBox64Version(shortcutName)
             if (box64Version == "Global") {
                 box64Version = sharedPreferences.getString(SELECTED_BOX64, "").toString()
             }
+
+            val driverType = if (driverName.startsWith("AdrenoToolsDriver-")) ADRENO_TOOLS_DRIVER else MESA_DRIVER
 
             val runWineIntent = Intent(ACTION_RUN_WINE).apply {
                 putExtra("exePath", getExePath(shortcutName))
@@ -1040,6 +1036,7 @@ class MainActivity : AppCompatActivity() {
         const val ACTION_STOP_ALL = "com.micewine.emu.ACTION_STOP_ALL"
         const val ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER"
         const val ACTION_SELECT_ICON = "com.micewine.emu.ACTION_SELECT_ICON"
+        const val ACTION_SELECT_EXE_PATH = "com.micewine.emu.ACTION_SELECT_EXE_PATH"
         const val ACTION_CREATE_WINE_PREFIX = "com.micewine.emu.ACTION_CREATE_WINE_PREFIX"
         const val RAM_COUNTER = "ramCounter"
         const val RAM_COUNTER_DEFAULT_VALUE = true
