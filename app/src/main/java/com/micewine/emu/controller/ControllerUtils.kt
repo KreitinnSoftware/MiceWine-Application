@@ -89,6 +89,8 @@ object ControllerUtils {
     const val LEFT_DOWN = 6
     const val LEFT = 7
     const val LEFT_UP = 8
+    const val SCROLL_UP = 9
+    const val SCROLL_DOWN = 10
 
     fun initialize(context: Context) {
         lorieView = LorieView(context)
@@ -187,6 +189,8 @@ object ControllerUtils {
             "M_Left" -> ButtonMapping("M_Left", BUTTON_LEFT, BUTTON_LEFT, MOUSE)
             "M_Middle" -> ButtonMapping("M_Middle", BUTTON_MIDDLE, BUTTON_MIDDLE, MOUSE)
             "M_Right" -> ButtonMapping("M_Right", BUTTON_RIGHT, BUTTON_RIGHT, MOUSE)
+            "M_WheelUp" -> ButtonMapping("M_WheelUp", SCROLL_UP, SCROLL_UP, MOUSE)
+            "M_WheelUp" -> ButtonMapping("M_WheelDown", SCROLL_DOWN, SCROLL_DOWN, MOUSE)
             "Mouse" -> ButtonMapping("Mouse", MOUSE, MOUSE, MOUSE)
             else -> getControllerPreset(preset, key) ?: ButtonMapping()
         }
@@ -291,7 +295,18 @@ object ControllerUtils {
     private fun handleKey(pressed: Boolean, mapping: ButtonMapping) {
         when (mapping.type) {
             KEYBOARD -> lorieView.sendKeyEvent(mapping.scanCode, mapping.keyCode, pressed)
-            MOUSE -> lorieView.sendMouseEvent(0F, 0F, mapping.scanCode, pressed, true)
+            MOUSE -> {
+              when (mapping.scanCode) {
+                SCROLL_UP -> {
+                  if (pressed) lorieView.sendMouseWheelEvent(0F, -10F)
+                }
+                SCROLL_DOWN -> {
+                  if (pressed) lorieView.sendMouseWheelEvent(0F, 10F)
+                }
+                else -> {
+                  lorieView.sendMouseEvent(0F, 0F, mapping.scanCode, pressed, true)
+                }
+            }
         }
     }
 

@@ -82,6 +82,8 @@ object XKeyCodes {
             keyNames.plusAssign("M_Left")
             keyNames.plusAssign("M_Middle")
             keyNames.plusAssign("M_Right")
+            keyNames.plusAssign("M_WheelUp")
+            keyNames.plusAssign("M_WheelDown")
         } else {
             keyNames.plusAssign("Mouse")
         }
