@@ -101,7 +101,6 @@ dependencies {
     implementation("com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0")
     implementation("com.getkeepsafe.taptargetview:taptargetview:1.15.0")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
-    implementation(project(":app:stub"))
 }
 
 fun getGitShortSHA(): String {
