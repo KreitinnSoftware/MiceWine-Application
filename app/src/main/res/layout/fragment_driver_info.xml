@@ -22,25 +22,36 @@
         android:layout_margin="4dp">
     </Spinner>
 
-    <ScrollView
-        android:id="@+id/scrollView"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/logsTextView"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="4dp"
-            android:gravity="start"
-            android:textSize="12sp"
-            android:textIsSelectable="true"
-            android:background="@drawable/top_rounded_shape"
-            android:theme="@style/Theme.MiceWine">
-        </TextView>
+            android:layout_height="match_parent"
+            android:background="@drawable/top_rounded_shape">
+        </View>
 
-    </ScrollView>
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <TextView
+                android:id="@+id/logsTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:gravity="start"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textIsSelectable="true"
+                android:theme="@style/Theme.MiceWine">
+            </TextView>
+
+        </ScrollView>
+
+    </FrameLayout>
 
 </LinearLayout>

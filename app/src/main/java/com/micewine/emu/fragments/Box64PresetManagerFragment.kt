@@ -32,7 +32,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_X87DOUBLE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42
-import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET_KEY
+import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET
 import com.micewine.emu.adapters.AdapterPreset
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
@@ -174,7 +174,7 @@ class Box64PresetManagerFragment : Fragment() {
 
             if (index == selectedPresetId) {
                 preferences?.edit {
-                    putString(SELECTED_BOX64_PRESET_KEY, presetListNames.first().titleSettings)
+                    putString(SELECTED_BOX64_PRESET, presetListNames.first().titleSettings)
                     apply()
                 }
                 recyclerView?.adapter?.notifyItemChanged(0)

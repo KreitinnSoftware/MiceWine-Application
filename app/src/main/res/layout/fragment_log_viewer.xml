@@ -18,6 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
+            android:textColor="@color/white"
             android:textSize="16sp"
             android:textIsSelectable="true"
             android:maxLines="10000"
@@ -36,7 +37,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/exportLogButton"
-            android:text="Export Log"
+            android:text="@string/export_log"
             android:textSize="15sp"
             android:layout_width="0dp"
             android:layout_weight="1"

@@ -33,6 +33,7 @@ import com.micewine.emu.activities.MainActivity.Companion.box64ShowBt
 import com.micewine.emu.activities.MainActivity.Companion.box64ShowSegv
 import com.micewine.emu.activities.MainActivity.Companion.box64Sse42
 import com.micewine.emu.activities.MainActivity.Companion.enableDRI3
+import com.micewine.emu.activities.MainActivity.Companion.getLdPreloadWorkaround
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedBox64
@@ -47,11 +48,11 @@ import com.micewine.emu.activities.MainActivity.Companion.useAdrenoTools
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.activities.MainActivity.Companion.wineESync
 import com.micewine.emu.activities.MainActivity.Companion.wineLogLevel
+import com.micewine.emu.fragments.EnvVarsSettingsFragment
 import com.micewine.emu.fragments.EnvVarsSettingsFragment.Companion.ENV_VARS_KEY
-import com.micewine.emu.fragments.EnvironmentVariable
 
 object EnvVars {
-    private lateinit var sharedPreferences: SharedPreferences
+    lateinit var sharedPreferences: SharedPreferences
 
     fun initialize(context: Context) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -64,9 +65,9 @@ object EnvVars {
 
         val savedVarsJson = sharedPreferences.getString(ENV_VARS_KEY, null)
         if (savedVarsJson != null) {
-            val type = object : TypeToken<List<EnvironmentVariable>>() {}.type
+            val type = object : TypeToken<List<EnvVarsSettingsFragment.EnvironmentVariable>>() {}.type
 
-            Gson().fromJson<List<EnvironmentVariable>>(savedVarsJson, type).forEach {
+            Gson().fromJson<List<EnvVarsSettingsFragment.EnvironmentVariable>>(savedVarsJson, type).forEach {
                 vars.add("${it.key}=${it.value}")
             }
         }
@@ -139,10 +140,10 @@ object EnvVars {
             vars.add("BOX64_DYNAREC_WAIT=$box64DynarecWait")
             vars.add("BOX64_DYNAREC_DIRTY=$box64DynarecDirty")
             vars.add("BOX64_DYNAREC_FORWARD=$box64DynarecForward")
-            vars.add("BOX64_SHOWSEGV=$box64ShowSegv")
-            vars.add("BOX64_SHOWBT=$box64ShowBt")
-            vars.add("BOX64_NOSIGSEGV=$box64NoSigSegv")
-            vars.add("BOX64_NOSIGILL=$box64NoSigill")
+            vars.add("BOX64_SHOWSEGV=${strBoolToNumStr(box64ShowSegv)}")
+            vars.add("BOX64_SHOWBT=${strBoolToNumStr(box64ShowBt)}")
+            vars.add("BOX64_NOSIGSEGV=${strBoolToNumStr(box64NoSigSegv)}")
+            vars.add("BOX64_NOSIGILL=${strBoolToNumStr(box64NoSigill)}")
         }
 
         vars.add("VKD3D_FEATURE_LEVEL=12_0")
@@ -159,7 +160,7 @@ object EnvVars {
             vars.add("ADRENOTOOLS_CUSTOM_DRIVER_DIR=${adrenoToolsDriverFile?.parent}/")
             vars.add("ADRENOTOOLS_CUSTOM_DRIVER_NAME=${adrenoToolsDriverFile?.name}")
             // Workaround for dlopen error (at least on my device)
-            vars.add("LD_PRELOAD=/system/lib64/libEGL.so:/system/lib64/libGLESv1_CM.so")
+            vars.add(getLdPreloadWorkaround())
         }
     }
 }

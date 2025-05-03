@@ -4,6 +4,7 @@ import android.os.Build
 import com.micewine.emu.activities.MainActivity.Companion.selectedCpuAffinity
 import com.micewine.emu.activities.MainActivity.Companion.wineDisksFolder
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
+import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
@@ -33,14 +34,14 @@ object WineWrapper {
 
     fun wine(args: String) {
         runCommand(
-            getEnv() + "WINEPREFIX='$winePrefix' $IS_BOX64 wine $args"
+            getEnv() + "WINEPREFIX='$winePrefixesDir/$winePrefix' $IS_BOX64 wine $args"
         )
     }
 
     fun wine(args: String, retLog: Boolean): String {
         if (retLog) {
             return runCommandWithOutput(
-                getEnv() + "BOX64_LOG=0 WINEPREFIX='$winePrefix' $IS_BOX64 wine $args"
+                getEnv() + "BOX64_LOG=0 WINEPREFIX='$winePrefixesDir/$winePrefix' $IS_BOX64 wine $args"
             )
         }
         return ""
@@ -48,7 +49,7 @@ object WineWrapper {
 
     fun wine(args: String, cwd: String) {
         runCommand(
-            "cd $cwd;" + getEnv() + "WINEPREFIX='$winePrefix' $IS_BOX64 wine $args"
+            "cd $cwd;" + getEnv() + "WINEPREFIX='$winePrefixesDir/$winePrefix' $IS_BOX64 wine $args"
         )
     }
 

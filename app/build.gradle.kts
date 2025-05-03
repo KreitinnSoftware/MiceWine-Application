@@ -84,6 +84,7 @@ android {
 }
 
 dependencies {
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("net.lingala.zip4j:zip4j:2.11.5")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")

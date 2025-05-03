@@ -17,7 +17,9 @@ import com.micewine.emu.activities.MainActivity.Companion.fileManagerCwd
 import com.micewine.emu.activities.MainActivity.Companion.fileManagerDefaultDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
+import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.WineWrapper.extractIcon
+import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.adToolsDriverCandidate
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.outputFile
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.utils.DriveUtils
@@ -107,6 +109,14 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                 }
             } else if (fileExtension == "rat" || fileExtension == "mwp") {
                 holder.icon.setImageResource(R.drawable.ic_rat_package)
+            } else if (fileExtension == "zip") {
+                val isAdrenoToolsPackage = RatPackageManager.AdrenoToolsPackage(sList.file.path).name != null
+
+                if (isAdrenoToolsPackage) {
+                    holder.icon.setImageResource(R.drawable.ic_rat_package)
+                } else {
+                    holder.icon.setImageResource(R.drawable.ic_log)
+                }
             } else {
                 holder.icon.setImageResource(R.drawable.ic_log)
             }

@@ -19,10 +19,13 @@ import android.view.KeyEvent.KEYCODE_BUTTON_Y
 import android.view.MotionEvent
 import android.view.MotionEvent.AXIS_HAT_X
 import android.view.MotionEvent.AXIS_HAT_Y
+import android.view.MotionEvent.AXIS_LTRIGGER
+import android.view.MotionEvent.AXIS_RTRIGGER
 import android.view.MotionEvent.AXIS_RZ
 import android.view.MotionEvent.AXIS_X
 import android.view.MotionEvent.AXIS_Y
 import android.view.MotionEvent.AXIS_Z
+import com.google.gson.Gson
 import com.micewine.emu.LorieView
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_MINUS_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_PLUS_KEY
@@ -49,19 +52,11 @@ import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_THUMBR
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_Y_KEY
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_DOWN
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT_DOWN
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT_UP
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_DOWN
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_UP
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_UP
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.connectController
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.connectedControllers
-import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
+import com.micewine.emu.controller.XKeyCodes.ButtonMapping
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getDeadZone
-import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMapping
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getControllerPreset
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMouseSensibility
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerXInput
@@ -84,29 +79,27 @@ object ControllerUtils {
     private var virtualMouseMovingState: Int? = null
     private var axisXVelocity: Float = 0F
     private var axisYVelocity: Float = 0F
-    private var lastUsedControllerIndex = 0
+    private var controllerIndex = 0
     private lateinit var lorieView: LorieView
-
-    private const val LEFT = 1
-    private const val RIGHT = 2
-    private const val UP = 3
-    private const val DOWN = 4
-    private const val LEFT_UP = 5
-    private const val LEFT_DOWN = 6
-    private const val RIGHT_UP = 7
-    private const val RIGHT_DOWN = 8
-    private const val SCROLL_UP = 9
-    private const val SCROLL_DOWN = 10
+    const val UP = 1
+    const val RIGHT_UP = 2
+    const val RIGHT = 3
+    const val RIGHT_DOWN = 4
+    const val DOWN = 5
+    const val LEFT_DOWN = 6
+    const val LEFT = 7
+    const val LEFT_UP = 8
+    const val SCROLL_UP = 9
+    const val SCROLL_DOWN = 10
 
     fun initialize(context: Context) {
         lorieView = LorieView(context)
     }
 
     suspend fun controllerMouseEmulation() {
-
         withContext(Dispatchers.IO) {
             while (true) {
-                val mouseSensibility = getMouseSensibility(getControllerPreset(selectedGameName, lastUsedControllerIndex)).toFloat() / 100
+                val mouseSensibility = getMouseSensibility(getControllerPreset(selectedGameName, controllerIndex)).toFloat() / 100
 
                 when (virtualMouseMovingState) {
                     LEFT -> {
@@ -188,52 +181,30 @@ object ControllerUtils {
         }
     }
 
-    private fun detectKey(presetName: String?, key: String): List<Int> {
-        var mapping = getMapping(presetName ?: "default", key)
+    private fun detectKey(presetName: String?, key: String): ButtonMapping {
+        val preset = if (presetName == "--") "default" else presetName ?: "default"
+        val controllerPreset = getControllerPreset(preset, key)
 
-        if (presetName == "--") {
-            mapping = getMapping("default", key)
+        return when (controllerPreset?.name) {
+            "M_Left" -> ButtonMapping("M_Left", BUTTON_LEFT, BUTTON_LEFT, MOUSE)
+            "M_Middle" -> ButtonMapping("M_Middle", BUTTON_MIDDLE, BUTTON_MIDDLE, MOUSE)
+            "M_Right" -> ButtonMapping("M_Right", BUTTON_RIGHT, BUTTON_RIGHT, MOUSE)
+            "M_WheelUp" -> ButtonMapping("M_WheelUp", SCROLL_UP, SCROLL_UP, MOUSE)
+            "M_WheelUp" -> ButtonMapping("M_WheelDown", SCROLL_DOWN, SCROLL_DOWN, MOUSE)
+            "Mouse" -> ButtonMapping("Mouse", MOUSE, MOUSE, MOUSE)
+            else -> getControllerPreset(preset, key) ?: ButtonMapping()
         }
-
-        val keyList: List<Int>
-
-        when (mapping[0]) {
-            "M_Left" -> {
-                keyList = listOf(BUTTON_LEFT, BUTTON_LEFT, MOUSE)
-            }
-            "M_Middle" -> {
-                keyList = listOf(BUTTON_MIDDLE, BUTTON_MIDDLE, MOUSE)
-            }
-            "M_Right" -> {
-                keyList = listOf(BUTTON_RIGHT, BUTTON_RIGHT, MOUSE)
-            }
-            "M_WheelUp" -> {
-                keyList = listOf(SCROLL_UP, SCROLL_UP, MOUSE)
-            }
-            "M_WheelDown" -> {
-                keyList = listOf(SCROLL_DOWN, SCROLL_DOWN, MOUSE)
-            }
-            "Mouse" -> {
-                keyList = listOf(MOUSE, MOUSE, MOUSE)
-            }
-            else -> {
-                keyList = getXKeyScanCodes(mapping[0])
-            }
-        }
-
-        return keyList
     }
 
     fun prepareButtonsAxisValues() {
         connectedPhysicalControllers.forEachIndexed { index, it ->
             val presetName = getControllerPreset(selectedGameName, index)
+            Log.e("ControllerDebug", ":$presetName")
 
             if (getControllerXInput(selectedGameName, index)) {
                 it.mappingType = MAPPING_TYPE_XINPUT
 
-                if (it.virtualXInputId == -1) {
-                    it.virtualXInputId = connectController()
-                }
+                if (it.virtualXInputId == -1) it.virtualXInputId = connectController()
             } else {
                 it.mappingType = MAPPING_TYPE_KEYBOARD_MOUSE
 
@@ -264,7 +235,7 @@ object ControllerUtils {
                     detectKey(presetName, AXIS_Y_PLUS_KEY),
                     detectKey(presetName, AXIS_X_MINUS_KEY),
                     detectKey(presetName, AXIS_X_PLUS_KEY)
-                ).any { it.first() == MOUSE }
+                ).any { it.type == MOUSE }
 
                 it.keyboardMapping.rightAnalog.up = detectKey(presetName, AXIS_Z_MINUS_KEY)
                 it.keyboardMapping.rightAnalog.down = detectKey(presetName, AXIS_Z_PLUS_KEY)
@@ -276,7 +247,7 @@ object ControllerUtils {
                     detectKey(presetName, AXIS_Z_PLUS_KEY),
                     detectKey(presetName, AXIS_RZ_MINUS_KEY),
                     detectKey(presetName, AXIS_RZ_PLUS_KEY)
-                ).any { it.first() == MOUSE }
+                ).any { it.type == MOUSE }
 
                 it.keyboardMapping.dPad.up = detectKey(presetName, AXIS_HAT_Y_MINUS_KEY)
                 it.keyboardMapping.dPad.down = detectKey(presetName, AXIS_HAT_Y_PLUS_KEY)
@@ -288,22 +259,23 @@ object ControllerUtils {
                     detectKey(presetName, AXIS_HAT_Y_PLUS_KEY),
                     detectKey(presetName, AXIS_HAT_X_MINUS_KEY),
                     detectKey(presetName, AXIS_HAT_X_PLUS_KEY)
-                ).any { it.first() == MOUSE }
+                ).any { it.type == MOUSE }
 
-                it.deadZone = getDeadZone(presetName).toFloat() / 100
-                it.mouseSensibility = getMouseSensibility(presetName).toFloat() / 100
+                it.deadZone = getDeadZone(presetName).toFloat() / 100F
+                it.mouseSensibility = getMouseSensibility(presetName).toFloat() / 100F
             }
         }
     }
 
-    fun getGameControllerNames(): MutableList<PhysicalController> {
+    fun getConnectedControllers(): MutableList<PhysicalController> {
         val deviceIds = InputDevice.getDeviceIds()
         val devices = mutableListOf<PhysicalController>()
 
         deviceIds.forEach { deviceId ->
             InputDevice.getDevice(deviceId)?.let { device ->
-                if ((device.sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD) ||
-                    (device.sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK)
+                if (((device.sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD) ||
+                    (device.sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK)) &&
+                    (!device.name.contains("uinput"))
                 ) {
                     devices.add(
                         PhysicalController(
@@ -320,29 +292,32 @@ object ControllerUtils {
         return devices
     }
 
-    private fun handleKey(pressed: Boolean, mapping: List<Int>) {
-        when (mapping[2]) {
-            KEYBOARD -> lorieView.sendKeyEvent(mapping[0], mapping[1], pressed)
+    private fun handleKey(pressed: Boolean, mapping: ButtonMapping) {
+        when (mapping.type) {
+            KEYBOARD -> lorieView.sendKeyEvent(mapping.scanCode, mapping.keyCode, pressed)
             MOUSE -> {
-                when (mapping[0]) {
-                    SCROLL_UP -> {
-                        if (pressed) lorieView.sendMouseWheelEvent(0F, -10F)
-                    }
-                    SCROLL_DOWN -> {
-                        if (pressed) lorieView.sendMouseWheelEvent(0F, 10F)
-                    }
-                    else -> lorieView.sendMouseEvent(0F, 0F, mapping[0], pressed, true)
+              when (mapping.scanCode) {
+                SCROLL_UP -> {
+                  if (pressed) lorieView.sendMouseWheelEvent(0F, -10F)
+                }
+                SCROLL_DOWN -> {
+                  if (pressed) lorieView.sendMouseWheelEvent(0F, 10F)
+                }
+                else -> {
+                  lorieView.sendMouseEvent(0F, 0F, mapping.scanCode, pressed, true)
                 }
             }
         }
     }
 
-    fun checkControllerButtons(e: KeyEvent): Boolean {
+    fun updateButtonsState(e: KeyEvent): Boolean {
         val pressed = e.action == KeyEvent.ACTION_DOWN
         val physicalController = connectedPhysicalControllers.firstOrNull { it.id == e.deviceId } ?: return false
 
         when (e.keyCode) {
             KEYCODE_BUTTON_Y -> {
+                physicalController.state.yPressed = pressed
+
                 when (physicalController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
                         val index = physicalController.virtualXInputId
@@ -357,6 +332,8 @@ object ControllerUtils {
                 }
             }
             KEYCODE_BUTTON_A -> {
+                physicalController.state.aPressed = pressed
+
                 when (physicalController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
                         val index = physicalController.virtualXInputId
@@ -371,6 +348,8 @@ object ControllerUtils {
                 }
             }
             KEYCODE_BUTTON_B -> {
+                physicalController.state.bPressed = pressed
+
                 when (physicalController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
                         val index = physicalController.virtualXInputId
@@ -385,6 +364,8 @@ object ControllerUtils {
                 }
             }
             KEYCODE_BUTTON_X -> {
+                physicalController.state.xPressed = pressed
+
                 when (physicalController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
                         val index = physicalController.virtualXInputId
@@ -399,6 +380,8 @@ object ControllerUtils {
                 }
             }
             KEYCODE_BUTTON_START -> {
+                physicalController.state.startPressed = pressed
+
                 when (physicalController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
                         val index = physicalController.virtualXInputId
@@ -413,6 +396,8 @@ object ControllerUtils {
                 }
             }
             KEYCODE_BUTTON_SELECT -> {
+                physicalController.state.selectPressed = pressed
+
                 when (physicalController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
                         val index = physicalController.virtualXInputId
@@ -427,6 +412,8 @@ object ControllerUtils {
                 }
             }
             KEYCODE_BUTTON_R1 -> {
+                physicalController.state.rbPressed = pressed
+
                 when (physicalController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
                         val index = physicalController.virtualXInputId
@@ -440,23 +427,9 @@ object ControllerUtils {
                     }
                 }
             }
-            KEYCODE_BUTTON_R2 -> {
-                when (physicalController.mappingType) {
-                    MAPPING_TYPE_XINPUT -> {
-                        val index = physicalController.virtualXInputId
-                        if (index != -1) {
-                            connectedControllers[index].rt[0] = if (pressed) 2 else 0
-                            connectedControllers[index].rt[1] = if (pressed) 5 else 0
-                            connectedControllers[index].rt[2] = if (pressed) 5 else 0
-                        }
-                    }
-                    MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                        val mapping = physicalController.keyboardMapping.rtButton
-                        handleKey(pressed, mapping)
-                    }
-                }
-            }
             KEYCODE_BUTTON_L1 -> {
+                physicalController.state.lbPressed = pressed
+
                 when (physicalController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
                         val index = physicalController.virtualXInputId
@@ -470,23 +443,49 @@ object ControllerUtils {
                     }
                 }
             }
-            KEYCODE_BUTTON_L2 -> {
-                when (physicalController.mappingType) {
-                    MAPPING_TYPE_XINPUT -> {
-                        val index = physicalController.virtualXInputId
-                        if (index != -1) {
-                            connectedControllers[index].lt[0] = if (pressed) 2 else 0
-                            connectedControllers[index].lt[1] = if (pressed) 5 else 0
-                            connectedControllers[index].lt[2] = if (pressed) 5 else 0
+            KEYCODE_BUTTON_R2 -> {
+                if (!physicalController.supportAxisTrigger) {
+                    physicalController.state.rt = 1F
+
+                    when (physicalController.mappingType) {
+                        MAPPING_TYPE_XINPUT -> {
+                            val index = physicalController.virtualXInputId
+                            if (index != -1) {
+                                connectedControllers[index].rt[0] = 2
+                                connectedControllers[index].rt[1] = 5
+                                connectedControllers[index].rt[2] = 5
+                            }
+                        }
+                        MAPPING_TYPE_KEYBOARD_MOUSE -> {
+                            val mapping = physicalController.keyboardMapping.rtButton
+                            handleKey(pressed, mapping)
                         }
                     }
-                    MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                        val mapping = physicalController.keyboardMapping.ltButton
-                        handleKey(pressed, mapping)
+                }
+            }
+            KEYCODE_BUTTON_L2 -> {
+                if (!physicalController.supportAxisTrigger) {
+                    physicalController.state.lt = 1F
+
+                    when (physicalController.mappingType) {
+                        MAPPING_TYPE_XINPUT -> {
+                            val index = physicalController.virtualXInputId
+                            if (index != -1) {
+                                connectedControllers[index].lt[0] = 2
+                                connectedControllers[index].lt[1] = 5
+                                connectedControllers[index].lt[2] = 5
+                            }
+                        }
+                        MAPPING_TYPE_KEYBOARD_MOUSE -> {
+                            val mapping = physicalController.keyboardMapping.ltButton
+                            handleKey(pressed, mapping)
+                        }
                     }
                 }
             }
             KEYCODE_BUTTON_THUMBR -> {
+                physicalController.state.rsPressed = pressed
+
                 when (physicalController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
                         val index = physicalController.virtualXInputId
@@ -501,6 +500,8 @@ object ControllerUtils {
                 }
             }
             KEYCODE_BUTTON_THUMBL -> {
+                physicalController.state.lsPressed = pressed
+
                 when (physicalController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
                         val index = physicalController.virtualXInputId
@@ -520,238 +521,250 @@ object ControllerUtils {
     }
 
     private fun setVirtualMouseState(axisX: Float, axisY: Float, state: Int) {
-        virtualMouseMovingState = state
+        if (axisX.absoluteValue > 0.25F) axisXVelocity = axisX.absoluteValue
+        if (axisY.absoluteValue > 0.25F) axisYVelocity = axisY.absoluteValue
 
-        axisXVelocity = axisX.absoluteValue
-        axisYVelocity = axisY.absoluteValue
+        virtualMouseMovingState = state
     }
 
-    private fun getDPadStatus(axisX: Float, axisY: Float, deadZone: Float): Int {
+    fun getAxisStatus(axisX: Float, axisY: Float, deadZone: Float): Int {
         val axisXNeutral = axisX < deadZone && axisX > -deadZone
         val axisYNeutral = axisY < deadZone && axisY > -deadZone
 
         return when {
-            axisY < -deadZone && axisXNeutral -> DPAD_UP
-            axisX > deadZone && axisY < -deadZone -> DPAD_RIGHT_UP
-            axisX > deadZone && axisYNeutral -> DPAD_RIGHT
-            axisX > deadZone && axisY > deadZone -> DPAD_RIGHT_DOWN
-            axisY > deadZone && axisXNeutral -> DPAD_DOWN
-            axisX < -deadZone && axisY > deadZone -> DPAD_LEFT_DOWN
-            axisX < -deadZone && axisYNeutral -> DPAD_LEFT
-            axisX < -deadZone && axisY < -deadZone -> DPAD_LEFT_UP
-
+            axisX > deadZone && axisY < -deadZone -> RIGHT_UP
+            axisX > deadZone && axisYNeutral -> RIGHT
+            axisX > deadZone && axisY > deadZone -> RIGHT_DOWN
+            axisY > deadZone && axisXNeutral -> DOWN
+            axisY < -deadZone && axisXNeutral -> UP
+            axisX < -deadZone && axisY > deadZone -> LEFT_DOWN
+            axisX < -deadZone && axisYNeutral -> LEFT
+            axisX < -deadZone && axisY < -deadZone -> LEFT_UP
             else -> 0
         }
     }
 
     fun handleAxis(axisX: Float, axisY: Float, analog: Analog, deadZone: Float) {
-        val axisXNeutral = axisX < deadZone && axisX > -deadZone
-        val axisYNeutral = axisY < deadZone && axisY > -deadZone
-
-        when {
-            // Left
-            axisX < -deadZone && axisYNeutral -> {
+        val status = getAxisStatus(axisX, axisY, deadZone)
+        when (status) {
+            LEFT -> {
                 if (analog.isMouseMapping) {
                     setVirtualMouseState(axisX, axisY, LEFT)
                 } else {
-                    lorieView.sendKeyEvent(analog.right[0], analog.right[1], false)
-                    lorieView.sendKeyEvent(analog.left[0], analog.left[1], true)
-                    lorieView.sendKeyEvent(analog.up[0], analog.up[1], false)
-                    lorieView.sendKeyEvent(analog.down[0], analog.down[1], false)
+                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
+                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, true)
+                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
+                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
                 }
             }
-
-            // Right
-            axisX > deadZone && axisYNeutral -> {
+            RIGHT -> {
                 if (analog.isMouseMapping) {
                     setVirtualMouseState(axisX, axisY, RIGHT)
                 } else {
-                    lorieView.sendKeyEvent(analog.right[0], analog.right[1], true)
-                    lorieView.sendKeyEvent(analog.left[0], analog.left[1], false)
-                    lorieView.sendKeyEvent(analog.up[0], analog.up[1], false)
-                    lorieView.sendKeyEvent(analog.down[0], analog.down[1], false)
+                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, true)
+                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
+                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
+                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
                 }
             }
-
-            // Up
-            axisY < -deadZone && axisXNeutral -> {
+            UP -> {
                 if (analog.isMouseMapping) {
                     setVirtualMouseState(axisX, axisY, UP)
                 } else {
-                    lorieView.sendKeyEvent(analog.right[0], analog.right[1], false)
-                    lorieView.sendKeyEvent(analog.left[0], analog.left[1], false)
-                    lorieView.sendKeyEvent(analog.up[0], analog.up[1], true)
-                    lorieView.sendKeyEvent(analog.down[0], analog.down[1], false)
+                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
+                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
+                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, true)
+                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
                 }
             }
-
-            // Down
-            axisY > deadZone && axisXNeutral -> {
+            DOWN -> {
                 if (analog.isMouseMapping) {
                     setVirtualMouseState(axisX, axisY, DOWN)
                 } else {
-                    lorieView.sendKeyEvent(analog.right[0], analog.right[1], false)
-                    lorieView.sendKeyEvent(analog.left[0], analog.left[1], false)
-                    lorieView.sendKeyEvent(analog.up[0], analog.up[1], false)
-                    lorieView.sendKeyEvent(analog.down[0], analog.down[1], true)
+                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
+                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
+                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
+                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, true)
                 }
             }
-
-            // Left/Up
-            axisX < -deadZone && axisY < -deadZone -> {
+            LEFT_UP -> {
                 if (analog.isMouseMapping) {
                     setVirtualMouseState(axisX, axisY, LEFT_UP)
                 } else {
-                    lorieView.sendKeyEvent(analog.right[0], analog.right[1], false)
-                    lorieView.sendKeyEvent(analog.left[0], analog.left[1], true)
-                    lorieView.sendKeyEvent(analog.up[0], analog.up[1], true)
-                    lorieView.sendKeyEvent(analog.down[0], analog.down[1], false)
+                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
+                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, true)
+                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, true)
+                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
                 }
             }
-
-            // Left/Down
-            axisX < -deadZone && axisY > deadZone -> {
+            LEFT_DOWN -> {
                 if (analog.isMouseMapping) {
                     setVirtualMouseState(axisX, axisY, LEFT_DOWN)
                 } else {
-                    lorieView.sendKeyEvent(analog.right[0], analog.right[1], false)
-                    lorieView.sendKeyEvent(analog.left[0], analog.left[1], true)
-                    lorieView.sendKeyEvent(analog.up[0], analog.up[1], false)
-                    lorieView.sendKeyEvent(analog.down[0], analog.down[1], true)
+                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
+                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, true)
+                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
+                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, true)
                 }
             }
-
-            // Right/Up
-            axisX > deadZone && axisY < -deadZone -> {
+            RIGHT_UP -> {
                 if (analog.isMouseMapping) {
                     setVirtualMouseState(axisX, axisY, RIGHT_UP)
                 } else {
-                    lorieView.sendKeyEvent(analog.right[0], analog.right[1], true)
-                    lorieView.sendKeyEvent(analog.left[0], analog.left[1], false)
-                    lorieView.sendKeyEvent(analog.up[0], analog.up[1], true)
-                    lorieView.sendKeyEvent(analog.down[0], analog.down[1], false)
+                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, true)
+                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
+                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, true)
+                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
                 }
             }
-
-            // Right/Down
-            axisX > deadZone && axisY > deadZone -> {
+            RIGHT_DOWN -> {
                 if (analog.isMouseMapping) {
                     setVirtualMouseState(axisX, axisY, RIGHT_DOWN)
                 } else {
-                    lorieView.sendKeyEvent(analog.right[0], analog.right[1], true)
-                    lorieView.sendKeyEvent(analog.left[0], analog.left[1], false)
-                    lorieView.sendKeyEvent(analog.up[0], analog.up[1], false)
-                    lorieView.sendKeyEvent(analog.down[0], analog.down[1], true)
+                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, true)
+                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
+                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
+                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, true)
                 }
             }
-
             else -> {
                 if (analog.isMouseMapping) {
                     virtualMouseMovingState = null
                 } else {
-                    lorieView.sendKeyEvent(analog.right[0], analog.right[1], false)
-                    lorieView.sendKeyEvent(analog.left[0], analog.left[1], false)
-                    lorieView.sendKeyEvent(analog.up[0], analog.up[1], false)
-                    lorieView.sendKeyEvent(analog.down[0], analog.down[1], false)
+                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
+                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
+                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
+                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
                 }
             }
         }
     }
 
-    fun checkControllerAxis(event: MotionEvent) {
-        lastUsedControllerIndex = connectedPhysicalControllers.indexOfFirst { it.id == event.deviceId }
-        if (lastUsedControllerIndex == -1) return
+    fun updateAxisState(event: MotionEvent) {
+        controllerIndex = connectedPhysicalControllers.indexOfFirst { it.id == event.deviceId }
+        if (controllerIndex == -1) return
 
-        val physicalController = connectedPhysicalControllers[lastUsedControllerIndex]
+        val pController = connectedPhysicalControllers[controllerIndex]
 
-        val axisX = event.getAxisValue(AXIS_X)
-        val axisY = event.getAxisValue(AXIS_Y)
+        pController.state.lx = event.getAxisValue(AXIS_X)
+        pController.state.ly = event.getAxisValue(AXIS_Y)
+        pController.state.rx = event.getAxisValue(AXIS_Z)
+        pController.state.ry = event.getAxisValue(AXIS_RZ)
+        pController.state.dpadX = event.getAxisValue(AXIS_HAT_X)
+        pController.state.dpadY = event.getAxisValue(AXIS_HAT_Y)
 
-        val axisZ = event.getAxisValue(AXIS_Z)
-        val axisRZ = event.getAxisValue(AXIS_RZ)
+        if (pController.supportAxisTrigger) {
+            pController.state.lt = event.getAxisValue(AXIS_LTRIGGER)
+            pController.state.rt = event.getAxisValue(AXIS_RTRIGGER)
+        }
 
-        val axisHatX = event.getAxisValue(AXIS_HAT_X)
-        val axisHatY = event.getAxisValue(AXIS_HAT_Y)
-
-        when (physicalController.mappingType) {
+        when (pController.mappingType) {
             MAPPING_TYPE_XINPUT -> {
-                val index = physicalController.virtualXInputId
+                val index = pController.virtualXInputId
                 if (index != -1) {
-                    val lxStr = ((axisX + 1) / 2 * 255).toInt().toString().padStart(3, '0')
-                    val lyStr = ((-axisY + 1) / 2 * 255).toInt().toString().padStart(3, '0')
+                    axisToByteArray(connectedControllers[index].lx, normalizeAxisValue(pController.state.lx))
+                    axisToByteArray(connectedControllers[index].ly, normalizeAxisValue(-pController.state.ly))
+                    axisToByteArray(connectedControllers[index].rx, normalizeAxisValue(pController.state.rx))
+                    axisToByteArray(connectedControllers[index].ry, normalizeAxisValue(-pController.state.ry))
 
-                    connectedControllers[index].lx[0] = lxStr[0].digitToInt().toByte()
-                    connectedControllers[index].lx[1] = lxStr[1].digitToInt().toByte()
-                    connectedControllers[index].lx[2] = lxStr[2].digitToInt().toByte()
+                    if (pController.supportAxisTrigger) {
+                        axisToByteArray(connectedControllers[index].lt, normalizeAxisValue(pController.state.lt, true))
+                        axisToByteArray(connectedControllers[index].rt, normalizeAxisValue(pController.state.rt, true))
+                    }
 
-                    connectedControllers[index].ly[0] = lyStr[0].digitToInt().toByte()
-                    connectedControllers[index].ly[1] = lyStr[1].digitToInt().toByte()
-                    connectedControllers[index].ly[2] = lyStr[2].digitToInt().toByte()
-
-                    val rxStr = ((axisZ + 1) / 2 * 255).toInt().toString().padStart(3, '0')
-                    val ryStr = ((-axisRZ + 1) / 2 * 255).toInt().toString().padStart(3, '0')
-
-                    connectedControllers[index].rx[0] = rxStr[0].digitToInt().toByte()
-                    connectedControllers[index].rx[1] = rxStr[1].digitToInt().toByte()
-                    connectedControllers[index].rx[2] = rxStr[2].digitToInt().toByte()
-
-                    connectedControllers[index].ry[0] = ryStr[0].digitToInt().toByte()
-                    connectedControllers[index].ry[1] = ryStr[1].digitToInt().toByte()
-                    connectedControllers[index].ry[2] = ryStr[2].digitToInt().toByte()
-
-                    connectedControllers[index].dpadStatus = getDPadStatus(axisHatX, axisHatY, 0.25F)
+                    connectedControllers[index].dpadStatus = getAxisStatus(pController.state.dpadX, pController.state.dpadY, 0.25F)
                 }
             }
             MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                val index = connectedPhysicalControllers.indexOfFirst { it.id == event.deviceId }
-                if (index == -1) return
+                handleAxis(pController.state.lx, pController.state.ly, pController.keyboardMapping.leftAnalog, pController.deadZone)
+                handleAxis(pController.state.rx, pController.state.ry, pController.keyboardMapping.rightAnalog, pController.deadZone)
+                handleAxis(pController.state.dpadX, pController.state.dpadY, pController.keyboardMapping.dPad, pController.deadZone)
 
-                handleAxis(axisX, axisY, connectedPhysicalControllers[index].keyboardMapping.leftAnalog, connectedPhysicalControllers[index].deadZone)
-                handleAxis(axisZ, axisRZ, connectedPhysicalControllers[index].keyboardMapping.rightAnalog, connectedPhysicalControllers[index].deadZone)
-                handleAxis(axisHatX, axisHatY, connectedPhysicalControllers[index].keyboardMapping.dPad, connectedPhysicalControllers[index].deadZone)
+                if (pController.supportAxisTrigger) {
+                    handleKey(pController.state.lt > pController.deadZone, pController.keyboardMapping.ltButton)
+                    handleKey(pController.state.rt > pController.deadZone, pController.keyboardMapping.rtButton)
+                }
             }
         }
     }
 
-    val connectedPhysicalControllers: MutableList<PhysicalController> = getGameControllerNames()
+    private fun normalizeAxisValue(value: Float, half: Boolean = false): Int {
+        return if (half) {
+            (value * 255).toInt().coerceIn(0, 255)
+        } else {
+            ((value + 1) / 2 * 255).toInt().coerceIn(0, 255)
+        }
+    }
 
-    const val MAPPING_TYPE_KEYBOARD_MOUSE = 0
-    const val MAPPING_TYPE_XINPUT = 1
+    private fun axisToByteArray(byteArray: ByteArray, value: Int) {
+        val str = value.coerceIn(0, 255).toString().padStart(3, '0')
+        byteArray[0] = str[0].digitToInt().toByte()
+        byteArray[1] = str[1].digitToInt().toByte()
+        byteArray[2] = str[2].digitToInt().toByte()
+    }
+
+    val connectedPhysicalControllers: MutableList<PhysicalController> = getConnectedControllers()
+
+    private const val MAPPING_TYPE_KEYBOARD_MOUSE = 0
+    private const val MAPPING_TYPE_XINPUT = 1
 
     class PhysicalController(
         var name: String,
         var id: Int,
         var mappingType: Int = MAPPING_TYPE_KEYBOARD_MOUSE,
         var virtualXInputId: Int = -1,
+        var supportAxisTrigger: Boolean = true,
         var deadZone: Float = 0.25F,
         var mouseSensibility: Float = 1F,
-        var keyboardMapping: KeyboardMapping = KeyboardMapping()
+        var keyboardMapping: KeyboardMapping = KeyboardMapping(),
+        var state: ControllerState = ControllerState(),
+    )
+
+    class ControllerState(
+        var aPressed: Boolean = false,
+        var bPressed: Boolean = false,
+        var xPressed: Boolean = false,
+        var yPressed: Boolean = false,
+        var startPressed: Boolean = false,
+        var selectPressed: Boolean = false,
+        var rbPressed: Boolean = false,
+        var lbPressed: Boolean = false,
+        var lsPressed: Boolean = false,
+        var rsPressed: Boolean = false,
+        var dpadX: Float = 0F,
+        var dpadY: Float = 0F,
+        var lx: Float = 0F,
+        var ly: Float = 0F,
+        var rx: Float = 0F,
+        var ry: Float = 0F,
+        var lt: Float = 0F,
+        var rt: Float = 0F,
     )
 
     class KeyboardMapping(
         var leftAnalog: Analog = Analog(),
         var rightAnalog: Analog = Analog(),
         var dPad: Analog = Analog(),
-        var aButton: List<Int> = listOf(),
-        var bButton: List<Int> = listOf(),
-        var xButton: List<Int> = listOf(),
-        var yButton: List<Int> = listOf(),
-        var startButton: List<Int> = listOf(),
-        var selectButton: List<Int> = listOf(),
-        var lbButton: List<Int> = listOf(),
-        var rbButton: List<Int> = listOf(),
-        var ltButton: List<Int> = listOf(),
-        var rtButton: List<Int> = listOf(),
-        var lsButton: List<Int> = listOf(),
-        var rsButton: List<Int> = listOf(),
+        var aButton: ButtonMapping = ButtonMapping(),
+        var bButton: ButtonMapping = ButtonMapping(),
+        var xButton: ButtonMapping = ButtonMapping(),
+        var yButton: ButtonMapping = ButtonMapping(),
+        var startButton: ButtonMapping = ButtonMapping(),
+        var selectButton: ButtonMapping = ButtonMapping(),
+        var lbButton: ButtonMapping = ButtonMapping(),
+        var rbButton: ButtonMapping = ButtonMapping(),
+        var ltButton: ButtonMapping = ButtonMapping(),
+        var rtButton: ButtonMapping = ButtonMapping(),
+        var lsButton: ButtonMapping = ButtonMapping(),
+        var rsButton: ButtonMapping = ButtonMapping(),
     )
 
     class Analog(
         var isMouseMapping: Boolean = false,
-        var up: List<Int> = listOf(),
-        var down: List<Int> = listOf(),
-        var left: List<Int> = listOf(),
-        var right: List<Int> = listOf()
+        var up: ButtonMapping = ButtonMapping(),
+        var down: ButtonMapping = ButtonMapping(),
+        var left: ButtonMapping = ButtonMapping(),
+        var right: ButtonMapping = ButtonMapping(),
     )
 
     class GamePadServer {
@@ -854,14 +867,6 @@ object ControllerUtils {
             const val BUFFER_SIZE = 128
             const val GET_CONNECTION = 1
             const val GET_GAMEPAD_STATE = 2
-            const val DPAD_UP = 1
-            const val DPAD_RIGHT_UP = 2
-            const val DPAD_RIGHT = 3
-            const val DPAD_RIGHT_DOWN = 4
-            const val DPAD_DOWN = 5
-            const val DPAD_LEFT_DOWN = 6
-            const val DPAD_LEFT = 7
-            const val DPAD_LEFT_UP = 8
         }
     }
 

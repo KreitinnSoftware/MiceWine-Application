@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView style="?attr/materialCardViewElevatedStyle"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/MiceWine.CardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:background="?attr/selectableItemBackground"
-    android:clickable="true"
-    android:clipToPadding="false"
-    android:focusable="true"
-    android:transitionName="card_game"
-    android:layout_marginBottom="10dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="0dp"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_marginBottom="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"

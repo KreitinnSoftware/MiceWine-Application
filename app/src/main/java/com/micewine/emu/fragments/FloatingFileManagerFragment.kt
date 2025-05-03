@@ -17,8 +17,6 @@ import com.micewine.emu.activities.MainActivity.Companion.ACTION_SETUP
 import com.micewine.emu.activities.MainActivity.Companion.customRootFSPath
 import com.micewine.emu.activities.MainActivity.Companion.fileManagerCwd
 import com.micewine.emu.adapters.AdapterFiles
-import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
-import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetType
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.exportBox64Preset
@@ -26,6 +24,8 @@ import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.importBox
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.exportControllerPreset
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.importControllerPreset
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.exportVirtualControllerPreset
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.importVirtualControllerPreset
 import java.io.File
@@ -72,8 +72,8 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
                 saveButton.visibility = View.VISIBLE
 
                 when (clickedPresetType) {
-                    VIRTUAL_CONTROLLER -> editText.setText("VirtualController-$clickedPresetName.mwp")
-                    PHYSICAL_CONTROLLER -> editText.setText("PhysicalController-$clickedPresetName.mwp")
+                    VIRTUAL_CONTROLLER_PRESET -> editText.setText("VirtualController-$clickedPresetName.mwp")
+                    CONTROLLER_PRESET -> editText.setText("PhysicalController-$clickedPresetName.mwp")
                     BOX64_PRESET -> editText.setText("Box64-$clickedPresetName.mwp")
                 }
 
@@ -85,10 +85,10 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
                     }
 
                     when (clickedPresetType) {
-                        VIRTUAL_CONTROLLER -> {
+                        VIRTUAL_CONTROLLER_PRESET -> {
                             exportVirtualControllerPreset(clickedPresetName, outputFile!!)
                         }
-                        PHYSICAL_CONTROLLER -> {
+                        CONTROLLER_PRESET -> {
                             exportControllerPreset(clickedPresetName, outputFile!!)
                         }
                         BOX64_PRESET -> {
@@ -110,12 +110,12 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
                     }
 
                     when (clickedPresetType) {
-                        VIRTUAL_CONTROLLER -> {
+                        VIRTUAL_CONTROLLER_PRESET -> {
                             importVirtualControllerPreset(requireActivity(), outputFile!!)
                             outputFile = null
                         }
-                        PHYSICAL_CONTROLLER -> {
-                            importControllerPreset(requireActivity(), outputFile!!)
+                        CONTROLLER_PRESET -> {
+                            importControllerPreset(outputFile!!)
                             outputFile = null
                         }
                         BOX64_PRESET -> {
@@ -183,12 +183,12 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
                                 val mwpType = it.readLines()[0]
 
                                 when (clickedPresetType) {
-                                    PHYSICAL_CONTROLLER -> {
+                                    CONTROLLER_PRESET -> {
                                         if (mwpType == "controllerPreset") {
                                             addToAdapter(it)
                                         }
                                     }
-                                    VIRTUAL_CONTROLLER -> {
+                                    VIRTUAL_CONTROLLER_PRESET -> {
                                         if (mwpType == "virtualControllerPreset") {
                                             addToAdapter(it)
                                         }

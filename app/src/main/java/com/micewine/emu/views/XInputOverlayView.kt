@@ -15,15 +15,15 @@ import androidx.core.content.ContextCompat
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.getNativeResolution
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_DOWN
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT_DOWN
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_LEFT_UP
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_DOWN
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_RIGHT_UP
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.DPAD_UP
 import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.connectedControllers
+import com.micewine.emu.controller.ControllerUtils.LEFT
+import com.micewine.emu.controller.ControllerUtils.LEFT_DOWN
+import com.micewine.emu.controller.ControllerUtils.LEFT_UP
+import com.micewine.emu.controller.ControllerUtils.RIGHT
+import com.micewine.emu.controller.ControllerUtils.RIGHT_DOWN
+import com.micewine.emu.controller.ControllerUtils.RIGHT_UP
+import com.micewine.emu.controller.ControllerUtils.UP
+import com.micewine.emu.controller.ControllerUtils.DOWN
 import com.micewine.emu.input.InputStub.BUTTON_UNDEFINED
 import com.micewine.emu.views.OverlayView.Companion.SHAPE_CIRCLE
 import com.micewine.emu.views.OverlayView.Companion.SHAPE_DPAD
@@ -184,7 +184,7 @@ class XInputOverlayView @JvmOverloads constructor(
                 0,
                 false,
                 SHAPE_CIRCLE,
-                getBitmapFromVectorDrawable(context, R.drawable.start_button, 100, 100)
+                getBitmapFromVectorDrawable(context, R.drawable.select_button, 100, 100)
             )
         )
         buttonList.add(
@@ -196,7 +196,7 @@ class XInputOverlayView @JvmOverloads constructor(
                 0,
                 false,
                 SHAPE_CIRCLE,
-                getBitmapFromVectorDrawable(context, R.drawable.select_button, 100, 100)
+                getBitmapFromVectorDrawable(context, R.drawable.start_button, 100, 100)
             )
         )
         buttonList.add(
@@ -433,25 +433,25 @@ class XInputOverlayView @JvmOverloads constructor(
 
                 drawDPad(
                     dpadUp,
-                    it.dpadStatus in listOf(DPAD_UP, DPAD_RIGHT_UP, DPAD_LEFT_UP),
+                    it.dpadStatus in listOf(UP, RIGHT_UP, LEFT_UP),
                     canvas
                 )
 
                 drawDPad(
                     dpadDown,
-                    it.dpadStatus in listOf(DPAD_DOWN, DPAD_RIGHT_DOWN, DPAD_LEFT_DOWN),
+                    it.dpadStatus in listOf(DOWN, RIGHT_DOWN, LEFT_DOWN),
                     canvas
                 )
 
                 drawDPad(
                     dpadLeft,
-                    it.dpadStatus in listOf(DPAD_LEFT, DPAD_LEFT_DOWN, DPAD_LEFT_UP),
+                    it.dpadStatus in listOf(LEFT, LEFT_DOWN, LEFT_UP),
                     canvas
                 )
 
                 drawDPad(
                     dpadRight,
-                    it.dpadStatus in listOf(DPAD_RIGHT, DPAD_RIGHT_DOWN, DPAD_RIGHT_UP),
+                    it.dpadStatus in listOf(RIGHT, RIGHT_DOWN, RIGHT_UP),
                     canvas
                 )
             }
@@ -548,28 +548,28 @@ class XInputOverlayView @JvmOverloads constructor(
 
                             when {
                                 (posX / it.radius > 0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus =
-                                    DPAD_RIGHT
+                                    RIGHT
 
                                 (posX / it.radius < -0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus =
-                                    DPAD_LEFT
+                                    LEFT
 
                                 (posY / it.radius > 0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus =
-                                    DPAD_DOWN
+                                    DOWN
 
                                 (posY / it.radius < -0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus =
-                                    DPAD_UP
+                                    UP
 
                                 (posX / it.radius > 0.25) && (posY / it.radius > 0.25) -> it.dpadStatus =
-                                    DPAD_RIGHT_DOWN
+                                    RIGHT_DOWN
 
                                 (posX / it.radius > 0.25) && (posY / it.radius < -0.25) -> it.dpadStatus =
-                                    DPAD_RIGHT_UP
+                                    RIGHT_UP
 
                                 (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus =
-                                    DPAD_LEFT_DOWN
+                                    LEFT_DOWN
 
                                 (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus =
-                                    DPAD_LEFT_UP
+                                    LEFT_UP
 
                                 else -> it.dpadStatus = 0
                             }
@@ -638,28 +638,28 @@ class XInputOverlayView @JvmOverloads constructor(
 
                                 when {
                                     (posX / it.radius > 0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus =
-                                        DPAD_RIGHT
+                                        RIGHT
 
                                     (posX / it.radius < -0.25) && !(posY / it.radius < -0.25 || posY / it.radius > 0.25) -> it.dpadStatus =
-                                        DPAD_LEFT
+                                        LEFT
 
                                     (posY / it.radius > 0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus =
-                                        DPAD_DOWN
+                                        DOWN
 
                                     (posY / it.radius < -0.25) && !(posX / it.radius < -0.25 || posX / it.radius > 0.25) -> it.dpadStatus =
-                                        DPAD_UP
+                                        UP
 
                                     (posX / it.radius > 0.25) && (posY / it.radius > 0.25) -> it.dpadStatus =
-                                        DPAD_RIGHT_DOWN
+                                        RIGHT_DOWN
 
                                     (posX / it.radius > 0.25) && (posY / it.radius < -0.25) -> it.dpadStatus =
-                                        DPAD_RIGHT_UP
+                                        RIGHT_UP
 
                                     (posX / it.radius < -0.25) && (posY / it.radius > 0.25) -> it.dpadStatus =
-                                        DPAD_LEFT_DOWN
+                                        LEFT_DOWN
 
                                     (posX / it.radius < -0.25) && (posY / it.radius < -0.25) -> it.dpadStatus =
-                                        DPAD_LEFT_UP
+                                        LEFT_UP
 
                                     else -> it.dpadStatus = 0
                                 }
