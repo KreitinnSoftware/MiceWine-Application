@@ -26,6 +26,15 @@ About Mali GPUs, Only tested on Mali-G615, Mali-G610, Mali G76 and Mali-G925-Imm
 
 Vulkan 1.3 is Recommended for better performance and graphical precision. 1.1 works with DXVK-Stripped-Requirements, but displays various graphical issues.
 
+---
+
+## RootFS Download
+
+You can download the required **RootFS** file from this repository:  
+🔗 [MiceWine RootFS Generator](https://github.com/KreitinnSoftware/MiceWine-RootFS-Generator)
+
+---
+
 ## Third Party Open Source Applications:
 
 - [Box64](https://github.com/ptitSeb/box64)
