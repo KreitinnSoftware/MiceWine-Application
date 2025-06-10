@@ -25,8 +25,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.gson.GsonBuilder
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
+import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_AVX
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BIGBLOCK
@@ -79,10 +81,10 @@ import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUD
 import com.micewine.emu.adapters.AdapterBottomNavigation
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.controller.ControllerUtils
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.disconnectController
 import com.micewine.emu.controller.ControllerUtils.connectedPhysicalControllers
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
-import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
+import com.micewine.emu.controller.ControllerUtils.disconnectController
+import com.micewine.emu.controller.ControllerUtils.prepareControllersMappings
 import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.EnvVars.sharedPreferences
@@ -108,6 +110,7 @@ import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.ratCandida
 import com.micewine.emu.fragments.Box64PresetManagerFragment
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Mapping
 import com.micewine.emu.fragments.ControllerPresetManagerFragment
+import com.micewine.emu.fragments.ControllerSettingsFragment.Companion.ACTION_UPDATE_CONTROLLERS_STATUS
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
@@ -138,7 +141,6 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getExePath
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriverType
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
@@ -214,7 +216,7 @@ class MainActivity : AppCompatActivity() {
                         else -> ""
                     }
 
-                    generateICDFile(driverLibPath, File("$appRootDir/vulkan_icd.json"))
+                    generateICDFile(driverLibPath)
                     generateMangoHUDConfFile()
                     generatePAFile()
 
@@ -228,7 +230,6 @@ class MainActivity : AppCompatActivity() {
 
                 ACTION_SELECT_FILE_MANAGER -> {
                     val fileName = intent.getStringExtra("selectedFile")
-
                     if (fileName == "..") {
                         fileManagerCwd = File(fileManagerCwd!!).parent!!
 
@@ -238,7 +239,6 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     val file = File(fileName!!)
-
                     if (file.isFile) {
                         val fileExtension = file.extension.lowercase()
 
@@ -431,11 +431,16 @@ class MainActivity : AppCompatActivity() {
                             deviceId,
                             -1,
                             -1,
-                            inputDevice.motionRanges.any { it.axis == MotionEvent.AXIS_LTRIGGER } && inputDevice.motionRanges.any { it.axis == MotionEvent.AXIS_RTRIGGER }
+                            inputDevice.motionRanges.any { it.axis == MotionEvent.AXIS_LTRIGGER } && inputDevice.motionRanges.any { it.axis == MotionEvent.AXIS_RTRIGGER },
+                            inputDevice.motionRanges.find { it.axis == MotionEvent.AXIS_X }!!.flat
                         )
                     )
+                    sharedLogs?.appendText(getDeviceInfoJson(inputDevice))
                 }
-                prepareButtonsAxisValues()
+                prepareControllersMappings()
+                sendBroadcast(
+                    Intent(ACTION_UPDATE_CONTROLLERS_STATUS)
+                )
             }
         }
 
@@ -443,9 +448,45 @@ class MainActivity : AppCompatActivity() {
             val index = connectedPhysicalControllers.indexOfFirst { it.id == deviceId }
             if (index == -1) return
 
-            disconnectController(connectedPhysicalControllers[index].virtualXInputId)
+            disconnectController(connectedPhysicalControllers[index].virtualControllerID)
             connectedPhysicalControllers.removeAt(index)
+
+            sendBroadcast(
+                Intent(ACTION_UPDATE_CONTROLLERS_STATUS)
+            )
         }
+    }
+
+    private fun getDeviceInfoJson(device: InputDevice): String {
+        val gson = GsonBuilder().setPrettyPrinting().create()
+
+        val motionRanges = device.motionRanges.map { range ->
+            mapOf(
+                "axisName" to MotionEvent.axisToString(range.axis),
+                "axisId" to range.axis,
+                "source" to range.source,
+                "min" to range.min,
+                "max" to range.max,
+                "flat" to range.flat,
+                "fuzz" to range.fuzz,
+                "resolution" to range.resolution
+            )
+        }
+
+        val jsonMap = mapOf(
+            "id" to device.id,
+            "name" to device.name,
+            "isVirtual" to device.isVirtual,
+            "keyboardType" to device.keyboardType,
+            "controllerNumber" to device.controllerNumber,
+            "sources" to device.sources,
+            "vendorId" to device.vendorId,
+            "productId" to device.productId,
+            "hasMicrophone" to device.hasMicrophone(),
+            "motionRanges" to motionRanges
+        )
+
+        return gson.toJson(jsonMap)
     }
 
     private var bottomNavigation: BottomNavigationView? = null
@@ -900,7 +941,6 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
 
         val shortcutName = intent.getStringExtra("shortcutName")
-
         if (shortcutName != null) {
             val emulationActivityIntent = Intent(this, EmulationActivity::class.java)
 
@@ -1182,8 +1222,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        private fun getVulkanDriverInfo(info: String, stdErr: Boolean = false): String {
-            return runCommandWithOutput("echo $(${getEnv()} DISPLAY= vulkaninfo | grep $info | cut -d '=' -f 2)", stdErr)
+        private fun getVulkanDriverInfo(info: String): String {
+            return runCommandWithOutput("echo $(${getEnv()} DISPLAY= vulkaninfo | grep $info | cut -d '=' -f 2)", false)
         }
 
         private val driverWorkaroundLdPreload = StringBuilder()
@@ -1225,7 +1265,7 @@ class MainActivity : AppCompatActivity() {
             findingLdPreloadWorkaround = true
 
             while (true) {
-                val res = getVulkanDriverInfo("", true)
+                val res = getVulkanDriverInfo("")
                 if (res.contains("cannot locate symbol")) {
                     val symbolName = res.split("\"")[1]
                     driverWorkaroundLdPreload.append(locateLibraryBySymbol(symbolName))

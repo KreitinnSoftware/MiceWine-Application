@@ -18,17 +18,17 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.VirtualControllerOverlayMapper.Companion.ACTION_INVALIDATE
 import com.micewine.emu.controller.XKeyCodes.getKeyNames
 import com.micewine.emu.controller.XKeyCodes.getMapping
-import com.micewine.emu.views.OverlayView.Companion.SHAPE_CIRCLE
-import com.micewine.emu.views.OverlayView.Companion.SHAPE_RECTANGLE
-import com.micewine.emu.views.OverlayView.Companion.SHAPE_SQUARE
-import com.micewine.emu.views.OverlayView.Companion.analogList
-import com.micewine.emu.views.OverlayView.Companion.buttonList
-import com.micewine.emu.views.OverlayView.Companion.dpadList
-import com.micewine.emu.views.OverlayViewCreator.Companion.ANALOG
-import com.micewine.emu.views.OverlayViewCreator.Companion.BUTTON
-import com.micewine.emu.views.OverlayViewCreator.Companion.DPAD
-import com.micewine.emu.views.OverlayViewCreator.Companion.lastSelectedButton
-import com.micewine.emu.views.OverlayViewCreator.Companion.lastSelectedType
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.SHAPE_CIRCLE
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.SHAPE_RECTANGLE
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.SHAPE_SQUARE
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.analogList
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.buttonList
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.dpadList
+import com.micewine.emu.views.VirtualKeyboardInputCreatorView.Companion.ANALOG
+import com.micewine.emu.views.VirtualKeyboardInputCreatorView.Companion.BUTTON
+import com.micewine.emu.views.VirtualKeyboardInputCreatorView.Companion.DPAD
+import com.micewine.emu.views.VirtualKeyboardInputCreatorView.Companion.lastSelectedButton
+import com.micewine.emu.views.VirtualKeyboardInputCreatorView.Companion.lastSelectedType
 
 class EditVirtualButtonFragment : DialogFragment() {
     @SuppressLint("SetTextI18n")

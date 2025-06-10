@@ -96,7 +96,7 @@
                     tools:ignore="LabelFor">
                 </TextView>
 
-                <ImageView
+                <ImageButton
                     android:id="@+id/selectExePath"
                     android:layout_width="32dp"
                     android:layout_height="match_parent"
@@ -105,7 +105,7 @@
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/ic_folder"
                     app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.ExtraSmall">
-                </ImageView>
+                </ImageButton>
 
             </LinearLayout>
 
@@ -358,183 +358,318 @@
             </TextView>
 
             <TextView
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="4dp"
+                android:id="@+id/controller0Name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:text="@string/selected_controller_profile">
+                android:layout_marginTop="14dp"
+                android:layout_marginStart="4dp"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"
+                android:textSize="16sp"
+                android:textStyle="bold">
             </TextView>
 
             <LinearLayout
-                android:id="@+id/controller0Layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/controller0"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginStart="6dp"
-                    android:textSize="14sp"
-                    android:textStyle="bold">
-                </TextView>
-
-                <TextView
-                    android:layout_marginTop="16dp"
-                    android:layout_marginStart="6dp"
+                    android:id="@+id/controller0MappingTypeText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:text="@string/enable_xinput_title">
+                    android:text="@string/controller_mapping_type">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller0MappingTypeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+                <TextView
+                    android:id="@+id/controller0SwapAnalogsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/swap_analogs">
                 </TextView>
 
                 <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/enableController0XInput"
+                    android:id="@+id/controller0SwapAnalogsSwitch"
                     android:theme="@style/Theme.MiceWine"
                     android:gravity="center_vertical"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="4dp"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent">
                 </com.google.android.material.materialswitch.MaterialSwitch>
 
-                <Spinner
-                    android:id="@+id/selectedController0Profile"
+                <TextView
+                    android:id="@+id/controller0KeyboardPresetText"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/selected_controller_preset">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller0KeyboardPresetSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
                 </Spinner>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/controller1Layout"
+            <TextView
+                android:id="@+id/controller1Name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginStart="4dp"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"
+                android:textSize="16sp"
+                android:textStyle="bold">
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/controller1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginStart="6dp"
-                    android:textSize="14sp"
-                    android:textStyle="bold">
-                </TextView>
-
-                <TextView
-                    android:layout_marginTop="16dp"
-                    android:layout_marginStart="6dp"
+                    android:id="@+id/controller1MappingTypeText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:text="@string/enable_xinput_title">
+                    android:text="@string/controller_mapping_type">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller1MappingTypeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+                <TextView
+                    android:id="@+id/controller1SwapAnalogsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/swap_analogs">
                 </TextView>
 
                 <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/enableController1XInput"
+                    android:id="@+id/controller1SwapAnalogsSwitch"
                     android:theme="@style/Theme.MiceWine"
                     android:gravity="center_vertical"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="4dp"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent">
                 </com.google.android.material.materialswitch.MaterialSwitch>
 
-                <Spinner
-                    android:id="@+id/selectedController1Profile"
+                <TextView
+                    android:id="@+id/controller1KeyboardPresetText"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/selected_controller_preset">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller1KeyboardPresetSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
                 </Spinner>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/controller2Layout"
+            <TextView
+                android:id="@+id/controller2Name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginStart="4dp"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"
+                android:textSize="16sp"
+                android:textStyle="bold">
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/controller2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginStart="6dp"
-                    android:textSize="14sp"
-                    android:textStyle="bold">
-                </TextView>
-
-                <TextView
-                    android:layout_marginTop="16dp"
-                    android:layout_marginStart="6dp"
+                    android:id="@+id/controller2MappingTypeText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:text="@string/enable_xinput_title">
+                    android:text="@string/controller_mapping_type">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller2MappingTypeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+                <TextView
+                    android:id="@+id/controller2SwapAnalogsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/swap_analogs">
                 </TextView>
 
                 <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/enableController2XInput"
+                    android:id="@+id/controller2SwapAnalogsSwitch"
                     android:theme="@style/Theme.MiceWine"
                     android:gravity="center_vertical"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="4dp"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent">
                 </com.google.android.material.materialswitch.MaterialSwitch>
 
-                <Spinner
-                    android:id="@+id/selectedController2Profile"
+                <TextView
+                    android:id="@+id/controller2KeyboardPresetText"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/selected_controller_preset">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller2KeyboardPresetSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
                 </Spinner>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/controller3Layout"
+            <TextView
+                android:id="@+id/controller3Name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginStart="4dp"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:text="">
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/controller3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginStart="6dp"
-                    android:textSize="14sp"
-                    android:textStyle="bold">
-                </TextView>
-
-                <TextView
-                    android:layout_marginTop="16dp"
-                    android:layout_marginStart="6dp"
+                    android:id="@+id/controller3MappingTypeText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:text="@string/enable_xinput_title">
+                    android:text="@string/controller_mapping_type">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller3MappingTypeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+                <TextView
+                    android:id="@+id/controller3SwapAnalogsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/swap_analogs">
                 </TextView>
 
                 <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/enableController3XInput"
+                    android:id="@+id/controller3SwapAnalogsSwitch"
                     android:theme="@style/Theme.MiceWine"
                     android:gravity="center_vertical"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="4dp"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent">
                 </com.google.android.material.materialswitch.MaterialSwitch>
 
-                <Spinner
-                    android:id="@+id/selectedController3Profile"
+                <TextView
+                    android:id="@+id/controller3KeyboardPresetText"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/selected_controller_preset">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller3KeyboardPresetSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
                 </Spinner>
 
             </LinearLayout>
@@ -544,36 +679,57 @@
                 android:layout_marginStart="4dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                android:text="@string/selected_virtual_controller_profile">
+                android:text="@string/virtual_controller_settings">
             </TextView>
 
-            <TextView
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="6dp"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:text="@string/enable_xinput_title">
-            </TextView>
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
 
-            <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/enableVirtualControllerXInput"
-                android:theme="@style/Theme.MiceWine"
-                android:gravity="center_vertical"
-                android:layout_marginStart="6dp"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent">
-            </com.google.android.material.materialswitch.MaterialSwitch>
+                <TextView
+                    android:id="@+id/onScreenControllerMappingTypeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/controller_mapping_type">
+                </TextView>
 
-            <Spinner
-                android:id="@+id/selectedVirtualControllerProfile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-            </Spinner>
+                <Spinner
+                    android:id="@+id/onScreenControllerMappingTypeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+                <TextView
+                    android:id="@+id/onScreenControllerKeyboardPresetText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/selected_controller_preset">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/onScreenControllerKeyboardPresetSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+            </LinearLayout>
 
             <TextView
                 android:layout_marginTop="16dp"

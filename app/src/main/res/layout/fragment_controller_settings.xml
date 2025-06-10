@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/menu_bg"
+    android:theme="@style/Theme.MiceWine"
+    android:padding="16dp"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/controller_settings">
+            </TextView>
+
+            <TextView
+                android:id="@+id/controller0Name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginStart="4dp"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"
+                android:textSize="16sp"
+                android:textStyle="bold">
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/controller0MappingTypeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/controller_mapping_type">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller0MappingTypeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+                <TextView
+                    android:id="@+id/controller0SwapAnalogsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/swap_analogs">
+                </TextView>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/controller0SwapAnalogsSwitch"
+                    android:theme="@style/Theme.MiceWine"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                </com.google.android.material.materialswitch.MaterialSwitch>
+
+                <TextView
+                    android:id="@+id/controller0KeyboardPresetText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/selected_controller_preset">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller0KeyboardPresetSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/controller1Name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginStart="4dp"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"
+                android:textSize="16sp"
+                android:textStyle="bold">
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/controller1MappingTypeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/controller_mapping_type">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller1MappingTypeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+                <TextView
+                    android:id="@+id/controller1SwapAnalogsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/swap_analogs">
+                </TextView>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/controller1SwapAnalogsSwitch"
+                    android:theme="@style/Theme.MiceWine"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                </com.google.android.material.materialswitch.MaterialSwitch>
+
+                <TextView
+                    android:id="@+id/controller1KeyboardPresetText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/selected_controller_preset">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller1KeyboardPresetSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/controller2Name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginStart="4dp"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"
+                android:textSize="16sp"
+                android:textStyle="bold">
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/controller2MappingTypeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/controller_mapping_type">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller2MappingTypeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+                <TextView
+                    android:id="@+id/controller2SwapAnalogsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/swap_analogs">
+                </TextView>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/controller2SwapAnalogsSwitch"
+                    android:theme="@style/Theme.MiceWine"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                </com.google.android.material.materialswitch.MaterialSwitch>
+
+                <TextView
+                    android:id="@+id/controller2KeyboardPresetText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/selected_controller_preset">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller2KeyboardPresetSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/controller3Name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginStart="4dp"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:text=":3">
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/controller3MappingTypeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/controller_mapping_type">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller3MappingTypeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+                <TextView
+                    android:id="@+id/controller3SwapAnalogsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/swap_analogs">
+                </TextView>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/controller3SwapAnalogsSwitch"
+                    android:theme="@style/Theme.MiceWine"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                </com.google.android.material.materialswitch.MaterialSwitch>
+
+                <TextView
+                    android:id="@+id/controller3KeyboardPresetText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="4dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="@string/selected_controller_preset">
+                </TextView>
+
+                <Spinner
+                    android:id="@+id/controller3KeyboardPresetSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="4dp">
+                </Spinner>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonCancel"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel_text">
+        </com.google.android.material.button.MaterialButton>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonContinue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/confirm_text">
+        </com.google.android.material.button.MaterialButton>
+
+    </LinearLayout>
+
+</LinearLayout>

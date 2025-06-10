@@ -11,6 +11,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.Gson
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.enableMangoHUD
 import com.micewine.emu.activities.MainActivity.Companion.fpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
@@ -72,7 +73,8 @@ class RatManagerActivity : AppCompatActivity() {
     companion object {
         private val gson = Gson()
 
-        fun generateICDFile(driverLib: String, destIcd: File) {
+        fun generateICDFile(driverLib: String) {
+            val icdFile = File("$appRootDir/vulkan_icd.json")
             val json = gson.toJson(
                 mapOf(
                     "ICD" to mapOf(
@@ -83,7 +85,7 @@ class RatManagerActivity : AppCompatActivity() {
                 )
             )
 
-            destIcd.writeText(json)
+            icdFile.writeText(json)
         }
 
         fun generateMangoHUDConfFile() {

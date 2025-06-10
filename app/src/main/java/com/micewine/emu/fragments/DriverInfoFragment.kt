@@ -21,7 +21,6 @@ import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.RatPackageManager.listRatPackages
 import com.micewine.emu.core.RatPackageManager.listRatPackagesId
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -64,10 +63,10 @@ class DriverInfoFragment : Fragment() {
 
                 setSharedVars(requireActivity(), null, null, null, null, null, null, null, null, null, null, null, (driverId.contains("AdrenoToolsDriver")), adrenoToolsDriverPath)
 
-                generateICDFile(driverFile, File("$appRootDir/vulkan_icd.json"))
+                generateICDFile(driverFile)
 
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val driverInfo = runCommandWithOutput(getEnv() + "vulkaninfo", true)
+                    val driverInfo = runCommandWithOutput(getEnv() + "vulkaninfo")
 
                     withContext(Dispatchers.Main) {
                         driverInfoTextView?.animate()

@@ -484,6 +484,22 @@ class ShortcutsFragment : Fragment() {
             return gameList[index].box64Preset
         }
 
+        fun putControllerXInputSwapAnalogs(name: String, enabled: Boolean, controllerIndex: Int) {
+            val index = gameList.indexOfFirst { it.name == name }
+            if (index == -1) return
+
+            gameList[index].controllersXInputSwapAnalogs[controllerIndex] = enabled
+
+            saveShortcuts()
+        }
+
+        fun getControllerXInputSwapAnalogs(name: String, controllerIndex: Int): Boolean {
+            val index = gameList.indexOfFirst { it.name == name }
+            if (index == -1) return false
+
+            return gameList[index].controllersXInputSwapAnalogs[controllerIndex]
+        }
+
         fun putControllerXInput(name: String, enabled: Boolean, controllerIndex: Int) {
             val index = gameList.indexOfFirst { it.name == name }
             if (index == -1) return
@@ -594,6 +610,7 @@ class ShortcutsFragment : Fragment() {
                     "default",
                     mutableListOf("default", "default", "default", "default"),
                     mutableListOf(true, true, true, true),
+                    mutableListOf(false, false, false, false),
                     "default",
                     true,
                     "16:9",
@@ -736,6 +753,7 @@ class ShortcutsFragment : Fragment() {
             var box64Preset: String,
             var controllersPreset: MutableList<String>,
             var controllersEnableXInput: MutableList<Boolean>,
+            var controllersXInputSwapAnalogs: MutableList<Boolean>,
             var virtualControllerPreset: String,
             var virtualControllerEnableXInput: Boolean,
             var displayMode: String,

@@ -58,27 +58,29 @@ import com.micewine.emu.activities.MainActivity.Companion.getCpuInfo
 import com.micewine.emu.activities.MainActivity.Companion.getMemoryInfo
 import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
+import com.micewine.emu.activities.MainActivity.Companion.wineDisksFolder
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
-import com.micewine.emu.controller.ControllerUtils
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.connectController
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.disconnectController
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.gamePadServerRunning
+import com.micewine.emu.controller.ControllerUtils.connectController
+import com.micewine.emu.controller.ControllerUtils.destroyInputServer
+import com.micewine.emu.controller.ControllerUtils.disconnectController
 import com.micewine.emu.controller.ControllerUtils.updateButtonsState
-import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
+import com.micewine.emu.controller.ControllerUtils.prepareControllersMappings
+import com.micewine.emu.controller.ControllerUtils.startInputServer
 import com.micewine.emu.controller.ControllerUtils.updateAxisState
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
-import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
-import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
+import com.micewine.emu.fragments.ControllerSettingsFragment
 import com.micewine.emu.fragments.LogViewerFragment
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getExePath
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerXInput
+import com.micewine.emu.fragments.VirtualControllerSettingsFragment
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.TouchInputHandler
-import com.micewine.emu.views.OverlayView
-import com.micewine.emu.views.XInputOverlayView
-import com.micewine.emu.views.XInputOverlayView.Companion.virtualXInputControllerId
+import com.micewine.emu.views.VirtualKeyboardInputView
+import com.micewine.emu.views.VirtualControllerInputView
+import com.micewine.emu.views.VirtualControllerInputView.Companion.virtualXInputControllerId
 import kotlinx.coroutines.launch
 
 @SuppressLint("ApplySharedPref")
@@ -112,8 +114,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
     private var drawerLayout: DrawerLayout? = null
     private var logsNavigationView: NavigationView? = null
-    private var overlayView: OverlayView? = null
-    private var xInputOverlayView: XInputOverlayView? = null
+    private var openCloseVirtualControllerSwitch: MaterialSwitch? = null
+    private var virtualKeyboardInputView: VirtualKeyboardInputView? = null
+    private var virtualControllerInputView: VirtualControllerInputView? = null
 
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -125,22 +128,11 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         initSharedLogs(supportFragmentManager)
 
-        if (enableCpuCounter) {
-            lifecycleScope.launch {
-                getCpuInfo()
-            }
-        }
-        if (enableRamCounter) {
-            lifecycleScope.launch {
-                getMemoryInfo(this@EmulationActivity)
-            }
-        }
+        lifecycleScope.launch { if (enableCpuCounter) getCpuInfo() }
+        lifecycleScope.launch { if (enableRamCounter) getMemoryInfo(this@EmulationActivity) }
+        lifecycleScope.launch { startInputServer() }
 
-        prepareButtonsAxisValues()
-
-        if (!gamePadServerRunning) {
-            ControllerUtils.GamePadServer().startServer()
-        }
+        prepareControllersMappings()
 
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         val imManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
@@ -164,13 +156,13 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
         val lorieParent = lorieView.parent as View
 
-        overlayView = findViewById(R.id.overlayView)
-        xInputOverlayView = findViewById(R.id.xInputOverlayView)
+        virtualKeyboardInputView = findViewById(R.id.overlayView)
+        virtualControllerInputView = findViewById(R.id.xInputOverlayView)
 
-        overlayView?.loadPreset(getSelectedVirtualControllerPreset(selectedGameName))
+        virtualKeyboardInputView?.loadPreset(getSelectedVirtualControllerPreset(selectedGameName))
 
-        overlayView?.visibility = View.INVISIBLE
-        xInputOverlayView?.visibility = View.INVISIBLE
+        virtualKeyboardInputView?.visibility = View.INVISIBLE
+        virtualControllerInputView?.visibility = View.INVISIBLE
 
         val headerViewMain: View = findViewById<NavigationView>(R.id.NavigationView).getHeaderView(0).apply {
             findViewById<MaterialButton>(R.id.exitButton).setOnClickListener {
@@ -178,10 +170,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 runCommand("pkill -9 .exe")
 
                 disconnectController(virtualXInputControllerId)
+                destroyInputServer()
 
                 finishAffinity()
             }
-
             findViewById<MaterialButton>(R.id.openKeyboardButton).setOnClickListener {
                 lorieView.requestFocus()
 
@@ -189,7 +181,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
                 drawerLayout?.closeDrawers()
             }
-
             findViewById<MaterialSwitch>(R.id.enableMangoHudSwitch).apply {
                 isChecked = preferences.getBoolean(ENABLE_MANGOHUD, ENABLE_MANGOHUD_DEFAULT_VALUE)
 
@@ -203,7 +194,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     generateMangoHUDConfFile()
                 }
             }
-
             findViewById<MaterialSwitch>(R.id.stretchDisplaySwitch).apply {
                 isChecked = preferences.getBoolean("displayStretch", false)
 
@@ -216,55 +206,40 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     lorieView.requestLayout()
                 }
             }
-
-            findViewById<MaterialSwitch>(R.id.openCloseOverlaySwitch).apply {
-                isChecked = if (enableXInput) {
-                    xInputOverlayView?.isVisible!!
-                } else {
-                    overlayView?.isVisible!!
-                }
-
+            openCloseVirtualControllerSwitch = findViewById<MaterialSwitch>(R.id.openCloseVirtualControllerSwitch).apply {
                 setOnClickListener {
-                    if (getVirtualControllerXInput(selectedGameName)) {
-                        if (xInputOverlayView?.isVisible!!) {
-                            xInputOverlayView?.visibility = View.INVISIBLE
-                            disconnectController(virtualXInputControllerId)
-                        } else {
-                            xInputOverlayView?.visibility = View.VISIBLE
+                    val isControllerInput = getVirtualControllerXInput(selectedGameName)
 
-                            if (virtualXInputControllerId == -1) {
-                                virtualXInputControllerId = connectController()
-                            }
+                    if (isChecked) {
+                        if (isControllerInput) {
+                            virtualKeyboardInputView?.visibility = View.INVISIBLE
+                            virtualControllerInputView?.visibility = View.VISIBLE
+
+                            if (virtualXInputControllerId == -1) virtualXInputControllerId = connectController()
+                        } else {
+                            virtualControllerInputView?.visibility = View.INVISIBLE
+                            virtualKeyboardInputView?.visibility = View.VISIBLE
                         }
                     } else {
-                        if (overlayView?.isVisible!!) {
-                            overlayView?.visibility = View.INVISIBLE
-                        } else {
-                            overlayView?.visibility = View.VISIBLE
+                        virtualKeyboardInputView?.visibility = View.INVISIBLE
+                        virtualControllerInputView?.visibility = View.INVISIBLE
+
+                        if (isControllerInput) {
+                            disconnectController(virtualXInputControllerId)
+                            virtualXInputControllerId = -1
                         }
                     }
                 }
             }
-
             findViewById<MaterialButton>(R.id.openLogViewer).setOnClickListener {
                 drawerLayout?.openDrawer(GravityCompat.END)
                 drawerLayout?.closeDrawer(GravityCompat.START)
             }
-
             findViewById<MaterialButton>(R.id.editVirtualControllerMapping).setOnClickListener {
-                val intent = Intent(context, PresetManagerActivity::class.java).apply {
-                    putExtra("presetType", VIRTUAL_CONTROLLER_PRESET)
-                    putExtra("editShortcut", true)
-                }
-                startActivity(intent)
+                VirtualControllerSettingsFragment().show(supportFragmentManager, "")
             }
-
             findViewById<MaterialButton>(R.id.editControllerMapping).setOnClickListener {
-                val intent = Intent(context, PresetManagerActivity::class.java).apply {
-                    putExtra("presetType", CONTROLLER_PRESET)
-                    putExtra("editShortcut", true)
-                }
-                startActivity(intent)
+                ControllerSettingsFragment().show(supportFragmentManager, "")
             }
         }
 
@@ -448,6 +423,20 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
 
         onReceiveConnection(intent)
+
+        supportFragmentManager.setFragmentResultListener("invalidateControllerType", this) { _, _ ->
+            val isControllerInput = getVirtualControllerXInput(selectedGameName)
+
+            if (openCloseVirtualControllerSwitch?.isChecked!!) {
+                if (isControllerInput) {
+                    virtualKeyboardInputView?.visibility = View.INVISIBLE
+                    virtualControllerInputView?.visibility = View.VISIBLE
+                } else {
+                    virtualKeyboardInputView?.visibility = View.VISIBLE
+                    virtualControllerInputView?.visibility = View.INVISIBLE
+                }
+            }
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -555,9 +544,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         lorieView!!.requestFocus()
         lorieView!!.requestLayout()
 
-        overlayView?.loadPreset(getSelectedVirtualControllerPreset(selectedGameName))
+        virtualKeyboardInputView?.loadPreset(getSelectedVirtualControllerPreset(selectedGameName))
 
-        prepareButtonsAxisValues()
+        prepareControllersMappings()
     }
 
     public override fun onPause() {

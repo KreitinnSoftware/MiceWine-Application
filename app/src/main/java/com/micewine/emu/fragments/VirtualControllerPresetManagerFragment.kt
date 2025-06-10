@@ -20,8 +20,8 @@ import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRT
 import com.micewine.emu.adapters.AdapterPreset
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
-import com.micewine.emu.views.OverlayView
-import com.micewine.emu.views.OverlayViewCreator.Companion.GRID_SIZE
+import com.micewine.emu.views.VirtualKeyboardInputView
+import com.micewine.emu.views.VirtualKeyboardInputCreatorView.Companion.GRID_SIZE
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -68,7 +68,7 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
 
         fun initialize(context: Context, boolean: Boolean = false) {
             preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            presetList = getVirtualControllerPresets(context)
+            presetList = getVirtualControllerPresets()
             editShortcut = boolean
         }
 
@@ -79,7 +79,7 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
             return presetList[index]
         }
 
-        fun putVirtualControllerPreset(name: String, resolution: String, buttonList: MutableList<OverlayView.VirtualButton>, analogList: MutableList<OverlayView.VirtualAnalog>, dpadList: MutableList<OverlayView.VirtualDPad>) {
+        fun putVirtualControllerPreset(name: String, resolution: String, buttonList: MutableList<VirtualKeyboardInputView.VirtualButton>, analogList: MutableList<VirtualKeyboardInputView.VirtualAnalog>, dpadList: MutableList<VirtualKeyboardInputView.VirtualDPad>) {
             val index = presetList.indexOfFirst { it.name == name }
             if (index == -1) return
 
@@ -221,21 +221,19 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
             }
         }
 
-        fun getVirtualControllerPresets(context: Context): MutableList<VirtualControllerPreset> {
+        fun getVirtualControllerPresets(): MutableList<VirtualControllerPreset> {
             val json = preferences?.getString("virtualControllerPresetList", "")
             val listType = object : TypeToken<MutableList<VirtualControllerPreset>>() {}.type
 
-            return gson.fromJson(json, listType) ?: mutableListOf(
-                VirtualControllerPreset("default", getNativeResolution(context), mutableListOf(), mutableListOf(), mutableListOf())
-            )
+            return gson.fromJson(json, listType) ?: mutableListOf()
         }
 
         data class VirtualControllerPreset(
             var name: String,
             var resolution: String,
-            var analogs: MutableList<OverlayView.VirtualAnalog>,
-            var buttons: MutableList<OverlayView.VirtualButton>,
-            var dpads: MutableList<OverlayView.VirtualDPad>
+            var analogs: MutableList<VirtualKeyboardInputView.VirtualAnalog>,
+            var buttons: MutableList<VirtualKeyboardInputView.VirtualButton>,
+            var dpads: MutableList<VirtualKeyboardInputView.VirtualDPad>
         )
     }
 }

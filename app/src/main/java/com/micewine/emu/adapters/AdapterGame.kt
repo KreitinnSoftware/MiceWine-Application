@@ -5,18 +5,27 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.EmulationActivity
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VULKAN_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_RUN_WINE
+import com.micewine.emu.fragments.EditGamePreferencesFragment
+import com.micewine.emu.fragments.EditGamePreferencesFragment.Companion.EDIT_GAME_PREFERENCES
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.ADRENO_TOOLS_DRIVER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.MESA_DRIVER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
@@ -25,10 +34,9 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriverType
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
@@ -37,7 +45,12 @@ import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Compani
 import java.io.File
 import kotlin.math.roundToInt
 
-class AdapterGame(private val gameList: MutableList<GameItem>, private val size: Float, private val activity: Activity,) : RecyclerView.Adapter<AdapterGame.ViewHolder>() {
+
+class AdapterGame(
+    private val gameList: MutableList<GameItem>,
+    private val size: Float,
+    private val activity: FragmentActivity,
+) : RecyclerView.Adapter<AdapterGame.ViewHolder>() {
     private var filteredList: MutableList<GameItem> = gameList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -56,11 +69,18 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val size:
         if (imageFile.exists() && imageFile.length() > 0) {
             val imageBitmap = BitmapFactory.decodeFile(sList.iconPath)
             if (imageBitmap != null) {
-                holder.gameImage.setImageBitmap(
+                val newBitmap: Bitmap = if (File(sList.exePath).exists()) {
                     resizeBitmap(
                         imageBitmap, holder.itemView.layoutParams.width - 10, holder.itemView.layoutParams.width - 10
                     )
-                )
+                } else {
+                    toGrayscale(
+                        resizeBitmap(
+                            imageBitmap, holder.itemView.layoutParams.width - 10, holder.itemView.layoutParams.width - 10
+                        )
+                    )
+                }
+                holder.gameImage.setImageBitmap(newBitmap)
             }
         } else if (sList.iconPath == "") {
             holder.gameImage.setImageBitmap(resizeBitmap(
@@ -90,6 +110,29 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val size:
         return Bitmap.createScaledBitmap(originalBitmap, width, height, false)
     }
 
+    private fun toGrayscale(bmpOriginal: Bitmap): Bitmap {
+        val bmpGrayscale = Bitmap.createBitmap(bmpOriginal.width, bmpOriginal.height, Bitmap.Config.ARGB_8888)
+
+        Canvas(bmpGrayscale).apply {
+            drawBitmap(bmpOriginal, 0f, 0f,
+                Paint().apply {
+                    colorFilter = ColorMatrixColorFilter(
+                        ColorMatrix().apply {
+                            setSaturation(0f)
+                        }
+                    )
+                }
+            )
+            drawRect(0f, 0f, bmpOriginal.width.toFloat(), bmpOriginal.height.toFloat(),
+                Paint().apply {
+                    color = Color.argb(25, 128, 128, 128)
+                }
+            )
+        }
+
+        return bmpGrayscale
+    }
+
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
         val titleGame: TextView = itemView.findViewById(R.id.title_game_model)
         val gameImage: ImageView = itemView.findViewById(R.id.img_game)
@@ -114,8 +157,10 @@ class AdapterGame(private val gameList: MutableList<GameItem>, private val size:
                     exeArguments = ""
                 } else {
                     activity.runOnUiThread {
-                        Toast.makeText(activity, "", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity, activity.getString(R.string.executable_file_not_found), Toast.LENGTH_SHORT).show()
                     }
+
+                    EditGamePreferencesFragment(EDIT_GAME_PREFERENCES).show(activity.supportFragmentManager, "")
                     return
                 }
             }

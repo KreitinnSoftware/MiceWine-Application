@@ -22,16 +22,16 @@ import com.micewine.emu.controller.XKeyCodes.ButtonMapping
 import com.micewine.emu.controller.XKeyCodes.getMapping
 import com.micewine.emu.databinding.ActivityVirtualControllerMapperBinding
 import com.micewine.emu.fragments.EditVirtualButtonFragment
-import com.micewine.emu.views.OverlayView
-import com.micewine.emu.views.OverlayView.Companion.SHAPE_CIRCLE
-import com.micewine.emu.views.OverlayView.Companion.analogList
-import com.micewine.emu.views.OverlayView.Companion.buttonList
-import com.micewine.emu.views.OverlayView.Companion.dpadList
-import com.micewine.emu.views.OverlayViewCreator
+import com.micewine.emu.views.VirtualKeyboardInputView
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.SHAPE_CIRCLE
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.analogList
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.buttonList
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.dpadList
+import com.micewine.emu.views.VirtualKeyboardInputCreatorView
 
 class VirtualControllerOverlayMapper : AppCompatActivity() {
     private var binding: ActivityVirtualControllerMapperBinding? = null
-    private var overlayView: OverlayViewCreator? = null
+    private var overlayView: VirtualKeyboardInputCreatorView? = null
     private var virtualControllerMapperDrawerLayout: DrawerLayout? = null
     private var navigationView: NavigationView? = null
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -61,7 +61,7 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
             when (item.itemId) {
                 R.id.addButton -> {
                     overlayView?.addButton(
-                        OverlayView.VirtualButton(
+                        VirtualKeyboardInputView.VirtualButton(
                             buttonList.count() + 1,
                             overlayView?.width!! / 2F,
                             overlayView?.height!! / 2F,
@@ -79,7 +79,7 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
 
                 R.id.addVAxis -> {
                     overlayView?.addAnalog(
-                        OverlayView.VirtualAnalog(
+                        VirtualKeyboardInputView.VirtualAnalog(
                             analogList.count() + 1,
                             overlayView?.width!! / 2F,
                             overlayView?.height!! / 2F,
@@ -105,7 +105,7 @@ class VirtualControllerOverlayMapper : AppCompatActivity() {
 
                 R.id.addDPad -> {
                     overlayView?.addDPad(
-                        OverlayView.VirtualDPad(
+                        VirtualKeyboardInputView.VirtualDPad(
                             dpadList.count() + 1,
                             overlayView?.width!! / 2F,
                             overlayView?.height!! / 2F,

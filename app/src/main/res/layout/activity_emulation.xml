@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/DrawerLayout"
     android:layout_width="match_parent"
@@ -28,21 +29,21 @@
             android:visibility="visible">
         </com.micewine.emu.views.OnScreenInfoView>
 
-        <com.micewine.emu.views.OverlayView
+        <com.micewine.emu.views.VirtualKeyboardInputView
             android:id="@+id/overlayView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:visibility="visible">
-        </com.micewine.emu.views.OverlayView>
+        </com.micewine.emu.views.VirtualKeyboardInputView>
 
-        <com.micewine.emu.views.XInputOverlayView
+        <com.micewine.emu.views.VirtualControllerInputView
             android:id="@+id/xInputOverlayView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:visibility="visible">
-        </com.micewine.emu.views.XInputOverlayView>
+        </com.micewine.emu.views.VirtualControllerInputView>
 
     </FrameLayout>
 
@@ -51,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:headerLayout="@layout/nav_header">
+        app:headerLayout="@layout/fragment_drawer">
     </com.google.android.material.navigation.NavigationView>
 
     <com.google.android.material.navigation.NavigationView

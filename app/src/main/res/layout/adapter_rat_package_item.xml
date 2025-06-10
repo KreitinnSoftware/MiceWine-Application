@@ -52,7 +52,7 @@
                     tools:ignore="HardcodedText" />
 
                 <TextView
-                    android:id="@+id/rat_package_description"
+                    android:id="@+id/rat_package_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ellipsize="marquee"

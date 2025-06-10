@@ -34,18 +34,18 @@ class SettingsFragment : Fragment() {
 
         settingsList.clear()
 
-        addToAdapter(R.string.general_settings, R.string.settings_description, R.drawable.ic_settings_outline)
-        addToAdapter(R.string.controller_mapper_title, R.string.controller_mapper_description, R.drawable.ic_joystick)
-        addToAdapter(R.string.virtual_controller_mapper_title, R.string.controller_virtual_mapper_description, R.drawable.ic_joystick)
+        addToAdapter(R.string.general_settings, R.string.settings_desc, R.drawable.ic_settings_outline)
+        addToAdapter(R.string.controller_mapper_title, R.string.controller_mapper_desc, R.drawable.ic_joystick)
+        addToAdapter(R.string.virtual_controller_mapper_title, R.string.controller_virtual_mapper_desc, R.drawable.ic_joystick)
 
         if (deviceArch != "x86_64") {
-            addToAdapter(R.string.box64_preset_manager_title, R.string.box64_preset_manager_description, R.drawable.ic_box64)
+            addToAdapter(R.string.box64_preset_manager_title, R.string.box64_preset_manager_desc, R.drawable.ic_box64)
         }
 
-        addToAdapter(R.string.wine_prefix_manager_title, R.string.wine_prefix_manager_description, R.drawable.ic_wine)
-        addToAdapter(R.string.rat_manager_title, R.string.rat_manager_description, R.drawable.ic_rat_package_grayscale)
-        addToAdapter(R.string.rat_downloader_title, R.string.rat_downloader_description, R.drawable.ic_download)
-        addToAdapter(R.string.controller_view_title, R.string.null_description, R.drawable.ic_joystick)
+        addToAdapter(R.string.wine_prefix_manager_title, R.string.wine_prefix_manager_desc, R.drawable.ic_wine)
+        addToAdapter(R.string.rat_manager_title, R.string.rat_manager_desc, R.drawable.ic_rat_package_grayscale)
+        addToAdapter(R.string.rat_downloader_title, R.string.rat_downloader_desc, R.drawable.ic_download)
+        addToAdapter(R.string.controller_view_title, R.string.controller_view_desc, R.drawable.ic_joystick)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, icon: Int) {

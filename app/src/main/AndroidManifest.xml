@@ -40,8 +40,7 @@
         </activity>
         <activity
             android:name=".activities.ControllerTestActivity"
-            android:theme="@style/Theme.MiceWine.FullScreen"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:theme="@style/Theme.MiceWine"
             android:exported="false">
         </activity>
         <activity

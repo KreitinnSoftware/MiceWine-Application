@@ -162,5 +162,9 @@ object EnvVars {
             // Workaround for dlopen error (at least on my device)
             vars.add(getLdPreloadWorkaround())
         }
+
+        // Force SDL Games to use DInput/XInput (RawInput and WGI don't works)
+        vars.add("SDL_JOYSTICK_WGI=0")
+        vars.add("SDL_JOYSTICK_RAWINPUT=0")
     }
 }

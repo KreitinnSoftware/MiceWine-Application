@@ -3,6 +3,7 @@ package com.micewine.emu.controller
 import android.content.Context
 import android.util.Log
 import android.view.InputDevice
+import android.view.InputDevice.MotionRange
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_BUTTON_A
 import android.view.KeyEvent.KEYCODE_BUTTON_B
@@ -26,7 +27,9 @@ import android.view.MotionEvent.AXIS_X
 import android.view.MotionEvent.AXIS_Y
 import android.view.MotionEvent.AXIS_Z
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.micewine.emu.LorieView
+import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_MINUS_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_PLUS_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_Y_MINUS_KEY
@@ -52,14 +55,13 @@ import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_THUMBR
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_Y_KEY
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.connectController
-import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.connectedControllers
 import com.micewine.emu.controller.XKeyCodes.ButtonMapping
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getDeadZone
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getControllerPreset
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMouseSensibility
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerXInput
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerXInputSwapAnalogs
 import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
@@ -196,14 +198,15 @@ object ControllerUtils {
         }
     }
 
-    fun prepareButtonsAxisValues() {
+    fun prepareControllersMappings() {
         connectedPhysicalControllers.forEachIndexed { index, it ->
             val presetName = getControllerPreset(selectedGameName, index)
 
             if (getControllerXInput(selectedGameName, index)) {
                 it.mappingType = MAPPING_TYPE_XINPUT
+                it.swapAnalogs = getControllerXInputSwapAnalogs(selectedGameName, index)
 
-                if (it.virtualXInputId == -1) it.virtualXInputId = connectController()
+                if (it.virtualControllerID == -1) it.virtualControllerID = connectController()
             } else {
                 it.mappingType = MAPPING_TYPE_KEYBOARD_MOUSE
 
@@ -282,6 +285,7 @@ object ControllerUtils {
                             deviceId,
                             -1,
                             -1,
+                            device.motionRanges.any { it.axis == AXIS_LTRIGGER } && device.motionRanges.any { it.axis == AXIS_RTRIGGER }
                         )
                     )
                 }
@@ -291,7 +295,7 @@ object ControllerUtils {
         return devices
     }
 
-    private fun handleKey(pressed: Boolean, mapping: ButtonMapping) {
+    fun handleKey(pressed: Boolean, mapping: ButtonMapping) {
         when (mapping.type) {
             KEYBOARD -> lorieView.sendKeyEvent(mapping.scanCode, mapping.keyCode, pressed)
             MOUSE -> {
@@ -312,205 +316,205 @@ object ControllerUtils {
 
     fun updateButtonsState(e: KeyEvent): Boolean {
         val pressed = e.action == KeyEvent.ACTION_DOWN
-        val physicalController = connectedPhysicalControllers.firstOrNull { it.id == e.deviceId } ?: return false
+        val pController = connectedPhysicalControllers.firstOrNull { it.id == e.deviceId } ?: return false
 
         when (e.keyCode) {
             KEYCODE_BUTTON_Y -> {
-                physicalController.state.yPressed = pressed
+                pController.state.yPressed = pressed
 
-                when (physicalController.mappingType) {
+                when (pController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
-                        val index = physicalController.virtualXInputId
+                        val index = pController.virtualControllerID
                         if (index != -1) {
-                            connectedControllers[index].yPressed = pressed
+                            connectedVirtualControllers[index].yPressed = pressed
                         }
                     }
                     MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                        val mapping = physicalController.keyboardMapping.yButton
+                        val mapping = pController.keyboardMapping.yButton
                         handleKey(pressed, mapping)
                     }
                 }
             }
             KEYCODE_BUTTON_A -> {
-                physicalController.state.aPressed = pressed
+                pController.state.aPressed = pressed
 
-                when (physicalController.mappingType) {
+                when (pController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
-                        val index = physicalController.virtualXInputId
+                        val index = pController.virtualControllerID
                         if (index != -1) {
-                            connectedControllers[index].aPressed = pressed
+                            connectedVirtualControllers[index].aPressed = pressed
                         }
                     }
                     MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                        val mapping = physicalController.keyboardMapping.aButton
+                        val mapping = pController.keyboardMapping.aButton
                         handleKey(pressed, mapping)
                     }
                 }
             }
             KEYCODE_BUTTON_B -> {
-                physicalController.state.bPressed = pressed
+                pController.state.bPressed = pressed
 
-                when (physicalController.mappingType) {
+                when (pController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
-                        val index = physicalController.virtualXInputId
+                        val index = pController.virtualControllerID
                         if (index != -1) {
-                            connectedControllers[index].bPressed = pressed
+                            connectedVirtualControllers[index].bPressed = pressed
                         }
                     }
                     MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                        val mapping = physicalController.keyboardMapping.bButton
+                        val mapping = pController.keyboardMapping.bButton
                         handleKey(pressed, mapping)
                     }
                 }
             }
             KEYCODE_BUTTON_X -> {
-                physicalController.state.xPressed = pressed
+                pController.state.xPressed = pressed
 
-                when (physicalController.mappingType) {
+                when (pController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
-                        val index = physicalController.virtualXInputId
+                        val index = pController.virtualControllerID
                         if (index != -1) {
-                            connectedControllers[index].xPressed = pressed
+                            connectedVirtualControllers[index].xPressed = pressed
                         }
                     }
                     MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                        val mapping = physicalController.keyboardMapping.xButton
+                        val mapping = pController.keyboardMapping.xButton
                         handleKey(pressed, mapping)
                     }
                 }
             }
             KEYCODE_BUTTON_START -> {
-                physicalController.state.startPressed = pressed
+                pController.state.startPressed = pressed
 
-                when (physicalController.mappingType) {
+                when (pController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
-                        val index = physicalController.virtualXInputId
+                        val index = pController.virtualControllerID
                         if (index != -1) {
-                            connectedControllers[index].startPressed = pressed
+                            connectedVirtualControllers[index].startPressed = pressed
                         }
                     }
                     MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                        val mapping = physicalController.keyboardMapping.startButton
+                        val mapping = pController.keyboardMapping.startButton
                         handleKey(pressed, mapping)
                     }
                 }
             }
             KEYCODE_BUTTON_SELECT -> {
-                physicalController.state.selectPressed = pressed
+                pController.state.selectPressed = pressed
 
-                when (physicalController.mappingType) {
+                when (pController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
-                        val index = physicalController.virtualXInputId
+                        val index = pController.virtualControllerID
                         if (index != -1) {
-                            connectedControllers[index].selectPressed = pressed
+                            connectedVirtualControllers[index].selectPressed = pressed
                         }
                     }
                     MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                        val mapping = physicalController.keyboardMapping.selectButton
+                        val mapping = pController.keyboardMapping.selectButton
                         handleKey(pressed, mapping)
                     }
                 }
             }
             KEYCODE_BUTTON_R1 -> {
-                physicalController.state.rbPressed = pressed
+                pController.state.rbPressed = pressed
 
-                when (physicalController.mappingType) {
+                when (pController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
-                        val index = physicalController.virtualXInputId
+                        val index = pController.virtualControllerID
                         if (index != -1) {
-                            connectedControllers[index].rbPressed = pressed
+                            connectedVirtualControllers[index].rbPressed = pressed
                         }
                     }
                     MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                        val mapping = physicalController.keyboardMapping.rbButton
+                        val mapping = pController.keyboardMapping.rbButton
                         handleKey(pressed, mapping)
                     }
                 }
             }
             KEYCODE_BUTTON_L1 -> {
-                physicalController.state.lbPressed = pressed
+                pController.state.lbPressed = pressed
 
-                when (physicalController.mappingType) {
+                when (pController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
-                        val index = physicalController.virtualXInputId
+                        val index = pController.virtualControllerID
                         if (index != -1) {
-                            connectedControllers[index].lbPressed = pressed
+                            connectedVirtualControllers[index].lbPressed = pressed
                         }
                     }
                     MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                        val mapping = physicalController.keyboardMapping.lbButton
+                        val mapping = pController.keyboardMapping.lbButton
                         handleKey(pressed, mapping)
                     }
                 }
             }
             KEYCODE_BUTTON_R2 -> {
-                if (!physicalController.supportAxisTrigger) {
-                    physicalController.state.rt = 1F
+                if (pController.supportAxisTrigger) return true
 
-                    when (physicalController.mappingType) {
-                        MAPPING_TYPE_XINPUT -> {
-                            val index = physicalController.virtualXInputId
-                            if (index != -1) {
-                                connectedControllers[index].rt[0] = 2
-                                connectedControllers[index].rt[1] = 5
-                                connectedControllers[index].rt[2] = 5
-                            }
+                pController.state.rt = if (pressed) 1F else 0F
+
+                when (pController.mappingType) {
+                    MAPPING_TYPE_XINPUT -> {
+                        val index = pController.virtualControllerID
+                        if (index != -1) {
+                            connectedVirtualControllers[index].rt[0] = if (pressed) 2 else 0
+                            connectedVirtualControllers[index].rt[1] = if (pressed) 5 else 0
+                            connectedVirtualControllers[index].rt[2] = if (pressed) 5 else 0
                         }
-                        MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                            val mapping = physicalController.keyboardMapping.rtButton
-                            handleKey(pressed, mapping)
-                        }
+                    }
+                    MAPPING_TYPE_KEYBOARD_MOUSE -> {
+                        val mapping = pController.keyboardMapping.rtButton
+                        handleKey(pressed, mapping)
                     }
                 }
             }
             KEYCODE_BUTTON_L2 -> {
-                if (!physicalController.supportAxisTrigger) {
-                    physicalController.state.lt = 1F
+                if (pController.supportAxisTrigger) return true
 
-                    when (physicalController.mappingType) {
-                        MAPPING_TYPE_XINPUT -> {
-                            val index = physicalController.virtualXInputId
-                            if (index != -1) {
-                                connectedControllers[index].lt[0] = 2
-                                connectedControllers[index].lt[1] = 5
-                                connectedControllers[index].lt[2] = 5
-                            }
+                pController.state.lt = if (pressed) 1F else 0F
+
+                when (pController.mappingType) {
+                    MAPPING_TYPE_XINPUT -> {
+                        val index = pController.virtualControllerID
+                        if (index != -1) {
+                            connectedVirtualControllers[index].lt[0] = if (pressed) 2 else 0
+                            connectedVirtualControllers[index].lt[1] = if (pressed) 5 else 0
+                            connectedVirtualControllers[index].lt[2] = if (pressed) 5 else 0
                         }
-                        MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                            val mapping = physicalController.keyboardMapping.ltButton
-                            handleKey(pressed, mapping)
-                        }
+                    }
+                    MAPPING_TYPE_KEYBOARD_MOUSE -> {
+                        val mapping = pController.keyboardMapping.ltButton
+                        handleKey(pressed, mapping)
                     }
                 }
             }
             KEYCODE_BUTTON_THUMBR -> {
-                physicalController.state.rsPressed = pressed
+                pController.state.rsPressed = pressed
 
-                when (physicalController.mappingType) {
+                when (pController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
-                        val index = physicalController.virtualXInputId
+                        val index = pController.virtualControllerID
                         if (index != -1) {
-                            connectedControllers[index].rsPressed = pressed
+                            connectedVirtualControllers[index].rsPressed = pressed
                         }
                     }
                     MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                        val mapping = physicalController.keyboardMapping.rsButton
+                        val mapping = pController.keyboardMapping.rsButton
                         handleKey(pressed, mapping)
                     }
                 }
             }
             KEYCODE_BUTTON_THUMBL -> {
-                physicalController.state.lsPressed = pressed
+                pController.state.lsPressed = pressed
 
-                when (physicalController.mappingType) {
+                when (pController.mappingType) {
                     MAPPING_TYPE_XINPUT -> {
-                        val index = physicalController.virtualXInputId
+                        val index = pController.virtualControllerID
                         if (index != -1) {
-                            connectedControllers[index].lsPressed = pressed
+                            connectedVirtualControllers[index].lsPressed = pressed
                         }
                     }
                     MAPPING_TYPE_KEYBOARD_MOUSE -> {
-                        val mapping = physicalController.keyboardMapping.lsButton
+                        val mapping = pController.keyboardMapping.lsButton
                         handleKey(pressed, mapping)
                     }
                 }
@@ -647,6 +651,9 @@ object ControllerUtils {
         val pController = connectedPhysicalControllers[controllerIndex]
 
         pController.state.lx = event.getAxisValue(AXIS_X)
+        if (pController.state.lx < -200F) {
+            pController.state.lx += 270F
+        }
         pController.state.ly = event.getAxisValue(AXIS_Y)
         pController.state.rx = event.getAxisValue(AXIS_Z)
         pController.state.ry = event.getAxisValue(AXIS_RZ)
@@ -660,19 +667,26 @@ object ControllerUtils {
 
         when (pController.mappingType) {
             MAPPING_TYPE_XINPUT -> {
-                val index = pController.virtualXInputId
+                val index = pController.virtualControllerID
                 if (index != -1) {
-                    axisToByteArray(connectedControllers[index].lx, normalizeAxisValue(pController.state.lx))
-                    axisToByteArray(connectedControllers[index].ly, normalizeAxisValue(-pController.state.ly))
-                    axisToByteArray(connectedControllers[index].rx, normalizeAxisValue(pController.state.rx))
-                    axisToByteArray(connectedControllers[index].ry, normalizeAxisValue(-pController.state.ry))
-
-                    if (pController.supportAxisTrigger) {
-                        axisToByteArray(connectedControllers[index].lt, normalizeAxisValue(pController.state.lt, true))
-                        axisToByteArray(connectedControllers[index].rt, normalizeAxisValue(pController.state.rt, true))
+                    if (pController.swapAnalogs) {
+                        axisToByteArray(connectedVirtualControllers[index].lx, normalizeAxisValue(pController.state.rx))
+                        axisToByteArray(connectedVirtualControllers[index].ly, normalizeAxisValue(-pController.state.ry))
+                        axisToByteArray(connectedVirtualControllers[index].rx, normalizeAxisValue(pController.state.lx))
+                        axisToByteArray(connectedVirtualControllers[index].ry, normalizeAxisValue(-pController.state.ly))
+                    } else {
+                        axisToByteArray(connectedVirtualControllers[index].lx, normalizeAxisValue(pController.state.lx))
+                        axisToByteArray(connectedVirtualControllers[index].ly, normalizeAxisValue(-pController.state.ly))
+                        axisToByteArray(connectedVirtualControllers[index].rx, normalizeAxisValue(pController.state.rx))
+                        axisToByteArray(connectedVirtualControllers[index].ry, normalizeAxisValue(-pController.state.ry))
                     }
 
-                    connectedControllers[index].dpadStatus = getAxisStatus(pController.state.dpadX, pController.state.dpadY, 0.25F)
+                    if (pController.supportAxisTrigger) {
+                        axisToByteArray(connectedVirtualControllers[index].lt, normalizeAxisValue(pController.state.lt, true))
+                        axisToByteArray(connectedVirtualControllers[index].rt, normalizeAxisValue(pController.state.rt, true))
+                    }
+
+                    connectedVirtualControllers[index].dpadStatus = getAxisStatus(pController.state.dpadX, pController.state.dpadY, 0.25F)
                 }
             }
             MAPPING_TYPE_KEYBOARD_MOUSE -> {
@@ -712,8 +726,10 @@ object ControllerUtils {
         var name: String,
         var id: Int,
         var mappingType: Int = MAPPING_TYPE_KEYBOARD_MOUSE,
-        var virtualXInputId: Int = -1,
-        var supportAxisTrigger: Boolean = true,
+        var virtualControllerID: Int = -1,
+        var supportAxisTrigger: Boolean = false,
+        var flatZone: Float = 0F,
+        var swapAnalogs: Boolean = false,
         var deadZone: Float = 0.25F,
         var mouseSensibility: Float = 1F,
         var keyboardMapping: KeyboardMapping = KeyboardMapping(),
@@ -739,6 +755,12 @@ object ControllerUtils {
         var ry: Float = 0F,
         var lt: Float = 0F,
         var rt: Float = 0F,
+    )
+
+    class Axis(
+        var value: Float,
+        var range: MotionRange,
+        var flatZone: Float
     )
 
     class KeyboardMapping(
@@ -767,109 +789,6 @@ object ControllerUtils {
         var right: ButtonMapping = ButtonMapping(),
     )
 
-    class GamePadServer {
-        fun startServer() {
-            val serverSocket = DatagramSocket(CLIENT_PORT)
-
-            gamePadServerRunning = true
-
-            Thread {
-                while (gamePadServerRunning) {
-                    try {
-                        Log.e("GamePad", "Server initialized on 127.0.0.1:${CLIENT_PORT}")
-
-                        val buffer = ByteArray(BUFFER_SIZE)
-                        val packet = DatagramPacket(buffer, buffer.size)
-
-                        while (true) {
-                            serverSocket.receive(packet)
-
-                            val receivedData = ByteBuffer.wrap(buffer).get().toInt()
-                            when (receivedData) {
-                                GET_CONNECTION -> {
-                                    val responsePacket = DatagramPacket(buffer, buffer.size, packet.address, packet.port)
-
-                                    serverSocket.send(responsePacket)
-                                }
-                                GET_GAMEPAD_STATE -> {
-                                    connectedControllers.forEachIndexed { index, virtualController ->
-                                        buffer[0 + (index * 32)] = GET_GAMEPAD_STATE.toByte()
-                                        buffer[1 + (index * 32)] = if (virtualController.connected || index == 0) 1 else 0
-                                        buffer[2 + (index * 32)] = if (virtualController.aPressed) 1 else 0
-                                        buffer[3 + (index * 32)] = if (virtualController.bPressed) 1 else 0
-                                        buffer[4 + (index * 32)] = if (virtualController.xPressed) 1 else 0
-                                        buffer[5 + (index * 32)] = if (virtualController.yPressed) 1 else 0
-                                        buffer[6 + (index * 32)] = if (virtualController.lbPressed) 1 else 0
-                                        buffer[7 + (index * 32)] = if (virtualController.rbPressed) 1 else 0
-                                        buffer[8 + (index * 32)] = if (virtualController.selectPressed) 1 else 0
-                                        buffer[9 + (index * 32)] = if (virtualController.startPressed) 1 else 0
-                                        buffer[10 + (index * 32)] = if (virtualController.lsPressed) 1 else 0
-                                        buffer[11 + (index * 32)] = if (virtualController.rsPressed) 1 else 0
-                                        buffer[12 + (index * 32)] = 0
-                                        buffer[13 + (index * 32)] = virtualController.dpadStatus.toByte()
-                                        buffer[14 + (index * 32)] = virtualController.lx[0]
-                                        buffer[15 + (index * 32)] = virtualController.lx[1]
-                                        buffer[16 + (index * 32)] = virtualController.lx[2]
-                                        buffer[17 + (index * 32)] = virtualController.ly[0]
-                                        buffer[18 + (index * 32)] = virtualController.ly[1]
-                                        buffer[19 + (index * 32)] = virtualController.ly[2]
-                                        buffer[20 + (index * 32)] = virtualController.rx[0]
-                                        buffer[21 + (index * 32)] = virtualController.rx[1]
-                                        buffer[22 + (index * 32)] = virtualController.rx[2]
-                                        buffer[23 + (index * 32)] = virtualController.ry[0]
-                                        buffer[24 + (index * 32)] = virtualController.ry[1]
-                                        buffer[25 + (index * 32)] = virtualController.ry[2]
-                                        buffer[26 + (index * 32)] = virtualController.lt[0]
-                                        buffer[27 + (index * 32)] = virtualController.lt[1]
-                                        buffer[28 + (index * 32)] = virtualController.lt[2]
-                                        buffer[29 + (index * 32)] = virtualController.rt[0]
-                                        buffer[30 + (index * 32)] = virtualController.rt[1]
-                                        buffer[31 + (index * 32)] = virtualController.rt[2]
-                                    }
-
-                                    val responsePacket = DatagramPacket(buffer, buffer.size, packet.address, packet.port)
-
-                                    serverSocket.send(responsePacket)
-                                }
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Log.e("GamePad", e.toString())
-                    } finally {
-                        serverSocket.close()
-                        gamePadServerRunning = false
-                    }
-                }
-            }.start()
-        }
-
-        companion object {
-            var gamePadServerRunning = false
-            val connectedControllers: List<VirtualController> = listOf(VirtualController(), VirtualController(), VirtualController(), VirtualController())
-
-            fun connectController(): Int {
-                connectedControllers.forEachIndexed { index, it ->
-                    if (!it.connected) {
-                        it.connected = true
-
-                        return index
-                    }
-                }
-
-                return -1
-            }
-
-            fun disconnectController(index: Int) {
-                if (index != -1) connectedControllers[index].connected = false
-            }
-
-            const val CLIENT_PORT = 7941
-            const val BUFFER_SIZE = 128
-            const val GET_CONNECTION = 1
-            const val GET_GAMEPAD_STATE = 2
-        }
-    }
-
     class VirtualController(
         var connected: Boolean = false,
         var aPressed: Boolean = false,
@@ -890,4 +809,101 @@ object ControllerUtils {
         var lt: ByteArray = byteArrayOf(0, 0, 0),
         var rt: ByteArray = byteArrayOf(0, 0, 0)
     )
+
+    val connectedVirtualControllers: List<VirtualController> = listOf(VirtualController(), VirtualController(), VirtualController(), VirtualController())
+
+    fun connectController(): Int {
+        connectedVirtualControllers.forEachIndexed { index, it ->
+            if (!it.connected) {
+                Log.d("ControllerDebug", "Connected Controller on Port $index")
+                it.connected = true
+                return index
+            }
+        }
+
+        return -1
+    }
+
+    fun disconnectController(index: Int) {
+        if (index != -1) {
+            Log.d("ControllerDebug", "Disconnected Controller on Port $index")
+            connectedVirtualControllers[index].connected = false
+        }
+    }
+
+    private const val CLIENT_PORT = 7941
+    private const val BUFFER_SIZE = 128
+    private const val GET_CONNECTION = 1
+    private const val GET_GAMEPAD_STATE = 2
+
+    private var inputServerRunning = false
+    private val serverSocket = DatagramSocket(CLIENT_PORT)
+
+    suspend fun startInputServer() {
+        if (inputServerRunning) return
+
+        Log.d("ControllerDebug", "Input Server Initialized.")
+
+        inputServerRunning = true
+
+        withContext(Dispatchers.IO) {
+            while (inputServerRunning) {
+                val buffer = ByteArray(BUFFER_SIZE)
+                val packet = DatagramPacket(buffer, buffer.size)
+
+                serverSocket.receive(packet)
+
+                val receivedData = ByteBuffer.wrap(buffer).get().toInt()
+                when (receivedData) {
+                    GET_CONNECTION -> {
+                        val responsePacket = DatagramPacket(buffer, buffer.size, packet.address, packet.port)
+                        serverSocket.send(responsePacket)
+                    }
+                    GET_GAMEPAD_STATE -> {
+                        connectedVirtualControllers.forEachIndexed { index, virtualController ->
+                            buffer[0 + (index * 32)] = GET_GAMEPAD_STATE.toByte()
+                            buffer[1 + (index * 32)] = if (virtualController.connected) 1 else 0
+                            buffer[2 + (index * 32)] = if (virtualController.aPressed) 1 else 0
+                            buffer[3 + (index * 32)] = if (virtualController.bPressed) 1 else 0
+                            buffer[4 + (index * 32)] = if (virtualController.xPressed) 1 else 0
+                            buffer[5 + (index * 32)] = if (virtualController.yPressed) 1 else 0
+                            buffer[6 + (index * 32)] = if (virtualController.lbPressed) 1 else 0
+                            buffer[7 + (index * 32)] = if (virtualController.rbPressed) 1 else 0
+                            buffer[8 + (index * 32)] = if (virtualController.selectPressed) 1 else 0
+                            buffer[9 + (index * 32)] = if (virtualController.startPressed) 1 else 0
+                            buffer[10 + (index * 32)] = if (virtualController.lsPressed) 1 else 0
+                            buffer[11 + (index * 32)] = if (virtualController.rsPressed) 1 else 0
+                            buffer[12 + (index * 32)] = 0
+                            buffer[13 + (index * 32)] = virtualController.dpadStatus.toByte()
+                            buffer[14 + (index * 32)] = virtualController.lx[0]
+                            buffer[15 + (index * 32)] = virtualController.lx[1]
+                            buffer[16 + (index * 32)] = virtualController.lx[2]
+                            buffer[17 + (index * 32)] = virtualController.ly[0]
+                            buffer[18 + (index * 32)] = virtualController.ly[1]
+                            buffer[19 + (index * 32)] = virtualController.ly[2]
+                            buffer[20 + (index * 32)] = virtualController.rx[0]
+                            buffer[21 + (index * 32)] = virtualController.rx[1]
+                            buffer[22 + (index * 32)] = virtualController.rx[2]
+                            buffer[23 + (index * 32)] = virtualController.ry[0]
+                            buffer[24 + (index * 32)] = virtualController.ry[1]
+                            buffer[25 + (index * 32)] = virtualController.ry[2]
+                            buffer[26 + (index * 32)] = virtualController.lt[0]
+                            buffer[27 + (index * 32)] = virtualController.lt[1]
+                            buffer[28 + (index * 32)] = virtualController.lt[2]
+                            buffer[29 + (index * 32)] = virtualController.rt[0]
+                            buffer[30 + (index * 32)] = virtualController.rt[1]
+                            buffer[31 + (index * 32)] = virtualController.rt[2]
+                        }
+
+                        val responsePacket = DatagramPacket(buffer, buffer.size, packet.address, packet.port)
+                        serverSocket.send(responsePacket)
+                    }
+                }
+            }
+        }
+    }
+
+    fun destroyInputServer() {
+        inputServerRunning = false
+    }
 }

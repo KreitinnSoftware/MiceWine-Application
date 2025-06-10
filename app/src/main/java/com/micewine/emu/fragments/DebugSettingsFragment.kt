@@ -58,31 +58,31 @@ class DebugSettingsFragment : Fragment() {
 
         settingsList.clear()
 
-        addToAdapter(R.string.wine_log_level_title, R.string.wine_log_level_description, arrayOf("disabled", "default"),
+        addToAdapter(R.string.wine_log_level_title, R.string.wine_log_level_desc, arrayOf("disabled", "default"),
             SPINNER, WINE_LOG_LEVEL_DEFAULT_VALUE, WINE_LOG_LEVEL
         )
-        addToAdapter(R.string.box64_log_title, R.string.box64_log_description, arrayOf("0", "1"),
+        addToAdapter(R.string.box64_log, R.string.box64_log_desc, arrayOf("0", "1"),
             SPINNER, BOX64_LOG_DEFAULT_VALUE, BOX64_LOG
         )
-        addToAdapter(R.string.box64_show_segv_title, R.string.box64_show_segv_description, null,
+        addToAdapter(R.string.box64_show_segv, R.string.box64_show_segv_desc, null,
             SWITCH, BOX64_SHOWSEGV_DEFAULT_VALUE, BOX64_SHOWSEGV
         )
-        addToAdapter(R.string.box64_no_sigsegv_title, R.string.box64_no_sigsegv_description, null,
+        addToAdapter(R.string.box64_no_sigsegv, R.string.box64_no_sigsegv_desc, null,
             SWITCH, BOX64_NOSIGSEGV_DEFAULT_VALUE, BOX64_NOSIGSEGV
         )
-        addToAdapter(R.string.box64_no_sigill_title, R.string.box64_no_sigill_description, null,
+        addToAdapter(R.string.box64_no_sigill, R.string.box64_no_sigill_desc, null,
             SWITCH, BOX64_NOSIGILL_DEFAULT_VALUE, BOX64_NOSIGILL
         )
-        addToAdapter(R.string.box64_show_bt_title, R.string.box64_show_bt_description, null,
+        addToAdapter(R.string.box64_show_bt, R.string.box64_show_bt_desc, null,
             SWITCH, BOX64_SHOWBT_DEFAULT_VALUE, BOX64_SHOWBT
         )
-        addToAdapter(R.string.enable_ram_counter, R.string.enable_ram_counter_description, null,
+        addToAdapter(R.string.enable_ram_counter, R.string.enable_ram_counter_desc, null,
             SWITCH, RAM_COUNTER_DEFAULT_VALUE, RAM_COUNTER
         )
-        addToAdapter(R.string.enable_cpu_counter, R.string.enable_cpu_counter_description, null,
+        addToAdapter(R.string.enable_cpu_counter, R.string.enable_cpu_counter_desc, null,
             SWITCH, CPU_COUNTER_DEFAULT_VALUE, CPU_COUNTER
         )
-        addToAdapter(R.string.enable_debug_info, R.string.enable_debug_info_description, null,
+        addToAdapter(R.string.enable_debug_info, R.string.enable_debug_info_desc, null,
             SWITCH, ENABLE_DEBUG_INFO_DEFAULT_VALUE, ENABLE_DEBUG_INFO
         )
     }

@@ -39,37 +39,26 @@ class GeneralSettingsActivity : AppCompatActivity() {
                 when (preference) {
                     getString(R.string.box64_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.box64_settings_title)
-
                         fragmentLoader(box64SettingsFragment, false)
                     }
-
                     getString(R.string.debug_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.debug_settings_title)
-
                         fragmentLoader(debugSettingsFragment, false)
                     }
-
                     getString(R.string.driver_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.driver_settings_title)
-
                         fragmentLoader(driversSettingsFragment, false)
                     }
-
                     getString(R.string.driver_info_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.driver_info_title)
-
                         fragmentLoader(driverInfoFragment, false)
                     }
-
                     getString(R.string.env_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.env_settings_title)
-
                         fragmentLoader(environmentVariablesSettings, false)
                     }
-
                     getString(R.string.sound_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.sound_settings_title)
-
                         fragmentLoader(soundSettingsFragment, false)
                     }
                 }
