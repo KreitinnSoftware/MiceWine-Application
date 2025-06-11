@@ -1,23 +1,20 @@
 package com.micewine.emu.fragments
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.selectedWine
 import com.micewine.emu.activities.MainActivity.Companion.unixUsername
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
-import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET
 import com.micewine.emu.adapters.AdapterPreset
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
 import com.micewine.emu.core.ShellLoader.runCommand
@@ -36,7 +33,7 @@ class WinePrefixManagerFragment : Fragment() {
         rootView = inflater.inflate(R.layout.fragment_general_settings, container, false)
         recyclerView = rootView?.findViewById(R.id.recyclerViewGeneralSettings)
 
-        initialize(requireContext())
+        initialize()
         setAdapter()
 
         return rootView
@@ -61,10 +58,8 @@ class WinePrefixManagerFragment : Fragment() {
         private var recyclerView: RecyclerView? = null
         private val presetListNames: MutableList<AdapterPreset.Item> = mutableListOf()
         private var presetList: MutableList<String> = mutableListOf()
-        private var preferences: SharedPreferences? = null
 
-        fun initialize(context: Context) {
-            preferences = PreferenceManager.getDefaultSharedPreferences(context)
+        fun initialize() {
             presetList = getWinePrefixes().toMutableList()
         }
 
@@ -81,7 +76,7 @@ class WinePrefixManagerFragment : Fragment() {
         }
 
         fun putSelectedWinePrefix(name: String) {
-            preferences!!.edit().apply {
+            preferences?.edit()?.apply {
                 putString(SELECTED_WINE_PREFIX, name)
                 apply()
             }

@@ -12,7 +12,6 @@ import android.widget.RadioButton
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.FragmentManager
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.PresetManagerActivity.Companion.ACTION_EDIT_BOX64_PRESET
@@ -40,8 +39,6 @@ import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.putSelecte
 
 class AdapterPreset(private val settingsList: MutableList<Item>, private val context: Context, private val supportFragmentManager: FragmentManager) :
     RecyclerView.Adapter<AdapterPreset.ViewHolder>() {
-
-    val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_preset_item, parent, false)
@@ -143,7 +140,7 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
                         clickedPresetName = sList.titleSettings
                         clickedPresetType = sList.type
 
-                        DeleteItemFragment(DELETE_PRESET, context).show(supportFragmentManager, "")
+                        DeleteItemFragment(DELETE_PRESET).show(supportFragmentManager, "")
 
                         true
                     }

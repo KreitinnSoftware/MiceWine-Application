@@ -85,9 +85,7 @@ import com.micewine.emu.controller.ControllerUtils.connectedPhysicalControllers
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.disconnectController
 import com.micewine.emu.controller.ControllerUtils.prepareControllersMappings
-import com.micewine.emu.core.EnvVars
 import com.micewine.emu.core.EnvVars.getEnv
-import com.micewine.emu.core.EnvVars.sharedPreferences
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.RatPackageManager.checkPackageInstalled
 import com.micewine.emu.core.RatPackageManager.installADToolsDriver
@@ -492,17 +490,17 @@ class MainActivity : AppCompatActivity() {
     private var bottomNavigation: BottomNavigationView? = null
     private var viewPager: ViewPager2? = null
     private var runningXServer = false
-    private var preferences: SharedPreferences? = null
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        EnvVars.initialize(this)
-        ControllerPresetManagerFragment.initialize(this)
-        VirtualControllerPresetManagerFragment.initialize(this)
-        Box64PresetManagerFragment.initialize(this)
-        ShortcutsFragment.initialize(this)
+        preferences = PreferenceManager.getDefaultSharedPreferences(this)
+
+        ControllerPresetManagerFragment.initialize()
+        VirtualControllerPresetManagerFragment.initialize()
+        Box64PresetManagerFragment.initialize()
+        ShortcutsFragment.initialize()
         ControllerUtils.initialize(this)
 
         lifecycleScope.launch {
@@ -517,11 +515,9 @@ class MainActivity : AppCompatActivity() {
 
         setSharedVars(this)
 
-        preferences = PreferenceManager.getDefaultSharedPreferences(this)
-
         // On future here will have a code for check if app is updated and do specific data conversion if needed
 
-        preferences!!.edit().apply {
+        preferences?.edit()?.apply {
             putString(APP_VERSION, BuildConfig.VERSION_NAME)
             apply()
         }
@@ -948,11 +944,11 @@ class MainActivity : AppCompatActivity() {
 
             var driverName = getVulkanDriver(shortcutName)
             if (driverName == "Global") {
-                driverName = sharedPreferences.getString(SELECTED_VULKAN_DRIVER, "").toString()
+                driverName = preferences?.getString(SELECTED_VULKAN_DRIVER, "").toString()
             }
             var box64Version = getBox64Version(shortcutName)
             if (box64Version == "Global") {
-                box64Version = sharedPreferences.getString(SELECTED_BOX64, "").toString()
+                box64Version = preferences?.getString(SELECTED_BOX64, "").toString()
             }
 
             val driverType = if (driverName.startsWith("AdrenoToolsDriver-")) ADRENO_TOOLS_DRIVER else MESA_DRIVER
@@ -1053,7 +1049,6 @@ class MainActivity : AppCompatActivity() {
         var wineESync: Boolean = false
         var wineServices: Boolean = false
         var selectedCpuAffinity: String? = null
-        var enableXInput: Boolean = false
         var enableWineVirtualDesktop: Boolean = false
         var selectedWine: String? = null
         var fileManagerDefaultDir: String = ""
@@ -1068,6 +1063,7 @@ class MainActivity : AppCompatActivity() {
         var selectedResolution: String? = null
         var useAdrenoTools: Boolean = false
         var adrenoToolsDriverFile: File? = null
+        var preferences: SharedPreferences? = null
 
         const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
         const val ACTION_SETUP = "com.micewine.emu.ACTION_SETUP"
@@ -1120,18 +1116,18 @@ class MainActivity : AppCompatActivity() {
             appBuiltinRootfs = activity.assets.list("")?.contains("rootfs.zip")!!
 
             selectedBox64 = box64Version ?: getBox64Version(selectedGameName)
-            box64LogLevel = sharedPreferences.getString(BOX64_LOG, BOX64_LOG_DEFAULT_VALUE)
+            box64LogLevel = preferences?.getString(BOX64_LOG, BOX64_LOG_DEFAULT_VALUE)
 
-            box64ShowSegv = sharedPreferences.getBoolean(BOX64_SHOWSEGV, BOX64_SHOWSEGV_DEFAULT_VALUE)
-            box64ShowBt = sharedPreferences.getBoolean(BOX64_SHOWBT, BOX64_SHOWBT_DEFAULT_VALUE)
-            box64NoSigill = sharedPreferences.getBoolean(BOX64_NOSIGILL, BOX64_NOSIGILL_DEFAULT_VALUE)
-            box64NoSigSegv = sharedPreferences.getBoolean(BOX64_NOSIGSEGV, BOX64_NOSIGSEGV_DEFAULT_VALUE)
+            box64ShowSegv = preferences?.getBoolean(BOX64_SHOWSEGV, BOX64_SHOWSEGV_DEFAULT_VALUE) ?: BOX64_SHOWSEGV_DEFAULT_VALUE
+            box64ShowBt = preferences?.getBoolean(BOX64_SHOWBT, BOX64_SHOWBT_DEFAULT_VALUE) ?: BOX64_SHOWBT_DEFAULT_VALUE
+            box64NoSigill = preferences?.getBoolean(BOX64_NOSIGILL, BOX64_NOSIGILL_DEFAULT_VALUE) ?: BOX64_NOSIGILL_DEFAULT_VALUE
+            box64NoSigSegv = preferences?.getBoolean(BOX64_NOSIGSEGV, BOX64_NOSIGSEGV_DEFAULT_VALUE) ?: BOX64_NOSIGSEGV_DEFAULT_VALUE
 
             setBox64Preset(box64Preset)
 
-            enableDRI3 = sharedPreferences.getBoolean(ENABLE_DRI3, ENABLE_DRI3_DEFAULT_VALUE)
-            enableMangoHUD = sharedPreferences.getBoolean(ENABLE_MANGOHUD, ENABLE_MANGOHUD_DEFAULT_VALUE)
-            wineLogLevel = sharedPreferences.getString(WINE_LOG_LEVEL, WINE_LOG_LEVEL_DEFAULT_VALUE)
+            enableDRI3 = preferences?.getBoolean(ENABLE_DRI3, ENABLE_DRI3_DEFAULT_VALUE) ?: ENABLE_DRI3_DEFAULT_VALUE
+            enableMangoHUD = preferences?.getBoolean(ENABLE_MANGOHUD, ENABLE_MANGOHUD_DEFAULT_VALUE) ?: ENABLE_MANGOHUD_DEFAULT_VALUE
+            wineLogLevel = preferences?.getString(WINE_LOG_LEVEL, WINE_LOG_LEVEL_DEFAULT_VALUE)
 
             selectedD3DXRenderer = d3dxRenderer ?: getD3DXRenderer(selectedGameName)
             selectedWineD3D = wineD3D ?: getWineD3DVersion(selectedGameName)
@@ -1144,17 +1140,17 @@ class MainActivity : AppCompatActivity() {
             enableWineVirtualDesktop = virtualDesktop ?: getWineVirtualDesktop(selectedGameName)
             selectedCpuAffinity = cpuAffinity ?: getCpuAffinity(selectedGameName)
 
-            selectedGLProfile = sharedPreferences.getString(SELECTED_GL_PROFILE, SELECTED_GL_PROFILE_DEFAULT_VALUE)
-            selectedDXVKHud = sharedPreferences.getString(SELECTED_DXVK_HUD_PRESET, SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE)
-            selectedMesaVkWsiPresentMode = sharedPreferences.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE, SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE)
-            selectedTuDebugPreset = sharedPreferences.getString(SELECTED_TU_DEBUG_PRESET, SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE)
+            selectedGLProfile = preferences?.getString(SELECTED_GL_PROFILE, SELECTED_GL_PROFILE_DEFAULT_VALUE)
+            selectedDXVKHud = preferences?.getString(SELECTED_DXVK_HUD_PRESET, SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE)
+            selectedMesaVkWsiPresentMode = preferences?.getString(SELECTED_MESA_VK_WSI_PRESENT_MODE, SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE)
+            selectedTuDebugPreset = preferences?.getString(SELECTED_TU_DEBUG_PRESET, SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE)
 
-            enableRamCounter = sharedPreferences.getBoolean(RAM_COUNTER, RAM_COUNTER_DEFAULT_VALUE)
-            enableCpuCounter = sharedPreferences.getBoolean(CPU_COUNTER, CPU_COUNTER_DEFAULT_VALUE)
-            enableDebugInfo = sharedPreferences.getBoolean(ENABLE_DEBUG_INFO, ENABLE_DEBUG_INFO_DEFAULT_VALUE)
+            enableRamCounter = preferences?.getBoolean(RAM_COUNTER, RAM_COUNTER_DEFAULT_VALUE) ?: CPU_COUNTER_DEFAULT_VALUE
+            enableCpuCounter = preferences?.getBoolean(CPU_COUNTER, CPU_COUNTER_DEFAULT_VALUE) ?: CPU_COUNTER_DEFAULT_VALUE
+            enableDebugInfo = preferences?.getBoolean(ENABLE_DEBUG_INFO, ENABLE_DEBUG_INFO_DEFAULT_VALUE) ?: ENABLE_DEBUG_INFO_DEFAULT_VALUE
 
             screenFpsLimit = (activity.getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay.refreshRate.toInt()
-            fpsLimit = sharedPreferences.getInt(FPS_LIMIT, screenFpsLimit)
+            fpsLimit = preferences?.getInt(FPS_LIMIT, screenFpsLimit) ?: screenFpsLimit
 
             vulkanDriverDeviceName = getVulkanDriverInfo("deviceName") + if (useAdrenoTools) " (AdrenoTools)" else ""
             vulkanDriverDriverVersion = getVulkanDriverInfo("driverVersion").split(" ")[0]
@@ -1169,13 +1165,12 @@ class MainActivity : AppCompatActivity() {
 
             fileManagerDefaultDir = wineDisksFolder!!.path
 
-            paSink = sharedPreferences.getString(PA_SINK, PA_SINK_DEFAULT_VALUE)?.toLowerCase(Locale.getDefault())
+            paSink = preferences?.getString(PA_SINK, PA_SINK_DEFAULT_VALUE)?.toLowerCase(Locale.getDefault())
         }
 
         private fun setBox64Preset(name: String?) {
-            var selectedBox64Preset = name ?: sharedPreferences.getString(SELECTED_BOX64_PRESET, "default")!!
-
-            if (name == "--") selectedBox64Preset = sharedPreferences.getString(SELECTED_BOX64_PRESET, "default")!!
+            var selectedBox64Preset = name ?: preferences?.getString(SELECTED_BOX64_PRESET, "default") ?: "default"
+            if (name == "--") selectedBox64Preset = preferences?.getString(SELECTED_BOX64_PRESET, "default") ?: "default"
 
             box64Mmap32 = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_MMAP32)[0])
             box64Avx = getBox64Mapping(selectedBox64Preset, BOX64_AVX)[0]
@@ -1255,7 +1250,7 @@ class MainActivity : AppCompatActivity() {
                 return "LD_PRELOAD=$driverWorkaroundLdPreload"
             }
 
-            val savedLdPreload = sharedPreferences.getString(ADRENOTOOLS_LD_PRELOAD_WORKAROUND, "")
+            val savedLdPreload = preferences?.getString(ADRENOTOOLS_LD_PRELOAD_WORKAROUND, "")
             if (!savedLdPreload.isNullOrEmpty()) {
                 return "LD_PRELOAD=$savedLdPreload"
             }
@@ -1279,7 +1274,7 @@ class MainActivity : AppCompatActivity() {
 
             findingLdPreloadWorkaround = false
 
-            sharedPreferences.edit().apply {
+            preferences?.edit()?.apply {
                 putString(ADRENOTOOLS_LD_PRELOAD_WORKAROUND, "$driverWorkaroundLdPreload")
                 apply()
             }

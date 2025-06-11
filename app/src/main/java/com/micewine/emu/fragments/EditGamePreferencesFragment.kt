@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.SharedPreferences
 import android.database.DataSetObserver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -28,7 +27,6 @@ import android.widget.Spinner
 import android.widget.SpinnerAdapter
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
-import androidx.preference.PreferenceManager
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.micewine.emu.R
 import com.micewine.emu.activities.EmulationActivity
@@ -38,6 +36,7 @@ import com.micewine.emu.activities.MainActivity.Companion.ACTION_RUN_WINE
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_EXE_PATH
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_SELECT_ICON
 import com.micewine.emu.activities.MainActivity.Companion.getNativeResolutions
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.resolutions16_9
 import com.micewine.emu.activities.MainActivity.Companion.resolutions4_3
 import com.micewine.emu.activities.MainActivity.Companion.selectedCpuAffinity
@@ -54,7 +53,6 @@ import com.micewine.emu.fragments.ControllerSettingsFragment.Companion.ACTION_UP
 import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.ADRENO_TOOLS_DRIVER
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.MESA_DRIVER
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.setGameName
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Version
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
@@ -79,7 +77,6 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.putBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putBox64Version
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerXInput
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerXInputSwapAnalogs
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putCpuAffinity
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putD3DXRenderer
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putDXVKVersion
@@ -93,12 +90,11 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineServices
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putWineVirtualDesktop
-import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.setGameName
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getVirtualControllerPresets
 import java.io.File
 
 class EditGamePreferencesFragment(private val type: Int, private val exePath: File? = null) : DialogFragment() {
-    private lateinit var preferences: SharedPreferences
     private lateinit var imageView: ImageView
     private lateinit var exePathText: TextView
     private lateinit var selectExePath: ImageButton
@@ -323,8 +319,6 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         imageView = view.findViewById(R.id.imageView)
         exePathText = view.findViewById(R.id.appExePath)
 
-        preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-
         when (type) {
             EDIT_GAME_PREFERENCES -> {
                 getGameIcon(selectedGameName)?.let {
@@ -383,8 +377,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
             }
         }
 
-        val virtualControllerProfilesNames: List<String> = getVirtualControllerPresets().map { it.name }
-        val box64Versions: List<String> = listRatPackages("Box64-").map { it.name + " " + it.version }.toMutableList().apply { add(0, "Global: ${getPackageNameVersionById(preferences.getString(SELECTED_BOX64, ""))}") }
+        val box64Versions: List<String> = listRatPackages("Box64-").map { it.name + " " + it.version }.toMutableList().apply { add(0, "Global: ${getPackageNameVersionById(preferences?.getString(SELECTED_BOX64, ""))}") }
         val box64VersionsId: List<String> = listRatPackagesId("Box64-").toMutableList().apply { add(0, "Global") }
         val box64ProfilesNames: List<String> = getBox64Presets().map { it[0] }
 
@@ -445,7 +438,9 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
         }
 
         val vulkanDriversId = listRatPackagesId("VulkanDriver", "AdrenoToolsDriver").toMutableList().apply { add(0, "Global") }
-        val vulkanDrivers = listRatPackages("VulkanDriver", "AdrenoToolsDriver").map { it.name + " " + it.version }.toMutableList().apply { add(0, "Global: ${getPackageNameVersionById(preferences.getString(SELECTED_VULKAN_DRIVER, ""))}") }
+        val vulkanDrivers = listRatPackages("VulkanDriver", "AdrenoToolsDriver").map { it.name + " " + it.version }.toMutableList().apply { add(0, "Global: ${getPackageNameVersionById(
+            preferences?.getString(SELECTED_VULKAN_DRIVER, "")
+        )}") }
 
         selectedDriverSpinner.let {
             val index = vulkanDriversId.indexOf(getVulkanDriver(selectedGameName)).coerceAtLeast(0)
@@ -660,10 +655,10 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
                 FILE_MANAGER_START_PREFERENCES -> {
                     temporarySettings.let {
                         if (it.vulkanDriver == "Global") {
-                            it.vulkanDriver = preferences.getString(SELECTED_VULKAN_DRIVER, "").toString()
+                            it.vulkanDriver = preferences?.getString(SELECTED_VULKAN_DRIVER, "").toString()
                         }
                         if (it.box64Version == "Global") {
-                            it.box64Version = preferences.getString(SELECTED_BOX64, "").toString()
+                            it.box64Version = preferences?.getString(SELECTED_BOX64, "").toString()
                         }
                         val driverType = if (it.vulkanDriver.startsWith("AdrenoToolsDriver-")) ADRENO_TOOLS_DRIVER else MESA_DRIVER
 

@@ -2,12 +2,12 @@ package com.micewine.emu.core
 
 import android.annotation.SuppressLint
 import android.content.Context
-import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VULKAN_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
@@ -20,8 +20,6 @@ import java.io.File
 object RatPackageManager {
     @SuppressLint("SetTextI18n")
     fun installRat(ratPackage: RatPackage, context: Context) {
-        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-
         progressBarIsIndeterminate = false
 
         var extractDir = appRootDir.parent
@@ -138,7 +136,7 @@ object RatPackageManager {
                 installingRootFS = false
             }
             "Box64" -> {
-                preferences.apply {
+                preferences?.apply {
                     if (getString(SELECTED_BOX64, "") == "") {
                         edit().apply {
                             putString(SELECTED_BOX64, File(extractDir!!).name)
@@ -154,7 +152,7 @@ object RatPackageManager {
                 }
             }
             "VulkanDriver", "AdrenoTools" -> {
-                preferences.apply {
+                preferences?.apply {
                     if (getString(SELECTED_VULKAN_DRIVER, "") == "") {
                         edit().apply {
                             putString(SELECTED_VULKAN_DRIVER, File(extractDir!!).name)

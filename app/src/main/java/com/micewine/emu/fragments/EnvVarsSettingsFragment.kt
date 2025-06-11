@@ -1,6 +1,5 @@
 package com.micewine.emu.fragments
 
-import com.micewine.emu.R
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,12 +10,13 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 
 class EnvVarsSettingsFragment : Fragment() {
     private var addEnvButton: FloatingActionButton? = null
@@ -49,8 +49,7 @@ class EnvVarsSettingsFragment : Fragment() {
     }
 
     private fun loadEnvironmentVariables() {
-        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val savedVarsJson = preferences.getString(ENV_VARS_KEY, null)
+        val savedVarsJson = preferences?.getString(ENV_VARS_KEY, null)
         savedVarsJson?.let {
             val type = object : TypeToken<List<EnvironmentVariable>>() {}.type
             val savedVars = Gson().fromJson<List<EnvironmentVariable>>(it, type)
@@ -60,11 +59,10 @@ class EnvVarsSettingsFragment : Fragment() {
     }
 
     private fun saveEnvironmentVariables() {
-        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val editor = preferences.edit()
-        val varsJson = Gson().toJson(envVarsList)
-        editor.putString(ENV_VARS_KEY, varsJson)
-        editor.apply()
+        preferences?.edit()?.apply {
+            putString(ENV_VARS_KEY, Gson().toJson(envVarsList))
+            apply()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -74,10 +72,6 @@ class EnvVarsSettingsFragment : Fragment() {
         )
         recyclerView?.layoutManager = LinearLayoutManager(context)
         recyclerView?.adapter = envVarsAdapter
-    }
-
-    private fun setupAddButton() {
-
     }
 
     private fun showDialog(position: Int?) {

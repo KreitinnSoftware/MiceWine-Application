@@ -20,8 +20,8 @@ import android.view.SurfaceView
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.annotation.Keep
-import androidx.preference.PreferenceManager
 import com.micewine.emu.activities.EmulationActivity
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.selectedResolution
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
@@ -177,8 +177,7 @@ class LorieView : SurfaceView, InputStub {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-        val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
-        if (preferences.getBoolean("displayStretch", false)) {
+        if (preferences?.getBoolean("displayStretch", false) == true) {
             holder.setSizeFromLayout()
             return
         }

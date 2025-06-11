@@ -17,13 +17,13 @@ import android.widget.SpinnerAdapter
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CHECKBOX
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SEEKBAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SWITCH
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.fragments.InfoDialogFragment
 
 class AdapterSettingsPreferences(
@@ -31,8 +31,6 @@ class AdapterSettingsPreferences(
     private val activity: FragmentActivity
 ) :
     RecyclerView.Adapter<AdapterSettingsPreferences.ViewHolder>() {
-
-    val preferences = PreferenceManager.getDefaultSharedPreferences(activity)!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_settings_preferences_item, parent, false)
@@ -56,10 +54,10 @@ class AdapterSettingsPreferences(
                 holder.seekBar.visibility = View.GONE
                 holder.seekBarValue.visibility = View.GONE
 
-                holder.settingsSwitch.isChecked = preferences.getBoolean(sList.key, sList.defaultValue.toBoolean())
+                holder.settingsSwitch.isChecked = preferences?.getBoolean(sList.key, sList.defaultValue.toBoolean()) ?: sList.defaultValue.toBoolean()
                 holder.settingsSwitch.setOnClickListener {
-                    preferences.edit().apply {
-                        putBoolean(sList.key, !preferences.getBoolean(sList.key, sList.defaultValue.toBoolean()))
+                    preferences?.edit()?.apply {
+                        putBoolean(sList.key, !(preferences?.getBoolean(sList.key, sList.defaultValue.toBoolean()) ?: sList.defaultValue.toBoolean()))
                         apply()
                     }
                 }
@@ -78,7 +76,7 @@ class AdapterSettingsPreferences(
 
                 holder.spinnerOptions.setSelection(
                     sList.spinnerOptions!!.indexOf(
-                        preferences.getString(
+                        preferences?.getString(
                             sList.key,
                             sList.defaultValue
                         )
@@ -95,7 +93,7 @@ class AdapterSettingsPreferences(
                         ) {
                             val selectedItem = parent?.getItemAtPosition(position).toString()
 
-                            preferences.edit().apply {
+                            preferences?.edit()?.apply {
                                 putString(sList.key, selectedItem)
                                 apply()
                             }
@@ -115,7 +113,7 @@ class AdapterSettingsPreferences(
                     activity,
                     sList.spinnerOptions!!,
                     sList,
-                    preferences,
+                    preferences!!,
                     holder.spinnerOptions
                 )
             }
@@ -128,7 +126,7 @@ class AdapterSettingsPreferences(
                 holder.seekBar.min = sList.seekBarMaxMinValues!![0]
                 holder.seekBar.max = sList.seekBarMaxMinValues!![1]
 
-                holder.seekBar.progress = preferences.getInt(sList.key, sList.defaultValue.toInt())
+                holder.seekBar.progress = preferences?.getInt(sList.key, sList.defaultValue.toInt()) ?: sList.defaultValue.toInt()
 
                 if (holder.seekBar.progress == 0) {
                     holder.seekBarValue.text = activity.getString(R.string.unlimited)
@@ -153,8 +151,8 @@ class AdapterSettingsPreferences(
                     }
 
                     override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                        preferences.edit().apply {
-                            putInt(sList.key, seekBar?.progress!!)
+                        preferences?.edit()?.apply {
+                            putInt(sList.key, seekBar?.progress ?: sList.defaultValue.toInt())
                             apply()
                         }
                     }

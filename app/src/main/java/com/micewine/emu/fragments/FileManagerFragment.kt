@@ -175,7 +175,7 @@ class FileManagerFragment : Fragment() {
                 EditGamePreferencesFragment(FILE_MANAGER_START_PREFERENCES, exeFile!!).show(requireActivity().supportFragmentManager, "")
             }
             R.id.deleteFile -> {
-                DeleteItemFragment(DELETE_GAME_ITEM, requireContext()).show(requireActivity().supportFragmentManager, "")
+                DeleteItemFragment(DELETE_GAME_ITEM).show(requireActivity().supportFragmentManager, "")
             }
             R.id.renameFile -> {
                 RenameFragment(RENAME_FILE, File(selectedFile).name).show(requireActivity().supportFragmentManager, "")

@@ -9,9 +9,9 @@ import android.graphics.Path
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import androidx.preference.PreferenceManager
 import com.micewine.emu.LorieView
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.controller.ControllerUtils
 import com.micewine.emu.controller.ControllerUtils.DOWN
@@ -32,8 +32,6 @@ import com.micewine.emu.input.InputStub.BUTTON_LEFT
 import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
 import com.micewine.emu.input.InputStub.BUTTON_UNDEFINED
-import com.micewine.emu.views.VirtualControllerInputView.Companion.SELECT_BUTTON
-import com.micewine.emu.views.VirtualControllerInputView.Companion.START_BUTTON
 import kotlin.math.sqrt
 
 class VirtualKeyboardInputView @JvmOverloads constructor(
@@ -54,14 +52,13 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
     }
 
     private var lorieView: LorieView = LorieView(context)
-    private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val dpadUp: Path = Path()
     private val dpadDown: Path = Path()
     private val dpadLeft: Path = Path()
     private val dpadRight: Path = Path()
 
     fun loadPreset(name: String?) {
-        val globalPreset = preferences.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET, "default") ?: "default"
+        val globalPreset = preferences?.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET, "default") ?: "default"
         val presetName = if (name == "--") { globalPreset } else { name ?: globalPreset }
         val preset = getVirtualControllerPreset(presetName) ?: return
 

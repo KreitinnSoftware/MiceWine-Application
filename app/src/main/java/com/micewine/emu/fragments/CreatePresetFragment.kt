@@ -12,9 +12,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.MainActivity.Companion.setupDone
 import com.micewine.emu.core.RatPackageManager.listRatPackages
@@ -46,8 +44,6 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
         val wineVersionsId: MutableList<String> = mutableListOf()
 
         val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create()
-
-        preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())!!
 
         when (presetType) {
             WINEPREFIX_PRESET -> {

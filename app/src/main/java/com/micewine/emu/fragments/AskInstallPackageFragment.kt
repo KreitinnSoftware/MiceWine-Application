@@ -4,12 +4,10 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
-import androidx.preference.PreferenceManager
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_INSTALL_ADTOOLS_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_INSTALL_RAT
@@ -22,7 +20,6 @@ import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROL
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.importVirtualControllerPreset
 
 class AskInstallPackageFragment(private val packageType: Int) : DialogFragment() {
-    private var preferences: SharedPreferences? = null
 
     @SuppressLint("SetTextI18n")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -33,7 +30,6 @@ class AskInstallPackageFragment(private val packageType: Int) : DialogFragment()
         val buttonCancel = view.findViewById<Button>(R.id.buttonCancel)
 
         val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create()
-
         val askInstallText = view.findViewById<TextView>(R.id.askInstallText)
 
         when (packageType) {
@@ -47,8 +43,6 @@ class AskInstallPackageFragment(private val packageType: Int) : DialogFragment()
                 askInstallText.text = "${activity?.getString(R.string.install_rat_package_warning)} ${mwpPresetCandidate?.second?.substringAfterLast("/")}?"
             }
         }
-
-        preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
         buttonContinue.setOnClickListener {
             when (packageType) {

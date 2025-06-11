@@ -25,7 +25,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity.INPUT_METHOD_SERVICE
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.AlignItems
@@ -39,6 +38,7 @@ import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity
 import com.micewine.emu.activities.MainActivity.Companion.copyFile
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterGame
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
@@ -47,9 +47,7 @@ import com.micewine.emu.databinding.FragmentShortcutsBinding
 import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_GAME_ITEM
 import com.micewine.emu.fragments.EditGamePreferencesFragment.Companion.EDIT_GAME_PREFERENCES
-import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.preferences
 import java.io.File
-import kotlin.math.max
 
 class ShortcutsFragment : Fragment() {
     private var binding: FragmentShortcutsBinding? = null
@@ -76,7 +74,7 @@ class ShortcutsFragment : Fragment() {
         searchInput = rootView?.findViewById(R.id.searchInput)
         imManager = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
-        initialize(requireContext())
+        initialize()
 
         recyclerView?.layoutManager = FlexboxLayoutManager(requireContext()).apply {
             flexDirection = FlexDirection.ROW
@@ -210,7 +208,7 @@ class ShortcutsFragment : Fragment() {
                 addGameToLauncher(requireContext(), selectedGameName)
             }
             R.id.removeGameItem -> {
-                DeleteItemFragment(DELETE_GAME_ITEM, requireContext()).show(requireActivity().supportFragmentManager, "")
+                DeleteItemFragment(DELETE_GAME_ITEM).show(requireActivity().supportFragmentManager, "")
             }
             R.id.editGameItem -> {
                 EditGamePreferencesFragment(EDIT_GAME_PREFERENCES).show(requireActivity().supportFragmentManager, "")
@@ -249,10 +247,6 @@ class ShortcutsFragment : Fragment() {
         )
     }
 
-    private fun getSpanCount(): Int {
-        return max(1F, requireActivity().resources.displayMetrics.widthPixels / dpToPx(138 * 1F, requireContext())).toInt()
-    }
-
     companion object {
         private val gson = Gson()
         private var recyclerView: RecyclerView? = null
@@ -264,8 +258,7 @@ class ShortcutsFragment : Fragment() {
         const val MESA_DRIVER = 0
         const val ADRENO_TOOLS_DRIVER = 1
 
-        fun initialize(context: Context) {
-            preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
+        fun initialize() {
             gameList = getGameList()
         }
 

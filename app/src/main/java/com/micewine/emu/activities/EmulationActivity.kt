@@ -36,11 +36,9 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.navigation.NavigationView
@@ -53,34 +51,32 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANG
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.FPS_LIMIT
 import com.micewine.emu.activities.MainActivity.Companion.enableCpuCounter
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
-import com.micewine.emu.activities.MainActivity.Companion.enableXInput
 import com.micewine.emu.activities.MainActivity.Companion.getCpuInfo
 import com.micewine.emu.activities.MainActivity.Companion.getMemoryInfo
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
-import com.micewine.emu.activities.MainActivity.Companion.wineDisksFolder
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.controller.ControllerUtils.connectController
 import com.micewine.emu.controller.ControllerUtils.destroyInputServer
 import com.micewine.emu.controller.ControllerUtils.disconnectController
-import com.micewine.emu.controller.ControllerUtils.updateButtonsState
 import com.micewine.emu.controller.ControllerUtils.prepareControllersMappings
 import com.micewine.emu.controller.ControllerUtils.startInputServer
 import com.micewine.emu.controller.ControllerUtils.updateAxisState
+import com.micewine.emu.controller.ControllerUtils.updateButtonsState
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.fragments.ControllerSettingsFragment
 import com.micewine.emu.fragments.LogViewerFragment
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getExePath
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerXInput
 import com.micewine.emu.fragments.VirtualControllerSettingsFragment
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.TouchInputHandler
-import com.micewine.emu.views.VirtualKeyboardInputView
 import com.micewine.emu.views.VirtualControllerInputView
 import com.micewine.emu.views.VirtualControllerInputView.Companion.virtualXInputControllerId
+import com.micewine.emu.views.VirtualKeyboardInputView
 import kotlinx.coroutines.launch
 
 @SuppressLint("ApplySharedPref")
@@ -122,7 +118,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this).apply {
+        preferences?.apply {
             registerOnSharedPreferenceChangeListener(preferencesChangedListener)
         }
 
@@ -182,10 +178,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 drawerLayout?.closeDrawers()
             }
             findViewById<MaterialSwitch>(R.id.enableMangoHudSwitch).apply {
-                isChecked = preferences.getBoolean(ENABLE_MANGOHUD, ENABLE_MANGOHUD_DEFAULT_VALUE)
+                isChecked = preferences?.getBoolean(ENABLE_MANGOHUD, ENABLE_MANGOHUD_DEFAULT_VALUE) ?: ENABLE_MANGOHUD_DEFAULT_VALUE
 
                 setOnClickListener {
-                    preferences.edit().apply {
+                    preferences?.edit()?.apply {
                         putBoolean(ENABLE_MANGOHUD, isChecked)
                         apply()
                     }
@@ -195,11 +191,11 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                 }
             }
             findViewById<MaterialSwitch>(R.id.stretchDisplaySwitch).apply {
-                isChecked = preferences.getBoolean("displayStretch", false)
+                isChecked = preferences?.getBoolean("displayStretch", false) ?: false
 
                 setOnClickListener {
-                    preferences.edit().apply {
-                        putBoolean("displayStretch", !preferences.getBoolean("displayStretch", false))
+                    preferences?.edit()?.apply {
+                        putBoolean("displayStretch", !(preferences?.getBoolean("displayStretch", false) ?: false))
                         apply()
                     }
 
@@ -248,7 +244,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         fpsLimitSeekbar.min = 0
         fpsLimitSeekbar.max = screenFpsLimit
-        fpsLimitSeekbar.progress = preferences.getInt(FPS_LIMIT, screenFpsLimit)
+        fpsLimitSeekbar.progress = preferences?.getInt(FPS_LIMIT, screenFpsLimit) ?: 0
 
         if (fpsLimitSeekbar.progress == 0) {
             fpsLimitText.text = getString(R.string.unlimited)
@@ -269,8 +265,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                preferences.edit().apply {
-                    putInt(FPS_LIMIT, seekBar?.progress!!)
+                preferences?.edit()?.apply {
+                    putInt(FPS_LIMIT, seekBar?.progress ?: 0)
                     apply()
                 }
 

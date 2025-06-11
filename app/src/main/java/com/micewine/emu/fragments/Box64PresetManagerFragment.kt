@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -32,6 +31,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_X87DOUBLE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET
 import com.micewine.emu.adapters.AdapterPreset
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
@@ -50,7 +50,7 @@ class Box64PresetManagerFragment : Fragment() {
         rootView = inflater.inflate(R.layout.fragment_general_settings, container, false)
         recyclerView = rootView?.findViewById(R.id.recyclerViewGeneralSettings)
 
-        initialize(requireContext())
+        initialize()
         setAdapter()
 
         return rootView
@@ -75,8 +75,6 @@ class Box64PresetManagerFragment : Fragment() {
         private var recyclerView: RecyclerView? = null
         private val presetListNames: MutableList<AdapterPreset.Item> = mutableListOf()
         private var presetList: MutableList<MutableList<String>> = mutableListOf()
-        private var preferences: SharedPreferences? = null
-
         private val gson = Gson()
 
         private val mappingMap = mapOf(
@@ -99,8 +97,7 @@ class Box64PresetManagerFragment : Fragment() {
             BOX64_DYNAREC_FORWARD to 17,
         )
 
-        fun initialize(context: Context) {
-            preferences = PreferenceManager.getDefaultSharedPreferences(context)
+        fun initialize() {
             presetList = getBox64Presets()
         }
 

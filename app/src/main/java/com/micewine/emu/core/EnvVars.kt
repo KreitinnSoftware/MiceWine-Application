@@ -1,9 +1,6 @@
 package com.micewine.emu.core
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Build
-import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.activities.MainActivity.Companion.adrenoToolsDriverFile
@@ -35,6 +32,7 @@ import com.micewine.emu.activities.MainActivity.Companion.box64Sse42
 import com.micewine.emu.activities.MainActivity.Companion.enableDRI3
 import com.micewine.emu.activities.MainActivity.Companion.getLdPreloadWorkaround
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedBox64
 import com.micewine.emu.activities.MainActivity.Companion.selectedDXVKHud
@@ -52,18 +50,12 @@ import com.micewine.emu.fragments.EnvVarsSettingsFragment
 import com.micewine.emu.fragments.EnvVarsSettingsFragment.Companion.ENV_VARS_KEY
 
 object EnvVars {
-    lateinit var sharedPreferences: SharedPreferences
-
-    fun initialize(context: Context) {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-    }
-
     fun getEnv(): String {
         val vars = mutableListOf<String>()
 
         setEnv(vars)
 
-        val savedVarsJson = sharedPreferences.getString(ENV_VARS_KEY, null)
+        val savedVarsJson = preferences?.getString(ENV_VARS_KEY, null)
         if (savedVarsJson != null) {
             val type = object : TypeToken<List<EnvVarsSettingsFragment.EnvironmentVariable>>() {}.type
 

@@ -1,20 +1,18 @@
 package com.micewine.emu.fragments
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_MINUS_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_PLUS_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_Y_MINUS_KEY
@@ -57,7 +55,7 @@ class ControllerPresetManagerFragment(private val editShortcut: Boolean) : Fragm
         rootView = inflater.inflate(R.layout.fragment_general_settings, container, false)
         recyclerView = rootView?.findViewById(R.id.recyclerViewGeneralSettings)
 
-        initialize(requireContext(), editShortcut)
+        initialize(editShortcut)
         setAdapter()
 
         return rootView
@@ -84,13 +82,11 @@ class ControllerPresetManagerFragment(private val editShortcut: Boolean) : Fragm
         private var recyclerView: RecyclerView? = null
         private val presetListNames: MutableList<AdapterPreset.Item> = mutableListOf()
         private var presetList: MutableList<ControllerPreset> = mutableListOf()
-        private var preferences: SharedPreferences? = null
         private var editShortcut: Boolean = false
 
         private val gson = Gson()
 
-        fun initialize(context: Context, boolean: Boolean = false) {
-            preferences = PreferenceManager.getDefaultSharedPreferences(context)
+        fun initialize(boolean: Boolean = false) {
             presetList = getControllerPresets()
             editShortcut = boolean
         }
