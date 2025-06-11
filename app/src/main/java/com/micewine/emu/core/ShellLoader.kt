@@ -75,6 +75,7 @@ object ShellLoader {
 
             os?.writeBytes("$cmd\nexit\n")
             os?.flush()
+            os?.close()
 
             val stdOutJob = async(Dispatchers.IO) {
                 var stdOut: String?
@@ -82,23 +83,21 @@ object ShellLoader {
                     sharedLogs?.appendText("$stdOut")
                     Log.i("ShellLoader", "$stdOut")
                 }
+                stdout?.close()
             }
             val stdErrJob = async(Dispatchers.IO) {
-                var stdOut: String?
-                while (stdout?.readLine().also { stdOut = it } != null) {
-                    sharedLogs?.appendText("$stdOut")
-                    Log.i("ShellLoader", "$stdOut")
+                var stdErr: String?
+                while (stderr?.readLine().also { stdErr = it } != null) {
+                    sharedLogs?.appendText("$stdErr")
+                    Log.i("ShellLoader", "$stdErr")
                 }
+                stderr?.close()
             }
 
             stdOutJob.await()
             stdErrJob.await()
 
             shell?.waitFor()
-
-            os?.close()
-            stdout?.close()
-            stderr?.close()
             shell?.destroy()
         }
     }
@@ -110,6 +109,7 @@ object ShellLoader {
             handler.post {
                 logsTextHead.value = "$text\n"
 
+                /*
                 // Check for errors
                 when {
                     text.contains("err:module:import_dll") -> {
@@ -138,7 +138,7 @@ object ShellLoader {
                             "Error on Creating X Window 'X_CreateWindow'"
                         ).show(supportFragmentManager, "")
                     }
-                }
+                }*/
             }
         }
     }
