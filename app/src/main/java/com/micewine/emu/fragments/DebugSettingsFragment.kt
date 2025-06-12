@@ -28,6 +28,7 @@ import com.micewine.emu.activities.MainActivity.Companion.ENABLE_DEBUG_INFO
 import com.micewine.emu.activities.MainActivity.Companion.ENABLE_DEBUG_INFO_DEFAULT_VALUE
 import com.micewine.emu.activities.MainActivity.Companion.RAM_COUNTER
 import com.micewine.emu.activities.MainActivity.Companion.RAM_COUNTER_DEFAULT_VALUE
+import com.micewine.emu.activities.MainActivity.Companion.deviceArch
 import com.micewine.emu.adapters.AdapterSettingsPreferences
 import com.micewine.emu.adapters.AdapterSettingsPreferences.SettingsListSpinner
 
@@ -61,21 +62,23 @@ class DebugSettingsFragment : Fragment() {
         addToAdapter(R.string.wine_log_level_title, R.string.wine_log_level_desc, arrayOf("disabled", "default"),
             SPINNER, WINE_LOG_LEVEL_DEFAULT_VALUE, WINE_LOG_LEVEL
         )
-        addToAdapter(R.string.box64_log, R.string.box64_log_desc, arrayOf("0", "1"),
-            SPINNER, BOX64_LOG_DEFAULT_VALUE, BOX64_LOG
-        )
-        addToAdapter(R.string.box64_show_segv, R.string.box64_show_segv_desc, null,
-            SWITCH, BOX64_SHOWSEGV_DEFAULT_VALUE, BOX64_SHOWSEGV
-        )
-        addToAdapter(R.string.box64_no_sigsegv, R.string.box64_no_sigsegv_desc, null,
-            SWITCH, BOX64_NOSIGSEGV_DEFAULT_VALUE, BOX64_NOSIGSEGV
-        )
-        addToAdapter(R.string.box64_no_sigill, R.string.box64_no_sigill_desc, null,
-            SWITCH, BOX64_NOSIGILL_DEFAULT_VALUE, BOX64_NOSIGILL
-        )
-        addToAdapter(R.string.box64_show_bt, R.string.box64_show_bt_desc, null,
-            SWITCH, BOX64_SHOWBT_DEFAULT_VALUE, BOX64_SHOWBT
-        )
+        if (deviceArch != "x86_64") {
+            addToAdapter(R.string.box64_log, R.string.box64_log_desc, arrayOf("0", "1"),
+                SPINNER, BOX64_LOG_DEFAULT_VALUE, BOX64_LOG
+            )
+            addToAdapter(R.string.box64_show_segv, R.string.box64_show_segv_desc, null,
+                SWITCH, BOX64_SHOWSEGV_DEFAULT_VALUE, BOX64_SHOWSEGV
+            )
+            addToAdapter(R.string.box64_no_sigsegv, R.string.box64_no_sigsegv_desc, null,
+                SWITCH, BOX64_NOSIGSEGV_DEFAULT_VALUE, BOX64_NOSIGSEGV
+            )
+            addToAdapter(R.string.box64_no_sigill, R.string.box64_no_sigill_desc, null,
+                SWITCH, BOX64_NOSIGILL_DEFAULT_VALUE, BOX64_NOSIGILL
+            )
+            addToAdapter(R.string.box64_show_bt, R.string.box64_show_bt_desc, null,
+                SWITCH, BOX64_SHOWBT_DEFAULT_VALUE, BOX64_SHOWBT
+            )
+        }
         addToAdapter(R.string.enable_ram_counter, R.string.enable_ram_counter_desc, null,
             SWITCH, RAM_COUNTER_DEFAULT_VALUE, RAM_COUNTER
         )
