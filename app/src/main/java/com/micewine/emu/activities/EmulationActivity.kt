@@ -276,10 +276,34 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         })
 
+        val pressedKeys: MutableSet<Int> = mutableSetOf()
         mInputHandler = TouchInputHandler(this, InputEventSender(lorieView))
         mLorieKeyListener = View.OnKeyListener { _: View?, k: Int, e: KeyEvent ->
+            if (e.action == KeyEvent.ACTION_DOWN) {
+                pressedKeys.add(k)
+            } else if (e.action == KeyEvent.ACTION_UP) {
+                pressedKeys.remove(k)
+            }
+
+            if (pressedKeys.contains(KeyEvent.KEYCODE_ALT_LEFT) && pressedKeys.contains(KeyEvent.KEYCODE_Q)) {
+                if (lorieView.hasPointerCapture()) {
+                    lorieView.releasePointerCapture()
+                }
+            }
+            if (k == KeyEvent.KEYCODE_ESCAPE && !lorieView.hasPointerCapture()) {
+                if (!drawerLayout?.isDrawerOpen(GravityCompat.START)!!) {
+                    drawerLayout?.openDrawer(GravityCompat.START)
+                } else {
+                    drawerLayout?.closeDrawers()
+                }
+            }
+
             if (k == KeyEvent.KEYCODE_BACK) {
                 if (e.scanCode == KEY_BACK && e.device.keyboardType != InputDevice.KEYBOARD_TYPE_ALPHABETIC || e.scanCode == 0) {
+                    val pointerCaptured = lorieView.hasPointerCapture()
+                    if (pointerCaptured) {
+                        lorieView.releasePointerCapture()
+                    }
                     if (e.action == KeyEvent.ACTION_UP) {
                         if (!drawerLayout?.isDrawerOpen(GravityCompat.START)!!) {
                             drawerLayout?.openDrawer(GravityCompat.START)
@@ -291,19 +315,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     imManager.hideSoftInputFromWindow(window.decorView.windowToken, 0)
 
                     return@OnKeyListener true
-                }
-            } else if (k == KeyEvent.KEYCODE_ESCAPE && e.action == KeyEvent.ACTION_UP) {
-                val pointerCaptured = lorieView.hasPointerCapture()
-                if (pointerCaptured) {
-                    lorieView.releasePointerCapture()
-                } else {
-                    if (!drawerLayout?.isDrawerOpen(GravityCompat.START)!!) {
-                        drawerLayout?.openDrawer(GravityCompat.START)
-                    } else {
-                        drawerLayout?.closeDrawers()
-                    }
-
-                    imManager.hideSoftInputFromWindow(window.decorView.windowToken, 0)
                 }
             } else if (k == KeyEvent.KEYCODE_VOLUME_DOWN) {
                 audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
@@ -522,16 +533,14 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
     private fun onPreferencesChangedCallback() {
         onWindowFocusChanged(hasWindowFocus())
-        val lorieView = lorieView
-
         lorieView!!.reloadPreferences()
 
-        lorieView.triggerCallback()
+        lorieView!!.triggerCallback()
 
         showIMEWhileExternalConnected = false
 
-        lorieView.requestLayout()
-        lorieView.invalidate()
+        lorieView!!.requestLayout()
+        lorieView!!.invalidate()
     }
 
     public override fun onResume() {

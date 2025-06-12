@@ -141,7 +141,7 @@
     <string name="enable_wine_services_title">启用 Wine 服务</string>
     <string name="box64_manager_title">Box64 管理器</string>
     <string name="box64_manager_desc">管理 Box64 版本</string>
-    <string name="mouse_captured">鼠标已捕获，按下返回键或ESC键释放</string>
+    <string name="mouse_captured">鼠标已捕获，按下返回键或Alt+Q键释放</string>
     <string name="cpu_affinity_title">CPU 关联性</string>
     <string name="action_search">搜索</string>
     <string name="highlight_nav_shortcuts">管理快捷方式</string>

@@ -137,7 +137,7 @@
     <string name="enable_wine_services_title">Включить службы Wine</string>
     <string name="box64_manager_title">Менеджер Box64</string>
     <string name="box64_manager_desc">Управление версиями Box64</string>
-    <string name="mouse_captured">Мышь захвачена. Нажмите Назад или ESC, чтобы освободить</string>
+    <string name="mouse_captured">Мышь захвачена. Нажмите Назад или Alt+Q, чтобы освободить</string>
     <string name="cpu_affinity_title">Привязка к ядрам CPU</string>
     <string name="action_search">Поиск</string>
     <string name="highlight_nav_shortcuts">Управление ярлыками</string>

@@ -141,7 +141,7 @@
     <string name="enable_wine_services_title">Ativar Serviços do Wine</string>
     <string name="box64_manager_title">Gerenciador de Box64</string>
     <string name="box64_manager_desc">Gerenciar Versões do Box64</string>
-    <string name="mouse_captured">Mouse Capturado Pressione Voltar ou ESC para Soltar</string>
+    <string name="mouse_captured">Mouse Capturado Pressione Voltar ou Alt+Q para Soltar</string>
     <string name="cpu_affinity_title">Afinidade de CPU</string>
     <string name="action_search">Pesquisar</string>
     <string name="highlight_nav_shortcuts">Gerenciar Atalhos</string>
