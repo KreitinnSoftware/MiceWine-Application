@@ -136,8 +136,8 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDXVKVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getDisplaySettings
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getExeArguments
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getExePath
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVKD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVulkanDriver
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineD3DVersion
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
@@ -153,7 +153,6 @@ import com.micewine.emu.utils.DriveUtils
 import com.micewine.emu.utils.FilePathResolver
 import io.ByteWriter
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -202,7 +201,19 @@ class MainActivity : AppCompatActivity() {
                         box64Version = preferences?.getString(SELECTED_BOX64, "").toString()
                     }
 
-                    setSharedVars(this@MainActivity, box64Version, box64Preset, d3dxRenderer, wineD3D, dxvk, vkd3d, displayResolution, esync, services, virtualDesktop)
+                    setSharedVars(
+                        this@MainActivity,
+                        box64Version,
+                        box64Preset,
+                        d3dxRenderer,
+                        wineD3D,
+                        dxvk,
+                        vkd3d,
+                        displayResolution,
+                        esync,
+                        services,
+                        virtualDesktop
+                    )
 
                     val driverLibPath: String = when (driverType) {
                         MESA_DRIVER -> {
@@ -218,9 +229,23 @@ class MainActivity : AppCompatActivity() {
                     generateMangoHUDConfFile()
                     generatePAFile()
 
-                    val driverPath = File("$ratPackagesDir/$driverName/pkg-header").readLines()[4].substringAfter("=")
+                    val adrenoToolsDriverPath = File("$ratPackagesDir/$driverName/pkg-header").readLines()[4].substringAfter("=")
 
-                    setSharedVars(this@MainActivity, box64Version, box64Preset, d3dxRenderer, wineD3D, dxvk, vkd3d, displayResolution, esync, services, virtualDesktop, cpuAffinity, (driverType == ADRENO_TOOLS_DRIVER), driverPath)
+                    setSharedVars(
+                        this@MainActivity,
+                        box64Version,
+                        box64Preset,
+                        d3dxRenderer,
+                        wineD3D,
+                        dxvk,
+                        vkd3d,
+                        displayResolution,
+                        esync,
+                        services,
+                        virtualDesktop,
+                        cpuAffinity,
+                        if (driverType == ADRENO_TOOLS_DRIVER) adrenoToolsDriverPath else null
+                    )
 
                     lifecycleScope.launch { runXServer(":0") }
                     lifecycleScope.launch { runWine(exePath, exeArguments) }
@@ -1081,7 +1106,7 @@ class MainActivity : AppCompatActivity() {
         const val ENABLE_DEBUG_INFO = "debugInfo"
         const val ENABLE_DEBUG_INFO_DEFAULT_VALUE = true
         const val APP_VERSION = "appVersion"
-        const val ADRENOTOOLS_LD_PRELOAD_WORKAROUND = "adrenoToolsLdPreload"
+        private const val ADRENOTOOLS_LD_PRELOAD = "adrenoToolsLdPreload"
 
         private fun strBoolToNumStr(strBool: String): String {
             return strBoolToNumStr(strBool.toBoolean())
@@ -1092,25 +1117,23 @@ class MainActivity : AppCompatActivity() {
         }
 
         @Suppress("DEPRECATION")
-        fun setSharedVars(activity: Activity,
-                          box64Version: String? = null,
-                          box64Preset: String? = null,
-                          d3dxRenderer: String? = null,
-                          wineD3D: String? = null,
-                          dxvk: String? = null,
-                          vkd3d: String? = null,
-                          displayResolution: String? = null,
-                          esync: Boolean? = null,
-                          services: Boolean? = null,
-                          virtualDesktop: Boolean? = null,
-                          cpuAffinity: String? = null,
-                          adrenoTools: Boolean? = null,
-                          adrenoToolsDriverPath: String? = null
+        fun setSharedVars(
+            activity: Activity,
+            box64Version: String? = null,
+            box64Preset: String? = null,
+            d3dxRenderer: String? = null,
+            wineD3D: String? = null,
+            dxvk: String? = null,
+            vkd3d: String? = null,
+            displayResolution: String? = null,
+            esync: Boolean? = null,
+            services: Boolean? = null,
+            virtualDesktop: Boolean? = null,
+            cpuAffinity: String? = null,
+            adrenoToolsDriverPath: String? = null
         ) {
-            if (adrenoTools == true) {
-                useAdrenoTools = true
-                adrenoToolsDriverFile = File(adrenoToolsDriverPath!!)
-            }
+            useAdrenoTools = adrenoToolsDriverPath != null
+            adrenoToolsDriverFile = adrenoToolsDriverPath?.let { File(it) }
 
             appLang = activity.resources.getString(R.string.app_lang)
             appBuiltinRootfs = activity.assets.list("")?.contains("rootfs.zip")!!
@@ -1217,40 +1240,33 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        private fun getVulkanDriverInfo(info: String): String {
-            return runCommandWithOutput("echo $(${getEnv()} DISPLAY= vulkaninfo | grep $info | cut -d '=' -f 2)", false)
+        private fun getVulkanDriverInfo(info: String, stdErr: Boolean = false): String {
+            return runCommandWithOutput("echo $(${getEnv()} DISPLAY= vulkaninfo | grep $info | cut -d '=' -f 2)", stdErr)
         }
 
         private val driverWorkaroundLdPreload = StringBuilder()
         private var findingLdPreloadWorkaround = false
 
-        fun getLdPreloadWorkaround(): String {
-            fun locateLibraryBySymbol(symbol: String): String {
-                return runBlocking {
-                    val libFiles = File("/system/lib64").listFiles()?.filter { it.isFile && it.extension == "so" } ?: return@runBlocking ""
-                    val result = libFiles.map {
-                        async(Dispatchers.IO) {
-                            val readElf = runCommandWithOutput("echo $(readelf --dyn-syms $it | grep $symbol)")
-                            if (readElf.contains(symbol)) {
-                                val implementsSymbol = !readElf.contains("FUNC GLOBAL DEFAULT UND")
-                                if (implementsSymbol) {
-                                    return@async "${it.path}:"
-                                }
-                            }
-
-                            return@async null
-                        }
+        private fun locateLibraryBySymbol(symbol: String): String {
+            return runBlocking {
+                val libFiles = File("/system/lib64").listFiles()?.filter { it.isFile && it.extension == "so" } ?: return@runBlocking ""
+                libFiles.forEach {
+                    val readElf = runCommandWithOutput("echo $(readelf --dyn-syms $it | grep $symbol)")
+                    if (readElf.contains(symbol)) {
+                        val implementsSymbol = !readElf.contains("FUNC GLOBAL DEFAULT UND")
+                        if (implementsSymbol) return@runBlocking "${it.name}:"
                     }
-
-                    result.firstNotNullOfOrNull { it.await() } ?: ""
                 }
+                ""
             }
+        }
 
+        fun getLdPreloadWorkaround(): String {
             if (findingLdPreloadWorkaround) {
                 return "LD_PRELOAD=$driverWorkaroundLdPreload"
             }
 
-            val savedLdPreload = preferences?.getString(ADRENOTOOLS_LD_PRELOAD_WORKAROUND, "")
+            val savedLdPreload = preferences?.getString(ADRENOTOOLS_LD_PRELOAD, "")
             if (!savedLdPreload.isNullOrEmpty()) {
                 return "LD_PRELOAD=$savedLdPreload"
             }
@@ -1260,7 +1276,7 @@ class MainActivity : AppCompatActivity() {
             findingLdPreloadWorkaround = true
 
             while (true) {
-                val res = getVulkanDriverInfo("")
+                val res = getVulkanDriverInfo("", true)
                 if (res.contains("cannot locate symbol")) {
                     val symbolName = res.split("\"")[1]
                     driverWorkaroundLdPreload.append(locateLibraryBySymbol(symbolName))
@@ -1275,7 +1291,7 @@ class MainActivity : AppCompatActivity() {
             findingLdPreloadWorkaround = false
 
             preferences?.edit()?.apply {
-                putString(ADRENOTOOLS_LD_PRELOAD_WORKAROUND, "$driverWorkaroundLdPreload")
+                putString(ADRENOTOOLS_LD_PRELOAD, "$driverWorkaroundLdPreload")
                 apply()
             }
 
