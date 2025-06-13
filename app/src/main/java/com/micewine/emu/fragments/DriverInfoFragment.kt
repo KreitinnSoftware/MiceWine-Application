@@ -61,7 +61,7 @@ class DriverInfoFragment : Fragment() {
                     driverFile = File("$ratPackagesDir/$driverId/pkg-header").readLines()[4].substringAfter("=")
                 }
 
-                setSharedVars(requireActivity(), null, null, null, null, null, null, null, null, null, null, null, (driverId.contains("AdrenoToolsDriver")), adrenoToolsDriverPath)
+                setSharedVars(requireActivity(), null, null, null, null, null, null, null, null, null, null, null, adrenoToolsDriverPath)
 
                 generateICDFile(driverFile)
 
