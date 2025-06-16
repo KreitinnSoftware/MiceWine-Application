@@ -612,7 +612,7 @@ class VirtualControllerInputView @JvmOverloads constructor(
         var y: Float,
         var radius: Float,
         var shape: Int,
-        var fingerId: Int = 0,
+        var fingerId: Int = -1,
         var isPressed: Boolean = false
     )
 
@@ -621,7 +621,7 @@ class VirtualControllerInputView @JvmOverloads constructor(
         var x: Float,
         var y: Float,
         var radius: Float,
-        var fingerId: Int = 0,
+        var fingerId: Int = -1,
         var isPressed: Boolean = false,
         var fingerX: Float = 0F,
         var fingerY: Float = 0F,
