@@ -26,9 +26,11 @@ object WineWrapper {
         return Integer.toHexString(cpuMask.joinToString("").toInt(2))
     }
 
-    fun waitFor(name: String) {
-        while (!wine("tasklist", true).contains(name)) {
-            Thread.sleep(100)
+    fun waitForProcess(name: String) {
+        while (true) {
+            val wineProcesses = runCommandWithOutput("ps -e -o cmd= | grep .exe")
+            if (wineProcesses.contains(name)) break
+            Thread.sleep(125)
         }
     }
 

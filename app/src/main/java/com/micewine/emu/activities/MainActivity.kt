@@ -810,7 +810,6 @@ class MainActivity : AppCompatActivity() {
             runCommand("pkill -9 .exe")
 
             val skCodec = File("/system/lib64/libskcodec.so")
-
             if (skCodec.exists()) {
                 runCommand(getEnv() + "LD_PRELOAD=$skCodec $usrDir/bin/pulseaudio --start --exit-idle=-1")
             }
@@ -821,7 +820,7 @@ class MainActivity : AppCompatActivity() {
                         val processName = if (exePath == "") "TFM.exe" else File(exePath).name
 
                         // Wait for Wine Successfully Start and Execute Specified Program and Kill Services
-                        WineWrapper.waitFor(processName)
+                        WineWrapper.waitForProcess(processName)
 
                         runCommand("pkill -9 services.exe", false)
                     }
@@ -834,11 +833,14 @@ class MainActivity : AppCompatActivity() {
                 if (enableWineVirtualDesktop) {
                     WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler ${getCpuHexMask()} '${getSanitizedPath(exePath)}' $exeArguments", "'${getSanitizedPath(File(exePath).parent!!)}'")
                 } else {
-                    WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe ${getCpuHexMask()}")
+                    lifecycleScope.launch {
+                        withContext(Dispatchers.IO) {
+                            WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe ${getCpuHexMask()}")
+                        }
+                    }
 
                     if (exePath.endsWith(".lnk")) {
                         val drive = DriveUtils.parseWindowsPath(ShellLink(exePath).resolveTarget())
-
                         if (drive == null) {
                             Toast.makeText(this@MainActivity, getString(R.string.lnk_read_fail), Toast.LENGTH_SHORT).show()
                             return@withContext
