@@ -25,6 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
@@ -1091,6 +1092,7 @@ class MainActivity : AppCompatActivity() {
         var useAdrenoTools: Boolean = false
         var adrenoToolsDriverFile: File? = null
         var preferences: SharedPreferences? = null
+        val gson: Gson = Gson()
 
         const val ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE"
         const val ACTION_SETUP = "com.micewine.emu.ACTION_SETUP"

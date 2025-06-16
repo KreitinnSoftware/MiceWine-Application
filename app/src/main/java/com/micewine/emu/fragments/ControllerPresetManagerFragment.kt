@@ -9,9 +9,9 @@ import android.widget.Toast
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.gson
 import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_MINUS_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_PLUS_KEY
@@ -83,8 +83,6 @@ class ControllerPresetManagerFragment(private val editShortcut: Boolean) : Fragm
         private val presetListNames: MutableList<AdapterPreset.Item> = mutableListOf()
         private var presetList: MutableList<ControllerPreset> = mutableListOf()
         private var editShortcut: Boolean = false
-
-        private val gson = Gson()
 
         fun initialize(boolean: Boolean = false) {
             presetList = getControllerPresets()

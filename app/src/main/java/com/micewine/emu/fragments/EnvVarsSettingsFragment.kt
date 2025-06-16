@@ -13,9 +13,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.gson
 import com.micewine.emu.activities.MainActivity.Companion.preferences
 
 class EnvVarsSettingsFragment : Fragment() {
@@ -52,7 +52,7 @@ class EnvVarsSettingsFragment : Fragment() {
         val savedVarsJson = preferences?.getString(ENV_VARS_KEY, null)
         savedVarsJson?.let {
             val type = object : TypeToken<List<EnvironmentVariable>>() {}.type
-            val savedVars = Gson().fromJson<List<EnvironmentVariable>>(it, type)
+            val savedVars = gson.fromJson<List<EnvironmentVariable>>(it, type)
             envVarsList.clear()
             envVarsList.addAll(savedVars)
         }
@@ -60,7 +60,7 @@ class EnvVarsSettingsFragment : Fragment() {
 
     private fun saveEnvironmentVariables() {
         preferences?.edit()?.apply {
-            putString(ENV_VARS_KEY, Gson().toJson(envVarsList))
+            putString(ENV_VARS_KEY, gson.toJson(envVarsList))
             apply()
         }
     }

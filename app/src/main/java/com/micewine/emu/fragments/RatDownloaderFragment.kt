@@ -9,10 +9,10 @@ import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.deviceArch
+import com.micewine.emu.activities.MainActivity.Companion.gson
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.adapters.AdapterRatPackage
 import com.micewine.emu.core.RatPackageManager.checkPackageInstalled
@@ -36,7 +36,6 @@ class RatDownloaderFragment(private val prefix: String, private val type: Int, p
     private val ratList: MutableList<AdapterRatPackage.Item> = mutableListOf()
     private var rootView: View? = null
     private var recyclerView: RecyclerView? = null
-    private val gson = Gson()
 
     override fun onCreateView(
         inflater: LayoutInflater,

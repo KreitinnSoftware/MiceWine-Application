@@ -33,11 +33,11 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.google.android.material.textfield.TextInputEditText
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity
 import com.micewine.emu.activities.MainActivity.Companion.copyFile
+import com.micewine.emu.activities.MainActivity.Companion.gson
 import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterGame
@@ -176,11 +176,6 @@ class ShortcutsFragment : Fragment() {
         itemTouchHelper?.attachToRecyclerView(recyclerView)
     }
 
-    private fun dpToPx(dp: Float, context: Context): Float {
-        val density = context.resources.displayMetrics.density
-        return dp * density
-    }
-
     override fun onCreateContextMenu(
         menu: ContextMenu,
         v: View,
@@ -248,7 +243,6 @@ class ShortcutsFragment : Fragment() {
     }
 
     companion object {
-        private val gson = Gson()
         private var recyclerView: RecyclerView? = null
         private var gameListNames: MutableList<AdapterGame.GameItem> = mutableListOf()
         private var gameList: MutableList<GameItem> = mutableListOf()

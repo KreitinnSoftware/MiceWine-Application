@@ -7,6 +7,7 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VULKAN_DRIVER
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
+import com.micewine.emu.activities.MainActivity.Companion.gson
 import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.core.ShellLoader.runCommand
@@ -296,7 +297,7 @@ object RatPackageManager {
             if (metaHeader != null) {
                 adrenoToolsFile.getInputStream(metaHeader).use { inputStream ->
                     val json = inputStream.reader().readLines().joinToString("\n")
-                    val meta = Gson().fromJson(json, AdrenoToolsMetaInfo::class.java)
+                    val meta = gson.fromJson(json, AdrenoToolsMetaInfo::class.java)
 
                     name = meta.name
                     version = meta.driverVersion

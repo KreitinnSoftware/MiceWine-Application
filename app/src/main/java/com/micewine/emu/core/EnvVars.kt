@@ -1,7 +1,6 @@
 package com.micewine.emu.core
 
 import android.os.Build
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.activities.MainActivity.Companion.adrenoToolsDriverFile
 import com.micewine.emu.activities.MainActivity.Companion.appLang
@@ -31,6 +30,7 @@ import com.micewine.emu.activities.MainActivity.Companion.box64ShowSegv
 import com.micewine.emu.activities.MainActivity.Companion.box64Sse42
 import com.micewine.emu.activities.MainActivity.Companion.enableDRI3
 import com.micewine.emu.activities.MainActivity.Companion.getLdPreloadWorkaround
+import com.micewine.emu.activities.MainActivity.Companion.gson
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
 import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
@@ -59,7 +59,7 @@ object EnvVars {
         if (savedVarsJson != null) {
             val type = object : TypeToken<List<EnvVarsSettingsFragment.EnvironmentVariable>>() {}.type
 
-            Gson().fromJson<List<EnvVarsSettingsFragment.EnvironmentVariable>>(savedVarsJson, type).forEach {
+            gson.fromJson<List<EnvVarsSettingsFragment.EnvironmentVariable>>(savedVarsJson, type).forEach {
                 vars.add("${it.key}=${it.value}")
             }
         }

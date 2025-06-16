@@ -10,17 +10,17 @@ import android.widget.Toast
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.getNativeResolution
+import com.micewine.emu.activities.MainActivity.Companion.gson
 import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.adapters.AdapterPreset
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
-import com.micewine.emu.views.VirtualKeyboardInputView
 import com.micewine.emu.views.VirtualKeyboardInputCreatorView.Companion.GRID_SIZE
+import com.micewine.emu.views.VirtualKeyboardInputView
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -61,8 +61,6 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
         private val presetListNames: MutableList<AdapterPreset.Item> = mutableListOf()
         private var presetList: MutableList<VirtualControllerPreset> = mutableListOf()
         private var editShortcut: Boolean = false
-
-        private val gson = Gson()
 
         fun initialize(editable: Boolean = false) {
             presetList = getVirtualControllerPresets()

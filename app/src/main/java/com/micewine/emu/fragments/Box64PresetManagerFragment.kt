@@ -2,7 +2,6 @@ package com.micewine.emu.fragments
 
 import android.app.Activity
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,6 @@ import android.widget.Toast
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_AVX
@@ -31,6 +29,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_X87DOUBLE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42
+import com.micewine.emu.activities.MainActivity.Companion.gson
 import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET
 import com.micewine.emu.adapters.AdapterPreset
@@ -75,7 +74,6 @@ class Box64PresetManagerFragment : Fragment() {
         private var recyclerView: RecyclerView? = null
         private val presetListNames: MutableList<AdapterPreset.Item> = mutableListOf()
         private var presetList: MutableList<MutableList<String>> = mutableListOf()
-        private val gson = Gson()
 
         private val mappingMap = mapOf(
             BOX64_MMAP32 to 1,
