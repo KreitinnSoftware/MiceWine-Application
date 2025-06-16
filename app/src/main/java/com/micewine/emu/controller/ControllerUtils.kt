@@ -702,7 +702,7 @@ object ControllerUtils {
         }
     }
 
-    private fun normalizeAxisValue(value: Float, half: Boolean = false): Int {
+    fun normalizeAxisValue(value: Float, half: Boolean = false): Int {
         return if (half) {
             (value * 255).toInt().coerceIn(0, 255)
         } else {
@@ -710,7 +710,7 @@ object ControllerUtils {
         }
     }
 
-    private fun axisToByteArray(byteArray: ByteArray, value: Int) {
+    fun axisToByteArray(byteArray: ByteArray, value: Int) {
         val str = value.coerceIn(0, 255).toString().padStart(3, '0')
         byteArray[0] = str[0].digitToInt().toByte()
         byteArray[1] = str[1].digitToInt().toByte()
@@ -862,7 +862,7 @@ object ControllerUtils {
                     GET_GAMEPAD_STATE -> {
                         connectedVirtualControllers.forEachIndexed { index, virtualController ->
                             buffer[0 + (index * 32)] = GET_GAMEPAD_STATE.toByte()
-                            buffer[1 + (index * 32)] = if (virtualController.connected) 1 else 0
+                            buffer[1 + (index * 32)] = if (virtualController.connected || index == 0) 1 else 0
                             buffer[2 + (index * 32)] = if (virtualController.aPressed) 1 else 0
                             buffer[3 + (index * 32)] = if (virtualController.bPressed) 1 else 0
                             buffer[4 + (index * 32)] = if (virtualController.xPressed) 1 else 0

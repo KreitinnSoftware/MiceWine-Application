@@ -17,14 +17,6 @@ import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.getNativeResolution
 import com.micewine.emu.activities.VirtualControllerOverlayMapper.Companion.ACTION_EDIT_VIRTUAL_BUTTON
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
-import com.micewine.emu.controller.ControllerUtils.DOWN
-import com.micewine.emu.controller.ControllerUtils.LEFT
-import com.micewine.emu.controller.ControllerUtils.LEFT_DOWN
-import com.micewine.emu.controller.ControllerUtils.LEFT_UP
-import com.micewine.emu.controller.ControllerUtils.RIGHT
-import com.micewine.emu.controller.ControllerUtils.RIGHT_DOWN
-import com.micewine.emu.controller.ControllerUtils.RIGHT_UP
-import com.micewine.emu.controller.ControllerUtils.UP
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogDownKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogLeftKeyName
 import com.micewine.emu.fragments.EditVirtualButtonFragment.Companion.selectedAnalogRightKeyName
@@ -42,7 +34,6 @@ import com.micewine.emu.views.VirtualKeyboardInputView.Companion.buttonList
 import com.micewine.emu.views.VirtualKeyboardInputView.Companion.detectClick
 import com.micewine.emu.views.VirtualKeyboardInputView.Companion.dpadList
 import kotlin.math.roundToInt
-import kotlin.math.sqrt
 
 class VirtualKeyboardInputCreatorView @JvmOverloads constructor (context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0): View(context, attrs, defStyleAttr) {
     private val paint = Paint().apply {

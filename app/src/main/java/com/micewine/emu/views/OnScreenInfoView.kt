@@ -8,6 +8,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.view.View
+import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.enableCpuCounter
 import com.micewine.emu.activities.MainActivity.Companion.enableDebugInfo
 import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
@@ -25,7 +26,8 @@ import com.micewine.emu.core.RatPackageManager.listRatPackages
 
 class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0): View(context, attrs, defStyleAttr) {
     private val paint: Paint = Paint().apply {
-        textSize = 30F
+        textSize = 40F
+        typeface = context.resources.getFont(R.font.quicksand)
         strokeWidth = 8F
     }
 
@@ -37,7 +39,7 @@ class OnScreenInfoView @JvmOverloads constructor (context: Context, attrs: Attri
         }
     }
 
-    private val textOffset = 40F
+    private val textOffset = paint.textSize + 10F
     private var textCount = 0
     private var vkd3dVersion: String? = getPackageNameVersionById(selectedVKD3D)
     private var dxvkVersion: String? = getPackageNameVersionById(selectedDXVK)

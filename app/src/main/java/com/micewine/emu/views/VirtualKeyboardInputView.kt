@@ -52,6 +52,7 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
     }
 
     private var lorieView: LorieView = LorieView(context)
+    private var isFingerPressingButton = false
     private val dpadUp: Path = Path()
     private val dpadDown: Path = Path()
     private val dpadLeft: Path = Path()
@@ -142,7 +143,7 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
                         paint
                     )
                 }
-		SHAPE_SQUARE -> {
+		        SHAPE_SQUARE -> {
                     canvas.drawRoundRect(
                         it.x - it.radius / 2,
                         it.y - it.radius / 2,
@@ -249,7 +250,7 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
                 buttonList.forEach {
                     if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
                         it.isPressed = true
-                        it.fingerId = event.actionIndex
+                        it.fingerId = event.getPointerId(event.actionIndex)
 
                         handleButton(it, true)
 
@@ -264,7 +265,7 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
                         it.fingerX = posX
                         it.fingerY = posY
                         it.isPressed = true
-                        it.fingerId = event.actionIndex
+                        it.fingerId = event.getPointerId(event.actionIndex)
 
                         it.fingerX = posX
                         it.fingerY = posY
@@ -282,7 +283,7 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
                         it.fingerX = posX
                         it.fingerY = posY
                         it.isPressed = true
-                        it.fingerId = event.actionIndex
+                        it.fingerId = event.getPointerId(event.actionIndex)
 
                         it.fingerX = posX
                         it.fingerY = posY
@@ -308,13 +309,12 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
 
                 invalidate()
             }
-
             MotionEvent.ACTION_MOVE -> {
                 for (i in 0 until event.pointerCount) {
-                    var isFingerPressingButton = false
+                    isFingerPressingButton = false
 
                     buttonList.forEach {
-                        if (it.fingerId == i) {
+                        if (it.fingerId == event.getPointerId(i)) {
                             it.isPressed = true
                             handleButton(it, true)
 
@@ -322,7 +322,7 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
                         }
                     }
                     analogList.forEach {
-                        if (it.isPressed && it.fingerId == i) {
+                        if (it.isPressed && it.fingerId == event.getPointerId(i)) {
                             val posX = event.getX(i) - it.x
                             val posY = event.getY(i) - it.y
 
@@ -335,7 +335,7 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
                         }
                     }
                     dpadList.forEach {
-                        if (it.isPressed && it.fingerId == i) {
+                        if (it.isPressed && it.fingerId == event.getPointerId(i)) {
                             val posX = event.getX(i) - it.x
                             val posY = event.getY(i) - it.y
 
@@ -361,14 +361,12 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
                         }
                     }
 
-                    if (!isFingerPressingButton) {
-                        if (event.historySize > 0) {
-                            val deltaX = event.getX(i) - event.getHistoricalX(i, 0)
-                            val deltaY = event.getY(i) - event.getHistoricalY(i, 0)
+                    if (!isFingerPressingButton && event.historySize > 0) {
+                        val deltaX = event.getX(i) - event.getHistoricalX(i, 0)
+                        val deltaY = event.getY(i) - event.getHistoricalY(i, 0)
 
-                            if ((deltaX > 0.08 || deltaX < -0.08) && (deltaY > 0.08 || deltaY < -0.08)) {
-                                lorieView.sendMouseEvent(deltaX, deltaY, BUTTON_UNDEFINED, false, true)
-                            }
+                        if ((deltaX > 0.08 || deltaX < -0.08) && (deltaY > 0.08 || deltaY < -0.08)) {
+                            lorieView.sendMouseEvent(deltaX, deltaY, BUTTON_UNDEFINED, false, true)
                         }
                     }
                 }
@@ -377,15 +375,13 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
             }
             MotionEvent.ACTION_POINTER_UP -> {
                 buttonList.forEach {
-                    if (it.fingerId == event.actionIndex) {
+                    if (it.fingerId == event.getPointerId(event.actionIndex)) {
                         it.fingerId = -1
-                    }
-                    if (detectClick(event, event.actionIndex, it.x, it.y, it.radius, it.shape)) {
                         handleButton(it, false)
                     }
                 }
                 analogList.forEach {
-                    if (it.fingerId == event.actionIndex) {
+                    if (it.fingerId == event.getPointerId(event.actionIndex)) {
                         it.fingerId = -1
                         it.fingerX = 0F
                         it.fingerY = 0F
@@ -396,7 +392,7 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
                     }
                 }
                 dpadList.forEach {
-                    if (it.fingerId == event.actionIndex) {
+                    if (it.fingerId == event.getPointerId(event.actionIndex)) {
                         it.fingerId = -1
                         it.fingerX = 0F
                         it.fingerY = 0F
@@ -410,7 +406,6 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
 
                 invalidate()
             }
-
             MotionEvent.ACTION_UP -> {
                 buttonList.forEach {
                     it.fingerId = -1
