@@ -355,7 +355,7 @@ class VirtualControllerInputView @JvmOverloads constructor(
                         it.fingerY = posY
 
                         axisToByteArray(connectedVirtualControllers[virtualXInputControllerId].lx, normalizeAxisValue(posX / (it.radius / 4)))
-                        axisToByteArray(connectedVirtualControllers[virtualXInputControllerId].ly, normalizeAxisValue(posY / (it.radius / 4)))
+                        axisToByteArray(connectedVirtualControllers[virtualXInputControllerId].ly, normalizeAxisValue(-posY / (it.radius / 4)))
 
                         return@let
                     }
@@ -424,7 +424,7 @@ class VirtualControllerInputView @JvmOverloads constructor(
                             isFingerPressingButton = true
 
                             axisToByteArray(connectedVirtualControllers[virtualXInputControllerId].lx, normalizeAxisValue(posX / (it.radius / 4)))
-                            axisToByteArray(connectedVirtualControllers[virtualXInputControllerId].ly, normalizeAxisValue(posY / (it.radius / 4)))
+                            axisToByteArray(connectedVirtualControllers[virtualXInputControllerId].ly, normalizeAxisValue(-posY / (it.radius / 4)))
                         }
                     }
                     rightTouchPad.let {
