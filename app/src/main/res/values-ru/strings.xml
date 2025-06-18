@@ -207,4 +207,5 @@
     <string name="controller_view_desc">Проверьте свои контроллеры</string>
     <string name="virtual_controller_settings">Настройки виртуального контроллера</string>
     <string name="executable_file_not_found">Исполняемый файл не найден.</string>
+    <string name="wine_dpi">DPI экрана</string>
 </resources>

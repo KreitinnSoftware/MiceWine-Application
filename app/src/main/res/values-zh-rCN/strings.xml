@@ -211,4 +211,5 @@
     <string name="controller_view_desc">测试你的控制器</string>
     <string name="virtual_controller_settings">虚拟控制器设置</string>
     <string name="executable_file_not_found">未找到可执行文件。</string>
+    <string name="wine_dpi">显示 DPI</string>
 </resources>

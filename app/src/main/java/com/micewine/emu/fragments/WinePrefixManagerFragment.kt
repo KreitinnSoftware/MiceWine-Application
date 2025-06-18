@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_DPI
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_DPI_DEFAULT_VALUE
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.selectedWine
@@ -141,6 +143,7 @@ class WinePrefixManagerFragment : Fragment() {
                 wine("regedit '$driveC/Addons/Themes/DarkBlue/DarkBlue.reg'")
                 wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Decorated /d N /f")
                 wine("reg add HKCU\\\\Software\\\\Wine\\\\X11\\ Driver /t REG_SZ /v Managed /d N /f")
+                wine("reg add HKCU\\\\Control\\ Panel\\\\Desktop /t REG_DWORD /v LogPixels /d ${preferences?.getInt(WINE_DPI, WINE_DPI_DEFAULT_VALUE)} /f")
 
                 presetList.add(name)
                 presetListNames.add(

@@ -21,6 +21,7 @@ import com.micewine.emu.fragments.DriversSettingsFragment
 import com.micewine.emu.fragments.EnvVarsSettingsFragment
 import com.micewine.emu.fragments.GeneralSettingsFragment
 import com.micewine.emu.fragments.SoundSettingsFragment
+import com.micewine.emu.fragments.WineSettingsFragment
 
 class GeneralSettingsActivity : AppCompatActivity() {
     private var binding: ActivityGeneralSettingsBinding? = null
@@ -31,6 +32,7 @@ class GeneralSettingsActivity : AppCompatActivity() {
     private val driversSettingsFragment = DriversSettingsFragment()
     private val environmentVariablesSettings = EnvVarsSettingsFragment()
     private val soundSettingsFragment = SoundSettingsFragment()
+    private val wineSettingsFragment = WineSettingsFragment()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val preference = intent.getStringExtra("preference")
@@ -60,6 +62,10 @@ class GeneralSettingsActivity : AppCompatActivity() {
                     getString(R.string.sound_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.sound_settings_title)
                         fragmentLoader(soundSettingsFragment, false)
+                    }
+                    getString(R.string.wine_settings_title) -> {
+                        generalSettingsToolbar?.title = getString(R.string.wine_settings_title)
+                        fragmentLoader(wineSettingsFragment, false)
                     }
                 }
             }
@@ -199,5 +205,9 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val FPS_LIMIT = "fpsLimit"
         const val PA_SINK = "pulseAudioSink"
         const val PA_SINK_DEFAULT_VALUE = "SLES"
+        const val WINE_DPI = "wineDpi"
+        const val WINE_DPI_DEFAULT_VALUE = 144
+        const val WINE_DPI_APPLIED = "wineDpiApplied"
+        const val WINE_DPI_APPLIED_DEFAULT_VALUE = false
     }
 }

@@ -233,4 +233,5 @@
     <string name="controller_view_desc">Test your Controllers</string>
     <string name="virtual_controller_settings">Virtual Controller Settings</string>
     <string name="executable_file_not_found">Executable File Not Found.</string>
+    <string name="wine_dpi">Display DPI</string>
 </resources>

@@ -74,6 +74,10 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_ME
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_TU_DEBUG_PRESET
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VULKAN_DRIVER
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_DPI
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_DPI_APPLIED
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_DPI_APPLIED_DEFAULT_VALUE
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_DPI_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LEVEL_DEFAULT_VALUE
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET
@@ -806,6 +810,14 @@ class MainActivity : AppCompatActivity() {
     private suspend fun runWine(exePath: String, exeArguments: String) {
         withContext(Dispatchers.Default) {
             installDXWrapper(winePrefix!!)
+
+            if (preferences?.getBoolean(WINE_DPI_APPLIED, WINE_DPI_APPLIED_DEFAULT_VALUE) != true) {
+                WineWrapper.wine("reg add HKCU\\\\Control\\ Panel\\\\Desktop /t REG_DWORD /v LogPixels /d ${preferences?.getInt(WINE_DPI, WINE_DPI_DEFAULT_VALUE)} /f")
+                preferences?.edit()?.apply {
+                    putBoolean(WINE_DPI_APPLIED, true)
+                    apply()
+                }
+            }
 
             runCommand("pkill -9 wineserver")
             runCommand("pkill -9 .exe")

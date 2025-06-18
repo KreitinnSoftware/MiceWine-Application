@@ -211,4 +211,5 @@
     <string name="controller_view_desc">Teste seus Controles</string>
     <string name="virtual_controller_settings">Configurações do Controle Virtual</string>
     <string name="executable_file_not_found">Arquivo Executável não Encontrado.</string>
+    <string name="wine_dpi">DPI da Tela</string>
 </resources>

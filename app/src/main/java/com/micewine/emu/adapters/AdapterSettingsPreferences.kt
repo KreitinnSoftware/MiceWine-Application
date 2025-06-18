@@ -23,6 +23,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.CHECKBOX
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SEEKBAR
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SWITCH
+import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_DPI_APPLIED
 import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.fragments.InfoDialogFragment
 
@@ -131,7 +132,7 @@ class AdapterSettingsPreferences(
                 if (holder.seekBar.progress == 0) {
                     holder.seekBarValue.text = activity.getString(R.string.unlimited)
                 } else {
-                    holder.seekBarValue.text = "${holder.seekBar.progress} FPS"
+                    holder.seekBarValue.text = "${holder.seekBar.progress}"
                 }
 
                 holder.seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
@@ -140,11 +141,9 @@ class AdapterSettingsPreferences(
                         progress: Int,
                         fromUser: Boolean
                     ) {
-                        if (progress == 0) {
-                            holder.seekBarValue.text = activity.getString(R.string.unlimited)
-                        } else {
-                            holder.seekBarValue.text = "$progress FPS"
-                        }
+                        seekBar?.progress = (progress / 24) * 24
+
+                        holder.seekBarValue.text = "${seekBar?.progress}"
                     }
 
                     override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -153,6 +152,10 @@ class AdapterSettingsPreferences(
                     override fun onStopTrackingTouch(seekBar: SeekBar?) {
                         preferences?.edit()?.apply {
                             putInt(sList.key, seekBar?.progress ?: sList.defaultValue.toInt())
+                            apply()
+                        }
+                        preferences?.edit()?.apply {
+                            putBoolean(WINE_DPI_APPLIED, false)
                             apply()
                         }
                     }
