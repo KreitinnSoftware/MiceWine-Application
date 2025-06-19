@@ -232,6 +232,15 @@ class ShortcutsFragment : Fragment() {
     companion object {
         private var recyclerView: RecyclerView? = null
         private var gameList: MutableList<GameItem> = mutableListOf()
+        private val fileManagerControllerSettings = FileManagerControllerSettings()
+
+        class FileManagerControllerSettings(
+            var virtualControllerIsXInput: Boolean = true,
+            var virtualControllerPreset: String = "default",
+            var controllerIsXInput: MutableList<Boolean> = mutableListOf(true, true, true, true),
+            var controllerPreset: MutableList<String> = mutableListOf("default", "default", "default", "default"),
+            var controllerSwapAnalogs: MutableList<Boolean> = mutableListOf(false, false, false, false)
+        )
 
         const val ACTION_UPDATE_WINE_PREFIX_SPINNER = "com.micewine.emu.ACTION_UPDATE_WINE_PREFIX_SPINNER"
 
@@ -459,7 +468,10 @@ class ShortcutsFragment : Fragment() {
 
         fun putControllerXInputSwapAnalogs(name: String, enabled: Boolean, controllerIndex: Int) {
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1) return
+            if (index == -1) {
+                fileManagerControllerSettings.controllerSwapAnalogs[controllerIndex] = enabled
+                return
+            }
 
             gameList[index].controllersXInputSwapAnalogs[controllerIndex] = enabled
 
@@ -468,14 +480,19 @@ class ShortcutsFragment : Fragment() {
 
         fun getControllerXInputSwapAnalogs(name: String, controllerIndex: Int): Boolean {
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1) return false
+            if (index == -1) {
+                return fileManagerControllerSettings.controllerSwapAnalogs[controllerIndex]
+            }
 
             return gameList[index].controllersXInputSwapAnalogs[controllerIndex]
         }
 
         fun putControllerXInput(name: String, enabled: Boolean, controllerIndex: Int) {
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1) return
+            if (index == -1) {
+                fileManagerControllerSettings.controllerIsXInput[controllerIndex] = enabled
+                return
+            }
 
             gameList[index].controllersEnableXInput[controllerIndex] = enabled
 
@@ -484,14 +501,19 @@ class ShortcutsFragment : Fragment() {
 
         fun getControllerXInput(name: String, controllerIndex: Int): Boolean {
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1) return true
+            if (index == -1) {
+                return fileManagerControllerSettings.controllerIsXInput[controllerIndex]
+            }
 
             return gameList[index].controllersEnableXInput[controllerIndex]
         }
 
         fun putControllerPreset(name: String, presetName: String, controllerIndex: Int) {
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1) return
+            if (index == -1) {
+                fileManagerControllerSettings.controllerPreset[controllerIndex] = presetName
+                return
+            }
 
             gameList[index].controllersPreset[controllerIndex] = presetName
 
@@ -500,14 +522,19 @@ class ShortcutsFragment : Fragment() {
 
         fun getControllerPreset(name: String, controllerIndex: Int): String {
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1 || controllerIndex == -1) return "default"
+            if (index == -1 || controllerIndex == -1) {
+                return fileManagerControllerSettings.controllerPreset[controllerIndex]
+            }
 
             return gameList[index].controllersPreset[controllerIndex]
         }
 
         fun putVirtualControllerXInput(name: String, enabled: Boolean) {
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1) return
+            if (index == -1) {
+                fileManagerControllerSettings.virtualControllerIsXInput = enabled
+                return
+            }
 
             gameList[index].virtualControllerEnableXInput = enabled
 
@@ -516,14 +543,19 @@ class ShortcutsFragment : Fragment() {
 
         fun getVirtualControllerXInput(name: String): Boolean {
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1) return true
+            if (index == -1) {
+                return fileManagerControllerSettings.virtualControllerIsXInput
+            }
 
             return gameList[index].virtualControllerEnableXInput
         }
 
         fun putSelectedVirtualControllerPreset(name: String, presetName: String) {
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1) return
+            if (index == -1) {
+                fileManagerControllerSettings.virtualControllerPreset = presetName
+                return
+            }
 
             gameList[index].virtualControllerPreset = presetName
 
@@ -532,7 +564,7 @@ class ShortcutsFragment : Fragment() {
 
         fun getSelectedVirtualControllerPreset(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1) return "default"
+            if (index == -1) return fileManagerControllerSettings.virtualControllerPreset
 
             return gameList[index].virtualControllerPreset
         }
