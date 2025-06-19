@@ -38,7 +38,6 @@ class WelcomeActivity : AppCompatActivity() {
         viewPager?.isUserInputEnabled = false
         viewPager?.adapter = AdapterWelcomeFragments(this)
 
-
         button = findViewById(R.id.continueButton)
         button?.setOnClickListener {
             if (viewPager!!.currentItem == 0) {

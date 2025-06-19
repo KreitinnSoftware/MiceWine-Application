@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
@@ -79,26 +80,21 @@ class FloatingFileManagerFragment(private val operationType: Int, private val in
                 }
 
                 saveButton.setOnClickListener {
-                    outputFile = "$fileManagerCwd/" + editText.text.toString()
+                    outputFile = File("$fileManagerCwd/" + editText.text.toString())
 
-                    if (File(outputFile!!).exists()) {
+                    if (outputFile!!.exists()) {
+                        Toast.makeText(context, "$outputFile already exists.", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
 
                     when (clickedPresetType) {
-                        VIRTUAL_CONTROLLER_PRESET -> {
-                            exportVirtualControllerPreset(clickedPresetName, outputFile!!)
-                            outputFile = null
-                        }
-                        CONTROLLER_PRESET -> {
-                            exportControllerPreset(clickedPresetName, outputFile!!)
-                            outputFile = null
-                        }
-                        BOX64_PRESET -> {
-                            exportBox64Preset(requireContext(), clickedPresetName, outputFile!!)
-                            outputFile = null
-                        }
+                        VIRTUAL_CONTROLLER_PRESET -> exportVirtualControllerPreset(clickedPresetName, outputFile!!)
+                        CONTROLLER_PRESET -> exportControllerPreset(clickedPresetName, outputFile!!)
+                        BOX64_PRESET -> exportBox64Preset(clickedPresetName, outputFile!!)
                     }
+                    outputFile = null
+
+                    Toast.makeText(context, getString(R.string.preset_exported, clickedPresetName), Toast.LENGTH_LONG).show()
 
                     dismiss()
                 }
@@ -115,18 +111,20 @@ class FloatingFileManagerFragment(private val operationType: Int, private val in
 
                     when (clickedPresetType) {
                         VIRTUAL_CONTROLLER_PRESET -> {
-                            importVirtualControllerPreset(requireActivity(), outputFile!!)
-                            outputFile = null
+                            val ret = importVirtualControllerPreset(requireContext(), outputFile!!)
+                            if (!ret) Toast.makeText(requireContext(), R.string.invalid_virtual_controller_preset_file, Toast.LENGTH_SHORT).show()
                         }
                         CONTROLLER_PRESET -> {
-                            importControllerPreset(outputFile!!)
-                            outputFile = null
+                            val ret = importControllerPreset(outputFile!!)
+                            if (!ret) Toast.makeText(requireContext(), R.string.invalid_controller_preset_file, Toast.LENGTH_SHORT).show()
                         }
                         BOX64_PRESET -> {
-                            importBox64Preset(requireActivity(), outputFile!!)
-                            outputFile = null
+                            val ret = importBox64Preset(outputFile!!)
+                            if (!ret) Toast.makeText(requireContext(), R.string.invalid_box64_preset_file, Toast.LENGTH_SHORT).show()
                         }
                     }
+                    outputFile = null
+
                     dismiss()
                 }.start()
             }
@@ -140,7 +138,7 @@ class FloatingFileManagerFragment(private val operationType: Int, private val in
                         Thread.sleep(16)
                     }
 
-                    putExePath(selectedGameName, outputFile!!)
+                    putExePath(selectedGameName, outputFile!!.path)
                     outputFile = null
 
                     parentFragmentManager.setFragmentResult("invalidate", Bundle())
@@ -169,7 +167,7 @@ class FloatingFileManagerFragment(private val operationType: Int, private val in
         private var recyclerView: RecyclerView? = null
         private val fileList: MutableList<AdapterFiles.FileList> = mutableListOf()
         var calledSetup: Boolean = false
-        var outputFile: String? = null
+        var outputFile: File? = null
         var fmOperationType = -1
 
         const val OPERATION_SELECT_RAT = 0
@@ -216,7 +214,7 @@ class FloatingFileManagerFragment(private val operationType: Int, private val in
                                         }
                                     }
                                     BOX64_PRESET -> {
-                                        if (mwpType == "box64Preset") {
+                                        if (mwpType == "box64Preset" || mwpType == "box64PresetV2") {
                                             addToAdapter(it)
                                         }
                                     }

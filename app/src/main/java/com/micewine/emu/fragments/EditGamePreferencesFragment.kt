@@ -379,7 +379,7 @@ class EditGamePreferencesFragment(private val type: Int, private val exePath: Fi
 
         val box64Versions: List<String> = listRatPackages("Box64-").map { it.name + " " + it.version }.toMutableList().apply { add(0, "Global: ${getPackageNameVersionById(preferences?.getString(SELECTED_BOX64, ""))}") }
         val box64VersionsId: List<String> = listRatPackagesId("Box64-").toMutableList().apply { add(0, "Global") }
-        val box64ProfilesNames: List<String> = getBox64Presets().map { it[0] }
+        val box64ProfilesNames: List<String> = getBox64Presets().map { it.name }
 
         selectedDisplayModeSpinner.let {
             val displaySettings = getDisplaySettings(selectedGameName)

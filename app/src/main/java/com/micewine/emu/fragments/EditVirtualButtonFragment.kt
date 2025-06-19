@@ -154,7 +154,7 @@ class EditVirtualButtonFragment : DialogFragment() {
                 dpadList[lastSelectedButton - 1].radius = radiusSeekbar.progress.toFloat()
             }
 
-            context?.sendBroadcast(
+            requireContext().sendBroadcast(
                 Intent(ACTION_INVALIDATE)
             )
 

@@ -2,7 +2,6 @@ package com.micewine.emu.fragments
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
@@ -10,6 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.micewine.emu.R
@@ -29,8 +29,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
-    var preferences: SharedPreferences? = null
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.fragment_create_preset, null)
@@ -46,7 +44,7 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
         val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create()
 
         when (presetType) {
-            WINEPREFIX_PRESET -> {
+            WINE_PREFIX_PRESET -> {
                 wineVersionText.visibility = View.VISIBLE
                 wineVersionSpinner.visibility = View.VISIBLE
 
@@ -66,13 +64,14 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
         }
 
         buttonContinue.setOnClickListener {
-            val newName = editTextNewName.text.toString()
+            val newName = editTextNewName.text.toString().trim()
             if (newName == "") {
-                dismiss()
+                Toast.makeText(requireContext(), R.string.invalid_preset_name, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
             when (presetType) {
-                WINEPREFIX_PRESET -> {
+                WINE_PREFIX_PRESET -> {
                     putSelectedWinePrefix(newName)
                     setSharedVars(requireActivity())
 
@@ -86,7 +85,6 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
 
                         withContext(Dispatchers.IO) {
                             createWinePrefix(newName, wineVersionsId[wineVersionSpinner.selectedItemId.toInt()])
-
                             setupDone = true
                         }
                     }
@@ -113,7 +111,7 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
     }
 
     companion object {
-        const val WINEPREFIX_PRESET = 1
+        const val WINE_PREFIX_PRESET = 1
         const val CONTROLLER_PRESET = 2
         const val VIRTUAL_CONTROLLER_PRESET = 3
         const val BOX64_PRESET = 4

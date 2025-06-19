@@ -18,7 +18,7 @@ import com.micewine.emu.activities.RatManagerActivity
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
-import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINE_PREFIX_PRESET
 
 class AdapterSettings(private val settingsList: List<SettingsList>, private val context: Context) :
     RecyclerView.Adapter<AdapterSettings.ViewHolder>() {
@@ -76,7 +76,7 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
                 }
                 context.getString(R.string.wine_prefix_manager_title) -> {
                     val intent = Intent(context, PresetManagerActivity::class.java).apply {
-                        putExtra("presetType", WINEPREFIX_PRESET)
+                        putExtra("presetType", WINE_PREFIX_PRESET)
                     }
                     context.startActivity(intent)
                 }

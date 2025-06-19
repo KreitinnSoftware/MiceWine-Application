@@ -46,7 +46,7 @@ class LogViewerFragment : Fragment() {
 
             logFile.writeText(logTextView?.text.toString())
 
-            requireActivity().runOnUiThread {
+            exportLogButton?.post {
                 Toast.makeText(context, "Log Exported to ${logFile.path}", Toast.LENGTH_SHORT).show()
             }
         }

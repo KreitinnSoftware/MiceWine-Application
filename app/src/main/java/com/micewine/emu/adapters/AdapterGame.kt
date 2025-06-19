@@ -208,11 +208,31 @@ class AdapterGame(
         }
     }
 
-    class GameItem(
+    data class GameItem(
         var name: String,
         var exePath: String,
         var exeArguments: String,
-        var iconPath: String
+        var iconPath: String,
+        var box64Version: String,
+        var box64Preset: String,
+        var controllersPreset: MutableList<String>,
+        var controllersEnableXInput: MutableList<Boolean>,
+        var controllersXInputSwapAnalogs: MutableList<Boolean>,
+        var virtualControllerPreset: String,
+        var virtualControllerEnableXInput: Boolean,
+        var displayMode: String,
+        var displayResolution: String,
+        var vulkanDriver: String,
+        var vulkanDriverType: Int,
+        var d3dxRenderer: String,
+        var dxvkVersion: String,
+        var wineD3DVersion: String,
+        var vkd3dVersion: String,
+        var wineESync: Boolean,
+        var wineServices: Boolean,
+        var cpuAffinityCores: String,
+        var wineVirtualDesktop: Boolean,
+        var enableXInput: Boolean
     )
 
     companion object {

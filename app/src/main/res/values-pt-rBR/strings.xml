@@ -11,6 +11,7 @@
     <string name="box64_fastround_desc">Ativa/Desativa a geração de arredondamento x86 preciso</string>
     <string name="box64_safeflags_desc">Manuseamento de flags em opcodes CALL/RET</string>
     <string name="box64_callret_desc">Otimização de opcodes CALL/RET (não compativel com jit/dynarec/smc)</string>
+    <string name="box64_df_desc">Ativar ou desativar o uso de flags adiadas.</string>
     <string name="box64_aligned_atomics_desc">Codigo gerado para atomics alinhados apenas</string>
     <string name="box64_nativeflags_desc">Generate code will use native flags if possible</string>
     <string name="box64_bleeding_edge_desc">Detectar MonoBleedingEdge e aplicar configurações conservativas</string>
@@ -212,4 +213,6 @@
     <string name="virtual_controller_settings">Configurações do Controle Virtual</string>
     <string name="executable_file_not_found">Arquivo Executável não Encontrado.</string>
     <string name="wine_dpi">DPI da Tela</string>
+    <string name="invalid_preset_name">Nome do Preset Inválido</string>
+    <string name="preset_exported">Preset \'%1$s\' exportado</string>
 </resources>

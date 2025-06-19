@@ -50,7 +50,7 @@ class SettingsFragment : Fragment() {
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, icon: Int) {
         settingsList.add(
-            SettingsList(context?.getString(titleId)!!, context?.getString(descriptionId)!!, icon)
+            SettingsList(getString(titleId), getString(descriptionId), icon)
         )
     }
 }

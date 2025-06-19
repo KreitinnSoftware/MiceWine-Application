@@ -21,7 +21,7 @@ import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
-import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINE_PREFIX_PRESET
 import com.micewine.emu.fragments.DeleteItemFragment
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_PRESET
 import com.micewine.emu.fragments.FloatingFileManagerFragment
@@ -88,7 +88,7 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
                         notifyItemRangeChanged(0, settingsList.size)
                     }
                 }
-                WINEPREFIX_PRESET -> {
+                WINE_PREFIX_PRESET -> {
                     if (sList.titleSettings == getSelectedWinePrefix()) {
                         selectedPresetId = position
                     }

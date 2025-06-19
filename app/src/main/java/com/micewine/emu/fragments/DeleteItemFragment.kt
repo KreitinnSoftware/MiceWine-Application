@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.selectedFile
@@ -16,7 +17,7 @@ import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.dele
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
-import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINE_PREFIX_PRESET
 import com.micewine.emu.fragments.FileManagerFragment.Companion.deleteFile
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.removeGameFromList
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.deleteVirtualControllerPreset
@@ -45,8 +46,18 @@ class DeleteItemFragment(private val deleteType: Int) : DialogFragment() {
                     when (clickedPresetType) {
                         CONTROLLER_PRESET -> deleteControllerPreset(clickedPresetName)
                         VIRTUAL_CONTROLLER_PRESET -> deleteVirtualControllerPreset(clickedPresetName)
-                        BOX64_PRESET -> deleteBox64Preset(clickedPresetName)
-                        WINEPREFIX_PRESET -> deleteWinePrefix(clickedPresetName)
+                        BOX64_PRESET -> {
+                            val ret = deleteBox64Preset(clickedPresetName)
+                            if (!ret) {
+                                Toast.makeText(requireContext(), R.string.remove_last_preset_error, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        WINE_PREFIX_PRESET -> {
+                            val ret = deleteWinePrefix(clickedPresetName)
+                            if (!ret) {
+                                Toast.makeText(requireContext(), R.string.remove_last_wine_prefix_error, Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
                 }
             }

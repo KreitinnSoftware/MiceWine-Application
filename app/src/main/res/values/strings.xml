@@ -10,6 +10,7 @@
     <string name="box64_fastround" translatable="false">BOX64_DYNAREC_FASTROUND</string>
     <string name="box64_safeflags" translatable="false">BOX64_DYNAREC_SAFEFLAGS</string>
     <string name="box64_callret" translatable="false">BOX64_DYNAREC_CALLRET</string>
+    <string name="box64_df" translatable="false">BOX64_DYNAREC_DF</string>
     <string name="box64_aligned_atomics" translatable="false">BOX64_DYNAREC_ALIGNED_ATOMICS</string>
     <string name="box64_nativeflags" translatable="false">BOX64_DYNAREC_NATIVEFLAGS</string>
     <string name="box64_bleeding_edge" translatable="false">BOX64_DYNAREC_BLEEDING_EDGE</string>
@@ -33,6 +34,7 @@
     <string name="box64_fastround_desc">Enable/Disable generation of precise x86 rounding</string>
     <string name="box64_safeflags_desc">Handling of flags on CALL/RET opcodes</string>
     <string name="box64_callret_desc">Optimization of CALL/RET opcodes (not compatible with jit/dynarec/smc)</string>
+    <string name="box64_df_desc">Enable or disable the use of deferred flags.</string>
     <string name="box64_aligned_atomics_desc">Generated code for aligned atomics only</string>
     <string name="box64_nativeflags_desc">Generate code will use native flags if possible</string>
     <string name="box64_bleeding_edge_desc">Detect MonoBleedingEdge and apply conservative settings</string>
@@ -234,4 +236,6 @@
     <string name="virtual_controller_settings">Virtual Controller Settings</string>
     <string name="executable_file_not_found">Executable File Not Found.</string>
     <string name="wine_dpi">Display DPI</string>
+    <string name="invalid_preset_name">Invalid Preset Name</string>
+    <string name="preset_exported">Preset \'%1$s\' exported</string>
 </resources>

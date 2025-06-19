@@ -30,24 +30,8 @@ import com.google.gson.GsonBuilder
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
 import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_AVX
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_ALIGNED_ATOMICS
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_BIGBLOCK
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_CALLRET
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_DIRTY
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FASTNAN
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FASTROUND
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_FORWARD
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_NATIVEFLAGS
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_PAUSE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_SAFEFLAGS
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_STRONGMEM
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_WAIT
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_WEAKBARRIER
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_DYNAREC_X87DOUBLE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_MMAP32
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGSEGV
@@ -56,7 +40,6 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWB
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWBT_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SHOWSEGV_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_SSE42
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_DRI3_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ENABLE_MANGOHUD
@@ -111,7 +94,24 @@ import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.adToolsDri
 import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.mwpPresetCandidate
 import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.ratCandidate
 import com.micewine.emu.fragments.Box64PresetManagerFragment
-import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Mapping
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64AlignedAtomics
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Avx
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64BigBlock
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64CallRet
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64DF
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Dirty
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64FastNan
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64FastRound
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Forward
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64MMap32
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64NativeFlags
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Pause
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64SafeFlags
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Sse2
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64StrongMem
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64Wait
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64WeakBarrier
+import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.getBox64X87Double
 import com.micewine.emu.fragments.ControllerPresetManagerFragment
 import com.micewine.emu.fragments.ControllerSettingsFragment.Companion.ACTION_UPDATE_CONTROLLERS_STATUS
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
@@ -308,13 +308,13 @@ class MainActivity : AppCompatActivity() {
                             if (mwpLines.isNotEmpty()) {
                                 when (mwpLines[0]) {
                                     "controllerPreset" -> {
-                                        mwpPresetCandidate = Pair(CONTROLLER_PRESET, file.path)
+                                        mwpPresetCandidate = Pair(CONTROLLER_PRESET, file)
                                     }
                                     "virtualControllerPreset" -> {
-                                        mwpPresetCandidate = Pair(VIRTUAL_CONTROLLER_PRESET, file.path)
+                                        mwpPresetCandidate = Pair(VIRTUAL_CONTROLLER_PRESET, file)
                                     }
                                     "box64Preset" -> {
-                                        mwpPresetCandidate = Pair(BOX64_PRESET, file.path)
+                                        mwpPresetCandidate = Pair(BOX64_PRESET, file)
                                     }
                                 }
 
@@ -1048,28 +1048,29 @@ class MainActivity : AppCompatActivity() {
         var enableMangoHUD: Boolean = false
         var appLang: String? = null
         var box64LogLevel: String? = null
-        var box64Mmap32: String? = null
-        var box64Avx: String? = null
-        var box64Sse42: String? = null
-        var box64DynarecBigblock: String? = null
-        var box64DynarecStrongmem: String? = null
-        var box64DynarecWeakbarrier: String? = null
-        var box64DynarecPause: String? = null
-        var box64DynarecX87double: String? = null
-        var box64DynarecFastnan: String? = null
-        var box64DynarecFastround: String? = null
-        var box64DynarecSafeflags: String? = null
-        var box64DynarecCallret: String? = null
-        var box64DynarecAlignedAtomics: String? = null
-        var box64DynarecNativeflags: String? = null
-        var box64DynarecBleedingEdge: String? = null
-        var box64DynarecWait: String? = null
-        var box64DynarecDirty: String? = null
-        var box64DynarecForward: String? = null
-        var box64ShowSegv: Boolean = false
-        var box64ShowBt: Boolean = false
-        var box64NoSigSegv: Boolean = false
-        var box64NoSigill: Boolean = false
+        var box64MMap32: Int? = null
+        var box64Avx: Int? = null
+        var box64Sse42: Int? = null
+        var box64DynarecBigBlock: Int? = null
+        var box64DynarecStrongMem: Int? = null
+        var box64DynarecWeakBarrier: Int? = null
+        var box64DynarecPause: Int? = null
+        var box64DynarecX87Double: Int? = null
+        var box64DynarecFastNan: Int? = null
+        var box64DynarecFastRound: Int? = null
+        var box64DynarecSafeFlags: Int? = null
+        var box64DynarecCallRet: Int? = null
+        var box64DynarecAlignedAtomics: Int? = null
+        var box64DynarecNativeFlags: Int? = null
+        var box64DynarecBleedingEdge: Int? = null
+        var box64DynarecWait: Int? = null
+        var box64DynarecDirty: Int? = null
+        var box64DynarecForward: Int? = null
+        var box64DynarecDF: Int? = null
+        var box64ShowSegv: Int? = null
+        var box64ShowBt: Int? = null
+        var box64NoSigSegv: Int? = null
+        var box64NoSigill: Int? = null
         var wineLogLevel: String? = null
         var selectedBox64: String? = null
         var selectedD3DXRenderer: String? = null
@@ -1124,12 +1125,8 @@ class MainActivity : AppCompatActivity() {
         const val APP_VERSION = "appVersion"
         private const val ADRENOTOOLS_LD_PRELOAD = "adrenoToolsLdPreload"
 
-        private fun strBoolToNumStr(strBool: String): String {
-            return strBoolToNumStr(strBool.toBoolean())
-        }
-
-        fun strBoolToNumStr(strBool: Boolean): String {
-            return if (strBool) "1" else "0"
+        fun strBoolToNum(strBool: Boolean): Int {
+            return if (strBool) 1 else 0
         }
 
         @Suppress("DEPRECATION")
@@ -1157,10 +1154,10 @@ class MainActivity : AppCompatActivity() {
             selectedBox64 = box64Version ?: getBox64Version(selectedGameName)
             box64LogLevel = preferences?.getString(BOX64_LOG, BOX64_LOG_DEFAULT_VALUE)
 
-            box64ShowSegv = preferences?.getBoolean(BOX64_SHOWSEGV, BOX64_SHOWSEGV_DEFAULT_VALUE) ?: BOX64_SHOWSEGV_DEFAULT_VALUE
-            box64ShowBt = preferences?.getBoolean(BOX64_SHOWBT, BOX64_SHOWBT_DEFAULT_VALUE) ?: BOX64_SHOWBT_DEFAULT_VALUE
-            box64NoSigill = preferences?.getBoolean(BOX64_NOSIGILL, BOX64_NOSIGILL_DEFAULT_VALUE) ?: BOX64_NOSIGILL_DEFAULT_VALUE
-            box64NoSigSegv = preferences?.getBoolean(BOX64_NOSIGSEGV, BOX64_NOSIGSEGV_DEFAULT_VALUE) ?: BOX64_NOSIGSEGV_DEFAULT_VALUE
+            box64ShowSegv = strBoolToNum(preferences?.getBoolean(BOX64_SHOWSEGV, BOX64_SHOWSEGV_DEFAULT_VALUE) ?: BOX64_SHOWSEGV_DEFAULT_VALUE)
+            box64ShowBt = strBoolToNum(preferences?.getBoolean(BOX64_SHOWBT, BOX64_SHOWBT_DEFAULT_VALUE) ?: BOX64_SHOWBT_DEFAULT_VALUE)
+            box64NoSigill = strBoolToNum(preferences?.getBoolean(BOX64_NOSIGILL, BOX64_NOSIGILL_DEFAULT_VALUE) ?: BOX64_NOSIGILL_DEFAULT_VALUE)
+            box64NoSigSegv = strBoolToNum(preferences?.getBoolean(BOX64_NOSIGSEGV, BOX64_NOSIGSEGV_DEFAULT_VALUE) ?: BOX64_NOSIGSEGV_DEFAULT_VALUE)
 
             setBox64Preset(box64Preset)
 
@@ -1211,23 +1208,24 @@ class MainActivity : AppCompatActivity() {
             var selectedBox64Preset = name ?: preferences?.getString(SELECTED_BOX64_PRESET, "default") ?: "default"
             if (name == "--") selectedBox64Preset = preferences?.getString(SELECTED_BOX64_PRESET, "default") ?: "default"
 
-            box64Mmap32 = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_MMAP32)[0])
-            box64Avx = getBox64Mapping(selectedBox64Preset, BOX64_AVX)[0]
-            box64Sse42 = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_SSE42)[0])
-            box64DynarecBigblock = getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_BIGBLOCK)[0]
-            box64DynarecStrongmem = getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_STRONGMEM)[0]
-            box64DynarecWeakbarrier = getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_WEAKBARRIER)[0]
-            box64DynarecPause = getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_PAUSE)[0]
-            box64DynarecX87double = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_X87DOUBLE)[0])
-            box64DynarecFastnan = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_FASTNAN)[0])
-            box64DynarecFastround = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_FASTROUND)[0])
-            box64DynarecSafeflags = getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_SAFEFLAGS)[0]
-            box64DynarecCallret = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_CALLRET)[0])
-            box64DynarecAlignedAtomics = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_ALIGNED_ATOMICS)[0])
-            box64DynarecNativeflags = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_NATIVEFLAGS)[0])
-            box64DynarecWait = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_WAIT)[0])
-            box64DynarecDirty = strBoolToNumStr(getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_DIRTY)[0])
-            box64DynarecForward = getBox64Mapping(selectedBox64Preset, BOX64_DYNAREC_FORWARD)[0]
+            box64MMap32 = strBoolToNum(getBox64MMap32(selectedBox64Preset))
+            box64Avx = getBox64Avx(selectedBox64Preset)
+            box64Sse42 = strBoolToNum(getBox64Sse2(selectedBox64Preset))
+            box64DynarecBigBlock = getBox64BigBlock(selectedBox64Preset)
+            box64DynarecStrongMem = getBox64StrongMem(selectedBox64Preset)
+            box64DynarecWeakBarrier = getBox64WeakBarrier(selectedBox64Preset)
+            box64DynarecPause = getBox64Pause(selectedBox64Preset)
+            box64DynarecX87Double = getBox64X87Double(selectedBox64Preset)
+            box64DynarecFastNan = strBoolToNum(getBox64FastNan(selectedBox64Preset))
+            box64DynarecFastRound = strBoolToNum(getBox64FastRound(selectedBox64Preset))
+            box64DynarecSafeFlags = getBox64SafeFlags(selectedBox64Preset)
+            box64DynarecCallRet = getBox64CallRet(selectedBox64Preset)
+            box64DynarecAlignedAtomics = strBoolToNum(getBox64AlignedAtomics(selectedBox64Preset))
+            box64DynarecNativeFlags = strBoolToNum(getBox64NativeFlags(selectedBox64Preset))
+            box64DynarecWait = strBoolToNum(getBox64Wait(selectedBox64Preset))
+            box64DynarecDirty = getBox64Dirty(selectedBox64Preset)
+            box64DynarecForward = getBox64Forward(selectedBox64Preset)
+            box64DynarecDF = strBoolToNum(getBox64DF(selectedBox64Preset))
         }
 
         fun copyAssets(activity: Activity, filename: String, outputPath: String) {

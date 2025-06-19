@@ -83,6 +83,7 @@ class ControllerPresetManagerFragment(private val editShortcut: Boolean) : Fragm
         private val presetListNames: MutableList<AdapterPreset.Item> = mutableListOf()
         private var presetList: MutableList<ControllerPreset> = mutableListOf()
         private var editShortcut: Boolean = false
+        private val listType = object : TypeToken<ControllerPreset>() {}.type
 
         fun initialize(boolean: Boolean = false) {
             presetList = getControllerPresets()
@@ -228,7 +229,7 @@ class ControllerPresetManagerFragment(private val editShortcut: Boolean) : Fragm
 
             if (index == selectedPresetId) {
                 preferences?.edit {
-                    putString(SELECTED_CONTROLLER_PRESET, presetListNames.first().titleSettings)
+                    putString(SELECTED_CONTROLLER_PRESET, presetListNames.firstOrNull()?.titleSettings)
                     apply()
                 }
                 recyclerView?.adapter?.notifyItemChanged(0)
@@ -250,21 +251,28 @@ class ControllerPresetManagerFragment(private val editShortcut: Boolean) : Fragm
             saveControllerPresets()
         }
 
-        fun importControllerPreset(path: String) {
-            val json = File(path).readLines()
-            val listType = object : TypeToken<ControllerPreset>() {}.type
-            if (json.size < 2 || json[0] != "controllerPreset") {
-                recyclerView?.post {
-                    Toast.makeText(recyclerView?.context, recyclerView?.context?.getString(R.string.invalid_controller_preset_file), Toast.LENGTH_LONG).show()
-                }
-                return
+        fun importControllerPreset(file: File): Boolean {
+            val lines = file.readLines()
+            if (lines.size < 2) return false
+
+            val type = lines[0]
+            if (type != "controllerPreset") return false
+
+            val json = lines[1]
+            val preset = gson.fromJson<ControllerPreset>(json, listType)
+
+            var presetName = preset.name
+            var count = 1
+
+            while (presetList.any { it.name == presetName }) {
+                presetName = "${preset.name}-${count++}"
             }
 
-            val importedPreset = gson.fromJson<ControllerPreset>(json[1], listType)
+            preset.name = presetName
 
-            presetList.add(importedPreset)
+            presetList.add(preset)
             presetListNames.add(
-                AdapterPreset.Item(importedPreset.name, CONTROLLER_PRESET, true)
+                AdapterPreset.Item(preset.name, CONTROLLER_PRESET, true)
             )
             
             recyclerView?.post { 
@@ -272,11 +280,12 @@ class ControllerPresetManagerFragment(private val editShortcut: Boolean) : Fragm
             }
 
             saveControllerPresets()
+
+            return true
         }
 
-        fun exportControllerPreset(name: String, path: String) {
+        fun exportControllerPreset(name: String, file: File) {
             val index = presetList.indexOfFirst { it.name == name }
-            val file = File(path)
 
             file.writeText("controllerPreset\n" + gson.toJson(presetList[index]))
         }

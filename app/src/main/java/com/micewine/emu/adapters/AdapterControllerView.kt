@@ -24,9 +24,7 @@ class AdapterControllerView(private val controllerViewList: List<ControllerViewL
         holder.controllerImage.setImageBitmap(getControllerBitmap(780, 400, sList.controllerID, context))
     }
 
-    override fun getItemCount(): Int {
-        return controllerViewList.size
-    }
+    override fun getItemCount(): Int = controllerViewList.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener {

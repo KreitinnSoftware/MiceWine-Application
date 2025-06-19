@@ -149,7 +149,7 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                     if (settingsModel.file.name.contains(".rat")) {
                         customRootFSPath = settingsModel.file.path
                     } else {
-                        outputFile = settingsModel.file.path
+                        outputFile = settingsModel.file
                     }
                 } else if (settingsModel.file.isDirectory) {
                     fileManagerCwd = settingsModel.file.path

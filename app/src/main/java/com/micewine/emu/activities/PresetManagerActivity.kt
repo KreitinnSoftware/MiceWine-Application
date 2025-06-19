@@ -10,14 +10,12 @@ import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.micewine.emu.R
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetType
-import com.micewine.emu.controller.ControllerUtils.connectedPhysicalControllers
 import com.micewine.emu.databinding.ActivityPresetManagerBinding
 import com.micewine.emu.fragments.Box64PresetManagerFragment
 import com.micewine.emu.fragments.Box64SettingsFragment
@@ -27,7 +25,7 @@ import com.micewine.emu.fragments.CreatePresetFragment
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
-import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINE_PREFIX_PRESET
 import com.micewine.emu.fragments.FloatingFileManagerFragment
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.OPERATION_IMPORT_PRESET
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
@@ -36,7 +34,6 @@ import com.micewine.emu.fragments.WinePrefixManagerFragment
 class PresetManagerActivity : AppCompatActivity() {
     private var binding: ActivityPresetManagerBinding? = null
     private var backButton: ImageButton? = null
-    private var controllerConnected: TextView? = null
     private var addPresetFAB: FloatingActionButton? = null
     private var importPresetFAB: FloatingActionButton? = null
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -65,8 +62,6 @@ class PresetManagerActivity : AppCompatActivity() {
         binding = ActivityPresetManagerBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        controllerConnected = findViewById(R.id.controllerConnected)
-
         backButton = findViewById(R.id.backButton)
         backButton?.setOnClickListener {
             onKeyDown(KeyEvent.KEYCODE_BACK, null)
@@ -84,12 +79,6 @@ class PresetManagerActivity : AppCompatActivity() {
 
                 findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.controller_mapper_title)
 
-                if (connectedPhysicalControllers.isNotEmpty()) {
-                    controllerConnected?.text = getString(R.string.connected_controller, connectedPhysicalControllers.joinToString(", ") { it.name })
-                } else {
-                    controllerConnected?.text = getString(R.string.no_controllers_connected)
-                }
-
                 addPresetFAB?.setOnClickListener {
                     CreatePresetFragment(CONTROLLER_PRESET).show(supportFragmentManager, "")
                 }
@@ -102,8 +91,6 @@ class PresetManagerActivity : AppCompatActivity() {
                 fragmentLoader(VirtualControllerPresetManagerFragment(editShortcut!!), true)
 
                 findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.virtual_controller_mapper_title)
-
-                controllerConnected?.visibility = View.GONE
 
                 addPresetFAB?.setOnClickListener {
                     CreatePresetFragment(VIRTUAL_CONTROLLER_PRESET).show(supportFragmentManager, "")
@@ -118,8 +105,6 @@ class PresetManagerActivity : AppCompatActivity() {
 
                 findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.box64_preset_manager_title)
 
-                controllerConnected?.visibility = View.GONE
-
                 addPresetFAB?.setOnClickListener {
                     CreatePresetFragment(BOX64_PRESET).show(supportFragmentManager, "")
                 }
@@ -128,15 +113,13 @@ class PresetManagerActivity : AppCompatActivity() {
                     FloatingFileManagerFragment(OPERATION_IMPORT_PRESET).show(supportFragmentManager, "")
                 }
             }
-            WINEPREFIX_PRESET -> {
+            WINE_PREFIX_PRESET -> {
                 fragmentLoader(WinePrefixManagerFragment(), true)
 
                 findViewById<Toolbar>(R.id.controllerMapperToolbar).title = getString(R.string.wine_prefix_manager_title)
 
-                controllerConnected?.visibility = View.GONE
-
                 addPresetFAB?.setOnClickListener {
-                    CreatePresetFragment(WINEPREFIX_PRESET).show(supportFragmentManager, "")
+                    CreatePresetFragment(WINE_PREFIX_PRESET).show(supportFragmentManager, "")
                 }
                 importPresetFAB?.visibility = View.GONE
             }

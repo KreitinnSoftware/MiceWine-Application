@@ -99,13 +99,13 @@ class FileManagerFragment : Fragment() {
                 if (mwpLines.isNotEmpty()) {
                     when (mwpLines[0]) {
                         "controllerPreset" -> {
-                            mwpPresetCandidate = Pair(CONTROLLER_PRESET, file.path)
+                            mwpPresetCandidate = Pair(CONTROLLER_PRESET, file)
                         }
                         "virtualControllerPreset" -> {
-                            mwpPresetCandidate = Pair(VIRTUAL_CONTROLLER_PRESET, file.path)
+                            mwpPresetCandidate = Pair(VIRTUAL_CONTROLLER_PRESET, file)
                         }
                         "box64Preset" -> {
-                            mwpPresetCandidate = Pair(BOX64_PRESET, file.path)
+                            mwpPresetCandidate = Pair(BOX64_PRESET, file)
                         }
                     }
 

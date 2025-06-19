@@ -42,25 +42,28 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
     }
 
     private fun setAdapter() {
-        recyclerView?.setAdapter(AdapterPreset(presetListNames, requireContext(), requireActivity().supportFragmentManager))
+        recyclerView?.setAdapter(
+            AdapterPreset(presetListAdapters, requireContext(), requireActivity().supportFragmentManager)
+        )
 
-        presetListNames.clear()
+        presetListAdapters.clear()
         presetList.forEach {
             addToAdapter(it.name, VIRTUAL_CONTROLLER_PRESET, true)
         }
     }
 
     private fun addToAdapter(titleSettings: String, type: Int, userPreset: Boolean) {
-        presetListNames.add(
+        presetListAdapters.add(
             AdapterPreset.Item(titleSettings, type, userPreset, editShortcut)
         )
     }
 
     companion object {
         private var recyclerView: RecyclerView? = null
-        private val presetListNames: MutableList<AdapterPreset.Item> = mutableListOf()
+        private val presetListAdapters: MutableList<AdapterPreset.Item> = mutableListOf()
         private var presetList: MutableList<VirtualControllerPreset> = mutableListOf()
         private var editShortcut: Boolean = false
+        private val listType = object : TypeToken<VirtualControllerPreset>() {}.type
 
         fun initialize(editable: Boolean = false) {
             presetList = getVirtualControllerPresets()
@@ -94,7 +97,7 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
         }
 
         fun addVirtualControllerPreset(context: Context, name: String) {
-            if (presetListNames.firstOrNull { it.titleSettings == name } != null) {
+            if (presetListAdapters.firstOrNull { it.titleSettings == name } != null) {
                 Toast.makeText(context, context.getString(R.string.executable_already_added), Toast.LENGTH_LONG).show()
                 return
             }
@@ -102,11 +105,11 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
             val defaultPreset = VirtualControllerPreset(name, "", mutableListOf(), mutableListOf(), mutableListOf())
 
             presetList.add(defaultPreset)
-            presetListNames.add(
+            presetListAdapters.add(
                 AdapterPreset.Item(name, VIRTUAL_CONTROLLER_PRESET, true, editShortcut)
             )
 
-            recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
+            recyclerView?.adapter?.notifyItemInserted(presetListAdapters.size)
 
             saveVirtualControllerPresets()
         }
@@ -115,13 +118,13 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
             val index = presetList.indexOfFirst { it.name == name }
 
             presetList.removeAt(index)
-            presetListNames.removeAt(index)
+            presetListAdapters.removeAt(index)
 
             recyclerView?.adapter?.notifyItemRemoved(index)
 
             if (index == selectedPresetId) {
                 preferences?.edit {
-                    putString(SELECTED_VIRTUAL_CONTROLLER_PRESET, presetListNames.first().titleSettings)
+                    putString(SELECTED_VIRTUAL_CONTROLLER_PRESET, presetListAdapters.firstOrNull()?.titleSettings)
                     apply()
                 }
                 recyclerView?.adapter?.notifyItemChanged(0)
@@ -134,77 +137,74 @@ class VirtualControllerPresetManagerFragment(private val editShortcut: Boolean) 
             val index = presetList.indexOfFirst { it.name == name }
 
             presetList[index].name = newName
-            presetListNames[index].titleSettings = newName
+            presetListAdapters[index].titleSettings = newName
 
             recyclerView?.adapter?.notifyItemChanged(index)
 
             saveVirtualControllerPresets()
         }
 
-        fun importVirtualControllerPreset(activity: Activity, path: String) {
-            val lines = File(path).readLines()
-            val canAutoAdjust = lines[1].contains("resolution")
-            val listType = object : TypeToken<VirtualControllerPreset>() {}.type
+        fun importVirtualControllerPreset(context: Context, file: File): Boolean {
+            val lines = file.readLines()
+            if (lines.size < 2) return false
 
-            if (lines.size < 2 || lines[0] != "virtualControllerPreset") {
-                activity.runOnUiThread {
-                    Toast.makeText(activity, activity.getString(R.string.invalid_virtual_controller_preset_file), Toast.LENGTH_LONG).show()
-                }
-                return
-            }
+            val type = lines[0]
+            if (type != "virtualControllerPreset") return false
 
-            val processed = gson.fromJson<VirtualControllerPreset>(lines[1], listType)
+            val json = lines[1]
+            val preset = gson.fromJson<VirtualControllerPreset>(json, listType)
+            val canAutoAdjust = json.contains("resolution")
 
-            var presetName = processed.name
+            var presetName = preset.name
             var count = 1
 
             while (presetList.any { it.name == presetName }) {
-                presetName = "${processed.name}-$count"
-                count++
+                presetName = "${preset.name}-${count++}"
             }
 
-            processed.name = presetName
+            preset.name = presetName
 
             if (canAutoAdjust) {
-                val nativeResolution = getNativeResolution(activity)
+                val nativeResolution = getNativeResolution(context)
 
-                if (processed.resolution != nativeResolution) {
+                if (preset.resolution != nativeResolution) {
                     val nativeSplit = nativeResolution.split("x").map { it.toFloat() }
-                    val processedSplit = processed.resolution.split("x").map { it.toFloat() }
+                    val processedSplit = preset.resolution.split("x").map { it.toFloat() }
 
                     val multiplierX = nativeSplit[0] / processedSplit[0] * 100F
                     val multiplierY = nativeSplit[1] / processedSplit[1] * 100F
 
-                    processed.buttons.forEach {
+                    preset.buttons.forEach {
                         it.x = (it.x / 100F * multiplierX / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
                         it.y = (it.y / 100F * multiplierY / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
                     }
-                    processed.analogs.forEach {
+                    preset.analogs.forEach {
                         it.x = (it.x / 100F * multiplierX / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
                         it.y = (it.y / 100F * multiplierY / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
                     }
-                    processed.dpads.forEach {
+                    preset.dpads.forEach {
                         it.x = (it.x / 100F * multiplierX / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
                         it.y = (it.y / 100F * multiplierY / GRID_SIZE).roundToInt() * GRID_SIZE.toFloat()
                     }
                 }
             }
 
-            presetList.add(processed)
-            presetListNames.add(
-                AdapterPreset.Item(processed.name, VIRTUAL_CONTROLLER_PRESET, true)
+            presetList.add(preset)
+            presetListAdapters.add(
+                AdapterPreset.Item(preset.name, VIRTUAL_CONTROLLER_PRESET, true)
             )
 
             recyclerView?.post {
-                recyclerView?.adapter?.notifyItemInserted(presetListNames.size)
+                recyclerView?.adapter?.notifyItemInserted(presetListAdapters.size)
             }
 
             saveVirtualControllerPresets()
+
+            return true
         }
 
-        fun exportVirtualControllerPreset(name: String, path: String) {
+        fun exportVirtualControllerPreset(name: String, file: File) {
             val index = presetList.indexOfFirst { it.name == name }
-            val file = File(path)
 
             file.writeText("virtualControllerPreset\n" + gson.toJson(presetList[index]))
         }

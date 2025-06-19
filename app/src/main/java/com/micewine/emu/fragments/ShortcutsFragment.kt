@@ -41,6 +41,7 @@ import com.micewine.emu.activities.MainActivity.Companion.gson
 import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterGame
+import com.micewine.emu.adapters.AdapterGame.GameItem
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.core.RatPackageManager.listRatPackagesId
 import com.micewine.emu.databinding.FragmentShortcutsBinding
@@ -189,10 +190,10 @@ class ShortcutsFragment : Fragment() {
             requireActivity().menuInflater.inflate(R.menu.game_list_context_menu, menu)
         }
 
-        val index = gameListNames.indexOfFirst { it.name == selectedGameName }
+        val index = gameList.indexOfFirst { it.name == selectedGameName }
         if (index == 0) return
 
-        val viewHolder = recyclerView?.findViewHolderForAdapterPosition(gameListNames.indexOfFirst { it.name == selectedGameName }) ?: return
+        val viewHolder = recyclerView?.findViewHolderForAdapterPosition(gameList.indexOfFirst { it.name == selectedGameName }) ?: return
 
         itemTouchHelper?.startDrag(viewHolder)
     }
@@ -225,26 +226,11 @@ class ShortcutsFragment : Fragment() {
     }
 
     private fun setAdapter() {
-        recyclerView?.setAdapter(
-            AdapterGame(gameListNames, 1F, requireActivity())
-        )
-
-        gameListNames.clear()
-
-        gameList.forEach {
-            addToAdapter(it.name, it.exePath, it.exeArguments, it.iconPath)
-        }
-    }
-
-    private fun addToAdapter(name: String, exePath: String, exeArguments: String, iconPath: String) {
-        gameListNames.add(
-            AdapterGame.GameItem(name, exePath, exeArguments, iconPath)
-        )
+        recyclerView?.setAdapter(AdapterGame(gameList, 1F, requireActivity()))
     }
 
     companion object {
         private var recyclerView: RecyclerView? = null
-        private var gameListNames: MutableList<AdapterGame.GameItem> = mutableListOf()
         private var gameList: MutableList<GameItem> = mutableListOf()
 
         const val ACTION_UPDATE_WINE_PREFIX_SPINNER = "com.micewine.emu.ACTION_UPDATE_WINE_PREFIX_SPINNER"
@@ -615,14 +601,11 @@ class ShortcutsFragment : Fragment() {
                     false
                 )
             )
-            gameListNames.add(
-                AdapterGame.GameItem(prettyName, path, "", icon)
-            )
 
             saveShortcuts()
 
             recyclerView?.post {
-                recyclerView?.adapter?.notifyItemInserted(gameListNames.size)
+                recyclerView?.adapter?.notifyItemInserted(gameList.size)
             }
         }
 
@@ -631,7 +614,6 @@ class ShortcutsFragment : Fragment() {
             if (index == -1) return
 
             gameList.removeAt(index)
-            gameListNames.removeAt(index)
 
             saveShortcuts()
 
@@ -643,7 +625,6 @@ class ShortcutsFragment : Fragment() {
             if (index == -1) return
 
             gameList[index].name = newName
-            gameListNames[index].name = newName
 
             saveShortcuts()
 
@@ -657,7 +638,6 @@ class ShortcutsFragment : Fragment() {
             createIconCache(context, uri, name)
 
             gameList[index].iconPath = "$usrDir/icons/$name-icon"
-            gameListNames[index].iconPath = "$usrDir/icons/$name-icon"
 
             saveShortcuts()
 
@@ -730,32 +710,5 @@ class ShortcutsFragment : Fragment() {
                 shortcutManager.requestPinShortcut(pinShortcutInfo, successCallback.intentSender)
             }
         }
-
-        data class GameItem(
-            var name: String,
-            var exePath: String,
-            var exeArguments: String,
-            var iconPath: String,
-            var box64Version: String,
-            var box64Preset: String,
-            var controllersPreset: MutableList<String>,
-            var controllersEnableXInput: MutableList<Boolean>,
-            var controllersXInputSwapAnalogs: MutableList<Boolean>,
-            var virtualControllerPreset: String,
-            var virtualControllerEnableXInput: Boolean,
-            var displayMode: String,
-            var displayResolution: String,
-            var vulkanDriver: String,
-            var vulkanDriverType: Int,
-            var d3dxRenderer: String,
-            var dxvkVersion: String,
-            var wineD3DVersion: String,
-            var vkd3dVersion: String,
-            var wineESync: Boolean,
-            var wineServices: Boolean,
-            var cpuAffinityCores: String,
-            var wineVirtualDesktop: Boolean,
-            var enableXInput: Boolean
-        )
     }
 }

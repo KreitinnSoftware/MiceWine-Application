@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.ACTION_INSTALL_ADTOOLS_DRIVER
@@ -17,7 +18,9 @@ import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.impo
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
+import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.outputFile
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.importVirtualControllerPreset
+import java.io.File
 
 class AskInstallPackageFragment(private val packageType: Int) : DialogFragment() {
 
@@ -40,32 +43,35 @@ class AskInstallPackageFragment(private val packageType: Int) : DialogFragment()
                 askInstallText.text = "${activity?.getString(R.string.install_rat_package_warning)} ${adToolsDriverCandidate?.name} (${adToolsDriverCandidate?.version})?"
             }
             MWP_PRESET_PACKAGE -> {
-                askInstallText.text = "${activity?.getString(R.string.install_rat_package_warning)} ${mwpPresetCandidate?.second?.substringAfterLast("/")}?"
+                askInstallText.text = "${activity?.getString(R.string.install_rat_package_warning)} ${mwpPresetCandidate?.second?.path?.substringAfterLast("/")}?"
             }
         }
 
         buttonContinue.setOnClickListener {
             when (packageType) {
                 RAT_PACKAGE -> {
-                    context?.sendBroadcast(
+                    requireContext().sendBroadcast(
                         Intent(ACTION_INSTALL_RAT)
                     )
                 }
                 ADTOOLS_DRIVER_PACKAGE -> {
-                    context?.sendBroadcast(
+                    requireContext().sendBroadcast(
                         Intent(ACTION_INSTALL_ADTOOLS_DRIVER)
                     )
                 }
                 MWP_PRESET_PACKAGE -> {
                     when (mwpPresetCandidate?.first) {
                         VIRTUAL_CONTROLLER_PRESET -> {
-                            importVirtualControllerPreset(requireActivity(), mwpPresetCandidate?.second!!)
+                            val ret = importVirtualControllerPreset(requireActivity(), mwpPresetCandidate?.second!!)
+                            if (!ret) Toast.makeText(requireContext(), R.string.invalid_virtual_controller_preset_file, Toast.LENGTH_SHORT).show()
                         }
                         CONTROLLER_PRESET -> {
-                            importControllerPreset(mwpPresetCandidate?.second!!)
+                            val ret = importControllerPreset(mwpPresetCandidate?.second!!)
+                            if (!ret) Toast.makeText(requireContext(), R.string.invalid_controller_preset_file, Toast.LENGTH_SHORT).show()
                         }
                         BOX64_PRESET -> {
-                            importBox64Preset(requireActivity(), mwpPresetCandidate?.second!!)
+                            val ret = importBox64Preset(mwpPresetCandidate?.second!!)
+                            if (!ret) Toast.makeText(requireContext(), R.string.invalid_box64_preset_file, Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -84,7 +90,7 @@ class AskInstallPackageFragment(private val packageType: Int) : DialogFragment()
     companion object {
         var ratCandidate: RatPackageManager.RatPackage? = null
         var adToolsDriverCandidate: RatPackageManager.AdrenoToolsPackage? = null
-        var mwpPresetCandidate: Pair<Int, String>? = null
+        var mwpPresetCandidate: Pair<Int, File>? = null
 
         const val RAT_PACKAGE = 0
         const val ADTOOLS_DRIVER_PACKAGE = 1

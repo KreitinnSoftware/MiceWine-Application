@@ -1,6 +1,6 @@
 package com.micewine.emu.core
 
-import android.os.Build
+import com.micewine.emu.activities.MainActivity.Companion.deviceArch
 import com.micewine.emu.activities.MainActivity.Companion.selectedCpuAffinity
 import com.micewine.emu.activities.MainActivity.Companion.wineDisksFolder
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
@@ -12,7 +12,7 @@ import java.io.File
 import kotlin.math.abs
 
 object WineWrapper {
-    private var IS_BOX64 = if (Build.SUPPORTED_ABIS[0] == "x86_64") "" else "box64"
+    private var IS_BOX64 = if (deviceArch == "x86_64") "" else "box64"
 
     fun getCpuHexMask(): String {
         val availCpus = Runtime.getRuntime().availableProcessors()

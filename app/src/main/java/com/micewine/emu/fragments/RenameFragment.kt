@@ -31,7 +31,6 @@ class RenameFragment(private val type: Int, private val initialText: String) : D
         editTextNewName.setText(initialText)
         buttonContinue.setOnClickListener {
             val newName = editTextNewName.text.toString()
-
             if (newName == "") {
                 dismiss()
             }

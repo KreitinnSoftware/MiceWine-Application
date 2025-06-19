@@ -59,7 +59,6 @@ class RatDownloaderFragment(private val prefix: String, private val type: Int, p
 
         lifecycleScope.launch {
             val packages = fetchPackages()
-
             if (packages != null) {
                 packages.forEach {
                     if (it.value.category == prefix || it.value.category == anotherPrefix) {
@@ -117,16 +116,13 @@ class RatDownloaderFragment(private val prefix: String, private val type: Int, p
             private var bufferedSource: BufferedSource? = null
 
             override fun contentType(): MediaType? = responseBody.contentType()
-
             override fun contentLength(): Long = responseBody.contentLength()
-
             override fun source(): BufferedSource {
                 if (bufferedSource == null) {
                     bufferedSource = source(responseBody.source()).buffer()
                 }
                 return bufferedSource!!
             }
-
             private fun source(source: Source): Source {
                 return object : ForwardingSource(source) {
                     var totalBytesRead = 0L

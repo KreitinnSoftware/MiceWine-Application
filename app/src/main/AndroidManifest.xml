@@ -26,11 +26,13 @@
         <activity
             android:name=".activities.WelcomeActivity"
             android:theme="@style/Theme.MiceWine"
+            android:configChanges="keyboard|keyboardHidden|navigation|touchscreen"
             android:exported="false">
         </activity>
         <activity
             android:name=".activities.PresetManagerActivity"
             android:theme="@style/Theme.MiceWine"
+            android:configChanges="keyboard|keyboardHidden|navigation|touchscreen"
             android:exported="false">
         </activity>
         <activity
@@ -52,11 +54,13 @@
         <activity
             android:name=".activities.RatManagerActivity"
             android:theme="@style/Theme.MiceWine"
+            android:configChanges="keyboard|keyboardHidden|navigation|touchscreen"
             android:exported="false">
         </activity>
         <activity
             android:name=".activities.RatDownloaderActivity"
             android:theme="@style/Theme.MiceWine"
+            android:configChanges="keyboard|keyboardHidden|navigation|touchscreen"
             android:exported="false">
         </activity>
         <activity

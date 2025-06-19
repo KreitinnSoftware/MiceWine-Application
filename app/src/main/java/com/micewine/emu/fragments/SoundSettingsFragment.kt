@@ -48,7 +48,9 @@ class SoundSettingsFragment : Fragment() {
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>?, type: Int, defaultValue: Any, keyId: String) {
-        settingsList.add(SettingsListSpinner(titleId, descriptionId, valuesArray, null, type, "$defaultValue", keyId))
+        settingsList.add(
+            SettingsListSpinner(titleId, descriptionId, valuesArray, null, type, "$defaultValue", keyId)
+        )
     }
 
     companion object {

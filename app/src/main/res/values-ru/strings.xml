@@ -10,6 +10,7 @@
     <string name="box64_fastround_desc">Включает генерацию точного округления x86</string>
     <string name="box64_safeflags_desc">Обработка флагов в опкодах CALL/RET</string>
     <string name="box64_callret_desc">Оптимизация опкодов CALL/RET (несовместимо с jit/dynarec/smc)</string>
+    <string name="box64_df_desc">Включить или отключить использование отложенных флагов.</string>
     <string name="box64_aligned_atomics_desc">Генерировать код только для выровненных атомарных операций</string>
     <string name="box64_nativeflags_desc">Генерируемый код будет использовать нативные флаги, если возможно</string>
     <string name="box64_bleeding_edge_desc">Обнаруживать MonoBleedingEdge и применять консервативные настройки</string>
@@ -208,4 +209,6 @@
     <string name="virtual_controller_settings">Настройки виртуального контроллера</string>
     <string name="executable_file_not_found">Исполняемый файл не найден.</string>
     <string name="wine_dpi">DPI экрана</string>
+    <string name="invalid_preset_name">Недопустимое имя пресета</string>
+    <string name="preset_exported">Пресет \'%1$s\' экспортирован</string>
 </resources>

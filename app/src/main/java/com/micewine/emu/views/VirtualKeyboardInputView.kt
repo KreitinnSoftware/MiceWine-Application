@@ -59,7 +59,7 @@ class VirtualKeyboardInputView @JvmOverloads constructor(
     private val dpadRight: Path = Path()
 
     fun loadPreset(name: String?) {
-        val globalPreset = preferences?.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET, "default") ?: "default"
+        val globalPreset = preferences?.getString(SELECTED_VIRTUAL_CONTROLLER_PRESET, "default") ?: return
         val presetName = if (name == "--") { globalPreset } else { name ?: globalPreset }
         val preset = getVirtualControllerPreset(presetName) ?: return
 

@@ -11,11 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.miceWineVersion
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
-import com.micewine.emu.activities.MainActivity.Companion.selectedBox64
-import com.micewine.emu.core.ShellLoader.runCommandWithOutput
-import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.FragmentAboutBinding
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

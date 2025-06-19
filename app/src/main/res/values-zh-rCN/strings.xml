@@ -11,6 +11,7 @@
     <string name="box64_fastround_desc">启用/禁用精确的 x86 四舍五入生成</string>
     <string name="box64_safeflags_desc">在 CALL/RET 操作码中处理标志</string>
     <string name="box64_callret_desc">优化 CALL/RET 操作码（不兼容 jit/dynarec/smc）</string>
+    <string name="box64_df_desc">启用或禁用延迟标志的使用。</string>
     <string name="box64_aligned_atomics_desc">仅为对齐的原子操作生成代码</string>
     <string name="box64_nativeflags_desc">生成的代码将尽可能使用本机标志</string>
     <string name="box64_bleeding_edge_desc">检测 MonoBleedingEdge 并应用保守设置</string>
@@ -212,4 +213,6 @@
     <string name="virtual_controller_settings">虚拟控制器设置</string>
     <string name="executable_file_not_found">未找到可执行文件。</string>
     <string name="wine_dpi">显示 DPI</string>
+    <string name="invalid_preset_name">无效的预设名称</string>
+    <string name="preset_exported">预设 \'%1$s\' 已导出</string>
 </resources>

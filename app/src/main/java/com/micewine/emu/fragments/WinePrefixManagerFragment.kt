@@ -21,7 +21,7 @@ import com.micewine.emu.adapters.AdapterPreset
 import com.micewine.emu.adapters.AdapterPreset.Companion.selectedPresetId
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.WineWrapper.wine
-import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINE_PREFIX_PRESET
 import java.io.File
 
 class WinePrefixManagerFragment : Fragment() {
@@ -46,7 +46,7 @@ class WinePrefixManagerFragment : Fragment() {
 
         presetListNames.clear()
         presetList.forEach {
-            addToAdapter(it, WINEPREFIX_PRESET, true)
+            addToAdapter(it, WINE_PREFIX_PRESET, true)
         }
     }
 
@@ -62,20 +62,12 @@ class WinePrefixManagerFragment : Fragment() {
         private var presetList: MutableList<String> = mutableListOf()
 
         fun initialize() {
-            presetList = getWinePrefixes().toMutableList()
+            presetList = getWinePrefixes()
         }
 
-        fun getWinePrefixes(): MutableList<String> {
-            return winePrefixesDir.listFiles()?.map { it.name }?.toMutableList() ?: mutableListOf()
-        }
-
-        fun getWinePrefixFile(name: String): File {
-            return File("$winePrefixesDir/$name")
-        }
-
-        fun getSelectedWinePrefix(): String {
-            return preferences?.getString(SELECTED_WINE_PREFIX, "default") ?: "default"
-        }
+        fun getWinePrefixes(): MutableList<String> = winePrefixesDir.listFiles()?.map { it.name }?.toMutableList() ?: mutableListOf()
+        fun getWinePrefixFile(name: String): File = File("$winePrefixesDir/$name")
+        fun getSelectedWinePrefix(): String = preferences?.getString(SELECTED_WINE_PREFIX, "default") ?: "default"
 
         fun putSelectedWinePrefix(name: String) {
             preferences?.edit()?.apply {
@@ -147,7 +139,7 @@ class WinePrefixManagerFragment : Fragment() {
 
                 presetList.add(name)
                 presetListNames.add(
-                    AdapterPreset.Item(name, WINEPREFIX_PRESET, true, true)
+                    AdapterPreset.Item(name, WINE_PREFIX_PRESET, true, true)
                 )
 
                 recyclerView?.post {
@@ -156,12 +148,10 @@ class WinePrefixManagerFragment : Fragment() {
             }
         }
 
-        fun deleteWinePrefix(name: String) {
-            val index = presetList.indexOfFirst { it == name }
+        fun deleteWinePrefix(name: String): Boolean {
+            if (presetList.size == 1) return false
 
-            if (getWinePrefixes().count() == 1) {
-                return
-            }
+            val index = presetList.indexOfFirst { it == name }
 
             runCommand("rm -rf $winePrefixesDir/$name")
 
@@ -177,6 +167,8 @@ class WinePrefixManagerFragment : Fragment() {
                 }
                 recyclerView?.adapter?.notifyItemChanged(0)
             }
+
+            return true
         }
     }
 }
