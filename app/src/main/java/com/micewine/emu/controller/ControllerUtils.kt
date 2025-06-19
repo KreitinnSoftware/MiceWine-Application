@@ -3,7 +3,6 @@ package com.micewine.emu.controller
 import android.content.Context
 import android.util.Log
 import android.view.InputDevice
-import android.view.InputDevice.MotionRange
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_BUTTON_A
 import android.view.KeyEvent.KEYCODE_BUTTON_B
@@ -26,10 +25,7 @@ import android.view.MotionEvent.AXIS_RZ
 import android.view.MotionEvent.AXIS_X
 import android.view.MotionEvent.AXIS_Y
 import android.view.MotionEvent.AXIS_Z
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.micewine.emu.LorieView
-import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_MINUS_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_PLUS_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_Y_MINUS_KEY
@@ -56,8 +52,8 @@ import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_X_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.BUTTON_Y_KEY
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.controller.XKeyCodes.ButtonMapping
-import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getDeadZone
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getControllerPreset
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getDeadZone
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMouseSensibility
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerXInput
@@ -269,7 +265,7 @@ object ControllerUtils {
         }
     }
 
-    fun getConnectedControllers(): MutableList<PhysicalController> {
+    private fun getConnectedControllers(): MutableList<PhysicalController> {
         val deviceIds = InputDevice.getDeviceIds()
         val devices = mutableListOf<PhysicalController>()
 
@@ -531,7 +527,7 @@ object ControllerUtils {
         virtualMouseMovingState = state
     }
 
-    fun getAxisStatus(axisX: Float, axisY: Float, deadZone: Float): Int {
+    private fun getAxisStatus(axisX: Float, axisY: Float, deadZone: Float): Int {
         val axisXNeutral = axisX < deadZone && axisX > -deadZone
         val axisYNeutral = axisY < deadZone && axisY > -deadZone
 
@@ -728,7 +724,6 @@ object ControllerUtils {
         var mappingType: Int = MAPPING_TYPE_KEYBOARD_MOUSE,
         var virtualControllerID: Int = -1,
         var supportAxisTrigger: Boolean = false,
-        var flatZone: Float = 0F,
         var swapAnalogs: Boolean = false,
         var deadZone: Float = 0.25F,
         var mouseSensibility: Float = 1F,
@@ -755,12 +750,6 @@ object ControllerUtils {
         var ry: Float = 0F,
         var lt: Float = 0F,
         var rt: Float = 0F,
-    )
-
-    class Axis(
-        var value: Float,
-        var range: MotionRange,
-        var flatZone: Float
     )
 
     class KeyboardMapping(
