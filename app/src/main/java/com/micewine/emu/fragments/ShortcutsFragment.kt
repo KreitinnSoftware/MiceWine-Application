@@ -484,7 +484,7 @@ class ShortcutsFragment : Fragment() {
 
         fun getControllerXInput(name: String, controllerIndex: Int): Boolean {
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1) return false
+            if (index == -1) return true
 
             return gameList[index].controllersEnableXInput[controllerIndex]
         }
@@ -516,7 +516,7 @@ class ShortcutsFragment : Fragment() {
 
         fun getVirtualControllerXInput(name: String): Boolean {
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1) return false
+            if (index == -1) return true
 
             return gameList[index].virtualControllerEnableXInput
         }
@@ -598,7 +598,7 @@ class ShortcutsFragment : Fragment() {
                     false,
                     availableCPUs.joinToString(","),
                     false,
-                    false
+                    true
                 )
             )
 
