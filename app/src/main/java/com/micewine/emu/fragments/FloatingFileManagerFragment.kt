@@ -83,7 +83,7 @@ class FloatingFileManagerFragment(private val operationType: Int, private val in
                     outputFile = File("$fileManagerCwd/" + editText.text.toString())
 
                     if (outputFile!!.exists()) {
-                        Toast.makeText(context, "$outputFile already exists.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "$outputFile ${getString(R.string.already_exists)}", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
 
