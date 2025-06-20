@@ -54,52 +54,39 @@ object ShellLoader {
         return@runBlocking "$output"
     }
 
-    fun runCommand(cmd: String) {
-        ShellLoader().runCommand(cmd, true)
-    }
+    fun runCommand(cmd: String, log: Boolean = true) = runBlocking {
+        if (log) Log.d("ShellLoader", "Trying to exec: $cmd")
 
-    fun runCommand(cmd: String, log: Boolean) {
-        ShellLoader().runCommand(cmd, log)
-    }
+        val shell = Runtime.getRuntime().exec("/system/bin/sh")
+        val os = DataOutputStream(shell?.outputStream)
+        val stdout = BufferedReader(InputStreamReader(shell?.inputStream))
+        val stderr = BufferedReader(InputStreamReader(shell?.errorStream))
 
-    private class ShellLoader {
-        var shell: Process? = Runtime.getRuntime().exec("/system/bin/sh")
-        var os: DataOutputStream? = DataOutputStream(shell?.outputStream)
-        var stdout: BufferedReader? = BufferedReader(InputStreamReader(shell?.inputStream))
-        var stderr: BufferedReader? = BufferedReader(InputStreamReader(shell?.errorStream))
+        os.writeBytes("$cmd\nexit\n")
+        os.flush()
 
-        fun runCommand(cmd: String, log: Boolean) = runBlocking {
-            if (log) {
-                Log.i("ShellLoader", "Trying to exec: '$cmd'")
-            }
-
-            os?.writeBytes("$cmd\nexit\n")
-            os?.flush()
-            os?.close()
-
-            val stdOutJob = async(Dispatchers.IO) {
-                var stdOut: String?
-                while (stdout?.readLine().also { stdOut = it } != null) {
-                    sharedLogs?.appendText("$stdOut")
-                    Log.i("ShellLoader", "$stdOut")
+        val stdOutJob = async(Dispatchers.IO) {
+            stdout.use { reader ->
+                reader.forEachLine { line ->
+                    sharedLogs?.appendText(line)
+                    Log.i("ShellLoader", line)
                 }
-                stdout?.close()
             }
-            val stdErrJob = async(Dispatchers.IO) {
-                var stdErr: String?
-                while (stderr?.readLine().also { stdErr = it } != null) {
-                    sharedLogs?.appendText("$stdErr")
-                    Log.i("ShellLoader", "$stdErr")
-                }
-                stderr?.close()
-            }
-
-            stdOutJob.await()
-            stdErrJob.await()
-
-            shell?.waitFor()
-            shell?.destroy()
         }
+        val stdErrJob = async(Dispatchers.IO) {
+            stderr.use { reader ->
+                reader.forEachLine { line ->
+                    sharedLogs?.appendText(line)
+                    Log.i("ShellLoader", line)
+                }
+            }
+        }
+
+        stdOutJob.await()
+        stdErrJob.await()
+
+        shell.waitFor()
+        shell.destroy()
     }
 
     class ViewModelAppLogs(private val supportFragmentManager: FragmentManager) : ViewModel() {
@@ -109,7 +96,6 @@ object ShellLoader {
             handler.post {
                 logsTextHead.value = "$text\n"
 
-                /*
                 // Check for errors
                 when {
                     text.contains("err:module:import_dll") -> {
@@ -138,7 +124,7 @@ object ShellLoader {
                             "Error on Creating X Window 'X_CreateWindow'"
                         ).show(supportFragmentManager, "")
                     }
-                }*/
+                }
             }
         }
     }

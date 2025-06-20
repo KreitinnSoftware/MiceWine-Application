@@ -818,8 +818,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            runCommand("pkill -9 wineserver")
-            runCommand("pkill -9 .exe")
+            runCommand("pkill -SIGINT -f .exe")
+            runCommand("pkill -SIGINT -f wineserver")
 
             val skCodec = File("/system/lib64/libskcodec.so")
             if (skCodec.exists()) {
@@ -865,8 +865,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            runCommand("pkill -9 wineserver")
-            runCommand("pkill -9 .exe")
+            runCommand("pkill -SIGINT -f .exe")
+            runCommand("pkill -SIGINT -f wineserver")
 
             runOnUiThread {
                 Toast.makeText(this@MainActivity, getString(R.string.wine_is_closed), Toast.LENGTH_SHORT).show()

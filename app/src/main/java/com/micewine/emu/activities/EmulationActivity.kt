@@ -67,6 +67,7 @@ import com.micewine.emu.controller.ControllerUtils.updateAxisState
 import com.micewine.emu.controller.ControllerUtils.updateButtonsState
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
+import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.fragments.ControllerSettingsFragment
 import com.micewine.emu.fragments.LogViewerFragment
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
@@ -162,8 +163,8 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         val headerViewMain: View = findViewById<NavigationView>(R.id.NavigationView).getHeaderView(0).apply {
             findViewById<MaterialButton>(R.id.exitButton).setOnClickListener {
-                runCommand("pkill -9 wineserver")
-                runCommand("pkill -9 .exe")
+                runCommand("pkill -SIGINT -f .exe")
+                runCommand("pkill -SIGINT -f wineserver")
 
                 disconnectController(virtualXInputControllerId)
                 destroyInputServer()
