@@ -500,7 +500,9 @@ class Box64PresetManagerFragment : Fragment() {
             val listType = object : TypeToken<MutableList<Box64Preset>>() {}.type
             val presetList = gson.fromJson<MutableList<Box64Preset>>(json, listType)
 
-            return presetList ?: mutableListOf()
+            return presetList ?: mutableListOf(
+                Box64Preset("default")
+            )
         }
 
         private fun intToBool(int: Int): Boolean = (int == 1)
