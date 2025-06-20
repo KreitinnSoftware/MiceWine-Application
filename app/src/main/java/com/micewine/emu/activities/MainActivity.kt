@@ -460,7 +460,6 @@ class MainActivity : AppCompatActivity() {
                             -1,
                             -1,
                             inputDevice.motionRanges.any { it.axis == MotionEvent.AXIS_LTRIGGER } && inputDevice.motionRanges.any { it.axis == MotionEvent.AXIS_RTRIGGER },
-                            inputDevice.motionRanges.find { it.axis == MotionEvent.AXIS_X }!!.flat
                         )
                     )
                     sharedLogs?.appendText(getDeviceInfoJson(inputDevice))
