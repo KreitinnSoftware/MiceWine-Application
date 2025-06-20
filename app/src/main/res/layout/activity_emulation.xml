@@ -52,6 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="@drawable/menu_bg"
         app:headerLayout="@layout/fragment_drawer">
     </com.google.android.material.navigation.NavigationView>
 
