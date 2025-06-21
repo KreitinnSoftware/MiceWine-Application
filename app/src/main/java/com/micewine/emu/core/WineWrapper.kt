@@ -28,7 +28,7 @@ object WineWrapper {
 
     fun waitForProcess(name: String) {
         while (true) {
-            val wineProcesses = runCommandWithOutput("ps -e -o cmd= | grep .exe")
+            val wineProcesses = runCommandWithOutput("ps -eo name= | grep .exe")
             if (wineProcesses.contains(name)) break
             Thread.sleep(125)
         }

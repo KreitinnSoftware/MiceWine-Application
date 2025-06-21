@@ -829,10 +829,8 @@ class MainActivity : AppCompatActivity() {
             if (!wineServices) {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
-                        val processName = if (exePath == "") "TFM.exe" else File(exePath).name
-
-                        // Wait for Wine Successfully Start and Execute Specified Program and Kill Services
-                        WineWrapper.waitForProcess(processName)
+                        // Wait for Wine Successfully Start and Execute window_handler and Kill Services
+                        WineWrapper.waitForProcess("window_handler.exe")
 
                         runCommand("pkill -9 services.exe", false)
                     }
@@ -840,10 +838,10 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (exePath == "") {
-                WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler ${getCpuHexMask()} TFM")
+                WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler.exe ${getCpuHexMask()} TFM")
             } else {
                 if (enableWineVirtualDesktop) {
-                    WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler ${getCpuHexMask()} '${getSanitizedPath(exePath)}' $exeArguments", "'${getSanitizedPath(File(exePath).parent!!)}'")
+                    WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler.exe ${getCpuHexMask()} '${getSanitizedPath(exePath)}' $exeArguments", "'${getSanitizedPath(File(exePath).parent!!)}'")
                 } else {
                     lifecycleScope.launch {
                         withContext(Dispatchers.IO) {
@@ -859,9 +857,9 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         WineWrapper.wine("'${getSanitizedPath(drive.getUnixPath())}' $exeArguments", "'${getSanitizedPath(File(drive.getUnixPath()).parent!!)}'")
+                    } else {
+                        WineWrapper.wine("'${getSanitizedPath(exePath)}' $exeArguments", "'${getSanitizedPath(File(exePath).parent!!)}'")
                     }
-
-                    WineWrapper.wine("'${getSanitizedPath(exePath)}' $exeArguments", "'${getSanitizedPath(File(exePath).parent!!)}'")
                 }
             }
 
