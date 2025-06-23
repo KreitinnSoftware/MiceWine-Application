@@ -48,6 +48,21 @@
         app:iconGravity="start">
     </com.google.android.material.button.MaterialButton>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/pauseEmulation"
+        android:text="@string/pause_emulation"
+        android:textSize="15sp"
+        android:textAlignment="textStart"
+        android:textColor="@color/textColor"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        style="@style/Widget.Material3.Button.TextButton"
+        app:icon="@android:drawable/ic_media_pause"
+        app:iconTint="@color/textColor"
+        app:iconPadding="10dp"
+        app:iconGravity="start">
+    </com.google.android.material.button.MaterialButton>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

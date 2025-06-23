@@ -239,4 +239,6 @@
     <string name="invalid_preset_name">Invalid Preset Name</string>
     <string name="preset_exported">Preset \'%1$s\' exported</string>
     <string name="already_exists">already exists.</string>
+    <string name="pause_emulation">Pause Emulation</string>
+    <string name="continue_emulation">Continue Emulation</string>
 </resources>

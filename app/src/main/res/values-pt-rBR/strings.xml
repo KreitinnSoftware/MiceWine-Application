@@ -216,4 +216,6 @@
     <string name="invalid_preset_name">Nome do Preset Inválido</string>
     <string name="preset_exported">Preset \'%1$s\' exportado</string>
     <string name="already_exists">já existe.</string>
+    <string name="pause_emulation">Pausar Emulação</string>
+    <string name="continue_emulation">Continuar Emulação</string>
 </resources>

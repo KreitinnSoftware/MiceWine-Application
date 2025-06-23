@@ -10,6 +10,8 @@ import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -32,6 +34,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.GravityCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -114,8 +117,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     private var drawerLayout: DrawerLayout? = null
     private var logsNavigationView: NavigationView? = null
     private var openCloseVirtualControllerSwitch: MaterialSwitch? = null
+    private var pauseEmulationButton: MaterialButton? = null
     private var virtualKeyboardInputView: VirtualKeyboardInputView? = null
     private var virtualControllerInputView: VirtualControllerInputView? = null
+    private var emulationPaused: Boolean = false
 
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -251,6 +256,20 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     putExtra("presetType", VIRTUAL_CONTROLLER_PRESET)
                 }
                 startActivity(intent)
+            }
+            findViewById<MaterialButton>(R.id.pauseEmulation).let { button ->
+                button.setOnClickListener {
+                    if (emulationPaused) {
+                        runCommand("pkill -SIGCONT -f .exe")
+                        button.text = getString(R.string.pause_emulation)
+                        button.icon = AppCompatResources.getDrawable(this@EmulationActivity, android.R.drawable.ic_media_pause)
+                    } else {
+                        runCommand("pkill -SIGSTOP -f .exe")
+                        button.text = getString(R.string.continue_emulation)
+                        button.icon = AppCompatResources.getDrawable(this@EmulationActivity, android.R.drawable.ic_media_play)
+                    }
+                    emulationPaused = !emulationPaused
+                }
             }
         }
 

@@ -212,4 +212,6 @@
     <string name="invalid_preset_name">Недопустимое имя пресета</string>
     <string name="preset_exported">Пресет \'%1$s\' экспортирован</string>
     <string name="already_exists">уже существует.</string>
+    <string name="pause_emulation">Пауза эмуляции</string>
+    <string name="continue_emulation">Продолжить эмуляцию</string>
 </resources>

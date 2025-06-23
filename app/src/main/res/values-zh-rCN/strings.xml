@@ -216,4 +216,6 @@
     <string name="invalid_preset_name">无效的预设名称</string>
     <string name="preset_exported">预设 \'%1$s\' 已导出</string>
     <string name="already_exists">已存在。</string>
+    <string name="pause_emulation">暂停模拟</string>
+    <string name="continue_emulation">继续模拟</string>
 </resources>
