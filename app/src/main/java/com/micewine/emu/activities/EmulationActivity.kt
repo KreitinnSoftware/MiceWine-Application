@@ -69,6 +69,8 @@ import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.fragments.ControllerSettingsFragment
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
 import com.micewine.emu.fragments.LogViewerFragment
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerXInput
@@ -237,6 +239,18 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
             findViewById<MaterialButton>(R.id.editControllerMapping).setOnClickListener {
                 ControllerSettingsFragment().show(supportFragmentManager, "")
+            }
+            findViewById<MaterialButton>(R.id.startControllerPresetManager).setOnClickListener {
+                val intent = Intent(this@EmulationActivity, PresetManagerActivity::class.java).apply {
+                    putExtra("presetType", CONTROLLER_PRESET)
+                }
+                startActivity(intent)
+            }
+            findViewById<MaterialButton>(R.id.startVirtualControllerPresetManager).setOnClickListener {
+                val intent = Intent(this@EmulationActivity, PresetManagerActivity::class.java).apply {
+                    putExtra("presetType", VIRTUAL_CONTROLLER_PRESET)
+                }
+                startActivity(intent)
             }
         }
 
