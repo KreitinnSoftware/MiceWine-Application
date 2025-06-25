@@ -65,25 +65,27 @@ object ShellLoader {
         os.writeBytes("$cmd\nexit\n")
         os.flush()
 
-        val stdOutJob = async(Dispatchers.IO) {
-            stdout.use { reader ->
-                reader.forEachLine { line ->
-                    sharedLogs?.appendText(line)
-                    Log.i("ShellLoader", line)
+        if (log) {
+            val stdOutJob = async(Dispatchers.IO) {
+                stdout.use { reader ->
+                    reader.forEachLine { line ->
+                        sharedLogs?.appendText(line)
+                        Log.i("ShellLoader", line)
+                    }
                 }
             }
-        }
-        val stdErrJob = async(Dispatchers.IO) {
-            stderr.use { reader ->
-                reader.forEachLine { line ->
-                    sharedLogs?.appendText(line)
-                    Log.i("ShellLoader", line)
+            val stdErrJob = async(Dispatchers.IO) {
+                stderr.use { reader ->
+                    reader.forEachLine { line ->
+                        sharedLogs?.appendText(line)
+                        Log.i("ShellLoader", line)
+                    }
                 }
             }
-        }
 
-        stdOutJob.await()
-        stdErrJob.await()
+            stdOutJob.await()
+            stdErrJob.await()
+        }
 
         shell.waitFor()
         shell.destroy()

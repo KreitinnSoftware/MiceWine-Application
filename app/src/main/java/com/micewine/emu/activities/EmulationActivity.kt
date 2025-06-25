@@ -10,8 +10,6 @@ import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -117,7 +115,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
     private var drawerLayout: DrawerLayout? = null
     private var logsNavigationView: NavigationView? = null
     private var openCloseVirtualControllerSwitch: MaterialSwitch? = null
-    private var pauseEmulationButton: MaterialButton? = null
     private var virtualKeyboardInputView: VirtualKeyboardInputView? = null
     private var virtualControllerInputView: VirtualControllerInputView? = null
     private var emulationPaused: Boolean = false
@@ -170,8 +167,7 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         val headerViewMain: View = findViewById<NavigationView>(R.id.NavigationView).getHeaderView(0).apply {
             findViewById<MaterialButton>(R.id.exitButton).setOnClickListener {
-                runCommand("pkill -SIGINT -f .exe")
-                runCommand("pkill -SIGINT -f wineserver")
+                WineWrapper.killAll()
 
                 disconnectController(virtualXInputControllerId)
                 destroyInputServer()

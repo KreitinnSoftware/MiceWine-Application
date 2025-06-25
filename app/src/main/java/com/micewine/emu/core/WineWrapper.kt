@@ -55,6 +55,12 @@ object WineWrapper {
         )
     }
 
+    fun killAll() {
+        runCommand(getEnv() + "WINEPREFIX='$winePrefixesDir/$winePrefix' $IS_BOX64 wineserver -k", false)
+        runCommand("pkill -SIGINT -f .exe")
+        runCommand("pkill -SIGINT -f wineserver")
+    }
+
     fun clearDrives() {
         var letter = 'e'
 
