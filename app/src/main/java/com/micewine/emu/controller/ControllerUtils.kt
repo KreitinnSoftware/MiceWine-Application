@@ -26,6 +26,7 @@ import android.view.MotionEvent.AXIS_X
 import android.view.MotionEvent.AXIS_Y
 import android.view.MotionEvent.AXIS_Z
 import com.micewine.emu.LorieView
+import com.micewine.emu.activities.EmulationActivity.Companion.handler
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_MINUS_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_X_PLUS_KEY
 import com.micewine.emu.activities.PresetManagerActivity.Companion.AXIS_HAT_Y_MINUS_KEY
@@ -63,7 +64,6 @@ import com.micewine.emu.input.InputStub.BUTTON_MIDDLE
 import com.micewine.emu.input.InputStub.BUTTON_RIGHT
 import com.micewine.emu.input.InputStub.BUTTON_UNDEFINED
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -74,9 +74,6 @@ object ControllerUtils {
     const val KEYBOARD = 0
     const val MOUSE = 1
 
-    private var virtualMouseMovingState: Int? = null
-    private var axisXVelocity: Float = 0F
-    private var axisYVelocity: Float = 0F
     private var controllerIndex = 0
     private lateinit var lorieView: LorieView
     const val UP = 1
@@ -92,90 +89,25 @@ object ControllerUtils {
 
     fun initialize(context: Context) {
         lorieView = LorieView(context)
+        handler.postDelayed(virtualMouseControllerRunnable, 16L)
     }
 
-    suspend fun controllerMouseEmulation() {
-        withContext(Dispatchers.IO) {
-            while (true) {
-                val mouseSensibility = getMouseSensibility(getControllerPreset(selectedGameName, controllerIndex)).toFloat() / 100
+    private var lastAxisX = 0F
+    private var lastAxisY = 0F
+    private var mouseSensibility = 0F
 
-                when (virtualMouseMovingState) {
-                    LEFT -> {
-                        lorieView.sendMouseEvent(
-                            -10F * (axisXVelocity * mouseSensibility),
-                            0F,
-                            BUTTON_UNDEFINED,
-                            false,
-                            true
-                        )
-                    }
-                    RIGHT -> {
-                        lorieView.sendMouseEvent(
-                            10F * (axisXVelocity * mouseSensibility),
-                            0F,
-                            BUTTON_UNDEFINED,
-                            false,
-                            true
-                        )
-                    }
-                    UP -> {
-                        lorieView.sendMouseEvent(
-                            0F,
-                            -10F * (axisYVelocity * mouseSensibility),
-                            BUTTON_UNDEFINED,
-                            false,
-                            true
-                        )
-                    }
-                    DOWN -> {
-                        lorieView.sendMouseEvent(
-                            0F,
-                            10F * (axisYVelocity * mouseSensibility),
-                            BUTTON_UNDEFINED,
-                            false,
-                            true
-                        )
-                    }
-                    LEFT_UP -> {
-                        lorieView.sendMouseEvent(
-                            -10F * (axisXVelocity * mouseSensibility),
-                            -10F * (axisYVelocity * mouseSensibility),
-                            BUTTON_UNDEFINED,
-                            false,
-                            true
-                        )
-                    }
-                    LEFT_DOWN -> {
-                        lorieView.sendMouseEvent(
-                            -10F * (axisXVelocity * mouseSensibility),
-                            10F * (axisYVelocity * mouseSensibility),
-                            BUTTON_UNDEFINED,
-                            false,
-                            true
-                        )
-                    }
-                    RIGHT_UP -> {
-                        lorieView.sendMouseEvent(
-                            10F * (axisXVelocity * mouseSensibility),
-                            -10F * (axisYVelocity * mouseSensibility),
-                            BUTTON_UNDEFINED,
-                            false,
-                            true
-                        )
-                    }
-                    RIGHT_DOWN -> {
-                        lorieView.sendMouseEvent(
-                            10F * (axisXVelocity * mouseSensibility),
-                            10F * (axisYVelocity * mouseSensibility),
-                            BUTTON_UNDEFINED,
-                            false,
-                            true
-                        )
-                    }
-                }
-
-                delay(20)
+    private val virtualMouseControllerRunnable = object : Runnable {
+        override fun run() {
+            if (lastAxisX.absoluteValue > 0.125F || lastAxisY.absoluteValue > 0.125F) {
+                lorieView.sendMouseEvent(
+                    lastAxisX * mouseSensibility,
+                    lastAxisY * mouseSensibility,
+                    BUTTON_UNDEFINED,
+                    false,
+                    true
+                )
             }
+            handler.postDelayed(this, 16L)
         }
     }
 
@@ -520,13 +452,6 @@ object ControllerUtils {
         return true
     }
 
-    private fun setVirtualMouseState(axisX: Float, axisY: Float, state: Int) {
-        if (axisX.absoluteValue > 0.25F) axisXVelocity = axisX.absoluteValue
-        if (axisY.absoluteValue > 0.25F) axisYVelocity = axisY.absoluteValue
-
-        virtualMouseMovingState = state
-    }
-
     private fun getAxisStatus(axisX: Float, axisY: Float, deadZone: Float): Int {
         val axisXNeutral = axisX < deadZone && axisX > -deadZone
         val axisYNeutral = axisY < deadZone && axisY > -deadZone
@@ -545,97 +470,67 @@ object ControllerUtils {
     }
 
     fun handleAxis(axisX: Float, axisY: Float, analog: Analog, deadZone: Float) {
+        if (analog.isMouseMapping) {
+            lastAxisX = axisX
+            lastAxisY = axisY
+            mouseSensibility = getMouseSensibility(getControllerPreset(selectedGameName, controllerIndex)).toFloat() / 10F
+            return
+        }
         val status = getAxisStatus(axisX, axisY, deadZone)
         when (status) {
             LEFT -> {
-                if (analog.isMouseMapping) {
-                    setVirtualMouseState(axisX, axisY, LEFT)
-                } else {
-                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
-                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, true)
-                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
-                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
-                }
+                lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
+                lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, true)
+                lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
+                lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
             }
             RIGHT -> {
-                if (analog.isMouseMapping) {
-                    setVirtualMouseState(axisX, axisY, RIGHT)
-                } else {
-                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, true)
-                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
-                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
-                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
-                }
+                lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, true)
+                lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
+                lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
+                lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
             }
             UP -> {
-                if (analog.isMouseMapping) {
-                    setVirtualMouseState(axisX, axisY, UP)
-                } else {
-                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
-                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
-                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, true)
-                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
-                }
+                lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
+                lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
+                lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, true)
+                lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
             }
             DOWN -> {
-                if (analog.isMouseMapping) {
-                    setVirtualMouseState(axisX, axisY, DOWN)
-                } else {
-                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
-                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
-                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
-                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, true)
-                }
+                lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
+                lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
+                lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
+                lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, true)
             }
             LEFT_UP -> {
-                if (analog.isMouseMapping) {
-                    setVirtualMouseState(axisX, axisY, LEFT_UP)
-                } else {
-                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
-                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, true)
-                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, true)
-                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
-                }
+                lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
+                lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, true)
+                lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, true)
+                lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
             }
             LEFT_DOWN -> {
-                if (analog.isMouseMapping) {
-                    setVirtualMouseState(axisX, axisY, LEFT_DOWN)
-                } else {
-                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
-                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, true)
-                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
-                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, true)
-                }
+                lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
+                lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, true)
+                lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
+                lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, true)
             }
             RIGHT_UP -> {
-                if (analog.isMouseMapping) {
-                    setVirtualMouseState(axisX, axisY, RIGHT_UP)
-                } else {
-                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, true)
-                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
-                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, true)
-                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
-                }
+                lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, true)
+                lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
+                lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, true)
+                lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
             }
             RIGHT_DOWN -> {
-                if (analog.isMouseMapping) {
-                    setVirtualMouseState(axisX, axisY, RIGHT_DOWN)
-                } else {
-                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, true)
-                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
-                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
-                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, true)
-                }
+                lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, true)
+                lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
+                lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
+                lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, true)
             }
             else -> {
-                if (analog.isMouseMapping) {
-                    virtualMouseMovingState = null
-                } else {
-                    lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
-                    lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
-                    lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
-                    lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
-                }
+                lorieView.sendKeyEvent(analog.right.scanCode, analog.right.keyCode, false)
+                lorieView.sendKeyEvent(analog.left.scanCode, analog.left.keyCode, false)
+                lorieView.sendKeyEvent(analog.up.scanCode, analog.up.keyCode, false)
+                lorieView.sendKeyEvent(analog.down.scanCode, analog.down.keyCode, false)
             }
         }
     }

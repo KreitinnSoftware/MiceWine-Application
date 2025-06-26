@@ -41,8 +41,8 @@ import com.micewine.emu.activities.MainActivity.Companion.gson
 import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterGame
-import com.micewine.emu.adapters.AdapterGame.GameItem
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
+import com.micewine.emu.adapters.AdapterGame.GameItem
 import com.micewine.emu.core.RatPackageManager.listRatPackagesId
 import com.micewine.emu.databinding.FragmentShortcutsBinding
 import com.micewine.emu.fragments.DebugSettingsFragment.Companion.availableCPUs
@@ -479,10 +479,9 @@ class ShortcutsFragment : Fragment() {
         }
 
         fun getControllerXInputSwapAnalogs(name: String, controllerIndex: Int): Boolean {
+            if (controllerIndex == -1) return false
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1) {
-                return fileManagerControllerSettings.controllerSwapAnalogs[controllerIndex]
-            }
+            if (index == -1) return fileManagerControllerSettings.controllerSwapAnalogs[controllerIndex]
 
             return gameList[index].controllersXInputSwapAnalogs[controllerIndex]
         }
@@ -500,10 +499,9 @@ class ShortcutsFragment : Fragment() {
         }
 
         fun getControllerXInput(name: String, controllerIndex: Int): Boolean {
+            if (controllerIndex == -1) return true
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1) {
-                return fileManagerControllerSettings.controllerIsXInput[controllerIndex]
-            }
+            if (index == -1) return fileManagerControllerSettings.controllerIsXInput[controllerIndex]
 
             return gameList[index].controllersEnableXInput[controllerIndex]
         }
@@ -521,10 +519,9 @@ class ShortcutsFragment : Fragment() {
         }
 
         fun getControllerPreset(name: String, controllerIndex: Int): String {
+            if (controllerIndex == -1) return ""
             val index = gameList.indexOfFirst { it.name == name }
-            if (index == -1 || controllerIndex == -1) {
-                return fileManagerControllerSettings.controllerPreset[controllerIndex]
-            }
+            if (index == -1) return fileManagerControllerSettings.controllerPreset[controllerIndex]
 
             return gameList[index].controllersPreset[controllerIndex]
         }

@@ -70,7 +70,6 @@ import com.micewine.emu.adapters.AdapterBottomNavigation
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.controller.ControllerUtils
 import com.micewine.emu.controller.ControllerUtils.connectedPhysicalControllers
-import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
 import com.micewine.emu.controller.ControllerUtils.disconnectController
 import com.micewine.emu.controller.ControllerUtils.prepareControllersMappings
 import com.micewine.emu.core.EnvVars.getEnv
@@ -531,10 +530,6 @@ class MainActivity : AppCompatActivity() {
         Box64PresetManagerFragment.initialize()
         ShortcutsFragment.initialize()
         ControllerUtils.initialize(this)
-
-        lifecycleScope.launch {
-            controllerMouseEmulation()
-        }
 
         inputManager = getSystemService(INPUT_SERVICE) as InputManager
         inputManager?.registerInputDeviceListener(inputDeviceListener, null)
