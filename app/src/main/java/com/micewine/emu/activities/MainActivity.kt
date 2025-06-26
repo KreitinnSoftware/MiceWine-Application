@@ -1346,9 +1346,12 @@ class MainActivity : AppCompatActivity() {
                 val availProcessors = Runtime.getRuntime().availableProcessors()
 
                 while (enableCpuCounter) {
-                    val usageInfo = runCommandWithOutput("top -bn 1 -u \$(whoami) -o %CPU -q | head -n 1").toFloat() / availProcessors
+                    val usageInfo = runCommandWithOutput("top -bqn 1 -o %CPU").lines()
+                    var usagePercentage = 0F
 
-                    totalCpuUsage = "$usageInfo%"
+                    usageInfo.forEach { usagePercentage += it.trim().toFloatOrNull() ?: 0F }
+
+                    totalCpuUsage = "${usagePercentage / availProcessors}%"
 
                     Thread.sleep(800)
                 }
