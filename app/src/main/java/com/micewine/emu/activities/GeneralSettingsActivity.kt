@@ -208,7 +208,7 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val PA_SINK = "pulseAudioSink"
         const val PA_SINK_DEFAULT_VALUE = "SLES"
         const val WINE_DPI = "wineDpi"
-        const val WINE_DPI_DEFAULT_VALUE = 144
+        const val WINE_DPI_DEFAULT_VALUE = 96
         const val WINE_DPI_APPLIED = "wineDpiApplied"
         const val WINE_DPI_APPLIED_DEFAULT_VALUE = false
     }
