@@ -1,13 +1,8 @@
 package com.micewine.emu.fragments
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -17,24 +12,14 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.materialswitch.MaterialSwitch
 import com.micewine.emu.R
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
-import com.micewine.emu.controller.ControllerUtils.connectedPhysicalControllers
 import com.micewine.emu.controller.ControllerUtils.prepareControllersMappings
-import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getControllerPresets
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerXInput
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerXInputSwapAnalogs
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerXInput
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerPreset
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerXInput
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerXInputSwapAnalogs
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerXInput
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.getVirtualControllerPresets
-import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.putVirtualControllerPreset
 
 class VirtualControllerSettingsFragment : DialogFragment() {
     private lateinit var controllerMappingTypeSpinner: Spinner

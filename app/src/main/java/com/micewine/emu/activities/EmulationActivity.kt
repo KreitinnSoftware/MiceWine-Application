@@ -464,6 +464,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         supportFragmentManager.setFragmentResultListener("invalidateControllerType", this) { _, _ ->
             val isControllerInput = getVirtualControllerXInput(selectedGameName)
 
+            virtualKeyboardInputView?.loadPreset(getSelectedVirtualControllerPreset(selectedGameName))
+            virtualKeyboardInputView?.invalidate()
+
             if (openCloseVirtualControllerSwitch?.isChecked!!) {
                 if (isControllerInput) {
                     virtualKeyboardInputView?.visibility = View.INVISIBLE
