@@ -5,14 +5,14 @@ import android.view.KeyEvent
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.google.gson.Gson
 import com.micewine.emu.R
+import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.enableMangoHUD
 import com.micewine.emu.activities.MainActivity.Companion.fpsLimit
+import com.micewine.emu.activities.MainActivity.Companion.gson
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.adapters.AdapterTabPager
@@ -62,17 +62,9 @@ class RatManagerActivity : AppCompatActivity() {
         setSharedVars(this)
     }
 
-    private fun fragmentLoader(fragment: Fragment) {
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.rat_manager_content, fragment)
-            commit()
-        }
-    }
-
     companion object {
-        private val gson = Gson()
-
-        fun generateICDFile(driverLib: String, destIcd: File) {
+        fun generateICDFile(driverLib: String) {
+            val icdFile = File("$appRootDir/vulkan_icd.json")
             val json = gson.toJson(
                 mapOf(
                     "ICD" to mapOf(
@@ -83,7 +75,7 @@ class RatManagerActivity : AppCompatActivity() {
                 )
             )
 
-            destIcd.writeText(json)
+            icdFile.writeText(json)
         }
 
         fun generateMangoHUDConfFile() {

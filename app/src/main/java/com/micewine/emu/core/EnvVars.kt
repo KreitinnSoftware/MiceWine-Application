@@ -1,39 +1,39 @@
 package com.micewine.emu.core
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Build
-import androidx.preference.PreferenceManager
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.activities.MainActivity.Companion.adrenoToolsDriverFile
 import com.micewine.emu.activities.MainActivity.Companion.appLang
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.box64Avx
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecAlignedAtomics
-import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBigblock
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBigBlock
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecBleedingEdge
-import com.micewine.emu.activities.MainActivity.Companion.box64DynarecCallret
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecCallRet
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecDF
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecDirty
-import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastnan
-import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastround
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastNan
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecFastRound
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecForward
-import com.micewine.emu.activities.MainActivity.Companion.box64DynarecNativeflags
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecNativeFlags
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecPause
-import com.micewine.emu.activities.MainActivity.Companion.box64DynarecSafeflags
-import com.micewine.emu.activities.MainActivity.Companion.box64DynarecStrongmem
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecSafeFlags
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecStrongMem
 import com.micewine.emu.activities.MainActivity.Companion.box64DynarecWait
-import com.micewine.emu.activities.MainActivity.Companion.box64DynarecWeakbarrier
-import com.micewine.emu.activities.MainActivity.Companion.box64DynarecX87double
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecWeakBarrier
+import com.micewine.emu.activities.MainActivity.Companion.box64DynarecX87Double
 import com.micewine.emu.activities.MainActivity.Companion.box64LogLevel
-import com.micewine.emu.activities.MainActivity.Companion.box64Mmap32
+import com.micewine.emu.activities.MainActivity.Companion.box64MMap32
 import com.micewine.emu.activities.MainActivity.Companion.box64NoSigSegv
 import com.micewine.emu.activities.MainActivity.Companion.box64NoSigill
 import com.micewine.emu.activities.MainActivity.Companion.box64ShowBt
 import com.micewine.emu.activities.MainActivity.Companion.box64ShowSegv
 import com.micewine.emu.activities.MainActivity.Companion.box64Sse42
 import com.micewine.emu.activities.MainActivity.Companion.enableDRI3
+import com.micewine.emu.activities.MainActivity.Companion.getLdPreloadWorkaround
+import com.micewine.emu.activities.MainActivity.Companion.gson
 import com.micewine.emu.activities.MainActivity.Companion.homeDir
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedBox64
 import com.micewine.emu.activities.MainActivity.Companion.selectedDXVKHud
@@ -41,32 +41,26 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedGLProfile
 import com.micewine.emu.activities.MainActivity.Companion.selectedMesaVkWsiPresentMode
 import com.micewine.emu.activities.MainActivity.Companion.selectedTuDebugPreset
 import com.micewine.emu.activities.MainActivity.Companion.selectedWine
-import com.micewine.emu.activities.MainActivity.Companion.strBoolToNumStr
+import com.micewine.emu.activities.MainActivity.Companion.strBoolToNum
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.activities.MainActivity.Companion.useAdrenoTools
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.activities.MainActivity.Companion.wineESync
 import com.micewine.emu.activities.MainActivity.Companion.wineLogLevel
+import com.micewine.emu.fragments.EnvVarsSettingsFragment
 import com.micewine.emu.fragments.EnvVarsSettingsFragment.Companion.ENV_VARS_KEY
-import com.micewine.emu.fragments.EnvironmentVariable
 
 object EnvVars {
-    private lateinit var sharedPreferences: SharedPreferences
-
-    fun initialize(context: Context) {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-    }
-
     fun getEnv(): String {
         val vars = mutableListOf<String>()
 
         setEnv(vars)
 
-        val savedVarsJson = sharedPreferences.getString(ENV_VARS_KEY, null)
+        val savedVarsJson = preferences?.getString(ENV_VARS_KEY, null)
         if (savedVarsJson != null) {
-            val type = object : TypeToken<List<EnvironmentVariable>>() {}.type
+            val type = object : TypeToken<List<EnvVarsSettingsFragment.EnvironmentVariable>>() {}.type
 
-            Gson().fromJson<List<EnvironmentVariable>>(savedVarsJson, type).forEach {
+            gson.fromJson<List<EnvVarsSettingsFragment.EnvironmentVariable>>(savedVarsJson, type).forEach {
                 vars.add("${it.key}=${it.value}")
             }
         }
@@ -120,25 +114,26 @@ object EnvVars {
         if (Build.SUPPORTED_ABIS[0] != "x86_64") {
             vars.add("BOX64_LOG=$box64LogLevel")
             vars.add("BOX64_CPUNAME=\"ARM64 CPU\"")
-            vars.add("BOX64_MMAP32=$box64Mmap32")
+            vars.add("BOX64_MMAP32=$box64MMap32")
             vars.add("BOX64_AVX=$box64Avx")
             vars.add("BOX64_SSE42=$box64Sse42")
             vars.add("BOX64_RCFILE=$usrDir/etc/box64.box64rc")
-            vars.add("BOX64_DYNAREC_BIGBLOCK=$box64DynarecBigblock")
-            vars.add("BOX64_DYNAREC_STRONGMEM=$box64DynarecStrongmem")
-            vars.add("BOX64_DYNAREC_WEAKBARRIER=$box64DynarecWeakbarrier")
+            vars.add("BOX64_DYNAREC_BIGBLOCK=$box64DynarecBigBlock")
+            vars.add("BOX64_DYNAREC_STRONGMEM=$box64DynarecStrongMem")
+            vars.add("BOX64_DYNAREC_WEAKBARRIER=$box64DynarecWeakBarrier")
             vars.add("BOX64_DYNAREC_PAUSE=$box64DynarecPause")
-            vars.add("BOX64_DYNAREC_X87DOUBLE=$box64DynarecX87double")
-            vars.add("BOX64_DYNAREC_FASTNAN=$box64DynarecFastnan")
-            vars.add("BOX64_DYNAREC_FASTROUND=$box64DynarecFastround")
-            vars.add("BOX64_DYNAREC_SAFEFLAGS=$box64DynarecSafeflags")
-            vars.add("BOX64_DYNAREC_CALLRET=$box64DynarecCallret")
+            vars.add("BOX64_DYNAREC_X87DOUBLE=$box64DynarecX87Double")
+            vars.add("BOX64_DYNAREC_FASTNAN=$box64DynarecFastNan")
+            vars.add("BOX64_DYNAREC_FASTROUND=$box64DynarecFastRound")
+            vars.add("BOX64_DYNAREC_SAFEFLAGS=$box64DynarecSafeFlags")
+            vars.add("BOX64_DYNAREC_CALLRET=$box64DynarecCallRet")
             vars.add("BOX64_DYNAREC_ALIGNED_ATOMICS=$box64DynarecAlignedAtomics")
-            vars.add("BOX64_DYNAREC_NATIVEFLAGS=$box64DynarecNativeflags")
+            vars.add("BOX64_DYNAREC_NATIVEFLAGS=$box64DynarecNativeFlags")
             vars.add("BOX64_DYNAREC_BLEEDING_EDGE=$box64DynarecBleedingEdge")
             vars.add("BOX64_DYNAREC_WAIT=$box64DynarecWait")
             vars.add("BOX64_DYNAREC_DIRTY=$box64DynarecDirty")
             vars.add("BOX64_DYNAREC_FORWARD=$box64DynarecForward")
+            vars.add("BOX64_DYNAREC_DF=$box64DynarecDF")
             vars.add("BOX64_SHOWSEGV=$box64ShowSegv")
             vars.add("BOX64_SHOWBT=$box64ShowBt")
             vars.add("BOX64_NOSIGSEGV=$box64NoSigSegv")
@@ -152,14 +147,18 @@ object EnvVars {
         }
 
         vars.add("WINE_Z_DISK=$appRootDir")
-        vars.add("WINEESYNC=${strBoolToNumStr(wineESync)}")
+        vars.add("WINEESYNC=${strBoolToNum(wineESync)}")
 
         if (useAdrenoTools) {
             vars.add("USE_ADRENOTOOLS=1")
             vars.add("ADRENOTOOLS_CUSTOM_DRIVER_DIR=${adrenoToolsDriverFile?.parent}/")
             vars.add("ADRENOTOOLS_CUSTOM_DRIVER_NAME=${adrenoToolsDriverFile?.name}")
             // Workaround for dlopen error (at least on my device)
-            vars.add("LD_PRELOAD=/system/lib64/libEGL.so:/system/lib64/libGLESv1_CM.so")
+            vars.add(getLdPreloadWorkaround())
         }
+
+        // Force SDL Games to use DInput/XInput (RawInput and WGI don't works)
+        vars.add("SDL_JOYSTICK_WGI=0")
+        vars.add("SDL_JOYSTICK_RAWINPUT=0")
     }
 }

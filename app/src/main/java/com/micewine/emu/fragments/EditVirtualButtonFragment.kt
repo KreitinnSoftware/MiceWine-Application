@@ -17,18 +17,18 @@ import androidx.fragment.app.DialogFragment
 import com.micewine.emu.R
 import com.micewine.emu.activities.VirtualControllerOverlayMapper.Companion.ACTION_INVALIDATE
 import com.micewine.emu.controller.XKeyCodes.getKeyNames
-import com.micewine.emu.controller.XKeyCodes.getXKeyScanCodes
-import com.micewine.emu.views.OverlayView.Companion.SHAPE_CIRCLE
-import com.micewine.emu.views.OverlayView.Companion.SHAPE_RECTANGLE
-import com.micewine.emu.views.OverlayView.Companion.SHAPE_SQUARE
-import com.micewine.emu.views.OverlayView.Companion.analogList
-import com.micewine.emu.views.OverlayView.Companion.buttonList
-import com.micewine.emu.views.OverlayView.Companion.dpadList
-import com.micewine.emu.views.OverlayViewCreator.Companion.ANALOG
-import com.micewine.emu.views.OverlayViewCreator.Companion.BUTTON
-import com.micewine.emu.views.OverlayViewCreator.Companion.DPAD
-import com.micewine.emu.views.OverlayViewCreator.Companion.lastSelectedButton
-import com.micewine.emu.views.OverlayViewCreator.Companion.lastSelectedType
+import com.micewine.emu.controller.XKeyCodes.getMapping
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.SHAPE_CIRCLE
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.SHAPE_RECTANGLE
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.SHAPE_SQUARE
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.analogList
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.buttonList
+import com.micewine.emu.views.VirtualKeyboardInputView.Companion.dpadList
+import com.micewine.emu.views.VirtualKeyboardInputCreatorView.Companion.ANALOG
+import com.micewine.emu.views.VirtualKeyboardInputCreatorView.Companion.BUTTON
+import com.micewine.emu.views.VirtualKeyboardInputCreatorView.Companion.DPAD
+import com.micewine.emu.views.VirtualKeyboardInputCreatorView.Companion.lastSelectedButton
+import com.micewine.emu.views.VirtualKeyboardInputCreatorView.Companion.lastSelectedType
 
 class EditVirtualButtonFragment : DialogFragment() {
     @SuppressLint("SetTextI18n")
@@ -115,7 +115,7 @@ class EditVirtualButtonFragment : DialogFragment() {
         saveButton.setOnClickListener {
             if (lastSelectedType == BUTTON && buttonList.isNotEmpty()) {
                 buttonList[lastSelectedButton - 1].keyName = buttonSpinner.selectedItem.toString()
-                buttonList[lastSelectedButton - 1].keyCodes = getXKeyScanCodes(buttonSpinner.selectedItem.toString())
+                buttonList[lastSelectedButton - 1].buttonMapping = getMapping(buttonSpinner.selectedItem.toString())
 
                 buttonList[lastSelectedButton - 1].radius = radiusSeekbar.progress.toFloat()
 
@@ -126,35 +126,35 @@ class EditVirtualButtonFragment : DialogFragment() {
                 }
             } else if (lastSelectedType == ANALOG && analogList.isNotEmpty()) {
                 analogList[lastSelectedButton - 1].upKeyName = analogUpKeySpinner.selectedItem.toString()
-                analogList[lastSelectedButton - 1].upKeyCodes = getXKeyScanCodes(analogUpKeySpinner.selectedItem.toString())
+                analogList[lastSelectedButton - 1].upKeyCodes = getMapping(analogUpKeySpinner.selectedItem.toString())
 
                 analogList[lastSelectedButton - 1].downKeyName = analogDownKeySpinner.selectedItem.toString()
-                analogList[lastSelectedButton - 1].downKeyCodes = getXKeyScanCodes(analogDownKeySpinner.selectedItem.toString())
+                analogList[lastSelectedButton - 1].downKeyCodes = getMapping(analogDownKeySpinner.selectedItem.toString())
 
                 analogList[lastSelectedButton - 1].leftKeyName = analogLeftKeySpinner.selectedItem.toString()
-                analogList[lastSelectedButton - 1].leftKeyCodes = getXKeyScanCodes(analogLeftKeySpinner.selectedItem.toString())
+                analogList[lastSelectedButton - 1].leftKeyCodes = getMapping(analogLeftKeySpinner.selectedItem.toString())
 
                 analogList[lastSelectedButton - 1].rightKeyName = analogRightKeySpinner.selectedItem.toString()
-                analogList[lastSelectedButton - 1].rightKeyCodes = getXKeyScanCodes(analogRightKeySpinner.selectedItem.toString())
+                analogList[lastSelectedButton - 1].rightKeyCodes = getMapping(analogRightKeySpinner.selectedItem.toString())
 
                 analogList[lastSelectedButton - 1].radius = radiusSeekbar.progress.toFloat()
             } else if (lastSelectedType == DPAD && dpadList.isNotEmpty()) {
                 dpadList[lastSelectedButton - 1].upKeyName = analogUpKeySpinner.selectedItem.toString()
-                dpadList[lastSelectedButton - 1].upKeyCodes = getXKeyScanCodes(analogUpKeySpinner.selectedItem.toString())
+                dpadList[lastSelectedButton - 1].upKeyCodes = getMapping(analogUpKeySpinner.selectedItem.toString())
 
                 dpadList[lastSelectedButton - 1].downKeyName = analogDownKeySpinner.selectedItem.toString()
-                dpadList[lastSelectedButton - 1].downKeyCodes = getXKeyScanCodes(analogDownKeySpinner.selectedItem.toString())
+                dpadList[lastSelectedButton - 1].downKeyCodes = getMapping(analogDownKeySpinner.selectedItem.toString())
 
                 dpadList[lastSelectedButton - 1].leftKeyName = analogLeftKeySpinner.selectedItem.toString()
-                dpadList[lastSelectedButton - 1].leftKeyCodes = getXKeyScanCodes(analogLeftKeySpinner.selectedItem.toString())
+                dpadList[lastSelectedButton - 1].leftKeyCodes = getMapping(analogLeftKeySpinner.selectedItem.toString())
 
                 dpadList[lastSelectedButton - 1].rightKeyName = analogRightKeySpinner.selectedItem.toString()
-                dpadList[lastSelectedButton - 1].rightKeyCodes = getXKeyScanCodes(analogRightKeySpinner.selectedItem.toString())
+                dpadList[lastSelectedButton - 1].rightKeyCodes = getMapping(analogRightKeySpinner.selectedItem.toString())
 
                 dpadList[lastSelectedButton - 1].radius = radiusSeekbar.progress.toFloat()
             }
 
-            context?.sendBroadcast(
+            requireContext().sendBroadcast(
                 Intent(ACTION_INVALIDATE)
             )
 

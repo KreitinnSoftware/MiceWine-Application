@@ -7,14 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.miceWineVersion
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
-import com.micewine.emu.activities.MainActivity.Companion.selectedBox64
-import com.micewine.emu.core.ShellLoader.runCommandWithOutput
-import com.micewine.emu.core.WineWrapper
 import com.micewine.emu.databinding.FragmentAboutBinding
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,37 +35,16 @@ class AboutFragment : Fragment() {
         }
 
         rootView?.findViewById<TextView>(R.id.RootfsVersion)?.apply {
-            CoroutineScope(Dispatchers.IO).launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 val rootFsVersionFile = File("$ratPackagesDir/rootfs-pkg-header")
-                val newText = if (rootFsVersionFile.exists())
+                val newText = if (rootFsVersionFile.exists()) {
                     rootFsVersionFile.readLines()[2].substringAfter("=").replace("(", "(git-")
-                else
+                } else {
                     "???"
+                }
 
                 withContext(Dispatchers.Main) {
                     text = newText
-                }
-            }
-        }
-
-        rootView?.findViewById<TextView>(R.id.Box64Version)?.apply {
-            CoroutineScope(Dispatchers.IO).launch {
-                val resultText = runCommandWithOutput("$ratPackagesDir/$selectedBox64/files/usr/bin/box64 -v")
-                    .replace("\n", "")
-                    .ifEmpty { "???" }
-
-                withContext(Dispatchers.Main) {
-                    text = resultText
-                }
-            }
-        }
-
-        rootView?.findViewById<TextView>(R.id.WineVersion)?.apply {
-            CoroutineScope(Dispatchers.IO).launch {
-                val resultText = WineWrapper.wine("--version", true).ifEmpty { "???" }
-
-                withContext(Dispatchers.Main) {
-                    text = resultText
                 }
             }
         }

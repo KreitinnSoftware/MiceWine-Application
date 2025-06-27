@@ -12,8 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.controller.XKeyCodes
+import com.micewine.emu.controller.XKeyCodes.getMapping
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.editControllerPreset
-import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getMapping
+import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.getControllerPreset
 
 class AdapterSettingsController(private val settingsControllerList: List<SettingsController>, private val context: Context) :
     RecyclerView.Adapter<AdapterSettingsController.ViewHolder>() {
@@ -31,18 +32,18 @@ class AdapterSettingsController(private val settingsControllerList: List<Setting
 
         holder.image.setImageResource(sList.image)
         
-        val mapping = getMapping(clickedPresetName, sList.key)
+        val mapping = getControllerPreset(clickedPresetName, sList.key) ?: return
 
         when (sList.image) {
             R.drawable.l_up, R.drawable.l_down, R.drawable.l_left, R.drawable.l_right,
             R.drawable.r_up, R.drawable.r_down, R.drawable.r_left, R.drawable.r_right -> {
                 holder.keyBindSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, keyEntries)
-                holder.keyBindSpinner.setSelection(keyEntries.indexOf(mapping[0]))
+                holder.keyBindSpinner.setSelection(keyEntries.indexOf(mapping.name))
             }
 
             else -> {
                 holder.keyBindSpinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, allEntries)
-                holder.keyBindSpinner.setSelection(allEntries.indexOf(mapping[0]))
+                holder.keyBindSpinner.setSelection(allEntries.indexOf(mapping.name))
             }
         }
 
@@ -57,7 +58,7 @@ class AdapterSettingsController(private val settingsControllerList: List<Setting
                     editControllerPreset(
                         clickedPresetName,
                         sList.key,
-                        parent?.selectedItem.toString()
+                        getMapping(parent?.selectedItem.toString())
                     )
                 }
 

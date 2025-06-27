@@ -21,6 +21,7 @@ import com.micewine.emu.fragments.DriversSettingsFragment
 import com.micewine.emu.fragments.EnvVarsSettingsFragment
 import com.micewine.emu.fragments.GeneralSettingsFragment
 import com.micewine.emu.fragments.SoundSettingsFragment
+import com.micewine.emu.fragments.WineSettingsFragment
 
 class GeneralSettingsActivity : AppCompatActivity() {
     private var binding: ActivityGeneralSettingsBinding? = null
@@ -31,6 +32,7 @@ class GeneralSettingsActivity : AppCompatActivity() {
     private val driversSettingsFragment = DriversSettingsFragment()
     private val environmentVariablesSettings = EnvVarsSettingsFragment()
     private val soundSettingsFragment = SoundSettingsFragment()
+    private val wineSettingsFragment = WineSettingsFragment()
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val preference = intent.getStringExtra("preference")
@@ -39,38 +41,31 @@ class GeneralSettingsActivity : AppCompatActivity() {
                 when (preference) {
                     getString(R.string.box64_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.box64_settings_title)
-
                         fragmentLoader(box64SettingsFragment, false)
                     }
-
                     getString(R.string.debug_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.debug_settings_title)
-
                         fragmentLoader(debugSettingsFragment, false)
                     }
-
                     getString(R.string.driver_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.driver_settings_title)
-
                         fragmentLoader(driversSettingsFragment, false)
                     }
-
                     getString(R.string.driver_info_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.driver_info_title)
-
                         fragmentLoader(driverInfoFragment, false)
                     }
-
                     getString(R.string.env_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.env_settings_title)
-
                         fragmentLoader(environmentVariablesSettings, false)
                     }
-
                     getString(R.string.sound_settings_title) -> {
                         generalSettingsToolbar?.title = getString(R.string.sound_settings_title)
-
                         fragmentLoader(soundSettingsFragment, false)
+                    }
+                    getString(R.string.wine_settings_title) -> {
+                        generalSettingsToolbar?.title = getString(R.string.wine_settings_title)
+                        fragmentLoader(wineSettingsFragment, false)
                     }
                 }
             }
@@ -146,39 +141,41 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val BOX64_LOG = "BOX64_LOG"
         const val BOX64_LOG_DEFAULT_VALUE = "1"
         const val BOX64_MMAP32 = "BOX64_MMAP32"
-        const val BOX64_MMAP32_DEFAULT_VALUE = true
+        const val BOX64_MMAP32_DEFAULT_VALUE = 1
         const val BOX64_AVX = "BOX64_AVX"
-        const val BOX64_AVX_DEFAULT_VALUE = "2"
+        const val BOX64_AVX_DEFAULT_VALUE = 2
         const val BOX64_SSE42 = "BOX64_SSE42"
-        const val BOX64_SSE42_DEFAULT_VALUE = true
+        const val BOX64_SSE42_DEFAULT_VALUE = 1
         const val BOX64_DYNAREC_BIGBLOCK = "BOX64_DYNAREC_BIGBLOCK"
-        const val BOX64_DYNAREC_BIGBLOCK_DEFAULT_VALUE = "1"
+        const val BOX64_DYNAREC_BIGBLOCK_DEFAULT_VALUE = 1
         const val BOX64_DYNAREC_STRONGMEM = "BOX64_DYNAREC_STRONGMEM"
-        const val BOX64_DYNAREC_STRONGMEM_DEFAULT_VALUE = "1"
+        const val BOX64_DYNAREC_STRONGMEM_DEFAULT_VALUE = 1
         const val BOX64_DYNAREC_WEAKBARRIER = "BOX64_DYNAREC_WEAKBARRIER"
-        const val BOX64_DYNAREC_WEAKBARRIER_DEFAULT_VALUE = "1"
+        const val BOX64_DYNAREC_WEAKBARRIER_DEFAULT_VALUE = 1
         const val BOX64_DYNAREC_PAUSE = "BOX64_DYNAREC_PAUSE"
-        const val BOX64_DYNAREC_PAUSE_DEFAULT_VALUE = "0"
+        const val BOX64_DYNAREC_PAUSE_DEFAULT_VALUE = 0
         const val BOX64_DYNAREC_X87DOUBLE = "BOX64_DYNAREC_X87DOUBLE"
-        const val BOX64_DYNAREC_X87DOUBLE_DEFAULT_VALUE = false
+        const val BOX64_DYNAREC_X87DOUBLE_DEFAULT_VALUE = 0
         const val BOX64_DYNAREC_FASTNAN = "BOX64_DYNAREC_FASTNAN"
-        const val BOX64_DYNAREC_FASTNAN_DEFAULT_VALUE = true
+        const val BOX64_DYNAREC_FASTNAN_DEFAULT_VALUE = 1
         const val BOX64_DYNAREC_FASTROUND = "BOX64_DYNAREC_FASTROUND"
-        const val BOX64_DYNAREC_FASTROUND_DEFAULT_VALUE = true
+        const val BOX64_DYNAREC_FASTROUND_DEFAULT_VALUE = 1
         const val BOX64_DYNAREC_SAFEFLAGS = "BOX64_DYNAREC_SAFEFLAGS"
-        const val BOX64_DYNAREC_SAFEFLAGS_DEFAULT_VALUE = "1"
+        const val BOX64_DYNAREC_SAFEFLAGS_DEFAULT_VALUE = 1
         const val BOX64_DYNAREC_CALLRET = "BOX64_DYNAREC_CALLRET"
-        const val BOX64_DYNAREC_CALLRET_DEFAULT_VALUE = true
+        const val BOX64_DYNAREC_CALLRET_DEFAULT_VALUE = 1
+        const val BOX64_DYNAREC_DF = "BOX64_DYNAREC_DF"
+        const val BOX64_DYNAREC_DF_DEFAULT_VALUE = 1
         const val BOX64_DYNAREC_ALIGNED_ATOMICS = "BOX64_DYNAREC_ALIGNED_ATOMICS"
-        const val BOX64_DYNAREC_ALIGNED_ATOMICS_DEFAULT_VALUE = false
+        const val BOX64_DYNAREC_ALIGNED_ATOMICS_DEFAULT_VALUE = 0
         const val BOX64_DYNAREC_NATIVEFLAGS = "BOX64_DYNAREC_NATIVEFLAGS"
-        const val BOX64_DYNAREC_NATIVEFLAGS_DEFAULT_VALUE = true
+        const val BOX64_DYNAREC_NATIVEFLAGS_DEFAULT_VALUE = 1
         const val BOX64_DYNAREC_WAIT = "BOX64_DYNAREC_WAIT"
-        const val BOX64_DYNAREC_WAIT_DEFAULT_VALUE = true
+        const val BOX64_DYNAREC_WAIT_DEFAULT_VALUE = 1
         const val BOX64_DYNAREC_DIRTY = "BOX64_DYNAREC_DIRTY"
-        const val BOX64_DYNAREC_DIRTY_DEFAULT_VALUE = false
+        const val BOX64_DYNAREC_DIRTY_DEFAULT_VALUE = 0
         const val BOX64_DYNAREC_FORWARD = "BOX64_DYNAREC_FORWARD"
-        const val BOX64_DYNAREC_FORWARD_DEFAULT_VALUE = "128"
+        const val BOX64_DYNAREC_FORWARD_DEFAULT_VALUE = 128
         const val BOX64_SHOWSEGV = "BOX64_SHOWSEGV"
         const val BOX64_SHOWSEGV_DEFAULT_VALUE = false
         const val BOX64_SHOWBT = "BOX64_SHOWBT"
@@ -210,5 +207,9 @@ class GeneralSettingsActivity : AppCompatActivity() {
         const val FPS_LIMIT = "fpsLimit"
         const val PA_SINK = "pulseAudioSink"
         const val PA_SINK_DEFAULT_VALUE = "SLES"
+        const val WINE_DPI = "wineDpi"
+        const val WINE_DPI_DEFAULT_VALUE = 96
+        const val WINE_DPI_APPLIED = "wineDpiApplied"
+        const val WINE_DPI_APPLIED_DEFAULT_VALUE = false
     }
 }

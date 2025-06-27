@@ -12,7 +12,6 @@ import android.widget.RadioButton
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.FragmentManager
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.PresetManagerActivity.Companion.ACTION_EDIT_BOX64_PRESET
@@ -20,6 +19,9 @@ import com.micewine.emu.activities.PresetManagerActivity.Companion.ACTION_EDIT_C
 import com.micewine.emu.activities.VirtualControllerOverlayMapper
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINE_PREFIX_PRESET
 import com.micewine.emu.fragments.DeleteItemFragment
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_PRESET
 import com.micewine.emu.fragments.FloatingFileManagerFragment
@@ -28,15 +30,15 @@ import com.micewine.emu.fragments.RenameFragment
 import com.micewine.emu.fragments.RenameFragment.Companion.RENAME_PRESET
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putBox64Preset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.putControllerPreset
-import com.micewine.emu.fragments.ShortcutsFragment.Companion.putVirtualControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putSelectedVirtualControllerPreset
+import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.getSelectedWinePrefix
+import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.putSelectedWinePrefix
 
 class AdapterPreset(private val settingsList: MutableList<Item>, private val context: Context, private val supportFragmentManager: FragmentManager) :
     RecyclerView.Adapter<AdapterPreset.ViewHolder>() {
-
-    val preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.adapter_preset_item, parent, false)
@@ -56,7 +58,7 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
 
         if (sList.showRadioButton) {
             when (sList.type) {
-                PHYSICAL_CONTROLLER -> {
+                CONTROLLER_PRESET -> {
                     if (sList.titleSettings == getControllerPreset(selectedGameName, 0)) {
                         selectedPresetId = position
                     }
@@ -66,12 +68,12 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
                         notifyItemRangeChanged(0, settingsList.size)
                     }
                 }
-                VIRTUAL_CONTROLLER -> {
-                    if (sList.titleSettings == getVirtualControllerPreset(selectedGameName)) {
+                VIRTUAL_CONTROLLER_PRESET -> {
+                    if (sList.titleSettings == getSelectedVirtualControllerPreset(selectedGameName)) {
                         selectedPresetId = position
                     }
                     holder.radioButton.setOnClickListener {
-                        putVirtualControllerPreset(selectedGameName, holder.settingsName.text.toString())
+                        putSelectedVirtualControllerPreset(selectedGameName, holder.settingsName.text.toString())
                         selectedPresetId = holder.adapterPosition
                         notifyItemRangeChanged(0, settingsList.size)
                     }
@@ -82,6 +84,16 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
                     }
                     holder.radioButton.setOnClickListener {
                         putBox64Preset(selectedGameName, holder.settingsName.text.toString())
+                        selectedPresetId = holder.adapterPosition
+                        notifyItemRangeChanged(0, settingsList.size)
+                    }
+                }
+                WINE_PREFIX_PRESET -> {
+                    if (sList.titleSettings == getSelectedWinePrefix()) {
+                        selectedPresetId = position
+                    }
+                    holder.radioButton.setOnClickListener {
+                        putSelectedWinePrefix(holder.settingsName.text.toString())
                         selectedPresetId = holder.adapterPosition
                         notifyItemRangeChanged(0, settingsList.size)
                     }
@@ -106,12 +118,12 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
                         clickedPresetType = sList.type
 
                         when (sList.type) {
-                            PHYSICAL_CONTROLLER -> {
+                            CONTROLLER_PRESET -> {
                                 context.sendBroadcast(
                                     Intent(ACTION_EDIT_CONTROLLER_MAPPING)
                                 )
                             }
-                            VIRTUAL_CONTROLLER -> {
+                            VIRTUAL_CONTROLLER_PRESET -> {
                                 val intent = Intent(context, VirtualControllerOverlayMapper::class.java)
                                 context.startActivity(intent)
                             }
@@ -128,7 +140,7 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
                         clickedPresetName = sList.titleSettings
                         clickedPresetType = sList.type
 
-                        DeleteItemFragment(DELETE_PRESET, context).show(supportFragmentManager, "")
+                        DeleteItemFragment(DELETE_PRESET).show(supportFragmentManager, "")
 
                         true
                     }
@@ -177,8 +189,6 @@ class AdapterPreset(private val settingsList: MutableList<Item>, private val con
     class Item(var titleSettings: String, var type: Int, var userPreset: Boolean, var showRadioButton: Boolean = false)
 
     companion object {
-        const val PHYSICAL_CONTROLLER = 0
-        const val VIRTUAL_CONTROLLER = 1
         var clickedPresetName = ""
         var clickedPresetType = -1
         var selectedPresetId = -1

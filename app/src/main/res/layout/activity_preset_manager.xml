@@ -29,17 +29,6 @@
         </androidx.appcompat.widget.Toolbar>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/controllerConnected"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:text="@string/no_controllers_connected"
-        android:padding="8dp">
-    </TextView>
-
     <FrameLayout
         android:id="@+id/presetManagerContent"
         android:layout_width="match_parent"

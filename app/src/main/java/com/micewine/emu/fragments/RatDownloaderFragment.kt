@@ -9,10 +9,10 @@ import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.deviceArch
+import com.micewine.emu.activities.MainActivity.Companion.gson
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.adapters.AdapterRatPackage
 import com.micewine.emu.core.RatPackageManager.checkPackageInstalled
@@ -36,7 +36,6 @@ class RatDownloaderFragment(private val prefix: String, private val type: Int, p
     private val ratList: MutableList<AdapterRatPackage.Item> = mutableListOf()
     private var rootView: View? = null
     private var recyclerView: RecyclerView? = null
-    private val gson = Gson()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,7 +59,6 @@ class RatDownloaderFragment(private val prefix: String, private val type: Int, p
 
         lifecycleScope.launch {
             val packages = fetchPackages()
-
             if (packages != null) {
                 packages.forEach {
                     if (it.value.category == prefix || it.value.category == anotherPrefix) {
@@ -118,16 +116,13 @@ class RatDownloaderFragment(private val prefix: String, private val type: Int, p
             private var bufferedSource: BufferedSource? = null
 
             override fun contentType(): MediaType? = responseBody.contentType()
-
             override fun contentLength(): Long = responseBody.contentLength()
-
             override fun source(): BufferedSource {
                 if (bufferedSource == null) {
                     bufferedSource = source(responseBody.source()).buffer()
                 }
                 return bufferedSource!!
             }
-
             private fun source(source: Source): Source {
                 return object : ForwardingSource(source) {
                     var totalBytesRead = 0L

@@ -20,8 +20,8 @@ import android.view.SurfaceView
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.annotation.Keep
-import androidx.preference.PreferenceManager
 import com.micewine.emu.activities.EmulationActivity
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.selectedResolution
 import com.micewine.emu.input.InputStub
 import com.micewine.emu.input.TouchInputHandler
@@ -62,7 +62,7 @@ class LorieView : SurfaceView, InputStub {
             Log.d("SurfaceChangedListener", "Surface was changed: " + measuredWidth + "x" + measuredHeight)
             if (mCallback == null) return
 
-            this@LorieView.dimensionsFromSettings
+            this@LorieView.updateDimensionsFromSettings()
             if (mCallback != null) mCallback!!.changed(holder.surface, measuredWidth, measuredHeight, p.x, p.y)
             this@LorieView.surfaceChanged(holder.surface)
         }
@@ -159,31 +159,29 @@ class LorieView : SurfaceView, InputStub {
             throw NullPointerException()
         }
 
-    private val dimensionsFromSettings: Unit
-        get() {
-            val width = measuredWidth
-            val height = measuredHeight
-            val resolution = (selectedResolution ?: "1280x720" ).split("x".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val w = resolution[0].toInt()
-            val h = resolution[1].toInt()
+    private fun updateDimensionsFromSettings() {
+        val width = measuredWidth
+        val height = measuredHeight
+        val resolution = (selectedResolution ?: "1280x720" ).split("x".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val w = resolution[0].toInt()
+        val h = resolution[1].toInt()
 
-            if ((width < height && w > h) || (width > height && w < h)) {
-                p[h] = w
-            } else {
-                p[w] = h
-            }
+        if ((width < height && w > h) || (width > height && w < h)) {
+            p[h] = w
+        } else {
+            p[w] = h
         }
+    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-        val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
-        if (preferences.getBoolean("displayStretch", false)) {
+        if (preferences?.getBoolean("displayStretch", false) == true) {
             holder.setSizeFromLayout()
             return
         }
 
-        dimensionsFromSettings
+        updateDimensionsFromSettings()
 
         if (p.x <= 0 || p.y <= 0) return
 

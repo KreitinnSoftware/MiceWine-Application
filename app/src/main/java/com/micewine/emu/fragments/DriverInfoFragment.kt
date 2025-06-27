@@ -11,6 +11,7 @@ import android.widget.ScrollView
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.micewine.emu.R
 import com.micewine.emu.activities.MainActivity.Companion.appRootDir
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
@@ -20,6 +21,9 @@ import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.RatPackageManager.listRatPackages
 import com.micewine.emu.core.RatPackageManager.listRatPackagesId
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class DriverInfoFragment : Fragment() {
@@ -56,17 +60,29 @@ class DriverInfoFragment : Fragment() {
                 } else {
                     driverFile = File("$ratPackagesDir/$driverId/pkg-header").readLines()[4].substringAfter("=")
                 }
-                
-                setSharedVars(requireActivity(), null, null, null, null, null, null, null, null, null, null, null, (driverId.contains("AdrenoToolsDriver")), adrenoToolsDriverPath)
 
-                generateICDFile(driverFile, File("$appRootDir/vulkan_icd.json"))
+                setSharedVars(requireActivity(), null, null, null, null, null, null, null, null, null, null, null, adrenoToolsDriverPath)
 
-                driverInfoTextView?.post {
-                    driverInfoTextView?.text = runCommandWithOutput(getEnv() + "vulkaninfo", true)
-                }
+                generateICDFile(driverFile)
 
-                scrollView?.post {
-                    scrollView?.scrollTo(0, 0)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val driverInfo = runCommandWithOutput(getEnv() + "vulkaninfo")
+
+                    withContext(Dispatchers.Main) {
+                        driverInfoTextView?.animate()
+                            ?.alpha(0f)
+                            ?.setDuration(200)
+                            ?.withEndAction {
+                                driverInfoTextView?.text = driverInfo
+                                driverInfoTextView?.animate()
+                                    ?.alpha(1f)
+                                    ?.setDuration(300)
+                                    ?.start()
+                            }
+                            ?.start()
+
+                        scrollView?.scrollTo(0, 0)
+                    }
                 }
             }
 

@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
@@ -17,8 +18,7 @@ import com.micewine.emu.activities.MainActivity.Companion.ACTION_SETUP
 import com.micewine.emu.activities.MainActivity.Companion.customRootFSPath
 import com.micewine.emu.activities.MainActivity.Companion.fileManagerCwd
 import com.micewine.emu.adapters.AdapterFiles
-import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
-import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
+import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetName
 import com.micewine.emu.adapters.AdapterPreset.Companion.clickedPresetType
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.exportBox64Preset
@@ -26,11 +26,14 @@ import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.importBox
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.exportControllerPreset
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.importControllerPreset
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.putExePath
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.exportVirtualControllerPreset
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.importVirtualControllerPreset
 import java.io.File
 
-class FloatingFileManagerFragment(private val operationType: Int) : DialogFragment() {
+class FloatingFileManagerFragment(private val operationType: Int, private val initialCwd: String = "/storage/emulated/0") : DialogFragment() {
     @SuppressLint("SetTextI18n")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater
@@ -42,8 +45,7 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
         recyclerView  = view.findViewById(R.id.recyclerViewFiles)
         recyclerView?.adapter = AdapterFiles(fileList, requireContext(), true)
 
-        fileManagerCwd = "/storage/emulated/0"
-
+        fileManagerCwd = initialCwd
         fmOperationType = operationType
 
         refreshFiles()
@@ -72,29 +74,27 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
                 saveButton.visibility = View.VISIBLE
 
                 when (clickedPresetType) {
-                    VIRTUAL_CONTROLLER -> editText.setText("VirtualController-$clickedPresetName.mwp")
-                    PHYSICAL_CONTROLLER -> editText.setText("PhysicalController-$clickedPresetName.mwp")
+                    VIRTUAL_CONTROLLER_PRESET -> editText.setText("VirtualController-$clickedPresetName.mwp")
+                    CONTROLLER_PRESET -> editText.setText("PhysicalController-$clickedPresetName.mwp")
                     BOX64_PRESET -> editText.setText("Box64-$clickedPresetName.mwp")
                 }
 
                 saveButton.setOnClickListener {
-                    outputFile = "$fileManagerCwd/" + editText.text.toString()
+                    outputFile = File("$fileManagerCwd/" + editText.text.toString())
 
-                    if (File(outputFile!!).exists()) {
+                    if (outputFile!!.exists()) {
+                        Toast.makeText(context, "$outputFile ${getString(R.string.already_exists)}", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
 
                     when (clickedPresetType) {
-                        VIRTUAL_CONTROLLER -> {
-                            exportVirtualControllerPreset(clickedPresetName, outputFile!!)
-                        }
-                        PHYSICAL_CONTROLLER -> {
-                            exportControllerPreset(clickedPresetName, outputFile!!)
-                        }
-                        BOX64_PRESET -> {
-                            exportBox64Preset(requireContext(), clickedPresetName, outputFile!!)
-                        }
+                        VIRTUAL_CONTROLLER_PRESET -> exportVirtualControllerPreset(clickedPresetName, outputFile!!)
+                        CONTROLLER_PRESET -> exportControllerPreset(clickedPresetName, outputFile!!)
+                        BOX64_PRESET -> exportBox64Preset(clickedPresetName, outputFile!!)
                     }
+                    outputFile = null
+
+                    Toast.makeText(context, getString(R.string.preset_exported, clickedPresetName), Toast.LENGTH_LONG).show()
 
                     dismiss()
                 }
@@ -110,19 +110,38 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
                     }
 
                     when (clickedPresetType) {
-                        VIRTUAL_CONTROLLER -> {
-                            importVirtualControllerPreset(requireActivity(), outputFile!!)
-                            outputFile = null
+                        VIRTUAL_CONTROLLER_PRESET -> {
+                            val ret = importVirtualControllerPreset(requireContext(), outputFile!!)
+                            if (!ret) Toast.makeText(requireContext(), R.string.invalid_virtual_controller_preset_file, Toast.LENGTH_SHORT).show()
                         }
-                        PHYSICAL_CONTROLLER -> {
-                            importControllerPreset(requireActivity(), outputFile!!)
-                            outputFile = null
+                        CONTROLLER_PRESET -> {
+                            val ret = importControllerPreset(outputFile!!)
+                            if (!ret) Toast.makeText(requireContext(), R.string.invalid_controller_preset_file, Toast.LENGTH_SHORT).show()
                         }
                         BOX64_PRESET -> {
-                            importBox64Preset(requireActivity(), outputFile!!)
-                            outputFile = null
+                            val ret = importBox64Preset(outputFile!!)
+                            if (!ret) Toast.makeText(requireContext(), R.string.invalid_box64_preset_file, Toast.LENGTH_SHORT).show()
                         }
                     }
+                    outputFile = null
+
+                    dismiss()
+                }.start()
+            }
+            OPERATION_SELECT_EXE -> {
+                selectRootFSFileText.visibility = View.GONE
+                editText.visibility = View.GONE
+                saveButton.visibility = View.GONE
+
+                Thread {
+                    while (outputFile == null || !isAdded) {
+                        Thread.sleep(16)
+                    }
+
+                    putExePath(selectedGameName, outputFile!!.path)
+                    outputFile = null
+
+                    parentFragmentManager.setFragmentResult("invalidate", Bundle())
 
                     dismiss()
                 }.start()
@@ -148,12 +167,13 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
         private var recyclerView: RecyclerView? = null
         private val fileList: MutableList<AdapterFiles.FileList> = mutableListOf()
         var calledSetup: Boolean = false
-        var outputFile: String? = null
+        var outputFile: File? = null
         var fmOperationType = -1
 
         const val OPERATION_SELECT_RAT = 0
         const val OPERATION_EXPORT_PRESET = 1
         const val OPERATION_IMPORT_PRESET = 2
+        const val OPERATION_SELECT_EXE = 3
 
         fun refreshFiles() {
             recyclerView?.adapter?.notifyItemRangeRemoved(0, fileList.count())
@@ -183,22 +203,27 @@ class FloatingFileManagerFragment(private val operationType: Int) : DialogFragme
                                 val mwpType = it.readLines()[0]
 
                                 when (clickedPresetType) {
-                                    PHYSICAL_CONTROLLER -> {
+                                    CONTROLLER_PRESET -> {
                                         if (mwpType == "controllerPreset") {
                                             addToAdapter(it)
                                         }
                                     }
-                                    VIRTUAL_CONTROLLER -> {
+                                    VIRTUAL_CONTROLLER_PRESET -> {
                                         if (mwpType == "virtualControllerPreset") {
                                             addToAdapter(it)
                                         }
                                     }
                                     BOX64_PRESET -> {
-                                        if (mwpType == "box64Preset") {
+                                        if (mwpType == "box64Preset" || mwpType == "box64PresetV2") {
                                             addToAdapter(it)
                                         }
                                     }
                                 }
+                            }
+                        }
+                        OPERATION_SELECT_EXE -> {
+                            if (it.name.endsWith(".exe")) {
+                                addToAdapter(it)
                             }
                         }
                         else -> {

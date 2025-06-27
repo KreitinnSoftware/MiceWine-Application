@@ -75,7 +75,7 @@ class ControllerMapperFragment : Fragment() {
         seekBarDeadZoneValue = rootView?.findViewById(R.id.seekBarDeadZoneValue)
         seekBarDeadZoneValue?.text = "${seekBarDeadZone?.progress}%"
 
-        seekBarDeadZone?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        seekBarDeadZone?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 seekBarDeadZoneValue?.text = "$progress%"
             }
@@ -125,8 +125,8 @@ class ControllerMapperFragment : Fragment() {
         addToAdapter(R.drawable.rt_button, BUTTON_R2_KEY)
         addToAdapter(R.drawable.lb_button, BUTTON_L1_KEY)
         addToAdapter(R.drawable.lt_button, BUTTON_L2_KEY)
-        addToAdapter(R.drawable.start_button, BUTTON_START_KEY)
-        addToAdapter(R.drawable.select_button, BUTTON_SELECT_KEY)
+        addToAdapter(R.drawable.select_button, BUTTON_START_KEY)
+        addToAdapter(R.drawable.start_button, BUTTON_SELECT_KEY)
         addToAdapter(R.drawable.l_thumb, BUTTON_THUMBL_KEY)
         addToAdapter(R.drawable.r_thumb, BUTTON_THUMBR_KEY)
         addToAdapter(R.drawable.l_up, AXIS_Y_MINUS_KEY)
@@ -144,6 +144,8 @@ class ControllerMapperFragment : Fragment() {
     }
 
     private fun addToAdapter(buttonIconId: Int, keyId: String) {
-        settingsList.add(SettingsController(buttonIconId, keyId))
+        settingsList.add(
+            SettingsController(buttonIconId, keyId)
+        )
     }
 }

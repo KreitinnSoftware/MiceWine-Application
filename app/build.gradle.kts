@@ -84,6 +84,7 @@ android {
 }
 
 dependencies {
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("net.lingala.zip4j:zip4j:2.11.5")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
@@ -100,7 +101,6 @@ dependencies {
     implementation("com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0")
     implementation("com.getkeepsafe.taptargetview:taptargetview:1.15.0")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
-    implementation(project(":app:stub"))
 }
 
 fun getGitShortSHA(): String {

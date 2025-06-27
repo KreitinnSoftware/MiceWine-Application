@@ -82,6 +82,8 @@ object XKeyCodes {
             keyNames.plusAssign("M_Left")
             keyNames.plusAssign("M_Middle")
             keyNames.plusAssign("M_Right")
+            keyNames.plusAssign("M_WheelUp")
+            keyNames.plusAssign("M_WheelDown")
         } else {
             keyNames.plusAssign("Mouse")
         }
@@ -93,9 +95,16 @@ object XKeyCodes {
         return keyNames
     }
 
-    fun getXKeyScanCodes(key: String): List<Int> {
+    fun getMapping(key: String): ButtonMapping {
         val scanCode = scanKeyCodes[key]?.first ?: 0
         val keyCode = scanKeyCodes[key]?.second ?: 0
-        return listOf(scanCode, keyCode, KEYBOARD)
+        return ButtonMapping(key, scanCode, keyCode, KEYBOARD)
     }
+
+    class ButtonMapping(
+        var name: String = "",
+        var scanCode: Int = -1,
+        var keyCode: Int = -1,
+        var type: Int = -1
+    )
 }

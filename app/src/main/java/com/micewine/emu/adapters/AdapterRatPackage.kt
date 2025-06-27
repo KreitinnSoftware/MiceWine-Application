@@ -13,11 +13,11 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.TextView
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_BOX64
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_VULKAN_DRIVER
+import com.micewine.emu.activities.MainActivity.Companion.preferences
 import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.tmpDir
 import com.micewine.emu.core.RatPackageManager
@@ -32,7 +32,6 @@ import java.io.File
 class AdapterRatPackage(private val settingsList: MutableList<Item>, private val activity: Activity, private val repositoryPackage: Boolean = false) :
     RecyclerView.Adapter<AdapterRatPackage.ViewHolder>() {
 
-    val preferences = PreferenceManager.getDefaultSharedPreferences(activity)!!
     private var selectedItemId = -1
 
     private fun textAsBitmap(text: String, size: Float, textColor: Int): Bitmap {
@@ -79,7 +78,7 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
 
         when (sList.type) {
             VK_DRIVER -> {
-                selectedItem = preferences.getString(SELECTED_VULKAN_DRIVER, "")
+                selectedItem = preferences?.getString(SELECTED_VULKAN_DRIVER, "")
                 packagePrefix = "VulkanDriver-"
 
                 if (repositoryPackage) {
@@ -88,7 +87,7 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
                 holder.imageView.setImageResource(R.drawable.ic_gpu)
             }
             BOX64 -> {
-                selectedItem = preferences.getString(SELECTED_BOX64, "")
+                selectedItem = preferences?.getString(SELECTED_BOX64, "")
                 packagePrefix = "Box64-"
 
                 if (repositoryPackage) {
@@ -136,7 +135,7 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
 
             radioButton.isChecked = position == selectedItemId
             radioButton.setOnClickListener {
-                preferences.edit().apply {
+                preferences?.edit()?.apply {
                     when (sList.type) {
                         BOX64 -> {
                             putString(SELECTED_BOX64, sList.itemFolderId)
@@ -162,7 +161,7 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
 
                     val firstPackage = File("$ratPackagesDir").listFiles()?.first { it.name.startsWith(packagePrefix!!) }?.name
 
-                    preferences.edit().apply {
+                    preferences?.edit()?.apply {
                         when (sList.type) {
                             BOX64 -> {
                                 putString(SELECTED_BOX64, firstPackage)
@@ -223,7 +222,7 @@ class AdapterRatPackage(private val settingsList: MutableList<Item>, private val
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         val radioButton: RadioButton = itemView.findViewById(R.id.radio_button)
         val settingsName: TextView = itemView.findViewById(R.id.preset_title)
-        val settingsDescription: TextView = itemView.findViewById(R.id.rat_package_description)
+        val settingsDescription: TextView = itemView.findViewById(R.id.rat_package_desc)
         val imageView: ImageView = itemView.findViewById(R.id.image_view)
         val deleteRatPackageButton: ImageButton = itemView.findViewById(R.id.rat_package_delete)
         val downloadRatPackageButton: ImageView = itemView.findViewById(R.id.rat_package_download)

@@ -9,14 +9,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
+import com.micewine.emu.activities.ControllerTestActivity
 import com.micewine.emu.activities.GeneralSettingsActivity
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.ACTION_PREFERENCE_SELECT
 import com.micewine.emu.activities.PresetManagerActivity
 import com.micewine.emu.activities.RatDownloaderActivity
 import com.micewine.emu.activities.RatManagerActivity
-import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
-import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.BOX64_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.CONTROLLER_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROLLER_PRESET
+import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINE_PREFIX_PRESET
 
 class AdapterSettings(private val settingsList: List<SettingsList>, private val context: Context) :
     RecyclerView.Adapter<AdapterSettings.ViewHolder>() {
@@ -54,38 +56,42 @@ class AdapterSettings(private val settingsList: List<SettingsList>, private val 
                     val intent = Intent(context, GeneralSettingsActivity::class.java)
                     context.startActivity(intent)
                 }
-
                 context.getString(R.string.controller_mapper_title) -> {
                     val intent = Intent(context, PresetManagerActivity::class.java).apply {
-                        putExtra("presetType", PHYSICAL_CONTROLLER)
+                        putExtra("presetType", CONTROLLER_PRESET)
                     }
                     context.startActivity(intent)
                 }
-
                 context.getString(R.string.virtual_controller_mapper_title) -> {
                     val intent = Intent(context, PresetManagerActivity::class.java).apply {
-                        putExtra("presetType", VIRTUAL_CONTROLLER)
+                        putExtra("presetType", VIRTUAL_CONTROLLER_PRESET)
                     }
                     context.startActivity(intent)
                 }
-
                 context.getString(R.string.box64_preset_manager_title) -> {
                     val intent = Intent(context, PresetManagerActivity::class.java).apply {
                         putExtra("presetType", BOX64_PRESET)
                     }
                     context.startActivity(intent)
                 }
-
+                context.getString(R.string.wine_prefix_manager_title) -> {
+                    val intent = Intent(context, PresetManagerActivity::class.java).apply {
+                        putExtra("presetType", WINE_PREFIX_PRESET)
+                    }
+                    context.startActivity(intent)
+                }
                 context.getString(R.string.rat_manager_title) -> {
                     val intent = Intent(context, RatManagerActivity::class.java)
                     context.startActivity(intent)
                 }
-
                 context.getString(R.string.rat_downloader_title) -> {
                     val intent = Intent(context, RatDownloaderActivity::class.java)
                     context.startActivity(intent)
                 }
-
+                context.getString(R.string.controller_view_title) -> {
+                    val intent = Intent(context, ControllerTestActivity::class.java)
+                    context.startActivity(intent)
+                }
                 else -> {
                     val intent = Intent(ACTION_PREFERENCE_SELECT).apply {
                         putExtra("preference", settingsModel.titleSettings)

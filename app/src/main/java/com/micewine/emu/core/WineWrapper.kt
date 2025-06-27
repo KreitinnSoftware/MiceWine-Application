@@ -1,9 +1,10 @@
 package com.micewine.emu.core
 
-import android.os.Build
+import com.micewine.emu.activities.MainActivity.Companion.deviceArch
 import com.micewine.emu.activities.MainActivity.Companion.selectedCpuAffinity
 import com.micewine.emu.activities.MainActivity.Companion.wineDisksFolder
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
+import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
 import com.micewine.emu.core.EnvVars.getEnv
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
@@ -11,7 +12,7 @@ import java.io.File
 import kotlin.math.abs
 
 object WineWrapper {
-    private var IS_BOX64 = if (Build.SUPPORTED_ABIS[0] == "x86_64") "" else "box64"
+    private var IS_BOX64 = if (deviceArch == "x86_64") "" else "box64"
 
     fun getCpuHexMask(): String {
         val availCpus = Runtime.getRuntime().availableProcessors()
@@ -25,22 +26,24 @@ object WineWrapper {
         return Integer.toHexString(cpuMask.joinToString("").toInt(2))
     }
 
-    fun waitFor(name: String) {
-        while (!wine("tasklist", true).contains(name)) {
-            Thread.sleep(100)
+    fun waitForProcess(name: String) {
+        while (true) {
+            val wineProcesses = runCommandWithOutput("ps -eo name= | grep .exe")
+            if (wineProcesses.contains(name)) break
+            Thread.sleep(125)
         }
     }
 
     fun wine(args: String) {
         runCommand(
-            getEnv() + "WINEPREFIX='$winePrefix' $IS_BOX64 wine $args"
+            getEnv() + "WINEPREFIX='$winePrefixesDir/$winePrefix' $IS_BOX64 wine $args"
         )
     }
 
     fun wine(args: String, retLog: Boolean): String {
         if (retLog) {
             return runCommandWithOutput(
-                getEnv() + "BOX64_LOG=0 WINEPREFIX='$winePrefix' $IS_BOX64 wine $args"
+                getEnv() + "BOX64_LOG=0 WINEPREFIX='$winePrefixesDir/$winePrefix' $IS_BOX64 wine $args"
             )
         }
         return ""
@@ -48,8 +51,14 @@ object WineWrapper {
 
     fun wine(args: String, cwd: String) {
         runCommand(
-            "cd $cwd;" + getEnv() + "WINEPREFIX='$winePrefix' $IS_BOX64 wine $args"
+            "cd $cwd;" + getEnv() + "WINEPREFIX='$winePrefixesDir/$winePrefix' $IS_BOX64 wine $args"
         )
+    }
+
+    fun killAll() {
+        runCommand(getEnv() + "WINEPREFIX='$winePrefixesDir/$winePrefix' $IS_BOX64 wineserver -k", false)
+        runCommand("pkill -SIGINT -f .exe")
+        runCommand("pkill -SIGINT -f wineserver")
     }
 
     fun clearDrives() {

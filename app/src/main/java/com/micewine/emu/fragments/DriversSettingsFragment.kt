@@ -51,11 +51,11 @@ class DriversSettingsFragment : Fragment() {
 
         settingsList.clear()
 
-        addToAdapter(R.string.enable_dri3, R.string.null_description, null, SWITCH, ENABLE_DRI3_DEFAULT_VALUE, ENABLE_DRI3)
-        addToAdapter(R.string.select_dxvk_hud_preset_title, R.string.null_description, arrayOf("fps", "gpuload", "devinfo", "version", "api", "memory", "cs", "compiler", "allocations", "pipelines", "frametimes", "descriptors", "drawcalls", "submissions"), CHECKBOX, SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE, SELECTED_DXVK_HUD_PRESET)
-        addToAdapter(R.string.mesa_vk_wsi_present_mode_title, R.string.null_description, arrayOf("fifo", "relaxed", "mailbox", "immediate"), SPINNER, SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE, SELECTED_MESA_VK_WSI_PRESENT_MODE)
-        addToAdapter(R.string.tu_debug_title, R.string.null_description, arrayOf("noconform", "flushall", "syncdraw", "sysmem", "gmem", "nolrz", "noubwc", "nomultipos", "forcebin"), CHECKBOX, SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE, SELECTED_TU_DEBUG_PRESET)
-        addToAdapter(R.string.select_gl_profile_title, R.string.null_description, arrayOf(
+        addToAdapter(R.string.enable_dri3, R.string.null_desc, null, SWITCH, ENABLE_DRI3_DEFAULT_VALUE, ENABLE_DRI3)
+        addToAdapter(R.string.select_dxvk_hud_preset_title, R.string.null_desc, arrayOf("fps", "gpuload", "devinfo", "version", "api", "memory", "cs", "compiler", "allocations", "pipelines", "frametimes", "descriptors", "drawcalls", "submissions"), CHECKBOX, SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE, SELECTED_DXVK_HUD_PRESET)
+        addToAdapter(R.string.mesa_vk_wsi_present_mode_title, R.string.null_desc, arrayOf("fifo", "relaxed", "mailbox", "immediate"), SPINNER, SELECTED_MESA_VK_WSI_PRESENT_MODE_DEFAULT_VALUE, SELECTED_MESA_VK_WSI_PRESENT_MODE)
+        addToAdapter(R.string.tu_debug_title, R.string.null_desc, arrayOf("noconform", "flushall", "syncdraw", "sysmem", "gmem", "nolrz", "noubwc", "nomultipos", "forcebin"), CHECKBOX, SELECTED_TU_DEBUG_PRESET_DEFAULT_VALUE, SELECTED_TU_DEBUG_PRESET)
+        addToAdapter(R.string.select_gl_profile_title, R.string.null_desc, arrayOf(
             "GL 2.1", "GL 3.0",
             "GL 3.1", "GL 3.2",
             "GL 3.3", "GL 4.0",

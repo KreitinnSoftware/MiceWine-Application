@@ -17,7 +17,9 @@ import com.micewine.emu.activities.MainActivity.Companion.fileManagerCwd
 import com.micewine.emu.activities.MainActivity.Companion.fileManagerDefaultDir
 import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
+import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.WineWrapper.extractIcon
+import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.adToolsDriverCandidate
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.outputFile
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.utils.DriveUtils
@@ -53,7 +55,6 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                 holder.fileDescription.visibility = View.GONE
             } else {
                 holder.fileDescription.visibility = View.VISIBLE
-
                 holder.fileDescription.text = when (count) {
                     0 -> {
                         context.getString(R.string.empty_text)
@@ -68,10 +69,9 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
             }
         } else if (sList.file.isFile) {
             val fileSize = sList.file.length().toDouble()
+            val fileExtension = sList.file.extension.lowercase()
 
             holder.fileDescription.text = formatSize(fileSize)
-
-            val fileExtension = sList.file.extension.lowercase()
 
             if (fileExtension == "exe") {
                 val output = File("$usrDir/icons/${sList.file.nameWithoutExtension}-icon")
@@ -89,7 +89,6 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                     val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
                     if (drive != null) {
                         val filePath = File(drive.getUnixPath())
-
                         val output = File("$usrDir/icons/${filePath.nameWithoutExtension}-icon")
 
                         extractIcon(filePath, output.path)
@@ -107,6 +106,13 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                 }
             } else if (fileExtension == "rat" || fileExtension == "mwp") {
                 holder.icon.setImageResource(R.drawable.ic_rat_package)
+            } else if (fileExtension == "zip") {
+                val isAdrenoToolsPackage = RatPackageManager.AdrenoToolsPackage(sList.file.path).name != null
+                if (isAdrenoToolsPackage) {
+                    holder.icon.setImageResource(R.drawable.ic_rat_package)
+                } else {
+                    holder.icon.setImageResource(R.drawable.ic_log)
+                }
             } else {
                 holder.icon.setImageResource(R.drawable.ic_log)
             }
@@ -143,7 +149,7 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
                     if (settingsModel.file.name.contains(".rat")) {
                         customRootFSPath = settingsModel.file.path
                     } else {
-                        outputFile = settingsModel.file.path
+                        outputFile = settingsModel.file
                     }
                 } else if (settingsModel.file.isDirectory) {
                     fileManagerCwd = settingsModel.file.path

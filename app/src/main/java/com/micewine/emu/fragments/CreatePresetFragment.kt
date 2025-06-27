@@ -2,8 +2,6 @@ package com.micewine.emu.fragments
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
@@ -11,22 +9,26 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import androidx.preference.PreferenceManager
+import androidx.lifecycle.lifecycleScope
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SELECTED_WINE_PREFIX
-import com.micewine.emu.activities.MainActivity.Companion.ACTION_CREATE_WINE_PREFIX
-import com.micewine.emu.activities.MainActivity.Companion.ratPackagesDir
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
-import com.micewine.emu.activities.MainActivity.Companion.winePrefix
+import com.micewine.emu.activities.MainActivity.Companion.setupDone
+import com.micewine.emu.core.RatPackageManager.listRatPackages
+import com.micewine.emu.core.RatPackageManager.listRatPackagesId
 import com.micewine.emu.fragments.Box64PresetManagerFragment.Companion.addBox64Preset
 import com.micewine.emu.fragments.ControllerPresetManagerFragment.Companion.addControllerPreset
+import com.micewine.emu.fragments.SetupFragment.Companion.dialogTitleText
+import com.micewine.emu.fragments.SetupFragment.Companion.progressBarIsIndeterminate
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.addVirtualControllerPreset
-import java.io.File
+import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.createWinePrefix
+import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.putSelectedWinePrefix
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
-    var preferences: SharedPreferences? = null
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.fragment_create_preset, null)
@@ -36,28 +38,24 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
         val buttonCancel = view.findViewById<Button>(R.id.buttonCancel)
         val wineVersionText = view.findViewById<TextView>(R.id.wineVersionText)
         val wineVersionSpinner = view.findViewById<Spinner>(R.id.wineVersionSpinner)
-        val wineVersionsNames: MutableList<String> = mutableListOf()
         val wineVersions: MutableList<String> = mutableListOf()
+        val wineVersionsId: MutableList<String> = mutableListOf()
 
         val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create()
 
-        preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())!!
-
         when (presetType) {
-            WINEPREFIX_PRESET -> {
+            WINE_PREFIX_PRESET -> {
                 wineVersionText.visibility = View.VISIBLE
                 wineVersionSpinner.visibility = View.VISIBLE
 
-                ratPackagesDir.listFiles()?.sorted()?.forEach {
-                    if (it.isDirectory && it.name.startsWith("Wine-")) {
-                        val wineName = File("$it/pkg-header").readLines()[0].substringAfter("=")
-
-                        wineVersionsNames.add(wineName)
-                        wineVersions.add(it.name)
-                    }
+                listRatPackages("Wine-").forEach {
+                    wineVersions.add(it.name!!)
+                }
+                listRatPackagesId("Wine-").forEach {
+                    wineVersionsId.add(it)
                 }
 
-                wineVersionSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, wineVersionsNames)
+                wineVersionSpinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, wineVersions)
             }
             CONTROLLER_PRESET, VIRTUAL_CONTROLLER_PRESET, BOX64_PRESET -> {
                 wineVersionText.visibility = View.GONE
@@ -66,27 +64,30 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
         }
 
         buttonContinue.setOnClickListener {
-            val newName = editTextNewName.text.toString()
-
+            val newName = editTextNewName.text.toString().trim()
             if (newName == "") {
-                dismiss()
+                Toast.makeText(requireContext(), R.string.invalid_preset_name, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
             when (presetType) {
-                WINEPREFIX_PRESET -> {
-                    preferences!!.edit().apply {
-                        putString(SELECTED_WINE_PREFIX, newName)
-                        apply()
-                    }
-
+                WINE_PREFIX_PRESET -> {
+                    putSelectedWinePrefix(newName)
                     setSharedVars(requireActivity())
 
-                    val createWinePrefixIntent = Intent(ACTION_CREATE_WINE_PREFIX).apply {
-                        putExtra("winePrefix", winePrefix?.path)
-                        putExtra("wine", wineVersions[wineVersionSpinner.selectedItemPosition])
-                    }
+                    lifecycleScope.launch {
+                        setupDone = false
 
-                    requireContext().sendBroadcast(createWinePrefixIntent)
+                        SetupFragment().show(requireActivity().supportFragmentManager, "")
+
+                        dialogTitleText = getString(R.string.creating_wine_prefix)
+                        progressBarIsIndeterminate = true
+
+                        withContext(Dispatchers.IO) {
+                            createWinePrefix(newName, wineVersionsId[wineVersionSpinner.selectedItemId.toInt()])
+                            setupDone = true
+                        }
+                    }
                 }
                 CONTROLLER_PRESET -> {
                     addControllerPreset(requireContext(), newName)
@@ -110,7 +111,7 @@ class CreatePresetFragment(private val presetType: Int) : DialogFragment() {
     }
 
     companion object {
-        const val WINEPREFIX_PRESET = 1
+        const val WINE_PREFIX_PRESET = 1
         const val CONTROLLER_PRESET = 2
         const val VIRTUAL_CONTROLLER_PRESET = 3
         const val BOX64_PRESET = 4

@@ -12,17 +12,18 @@
     android:background="@color/darker_gray"
     tools:context=".activities.VirtualControllerOverlayMapper">
 
-    <com.micewine.emu.views.OverlayViewCreator
+    <com.micewine.emu.views.VirtualKeyboardInputCreatorView
         android:id="@+id/overlayView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </com.micewine.emu.views.OverlayViewCreator>
+    </com.micewine.emu.views.VirtualKeyboardInputCreatorView>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="@drawable/menu_bg"
         app:menu="@menu/virtual_controllers_drawer">
     </com.google.android.material.navigation.NavigationView>
 

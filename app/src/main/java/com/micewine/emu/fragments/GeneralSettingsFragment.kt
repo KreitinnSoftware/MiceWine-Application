@@ -33,16 +33,17 @@ class GeneralSettingsFragment : Fragment() {
 
         settingsList.clear()
 
-        addToAdapter(R.string.debug_settings_title, R.string.debug_settings_description, R.drawable.ic_settings_outline)
-        addToAdapter(R.string.sound_settings_title, R.string.sound_settings_description, R.drawable.ic_sound)
-        addToAdapter(R.string.driver_settings_title, R.string.driver_settings_description, R.drawable.ic_gpu)
-        addToAdapter(R.string.driver_info_title, R.string.driver_info_description, R.drawable.ic_gpu)
-        addToAdapter(R.string.env_settings_title, R.string.env_settings_description, R.drawable.ic_globe)
+        addToAdapter(R.string.debug_settings_title, R.string.debug_settings_desc, R.drawable.ic_settings_outline)
+        addToAdapter(R.string.sound_settings_title, R.string.sound_settings_desc, R.drawable.ic_sound)
+        addToAdapter(R.string.driver_settings_title, R.string.driver_settings_desc, R.drawable.ic_gpu)
+        addToAdapter(R.string.driver_info_title, R.string.driver_info_desc, R.drawable.ic_gpu)
+        addToAdapter(R.string.env_settings_title, R.string.env_settings_desc, R.drawable.ic_globe)
+        addToAdapter(R.string.wine_settings_title, R.string.wine_settings_desc, R.drawable.ic_wine)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, icon: Int) {
         settingsList.add(
-            SettingsList(context?.getString(titleId)!!, context?.getString(descriptionId)!!, icon)
+            SettingsList(getString(titleId), getString(descriptionId), icon)
         )
     }
 }

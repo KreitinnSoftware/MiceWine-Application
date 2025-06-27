@@ -44,11 +44,13 @@ class SoundSettingsFragment : Fragment() {
 
         settingsList.clear()
 
-        addToAdapter(R.string.select_audio_sink, R.string.null_description, arrayOf("SLES", "AAudio"), SPINNER, PA_SINK_DEFAULT_VALUE, PA_SINK)
+        addToAdapter(R.string.select_audio_sink, R.string.null_desc, arrayOf("SLES", "AAudio"), SPINNER, PA_SINK_DEFAULT_VALUE, PA_SINK)
     }
 
     private fun addToAdapter(titleId: Int, descriptionId: Int, valuesArray: Array<String>?, type: Int, defaultValue: Any, keyId: String) {
-        settingsList.add(SettingsListSpinner(titleId, descriptionId, valuesArray, null, type, "$defaultValue", keyId))
+        settingsList.add(
+            SettingsListSpinner(titleId, descriptionId, valuesArray, null, type, "$defaultValue", keyId)
+        )
     }
 
     companion object {
