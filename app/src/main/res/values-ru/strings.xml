@@ -214,4 +214,6 @@
     <string name="already_exists">уже существует.</string>
     <string name="pause_emulation">Пауза эмуляции</string>
     <string name="continue_emulation">Продолжить эмуляцию</string>
+    <string name="kill_process">Завершить процесс</string>
+    <string name="task_manager">Диспетчер задач</string>
 </resources>

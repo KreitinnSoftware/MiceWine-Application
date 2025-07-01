@@ -54,6 +54,8 @@ class WelcomeActivity : AppCompatActivity() {
                         )
                     }
 
+                    finishedWelcomeScreen = true
+
                     finish()
                 }
             }
@@ -120,5 +122,6 @@ class WelcomeActivity : AppCompatActivity() {
 
     companion object {
         private const val REQUEST_CODE = 1000
+        var finishedWelcomeScreen = false
     }
 }

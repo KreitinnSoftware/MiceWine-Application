@@ -75,6 +75,7 @@ import com.micewine.emu.fragments.CreatePresetFragment.Companion.VIRTUAL_CONTROL
 import com.micewine.emu.fragments.LogViewerFragment
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getSelectedVirtualControllerPreset
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerXInput
+import com.micewine.emu.fragments.TaskManagerFragment
 import com.micewine.emu.fragments.VirtualControllerSettingsFragment
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.TouchInputHandler
@@ -266,6 +267,9 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
                     }
                     emulationPaused = !emulationPaused
                 }
+            }
+            findViewById<MaterialButton>(R.id.openTaskMgr).setOnClickListener {
+                TaskManagerFragment().show(supportFragmentManager, "")
             }
         }
 

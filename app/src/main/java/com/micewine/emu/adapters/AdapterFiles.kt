@@ -19,7 +19,6 @@ import com.micewine.emu.activities.MainActivity.Companion.selectedFile
 import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.core.RatPackageManager
 import com.micewine.emu.core.WineWrapper.extractIcon
-import com.micewine.emu.fragments.AskInstallPackageFragment.Companion.adToolsDriverCandidate
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.outputFile
 import com.micewine.emu.fragments.FloatingFileManagerFragment.Companion.refreshFiles
 import com.micewine.emu.utils.DriveUtils
@@ -73,48 +72,66 @@ class AdapterFiles(private val fileList: List<FileList>, private val context: Co
 
             holder.fileDescription.text = formatSize(fileSize)
 
-            if (fileExtension == "exe") {
-                val output = File("$usrDir/icons/${sList.file.nameWithoutExtension}-icon")
+            when (fileExtension) {
+                "exe" -> {
+                    val output = File("$usrDir/icons/${sList.file.nameWithoutExtension}-icon")
 
-                extractIcon(sList.file, output.path)
+                    extractIcon(sList.file.path, output.path)
 
-                if (output.exists() && output.length() > 0) {
-                    holder.icon.setImageBitmap(BitmapFactory.decodeFile(output.path))
-                } else {
-                    holder.icon.setImageResource(R.drawable.ic_log)
+                    if (output.exists() && output.length() > 0) {
+                        holder.icon.setImageBitmap(BitmapFactory.decodeFile(output.path))
+                    } else {
+                        holder.icon.setImageResource(R.drawable.unknown_exe)
+                    }
                 }
-            } else if (fileExtension == "lnk") {
-                try {
-                    val shell = ShellLink(sList.file)
-                    val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
-                    if (drive != null) {
-                        val filePath = File(drive.getUnixPath())
-                        val output = File("$usrDir/icons/${filePath.nameWithoutExtension}-icon")
+                "lnk" -> {
+                    try {
+                        val shell = ShellLink(sList.file)
+                        val drive = DriveUtils.parseWindowsPath(shell.resolveTarget())
+                        if (drive != null) {
+                            val file = File(drive.getUnixPath())
+                            val output = File("$usrDir/icons/${file.nameWithoutExtension}-icon")
 
-                        extractIcon(filePath, output.path)
+                            extractIcon(file.path, output.path)
 
-                        if (output.exists() && output.length() > 0) {
-                            holder.icon.setImageBitmap(BitmapFactory.decodeFile(output.path))
+                            if (output.exists() && output.length() > 0) {
+                                holder.icon.setImageBitmap(BitmapFactory.decodeFile(output.path))
+                            } else {
+                                holder.icon.setImageResource(R.drawable.ic_log)
+                            }
                         } else {
                             holder.icon.setImageResource(R.drawable.ic_log)
                         }
+                    } catch (_: ShellLinkException) {
+                        holder.icon.setImageResource(R.drawable.ic_log)
+                    }
+                }
+                "rat", "mwp" -> {
+                    holder.icon.setImageResource(R.drawable.ic_rat_package)
+                }
+                "zip" -> {
+                    val isAdrenoToolsPackage = RatPackageManager.AdrenoToolsPackage(sList.file.path).name != null
+                    if (isAdrenoToolsPackage) {
+                        holder.icon.setImageResource(R.drawable.ic_rat_package)
                     } else {
                         holder.icon.setImageResource(R.drawable.ic_log)
                     }
-                } catch (_: ShellLinkException) {
+                }
+                "dll" -> {
+                    holder.icon.setImageResource(R.drawable.ic_dll)
+                }
+                "bat" -> {
+                    holder.icon.setImageResource(R.drawable.ic_batch)
+                }
+                "ico", "png", "jpg", "jpeg", "bmp" -> {
+                    holder.icon.setImageBitmap(BitmapFactory.decodeFile(sList.file.path))
+                }
+                "mp3", "ogg", "wav", "flac", "aac", "wma", "aiff" -> {
+                    holder.icon.setImageResource(R.drawable.ic_music)
+                }
+                else -> {
                     holder.icon.setImageResource(R.drawable.ic_log)
                 }
-            } else if (fileExtension == "rat" || fileExtension == "mwp") {
-                holder.icon.setImageResource(R.drawable.ic_rat_package)
-            } else if (fileExtension == "zip") {
-                val isAdrenoToolsPackage = RatPackageManager.AdrenoToolsPackage(sList.file.path).name != null
-                if (isAdrenoToolsPackage) {
-                    holder.icon.setImageResource(R.drawable.ic_rat_package)
-                } else {
-                    holder.icon.setImageResource(R.drawable.ic_log)
-                }
-            } else {
-                holder.icon.setImageResource(R.drawable.ic_log)
             }
         }
     }

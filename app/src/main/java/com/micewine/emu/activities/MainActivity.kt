@@ -26,10 +26,8 @@ import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.micewine.emu.BuildConfig
 import com.micewine.emu.R
-import com.micewine.emu.activities.EmulationActivity.Companion.sharedLogs
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_LOG_DEFAULT_VALUE
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.BOX64_NOSIGILL
@@ -66,6 +64,7 @@ import com.micewine.emu.activities.GeneralSettingsActivity.Companion.WINE_LOG_LE
 import com.micewine.emu.activities.PresetManagerActivity.Companion.SELECTED_BOX64_PRESET
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateICDFile
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
+import com.micewine.emu.activities.WelcomeActivity.Companion.finishedWelcomeScreen
 import com.micewine.emu.adapters.AdapterBottomNavigation
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.controller.ControllerUtils
@@ -461,7 +460,6 @@ class MainActivity : AppCompatActivity() {
                             inputDevice.motionRanges.any { it.axis == MotionEvent.AXIS_LTRIGGER } && inputDevice.motionRanges.any { it.axis == MotionEvent.AXIS_RTRIGGER },
                         )
                     )
-                    sharedLogs?.appendText(getDeviceInfoJson(inputDevice))
                 }
                 prepareControllersMappings()
                 sendBroadcast(
@@ -481,38 +479,6 @@ class MainActivity : AppCompatActivity() {
                 Intent(ACTION_UPDATE_CONTROLLERS_STATUS)
             )
         }
-    }
-
-    private fun getDeviceInfoJson(device: InputDevice): String {
-        val gson = GsonBuilder().setPrettyPrinting().create()
-
-        val motionRanges = device.motionRanges.map { range ->
-            mapOf(
-                "axisName" to MotionEvent.axisToString(range.axis),
-                "axisId" to range.axis,
-                "source" to range.source,
-                "min" to range.min,
-                "max" to range.max,
-                "flat" to range.flat,
-                "fuzz" to range.fuzz,
-                "resolution" to range.resolution
-            )
-        }
-
-        val jsonMap = mapOf(
-            "id" to device.id,
-            "name" to device.name,
-            "isVirtual" to device.isVirtual,
-            "keyboardType" to device.keyboardType,
-            "controllerNumber" to device.controllerNumber,
-            "sources" to device.sources,
-            "vendorId" to device.vendorId,
-            "productId" to device.productId,
-            "hasMicrophone" to device.hasMicrophone(),
-            "motionRanges" to motionRanges
-        )
-
-        return gson.toJson(jsonMap)
     }
 
     private var bottomNavigation: BottomNavigationView? = null
@@ -750,7 +716,7 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch { runXServer(":0") }
 
-        if (!setupDone) {
+        if (!setupDone && finishedWelcomeScreen) {
             if (appBuiltinRootfs) {
                 SetupFragment().show(supportFragmentManager , "")
             } else {

@@ -63,6 +63,21 @@
         app:iconGravity="start">
     </com.google.android.material.button.MaterialButton>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/openTaskMgr"
+        android:text="@string/task_manager"
+        android:textSize="15sp"
+        android:textAlignment="textStart"
+        android:textColor="@color/textColor"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        style="@style/Widget.Material3.Button.TextButton"
+        app:icon="@drawable/ic_taskmgr"
+        app:iconTint="@color/textColor"
+        app:iconPadding="10dp"
+        app:iconGravity="start">
+    </com.google.android.material.button.MaterialButton>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

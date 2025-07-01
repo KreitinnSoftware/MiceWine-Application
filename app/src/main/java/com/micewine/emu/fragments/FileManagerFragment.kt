@@ -140,7 +140,7 @@ class FileManagerFragment : Fragment() {
                 if (selectedFile.endsWith("exe")) {
                     val output = "$usrDir/icons/${File(selectedFile).nameWithoutExtension}-icon"
 
-                    WineWrapper.extractIcon(file, output)
+                    WineWrapper.extractIcon(file.path, output)
 
                     addGameToList(selectedFile, file.nameWithoutExtension, output)
                 } else if (selectedFile.endsWith(".bat") || selectedFile.endsWith(".msi")) {

@@ -218,4 +218,6 @@
     <string name="already_exists">já existe.</string>
     <string name="pause_emulation">Pausar Emulação</string>
     <string name="continue_emulation">Continuar Emulação</string>
+    <string name="kill_process">Encerrar Processo</string>
+    <string name="task_manager">Gerenciador de Tarefas</string>
 </resources>

@@ -241,4 +241,6 @@
     <string name="already_exists">already exists.</string>
     <string name="pause_emulation">Pause Emulation</string>
     <string name="continue_emulation">Continue Emulation</string>
+    <string name="kill_process">Kill Process</string>
+    <string name="task_manager">Task Manager</string>
 </resources>
