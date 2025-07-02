@@ -1,4 +1,6 @@
-## MiceWine Emulator
+![MiceWine Logo](logo.png "MiceWine Logo")
+
+### MiceWine Emulator
 
 MiceWine is a project that aims to run Windows applications and games on Android smartphones.
 
@@ -6,36 +8,64 @@ It uses a customized build of Wine compiled for Android and Box64 to run in the 
 
 Actually in constant development.
 
-It's use a XServer based on Termux-X11 
+---
 
-### Compatible Android Versions
+### Minimum Requirements
 
-Support Android 10+
+- 4GB RAM
+- Vulkan 1.1+
+- Android 10+
+- 64-bit CPU
 
-### Compatible GPUs
+### Recommended Requirements
 
-| GPU        | Support               | Driver                      |
-|------------|-----------------------|-----------------------------|
-| Adreno     | Supported             | Turnip/Native/Zink          |
-| Xclipse    | Supported             | Native/Zink                 |
-| Mali       | Supported             | Native/Zink                 |
-
-The native driver works well for Xclipse GPUs, Adreno GPUs, Mali GPUs.
-
-About Mali GPUs, Only tested on Mali-G615, Mali-G610, Mali G76 and Mali-G925-Immortalis.
-
-Vulkan 1.3 is Recommended for better performance and graphical precision. 1.1 works with DXVK-Stripped-Requirements, but displays various graphical issues.
+- 8GB RAM
+- Vulkan 1.3+ or Turnip Compatible GPU
+- Android 12+
+- 64-bit CPU
 
 ---
 
-## RootFS Download
+### Tested GPUs
+
+- Adreno 610+
+- Adreno 710+
+- Adreno 830
+- Mali G52 MC2
+- Mali G610
+- Mali G615
+- Mali G76
+- Mali G925 Immortalis
+- PowerVR IMG BXM-8-256
+
+---
+
+### Controller Support
+
+MiceWine Supports Up To 4 Physical Controllers. With XInput and DInput Automatic Mapping.
+
+Any Xbox Like Controller May Works.
+
+Tested with Ipega 9021s, Ipega 9078, Altomex AL-G7, Xbox One Controller, Xbox Series Controller.
+
+---
+
+### Keyboard and Mouse Support
+
+MiceWine Should Work Out of Box with Any QWERTY ABNT2 Keyboard and Mouse.
+
+When Mouse is Captured Press Alt+Q on Keyboard to Release or Press Back on Device.
+
+---
+
+### RootFS Download
 
 You can download the required **RootFS** file from this repository:  
-🔗 [MiceWine RootFS Generator](https://github.com/KreitinnSoftware/MiceWine-RootFS-Generator)
+- [MiceWine RootFS Generator](https://github.com/KreitinnSoftware/MiceWine-RootFS-Generator)
 
 ---
 
-## Third Party Open Source Applications:
+### Third Party Open Source Applications:
 
 - [Box64](https://github.com/ptitSeb/box64)
 - [WineHQ](https://gitlab.winehq.org/wine/wine)

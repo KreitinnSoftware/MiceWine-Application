@@ -15,8 +15,8 @@ android {
         minSdk = 28
         //noinspection ExpiredTargetSdkVersion
         targetSdk = 28
-        versionCode = 10
-        versionName = "v0.3.1"
+        versionCode = 11
+        versionName = "v0.4.0"
         signingConfig = signingConfigs.getByName("debug")
         proguardFiles()
     }
