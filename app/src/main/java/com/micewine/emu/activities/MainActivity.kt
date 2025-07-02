@@ -312,7 +312,7 @@ class MainActivity : AppCompatActivity() {
                                     "virtualControllerPreset" -> {
                                         mwpPresetCandidate = Pair(VIRTUAL_CONTROLLER_PRESET, file)
                                     }
-                                    "box64Preset" -> {
+                                    "box64Preset", "box64PresetV2" -> {
                                         mwpPresetCandidate = Pair(BOX64_PRESET, file)
                                     }
                                 }
