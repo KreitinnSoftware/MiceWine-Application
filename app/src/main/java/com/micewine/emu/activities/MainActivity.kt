@@ -147,6 +147,7 @@ import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineESync
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineServices
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getWineVirtualDesktop
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.setIconToGame
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.updateShortcuts
 import com.micewine.emu.fragments.SoundSettingsFragment.Companion.generatePAFile
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment
 import com.micewine.emu.fragments.WinePrefixManagerFragment.Companion.createWinePrefix
@@ -518,6 +519,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_shortcuts -> {
                     selectedFragmentId = 0
                     viewPager?.currentItem = 0
+                    updateShortcuts()
                 }
                 R.id.nav_settings -> {
                     selectedFragmentId = 1
@@ -715,6 +717,8 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         lifecycleScope.launch { runXServer(":0") }
+
+        updateShortcuts()
 
         if (!setupDone && finishedWelcomeScreen) {
             if (appBuiltinRootfs) {

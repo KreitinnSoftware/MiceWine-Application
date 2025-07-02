@@ -649,6 +649,10 @@ class ShortcutsFragment : Fragment() {
             recyclerView?.adapter?.notifyItemRemoved(index)
         }
 
+        fun updateShortcuts() {
+            recyclerView?.adapter?.notifyItemRangeChanged(0, gameList.size)
+        }
+
         fun setGameName(name: String, newName: String) {
             val index = gameList.indexOfFirst { it.name == name }
             if (index == -1) return
