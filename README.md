@@ -37,6 +37,9 @@ Actually in constant development.
 - Mali G76
 - Mali G925 Immortalis
 - PowerVR IMG BXM-8-256
+- Xclipse 530
+- Xclipse 920
+- Xclipse 940
 
 ---
 
