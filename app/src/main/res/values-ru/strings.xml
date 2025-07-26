@@ -216,4 +216,5 @@
     <string name="continue_emulation">Продолжить эмуляцию</string>
     <string name="kill_process">Завершить процесс</string>
     <string name="task_manager">Диспетчер задач</string>
+    <string name="invalid_variable_name">Недопустимое имя переменной</string>
 </resources>

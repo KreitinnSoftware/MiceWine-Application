@@ -220,4 +220,5 @@
     <string name="continue_emulation">继续模拟</string>
     <string name="kill_process">结束进程</string>
     <string name="task_manager">任务管理器</string>
+    <string name="invalid_variable_name">无效的变量名</string>
 </resources>

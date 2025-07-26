@@ -4,10 +4,11 @@
 
 package com.micewine.emu.input;
 
-import static com.micewine.emu.activities.EmulationActivity.getDisplayDensity;
+import static com.micewine.emu.activities.EmulationActivity.externalKeyboardConnected;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.PointF;
 import android.hardware.input.InputManager;
 import android.os.Handler;
@@ -199,7 +200,7 @@ public class TouchInputHandler {
         android.util.Log.d("DEVICES", "external keyboard connected " + externalKeyboardAvailable.get());
 
         LorieView.requestStylusEnabled(stylusAvailable.get());
-        EmulationActivity.getInstance().setExternalKeyboardConnected(externalKeyboardAvailable.get());
+        externalKeyboardConnected = externalKeyboardAvailable.get();
     }
 
     public boolean handleTouchEvent(View view0, View view, MotionEvent event) {
@@ -305,7 +306,7 @@ public class TouchInputHandler {
             mTouchpadHandler.handleHostSizeChanged(w, h);
 
         resetTransformation();
-        mDensity = getDisplayDensity();
+        mDensity = Resources.getSystem().getDisplayMetrics().density;
     }
 
     public void setInputMode(@InputMode int inputMode) {

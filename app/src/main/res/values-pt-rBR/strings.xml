@@ -220,4 +220,5 @@
     <string name="continue_emulation">Continuar Emulação</string>
     <string name="kill_process">Encerrar Processo</string>
     <string name="task_manager">Gerenciador de Tarefas</string>
+    <string name="invalid_variable_name">Nome de Variável Inválido</string>
 </resources>

@@ -7,7 +7,7 @@ package com.micewine.emu.input;
 import static android.view.KeyEvent.*;
 import static android.view.MotionEvent.*;
 import static androidx.core.math.MathUtils.clamp;
-import static com.micewine.emu.activities.EmulationActivity.getKeyboardConnected;
+import static com.micewine.emu.activities.EmulationActivity.externalKeyboardConnected;
 import static com.micewine.emu.input.InputStub.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -166,11 +166,9 @@ public final class InputEventSender {
         // want to send it as KeyEvent.
         char unicode = keyCode != KEYCODE_ENTER ? (char) e.getUnicodeChar() : 0;
 
-        boolean keyboardIsConnected = getKeyboardConnected();
+        int scancode = (externalKeyboardConnected || !no_modifiers) ? e.getScanCode(): 0;
 
-        int scancode = (keyboardIsConnected || !no_modifiers) ? e.getScanCode(): 0;
-
-        if (!keyboardIsConnected) {
+        if (!externalKeyboardConnected) {
             if (pressed && unicode != 0 && no_modifiers) {
                 mPressedTextKeys.add(keyCode);
                 if ((e.getMetaState() & META_ALT_RIGHT_ON) != 0)

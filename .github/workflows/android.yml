@@ -49,10 +49,10 @@ jobs:
       run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - name: "Get Version"
-      run: echo "VERSION=$(echo $(cat app/build.gradle.kts | grep versionName | cut -d "=" -f 2 | sed "s/\"//g"))" >> $GITHUB_ENV
+      run: echo "VERSION=$(echo $(cat app/build.gradle | grep versionName | cut -d "=" -f 2 | sed "s/\"//g"))" >> $GITHUB_ENV
       
     - name: "Check If It's New Release"
-      run: if [ -n "$(git diff HEAD~1 HEAD app/build.gradle.kts | grep versionName)" ]; then echo "VERSION_CHANGED=1" >> $GITHUB_ENV; else echo "VERSION_CHANGED=0" >> $GITHUB_ENV; fi
+      run: if [ -n "$(git diff HEAD~1 HEAD app/build.gradle | grep versionName)" ]; then echo "VERSION_CHANGED=1" >> $GITHUB_ENV; else echo "VERSION_CHANGED=0" >> $GITHUB_ENV; fi
           
     - name: "Create Release"
       if: env.VERSION_CHANGED == '1' && github.event_name != 'pull_request'
