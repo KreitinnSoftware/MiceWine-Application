@@ -77,7 +77,7 @@ public class PresetManagerActivity extends AppCompatActivity {
         boolean editShortcut = getIntent().getBooleanExtra("editShortcut", false);
 
         switch (presetType) {
-            case CONTROLLER_PRESET: {
+            case CONTROLLER_PRESET -> {
                 fragmentLoader(new ControllerPresetManagerFragment(editShortcut), true);
 
                 controllerMapperToolbar.setTitle(R.string.controller_mapper_title);
@@ -87,9 +87,8 @@ public class PresetManagerActivity extends AppCompatActivity {
                     clickedPresetType = CONTROLLER_PRESET;
                     new FloatingFileManagerFragment(OPERATION_IMPORT_PRESET, "/storage/emulated/0").show(getSupportFragmentManager(), "");
                 });
-                break;
             }
-            case VIRTUAL_CONTROLLER_PRESET: {
+            case VIRTUAL_CONTROLLER_PRESET -> {
                 fragmentLoader(new VirtualControllerPresetManagerFragment(editShortcut), true);
 
                 controllerMapperToolbar.setTitle(R.string.virtual_controller_mapper_title);
@@ -99,9 +98,8 @@ public class PresetManagerActivity extends AppCompatActivity {
                     clickedPresetType = VIRTUAL_CONTROLLER_PRESET;
                     new FloatingFileManagerFragment(OPERATION_IMPORT_PRESET, "/storage/emulated/0").show(getSupportFragmentManager(), "");
                 });
-                break;
             }
-            case BOX64_PRESET: {
+            case BOX64_PRESET -> {
                 fragmentLoader(new Box64PresetManagerFragment(), true);
 
                 controllerMapperToolbar.setTitle(R.string.box64_preset_manager_title);
@@ -111,16 +109,14 @@ public class PresetManagerActivity extends AppCompatActivity {
                     clickedPresetType = BOX64_PRESET;
                     new FloatingFileManagerFragment(OPERATION_IMPORT_PRESET, "/storage/emulated/0").show(getSupportFragmentManager(), "");
                 });
-                break;
             }
-            case WINE_PREFIX_PRESET: {
+            case WINE_PREFIX_PRESET -> {
                 fragmentLoader(new WinePrefixManagerFragment(), true);
 
                 controllerMapperToolbar.setTitle(R.string.wine_prefix_manager_title);
 
                 addPresetFAB.setOnClickListener((v) -> new CreatePresetFragment(WINE_PREFIX_PRESET).show(getSupportFragmentManager(), ""));
                 importPresetFAB.setVisibility(View.GONE);
-                break;
             }
         }
 

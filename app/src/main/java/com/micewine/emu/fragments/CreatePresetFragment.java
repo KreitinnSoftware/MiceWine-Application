@@ -94,7 +94,7 @@ public class CreatePresetFragment extends DialogFragment {
                     new Thread(() -> {
                         createWinePrefix(newName, winePackages.get(wineVersionSpinner.getSelectedItemPosition()).getFolderName());
                         setupDone = true;
-                    });
+                    }).start();
                 }
                 case CONTROLLER_PRESET -> addControllerPreset(requireContext(), newName);
                 case VIRTUAL_CONTROLLER_PRESET -> addVirtualControllerPreset(requireContext(), newName);
