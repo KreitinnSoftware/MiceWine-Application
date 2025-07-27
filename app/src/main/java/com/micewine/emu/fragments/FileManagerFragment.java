@@ -18,6 +18,7 @@ import static com.micewine.emu.fragments.DeleteItemFragment.DELETE_GAME_ITEM;
 import static com.micewine.emu.fragments.EditGamePreferencesFragment.FILE_MANAGER_START_PREFERENCES;
 import static com.micewine.emu.fragments.RenameFragment.RENAME_FILE;
 import static com.micewine.emu.fragments.ShortcutsFragment.addGameToList;
+import static com.micewine.emu.utils.FileUtils.getFileExtension;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -25,7 +26,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -37,7 +37,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -197,14 +196,13 @@ public class FileManagerFragment extends Fragment {
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         File file = new File(selectedFile);
-        String fileExtension = selectedFile.substring(selectedFile.lastIndexOf(".") + 1).toLowerCase();
-        String fileExtensionFull = selectedFile.substring(selectedFile.lastIndexOf("."));
+        String fileExtension = getFileExtension(file);
 
         if (item.getItemId() == R.id.addToHome) {
-            String fileNameWithoutExtension = file.getName().replace(fileExtensionFull, "");
+            String fileNameWithoutExtension = file.getName().replace("." + fileExtension, "");
 
-            if (fileExtension.equals("exe")) {
-                String iconPath = usrDir.getPath() + "/icons/" + file.getName().replace(fileExtensionFull, "");
+            if (fileExtension.equalsIgnoreCase("exe")) {
+                String iconPath = usrDir.getPath() + "/icons/" + fileNameWithoutExtension;
 
                 WineWrapper.extractIcon(selectedFile, iconPath);
 

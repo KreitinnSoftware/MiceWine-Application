@@ -615,6 +615,38 @@ public class ShortcutsFragment extends Fragment {
         return gameList.get(index).exePath;
     }
 
+    public static void putEnableXInput(String name, boolean enabled) {
+        int index = IntStream.range(0, gameList.size()).filter(i -> gameList.get(i).name.equals(name)).findFirst().orElse(-1);
+        if (index == -1) return;
+
+        gameList.get(index).enableXInput = enabled;
+
+        saveShortcuts();
+    }
+
+    public static boolean getEnableXInput(String name) {
+        int index = IntStream.range(0, gameList.size()).filter(i -> gameList.get(i).name.equals(name)).findFirst().orElse(-1);
+        if (index == -1) return true;
+
+        return gameList.get(index).enableXInput;
+    }
+
+    public static void putEnableDInput(String name, boolean enabled) {
+        int index = IntStream.range(0, gameList.size()).filter(i -> gameList.get(i).name.equals(name)).findFirst().orElse(-1);
+        if (index == -1) return;
+
+        gameList.get(index).enableDInput = enabled;
+
+        saveShortcuts();
+    }
+
+    public static boolean getEnableDInput(String name) {
+        int index = IntStream.range(0, gameList.size()).filter(i -> gameList.get(i).name.equals(name)).findFirst().orElse(-1);
+        if (index == -1) return true;
+
+        return gameList.get(index).enableDInput;
+    }
+
     public static void addGameToList(String path, String prettyName, String iconPath) {
         boolean gameExists = gameList.stream().anyMatch(i -> i.name.equals(prettyName));
         if (gameExists) return;

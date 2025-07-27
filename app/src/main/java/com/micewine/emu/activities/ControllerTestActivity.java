@@ -4,7 +4,6 @@ import static com.micewine.emu.controller.ControllerUtils.updateAxisState;
 import static com.micewine.emu.controller.ControllerUtils.updateButtonsState;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.widget.ImageButton;

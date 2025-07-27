@@ -28,6 +28,8 @@ import static com.micewine.emu.fragments.ShortcutsFragment.getCpuAffinity;
 import static com.micewine.emu.fragments.ShortcutsFragment.getD3DXRenderer;
 import static com.micewine.emu.fragments.ShortcutsFragment.getDXVKVersion;
 import static com.micewine.emu.fragments.ShortcutsFragment.getDisplaySettings;
+import static com.micewine.emu.fragments.ShortcutsFragment.getEnableDInput;
+import static com.micewine.emu.fragments.ShortcutsFragment.getEnableXInput;
 import static com.micewine.emu.fragments.ShortcutsFragment.getExePath;
 import static com.micewine.emu.fragments.ShortcutsFragment.getGameExeArguments;
 import static com.micewine.emu.fragments.ShortcutsFragment.getGameIcon;
@@ -47,6 +49,8 @@ import static com.micewine.emu.fragments.ShortcutsFragment.putCpuAffinity;
 import static com.micewine.emu.fragments.ShortcutsFragment.putD3DXRenderer;
 import static com.micewine.emu.fragments.ShortcutsFragment.putDXVKVersion;
 import static com.micewine.emu.fragments.ShortcutsFragment.putDisplaySettings;
+import static com.micewine.emu.fragments.ShortcutsFragment.putEnableDInput;
+import static com.micewine.emu.fragments.ShortcutsFragment.putEnableXInput;
 import static com.micewine.emu.fragments.ShortcutsFragment.putExeArguments;
 import static com.micewine.emu.fragments.ShortcutsFragment.putSelectedVirtualControllerPreset;
 import static com.micewine.emu.fragments.ShortcutsFragment.putVKD3DVersion;
@@ -132,6 +136,8 @@ public class EditGamePreferencesFragment extends DialogFragment {
     private MaterialSwitch wineESyncSwitch;
     private MaterialSwitch wineServicesSwitch;
     private MaterialSwitch enableWineVirtualDesktopSwitch;
+    private MaterialSwitch enableXInputSwitch;
+    private MaterialSwitch enableDInputSwitch;
     private Spinner cpuAffinitySpinner;
     private Spinner selectedBox64Spinner;
     private Spinner selectedBox64ProfileSpinner;
@@ -267,6 +273,8 @@ public class EditGamePreferencesFragment extends DialogFragment {
         wineESyncSwitch = view.findViewById(R.id.wineESync);
         wineServicesSwitch = view.findViewById(R.id.wineServices);
         enableWineVirtualDesktopSwitch = view.findViewById(R.id.enableWineVirtualDesktop);
+        enableXInputSwitch = view.findViewById(R.id.enableXInput);
+        enableDInputSwitch = view.findViewById(R.id.enableDInput);
         cpuAffinitySpinner = view.findViewById(R.id.cpuAffinity);
 
         controllersMappingTypeTexts = List.of(
@@ -602,6 +610,16 @@ public class EditGamePreferencesFragment extends DialogFragment {
             });
         }
 
+        enableXInputSwitch.setChecked(getEnableXInput(selectedGameName));
+        enableXInputSwitch.setOnClickListener((v) -> {
+            temporarySettings.enableXInput = enableXInputSwitch.isChecked();
+        });
+
+        enableDInputSwitch.setChecked(getEnableDInput(selectedGameName));
+        enableDInputSwitch.setOnClickListener((v) -> {
+            temporarySettings.enableDInput = enableDInputSwitch.isChecked();
+        });
+
         cpuAffinitySpinner.setAdapter(new CPUAffinityAdapter(requireActivity(), availableCPUs, cpuAffinitySpinner, type));
 
         List<RatPackageManager.RatPackage> box64Packages = listRatPackages("Box64");
@@ -691,6 +709,9 @@ public class EditGamePreferencesFragment extends DialogFragment {
 
                     putBox64Version(selectedGameName, temporarySettings.box64Version);
                     putBox64Preset(selectedGameName, temporarySettings.box64Preset);
+
+                    putEnableXInput(selectedGameName, temporarySettings.enableXInput);
+                    putEnableDInput(selectedGameName, temporarySettings.enableDInput);
 
                     putExeArguments(selectedGameName, newArguments);
                     setGameName(selectedGameName, newName);
@@ -785,6 +806,8 @@ public class EditGamePreferencesFragment extends DialogFragment {
         };
         String box64Version = getBox64Version(selectedGameName);
         String box64Preset = getBox64Preset(selectedGameName);
+        boolean enableXInput = getEnableXInput(selectedGameName);
+        boolean enableDInput = getEnableDInput(selectedGameName);
     }
 
     public static class CPUAffinityAdapter implements SpinnerAdapter {

@@ -221,4 +221,7 @@
     <string name="kill_process">Encerrar Processo</string>
     <string name="task_manager">Gerenciador de Tarefas</string>
     <string name="invalid_variable_name">Nome de Variável Inválido</string>
+    <string name="enable_xinput">Ativar XInput</string>
+    <string name="enable_directinput">Ativar DirectInput</string>
+    <string name="other_controller_settings">Outras Configurações de Controle</string>
 </resources>

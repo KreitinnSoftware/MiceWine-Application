@@ -325,8 +325,8 @@ public class VirtualKeyboardInputView extends View {
 
                     for (VirtualAnalog analog : analogList) {
                         if (analog.isPressed && analog.fingerId == event.getPointerId(i)) {
-                            float posX = event.getX(event.getActionIndex()) - analog.x;
-                            float posY = event.getY(event.getActionIndex()) - analog.y;
+                            float posX = event.getX(i) - analog.x;
+                            float posY = event.getY(i) - analog.y;
 
                             analog.fingerX = posX;
                             analog.fingerY = posY;
@@ -342,8 +342,8 @@ public class VirtualKeyboardInputView extends View {
 
                     for (VirtualDPad dpad : dpadList) {
                         if (dpad.isPressed && dpad.fingerId == event.getPointerId(i)) {
-                            float posX = event.getX(event.getActionIndex()) - dpad.x;
-                            float posY = event.getY(event.getActionIndex()) - dpad.y;
+                            float posX = event.getX(i) - dpad.x;
+                            float posY = event.getY(i) - dpad.y;
 
                             dpad.fingerX = posX;
                             dpad.fingerY = posY;

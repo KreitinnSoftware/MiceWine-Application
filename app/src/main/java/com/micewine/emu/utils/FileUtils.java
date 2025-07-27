@@ -50,4 +50,17 @@ public class FileUtils {
         } catch (IOException ignored) {
         }
     }
+
+    public static String getFileExtension(File file) {
+        if (file == null) return "";
+
+        String name = file.getName();
+        int lastDot = name.lastIndexOf('.');
+
+        if (lastDot == -1 || lastDot == 0 || lastDot == name.length() - 1) {
+            return "";
+        }
+
+        return name.substring(lastDot + 1);
+    }
 }

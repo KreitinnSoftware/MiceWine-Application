@@ -95,6 +95,8 @@ import static com.micewine.emu.fragments.ShortcutsFragment.getCpuAffinity;
 import static com.micewine.emu.fragments.ShortcutsFragment.getD3DXRenderer;
 import static com.micewine.emu.fragments.ShortcutsFragment.getDXVKVersion;
 import static com.micewine.emu.fragments.ShortcutsFragment.getDisplaySettings;
+import static com.micewine.emu.fragments.ShortcutsFragment.getEnableDInput;
+import static com.micewine.emu.fragments.ShortcutsFragment.getEnableXInput;
 import static com.micewine.emu.fragments.ShortcutsFragment.getExeArguments;
 import static com.micewine.emu.fragments.ShortcutsFragment.getExePath;
 import static com.micewine.emu.fragments.ShortcutsFragment.getSelectedVirtualControllerPreset;
@@ -115,6 +117,7 @@ import static com.micewine.emu.fragments.SetupFragment.dialogTitleText;
 import static com.micewine.emu.fragments.WinePrefixManagerFragment.getWinePrefixFile;
 import static com.micewine.emu.utils.FileUtils.copyRecursively;
 import static com.micewine.emu.utils.FileUtils.deleteDirectoryRecursively;
+import static com.micewine.emu.utils.FileUtils.getFileExtension;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -202,6 +205,8 @@ public class MainActivity extends AppCompatActivity {
                     boolean esync = intent.getBooleanExtra("esync", true);
                     boolean services = intent.getBooleanExtra("services", false);
                     boolean virtualDesktop = intent.getBooleanExtra("virtualDesktop", false);
+                    boolean enableXInput = intent.getBooleanExtra("enableXInput", true);
+                    boolean enableDInput = intent.getBooleanExtra("enableDInput", true);
                     String cpuAffinity = intent.getStringExtra("cpuAffinity");
 
                     if (exeArguments == null) exeArguments = "";
@@ -254,6 +259,8 @@ public class MainActivity extends AppCompatActivity {
                             esync,
                             services,
                             virtualDesktop,
+                            enableXInput,
+                            enableDInput,
                             cpuAffinity,
                             adrenoToolsDriverPath
                     );
@@ -275,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
 
                     File file = new File(fileName);
                     if (file.isFile()) {
-                        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+                        String fileExtension = getFileExtension(file).toLowerCase();
                         switch (fileExtension) {
                             case "exe", "bat", "msi", "lnk" -> {
                                 if (fileExtension.equals("lnk")) {
@@ -933,6 +940,8 @@ public class MainActivity extends AppCompatActivity {
             runWineIntent.putExtra("esync", getWineESync(selectedGameName));
             runWineIntent.putExtra("services", getWineServices(selectedGameName));
             runWineIntent.putExtra("virtualDesktop", getWineVirtualDesktop(selectedGameName));
+            runWineIntent.putExtra("enableXInput", getEnableXInput(selectedGameName));
+            runWineIntent.putExtra("enableDInput", getEnableDInput(selectedGameName));
             runWineIntent.putExtra("cpuAffinity", getCpuAffinity(selectedGameName));
 
             sendBroadcast(runWineIntent);
@@ -1025,6 +1034,8 @@ public class MainActivity extends AppCompatActivity {
     public static String paSink = null;
     public static String selectedResolution = null;
     public static boolean useAdrenoTools = false;
+    public static boolean enableXInput = true;
+    public static boolean enableDInput = true;
     public static File adrenoToolsDriverFile = null;
     public static SharedPreferences preferences = null;
     public static final Gson gson = new Gson();
@@ -1056,11 +1067,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void setSharedVars(Activity activity, String adrenoToolsDriverPath) {
-        setSharedVars(activity, null, null, null, null, null, null, null, null, null, null, null, adrenoToolsDriverPath);
+        setSharedVars(activity, null, null, null, null, null, null, null, null, null, null, null, null, null, adrenoToolsDriverPath);
     }
 
     public static void setSharedVars(Activity activity) {
-        setSharedVars(activity, null, null, null, null, null, null, null, null, null, null, null, null);
+        setSharedVars(activity, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     public static void setSharedVars(
@@ -1075,6 +1086,8 @@ public class MainActivity extends AppCompatActivity {
             Boolean esync,
             Boolean services,
             Boolean virtualDesktop,
+            Boolean enableXInputController,
+            Boolean enableDInputController,
             String cpuAffinity,
             String adrenoToolsDriverPath
     ) {
@@ -1113,6 +1126,8 @@ public class MainActivity extends AppCompatActivity {
         wineESync = (esync != null ? esync : getWineESync(selectedGameName));
         wineServices = (services != null ? services : getWineServices(selectedGameName));
         enableWineVirtualDesktop = (virtualDesktop != null ? virtualDesktop : getWineVirtualDesktop(selectedGameName));
+        enableXInput = (enableXInputController != null ? enableXInputController : getEnableXInput(selectedGameName));
+        enableDInput = (enableDInputController != null ? enableDInputController : getEnableDInput(selectedGameName));
         selectedCpuAffinity = (cpuAffinity != null ? cpuAffinity : getCpuAffinity(selectedGameName));
 
         selectedGLProfile = preferences.getString(SELECTED_GL_PROFILE, SELECTED_GL_PROFILE_DEFAULT_VALUE);

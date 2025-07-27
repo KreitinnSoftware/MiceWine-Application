@@ -217,4 +217,7 @@
     <string name="kill_process">Завершить процесс</string>
     <string name="task_manager">Диспетчер задач</string>
     <string name="invalid_variable_name">Недопустимое имя переменной</string>
+    <string name="enable_xinput">Включить XInput</string>
+    <string name="enable_directinput">Включить DirectInput</string>
+    <string name="other_controller_settings">Другие настройки контроллера</string>
 </resources>

@@ -13,6 +13,8 @@ import static com.micewine.emu.fragments.ShortcutsFragment.getCpuAffinity;
 import static com.micewine.emu.fragments.ShortcutsFragment.getD3DXRenderer;
 import static com.micewine.emu.fragments.ShortcutsFragment.getDXVKVersion;
 import static com.micewine.emu.fragments.ShortcutsFragment.getDisplaySettings;
+import static com.micewine.emu.fragments.ShortcutsFragment.getEnableDInput;
+import static com.micewine.emu.fragments.ShortcutsFragment.getEnableXInput;
 import static com.micewine.emu.fragments.ShortcutsFragment.getSelectedVirtualControllerPreset;
 import static com.micewine.emu.fragments.ShortcutsFragment.getVKD3DVersion;
 import static com.micewine.emu.fragments.ShortcutsFragment.getVulkanDriver;
@@ -198,6 +200,8 @@ public class AdapterGame extends RecyclerView.Adapter<AdapterGame.ViewHolder> {
             runWineIntent.putExtra("esync", getWineESync(selectedGameName));
             runWineIntent.putExtra("services", getWineServices(selectedGameName));
             runWineIntent.putExtra("virtualDesktop", getWineVirtualDesktop(selectedGameName));
+            runWineIntent.putExtra("enableXInput", getEnableXInput(selectedGameName));
+            runWineIntent.putExtra("enableDInput", getEnableDInput(selectedGameName));
             runWineIntent.putExtra("cpuAffinity", getCpuAffinity(selectedGameName));
 
             activity.sendBroadcast(runWineIntent);
@@ -237,6 +241,8 @@ public class AdapterGame extends RecyclerView.Adapter<AdapterGame.ViewHolder> {
         public boolean wineServices;
         public String cpuAffinityCores;
         public boolean wineVirtualDesktop;
+        public boolean enableXInput;
+        public boolean enableDInput;
 
         public GameItem(String name, String exePath, String exeArguments, String iconPath) {
             this.name = name;
@@ -262,6 +268,8 @@ public class AdapterGame extends RecyclerView.Adapter<AdapterGame.ViewHolder> {
             this.wineServices = false;
             this.cpuAffinityCores = String.join(",", availableCPUs);
             this.wineVirtualDesktop = false;
+            this.enableXInput = true;
+            this.enableDInput = true;
         }
 
         public GameItem(

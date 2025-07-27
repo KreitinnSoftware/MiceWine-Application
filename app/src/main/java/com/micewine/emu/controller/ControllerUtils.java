@@ -1,6 +1,8 @@
 package com.micewine.emu.controller;
 
 import static com.micewine.emu.activities.EmulationActivity.handler;
+import static com.micewine.emu.activities.MainActivity.enableDInput;
+import static com.micewine.emu.activities.MainActivity.enableXInput;
 import static com.micewine.emu.activities.PresetManagerActivity.AXIS_HAT_X_MINUS_KEY;
 import static com.micewine.emu.activities.PresetManagerActivity.AXIS_HAT_X_PLUS_KEY;
 import static com.micewine.emu.activities.PresetManagerActivity.AXIS_HAT_Y_MINUS_KEY;
@@ -725,9 +727,10 @@ public class ControllerUtils {
     }
 
     private static final int CLIENT_PORT = 7941;
-    private static final int BUFFER_SIZE = 128;
+    private static final int BUFFER_SIZE = 44;
     private static final int GET_CONNECTION = 1;
     private static final int GET_GAMEPAD_STATE = 2;
+    private static final int GET_GAMEPAD_STATE_DINPUT = 3;
 
     private static boolean inputServerRunning = false;
 
@@ -740,33 +743,42 @@ public class ControllerUtils {
 
         try (DatagramSocket serverSocket = new DatagramSocket(CLIENT_PORT)) {
             while (inputServerRunning) {
+                Thread.sleep(2);
                 byte[] buffer = new byte[BUFFER_SIZE];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
                 serverSocket.receive(packet);
 
-                int receivedData = ByteBuffer.wrap(buffer).get() & 0xFF;
-                switch (receivedData) {
+                ByteBuffer receivedBuffer = ByteBuffer.wrap(buffer);
+                switch (receivedBuffer.get(0) & 0xFF) {
                     case GET_CONNECTION -> {
                         DatagramPacket responsePacket = new DatagramPacket(buffer, buffer.length, packet.getAddress(), packet.getPort());
                         serverSocket.send(responsePacket);
                     }
                     case GET_GAMEPAD_STATE -> {
                         for (int i = 0; i < connectedVirtualControllers.length; i++) {
-                            buffer[i * 32] = (byte) GET_GAMEPAD_STATE;
-                            buffer[1 + (i * 32)] = (byte) ((connectedVirtualControllers[i].connected || i == 0) ? 1 : 0);
-                            buffer[2 + (i * 32)] = (byte) (connectedVirtualControllers[i].state.aPressed ? 1 : 0);
-                            buffer[3 + (i * 32)] = (byte) (connectedVirtualControllers[i].state.bPressed ? 1 : 0);
-                            buffer[4 + (i * 32)] = (byte) (connectedVirtualControllers[i].state.xPressed ? 1 : 0);
-                            buffer[5 + (i * 32)] = (byte) (connectedVirtualControllers[i].state.yPressed ? 1 : 0);
-                            buffer[6 + (i * 32)] = (byte) (connectedVirtualControllers[i].state.lbPressed ? 1 : 0);
-                            buffer[7 + (i * 32)] = (byte) (connectedVirtualControllers[i].state.rbPressed ? 1 : 0);
-                            buffer[8 + (i * 32)] = (byte) (connectedVirtualControllers[i].state.selectPressed ? 1 : 0);
-                            buffer[9 + (i * 32)] = (byte) (connectedVirtualControllers[i].state.startPressed ? 1 : 0);
-                            buffer[10 + (i * 32)] = (byte) (connectedVirtualControllers[i].state.lsPressed ? 1 : 0);
-                            buffer[11 + (i * 32)] = (byte) (connectedVirtualControllers[i].state.rsPressed ? 1 : 0);
-                            buffer[12 + (i * 32)] = 0;
-                            buffer[13 + (i * 32)] = (byte) getAxisStatus(connectedVirtualControllers[i].state.dpadX, connectedVirtualControllers[i].state.dpadY, 0.25F);
+                            buffer[i * 11] = (byte) GET_GAMEPAD_STATE;
+                            buffer[1 + (i * 11)] = (byte) (((connectedVirtualControllers[i].connected || i == 0) && enableXInput) ? 1 : 0);
+
+                            int buttonsState1 = 0;
+                            
+                            buttonsState1 |= (connectedVirtualControllers[i].state.aPressed ? A_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.bPressed ? B_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.xPressed ? X_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.yPressed ? Y_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.lbPressed ? LB_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.rbPressed ? RB_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.lsPressed ? LS_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.rsPressed ? RS_BUTTON : 0);
+
+                            int buttonsState2 = 0;
+
+                            buttonsState2 |= (connectedVirtualControllers[i].state.startPressed ? START_BUTTON : 0);
+                            buttonsState2 |= (connectedVirtualControllers[i].state.selectPressed ? SELECT_BUTTON : 0);
+                            
+                            buffer[2 + (i * 11)] = (byte) buttonsState1;
+                            buffer[3 + (i * 11)] = (byte) buttonsState2;
+                            buffer[4 + (i * 11)] = (byte) getAxisStatus(connectedVirtualControllers[i].state.dpadX, connectedVirtualControllers[i].state.dpadY, 0.25F);
 
                             int lx = (int) ((connectedVirtualControllers[i].state.lx + 1F) * 127.5F);
                             int ly = (int) ((-connectedVirtualControllers[i].state.ly + 1F) * 127.5F);
@@ -775,24 +787,55 @@ public class ControllerUtils {
                             int lt = (int) ((connectedVirtualControllers[i].state.lt * 2F) * 127.5F);
                             int rt = (int) ((connectedVirtualControllers[i].state.rt * 2F) * 127.5F);
 
-                            buffer[14 + (i * 32)] = (byte) ((lx / 100) % 10);
-                            buffer[15 + (i * 32)] = (byte) ((lx / 10) % 10);
-                            buffer[16 + (i * 32)] = (byte) (lx % 10);
-                            buffer[17 + (i * 32)] = (byte) ((ly / 100) % 10);
-                            buffer[18 + (i * 32)] = (byte) ((ly / 10) % 10);
-                            buffer[19 + (i * 32)] = (byte) (ly % 10);
-                            buffer[20 + (i * 32)] = (byte) ((rx / 100) % 10);
-                            buffer[21 + (i * 32)] = (byte) ((rx / 10) % 10);
-                            buffer[22 + (i * 32)] = (byte) (rx % 10);
-                            buffer[23 + (i * 32)] = (byte) ((ry / 100) % 10);
-                            buffer[24 + (i * 32)] = (byte) ((ry / 10) % 10);
-                            buffer[25 + (i * 32)] = (byte) (ry % 10);
-                            buffer[26 + (i * 32)] = (byte) ((lt / 100) % 10);
-                            buffer[27 + (i * 32)] = (byte) ((lt / 10) % 10);
-                            buffer[28 + (i * 32)] = (byte) (lt % 10);
-                            buffer[29 + (i * 32)] = (byte) ((rt / 100) % 10);
-                            buffer[30 + (i * 32)] = (byte) ((rt / 10) % 10);
-                            buffer[31 + (i * 32)] = (byte) (rt % 10);
+                            buffer[5 + (i * 11)] = (byte) lx;
+                            buffer[6 + (i * 11)] = (byte) ly;
+                            buffer[7 + (i * 11)] = (byte) rx;
+                            buffer[8 + (i * 11)] = (byte) ry;
+                            buffer[9 + (i * 11)] = (byte) lt;
+                            buffer[10 + (i * 11)] = (byte) rt;
+                        }
+
+                        DatagramPacket responsePacket = new DatagramPacket(buffer, buffer.length, packet.getAddress(), packet.getPort());
+                        serverSocket.send(responsePacket);
+                    }
+                    case GET_GAMEPAD_STATE_DINPUT -> {
+                        for (int i = 0; i < connectedVirtualControllers.length; i++) {
+                            buffer[i * 11] = (byte) GET_GAMEPAD_STATE_DINPUT;
+                            buffer[1 + (i * 11)] = (byte) (((connectedVirtualControllers[i].connected || i == 0) && enableDInput) ? 1 : 0);
+
+                            int buttonsState1 = 0;
+
+                            buttonsState1 |= (connectedVirtualControllers[i].state.aPressed ? A_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.bPressed ? B_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.xPressed ? X_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.yPressed ? Y_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.lbPressed ? LB_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.rbPressed ? RB_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.lsPressed ? LS_BUTTON : 0);
+                            buttonsState1 |= (connectedVirtualControllers[i].state.rsPressed ? RS_BUTTON : 0);
+
+                            int buttonsState2 = 0;
+
+                            buttonsState2 |= (connectedVirtualControllers[i].state.startPressed ? START_BUTTON : 0);
+                            buttonsState2 |= (connectedVirtualControllers[i].state.selectPressed ? SELECT_BUTTON : 0);
+
+                            buffer[2 + (i * 11)] = (byte) buttonsState1;
+                            buffer[3 + (i * 11)] = (byte) buttonsState2;
+                            buffer[4 + (i * 11)] = (byte) getAxisStatus(connectedVirtualControllers[i].state.dpadX, connectedVirtualControllers[i].state.dpadY, 0.25F);
+
+                            int lx = (int) ((connectedVirtualControllers[i].state.lx + 1F) * 127.5F);
+                            int ly = (int) ((-connectedVirtualControllers[i].state.ly + 1F) * 127.5F);
+                            int rx = (int) ((connectedVirtualControllers[i].state.rx + 1F) * 127.5F);
+                            int ry = (int) ((-connectedVirtualControllers[i].state.ry + 1F) * 127.5F);
+                            int lt = (int) ((connectedVirtualControllers[i].state.lt * 2F) * 127.5F);
+                            int rt = (int) ((connectedVirtualControllers[i].state.rt * 2F) * 127.5F);
+
+                            buffer[5 + (i * 11)] = (byte) lx;
+                            buffer[6 + (i * 11)] = (byte) ly;
+                            buffer[7 + (i * 11)] = (byte) rx;
+                            buffer[8 + (i * 11)] = (byte) ry;
+                            buffer[9 + (i * 11)] = (byte) lt;
+                            buffer[10 + (i * 11)] = (byte) rt;
                         }
 
                         DatagramPacket responsePacket = new DatagramPacket(buffer, buffer.length, packet.getAddress(), packet.getPort());
@@ -804,10 +847,23 @@ public class ControllerUtils {
             Log.e("ControllerDebug", "Failed to create socket. " + e.getMessage());
         } catch (IOException e) {
             Log.e("ControllerDebug", "IOException: " + e.getMessage());
+        } catch (InterruptedException e) {
+            Log.e("ControllerDebug", "InterruptedException: " + e.getMessage());
         }
     }
 
     public static void destroyInputServer() {
         inputServerRunning = false;
     }
+
+    private final static int A_BUTTON = 0x01;
+    private final static int B_BUTTON = 0x02;
+    private final static int X_BUTTON = 0x04;
+    private final static int Y_BUTTON = 0x08;
+    private final static int RB_BUTTON = 0x10;
+    private final static int LB_BUTTON = 0x20;
+    private final static int LS_BUTTON = 0x40;
+    private final static int RS_BUTTON = 0x80;
+    private final static int START_BUTTON = 0x01;
+    private final static int SELECT_BUTTON = 0x02;
 }

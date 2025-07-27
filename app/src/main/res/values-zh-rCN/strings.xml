@@ -221,4 +221,7 @@
     <string name="kill_process">结束进程</string>
     <string name="task_manager">任务管理器</string>
     <string name="invalid_variable_name">无效的变量名</string>
+    <string name="enable_xinput">启用 XInput</string>
+    <string name="enable_directinput">启用 DirectInput</string>
+    <string name="other_controller_settings">其他控制器设置</string>
 </resources>

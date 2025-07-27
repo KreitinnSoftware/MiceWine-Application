@@ -75,8 +75,8 @@ public class Box64PresetManagerFragment extends Fragment {
 
     private static final ArrayList<AdapterPreset.Item> presetListAdapters = new ArrayList<>();
     private static ArrayList<Box64Preset> presetList = new ArrayList<>();
-    private static final Type listTypeV1 = new TypeToken<ArrayList<String>>() {}.getType();
-    private static final Type listTypeV2 = new TypeToken<ArrayList<String>>() {}.getType();
+    private static final Type listTypeV1 = new TypeToken<List<String>>() {}.getType();
+    private static final Type listTypeV2 = new TypeToken<Box64Preset>() {}.getType();
 
     public static void initialize() {
         presetList = getBox64Presets();

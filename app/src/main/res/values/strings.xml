@@ -244,4 +244,7 @@
     <string name="kill_process">Kill Process</string>
     <string name="task_manager">Task Manager</string>
     <string name="invalid_variable_name">Invalid Variable Name</string>
+    <string name="enable_xinput">Enable XInput</string>
+    <string name="enable_directinput">Enable DirectInput</string>
+    <string name="other_controller_settings">Other Controller Settings</string>
 </resources>
