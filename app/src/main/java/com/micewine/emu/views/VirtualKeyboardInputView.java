@@ -499,7 +499,7 @@ public class VirtualKeyboardInputView extends View {
         public int dpadStatus;
 
         public VirtualDPad(float x, float y, float radius, String upKeyName, String downKeyName, String leftKeyName, String rightKeyName, float deadZone) {
-            this.id = analogList.size() + 1;
+            this.id = dpadList.size() + 1;
             this.x = x;
             this.y = y;
             this.fingerX = 0F;

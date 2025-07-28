@@ -466,14 +466,6 @@ public class VirtualKeyboardInputCreatorView extends View {
         float radius;
     }
 
-    /*
-    class CircleButton(
-        var x: Float,
-        var y: Float,
-        var radius: Float,
-    )
-     */
-
     public final static int BUTTON = 0;
     public final static int ANALOG = 1;
     public final static int DPAD = 2;
