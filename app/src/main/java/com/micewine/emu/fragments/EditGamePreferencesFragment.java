@@ -2,6 +2,7 @@ package com.micewine.emu.fragments;
 
 import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_BOX64;
 import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_VULKAN_DRIVER;
+import static com.micewine.emu.activities.MainActivity.ACTION_RUN_WINE;
 import static com.micewine.emu.activities.MainActivity.ACTION_SELECT_EXE_PATH;
 import static com.micewine.emu.activities.MainActivity.ACTION_SELECT_ICON;
 import static com.micewine.emu.activities.MainActivity.getNativeResolutions;
@@ -30,6 +31,7 @@ import static com.micewine.emu.fragments.ShortcutsFragment.getDXVKVersion;
 import static com.micewine.emu.fragments.ShortcutsFragment.getDisplaySettings;
 import static com.micewine.emu.fragments.ShortcutsFragment.getEnableDInput;
 import static com.micewine.emu.fragments.ShortcutsFragment.getEnableXInput;
+import static com.micewine.emu.fragments.ShortcutsFragment.getExeArguments;
 import static com.micewine.emu.fragments.ShortcutsFragment.getExePath;
 import static com.micewine.emu.fragments.ShortcutsFragment.getGameExeArguments;
 import static com.micewine.emu.fragments.ShortcutsFragment.getGameIcon;
@@ -37,6 +39,7 @@ import static com.micewine.emu.fragments.ShortcutsFragment.getSelectedVirtualCon
 import static com.micewine.emu.fragments.ShortcutsFragment.getVKD3DVersion;
 import static com.micewine.emu.fragments.ShortcutsFragment.getVirtualControllerXInput;
 import static com.micewine.emu.fragments.ShortcutsFragment.getVulkanDriver;
+import static com.micewine.emu.fragments.ShortcutsFragment.getVulkanDriverType;
 import static com.micewine.emu.fragments.ShortcutsFragment.getWineD3DVersion;
 import static com.micewine.emu.fragments.ShortcutsFragment.getWineESync;
 import static com.micewine.emu.fragments.ShortcutsFragment.getWineServices;
@@ -97,6 +100,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.micewine.emu.R;
+import com.micewine.emu.activities.EmulationActivity;
 import com.micewine.emu.core.RatPackageManager;
 
 import java.io.File;
@@ -387,9 +391,13 @@ public class EditGamePreferencesFragment extends DialogFragment {
                 } else {
                     Bitmap gameIcon = getGameIcon(selectedGameName);
 
-                    imageView.setImageBitmap(resizeBitmap(
-                            gameIcon, imageView.getLayoutParams().width, imageView.getLayoutParams().height
-                    ));
+                    if (gameIcon == null) {
+                        imageView.setImageResource(R.drawable.unknown_exe);
+                    } else {
+                        imageView.setImageBitmap(resizeBitmap(
+                                gameIcon, imageView.getLayoutParams().width, imageView.getLayoutParams().height
+                        ));
+                    }
 
                     imageView.setOnClickListener((v) -> requireContext().sendBroadcast(new Intent(ACTION_SELECT_ICON)));
                     selectExePath.setOnClickListener((v) -> requireContext().sendBroadcast(new Intent(ACTION_SELECT_EXE_PATH)));
@@ -717,7 +725,32 @@ public class EditGamePreferencesFragment extends DialogFragment {
                     setGameName(selectedGameName, newName);
                 }
                 case FILE_MANAGER_START_PREFERENCES -> {
+                    String arguments = editTextArguments.getText().toString().trim();
 
+                    Intent runActivityIntent = new Intent(requireContext(), EmulationActivity.class);
+                    Intent runWineIntent = new Intent(ACTION_RUN_WINE);
+
+                    runWineIntent.putExtra("exePath", exeFile.getPath());
+                    runWineIntent.putExtra("exeArguments", arguments);
+                    runWineIntent.putExtra("driverName", temporarySettings.vulkanDriver);
+                    runWineIntent.putExtra("driverType", getVulkanDriverType(temporarySettings.vulkanDriver));
+                    runWineIntent.putExtra("box64Version", temporarySettings.box64Version);
+                    runWineIntent.putExtra("box64Preset", temporarySettings.box64Preset);
+                    runWineIntent.putExtra("displayResolution", temporarySettings.displayResolution);
+                    runWineIntent.putExtra("virtualControllerPreset", temporarySettings.virtualControllerPreset);
+                    runWineIntent.putExtra("d3dxRenderer", temporarySettings.d3dxRenderer);
+                    runWineIntent.putExtra("wineD3D", temporarySettings.wineD3D);
+                    runWineIntent.putExtra("dxvk", temporarySettings.dxvk);
+                    runWineIntent.putExtra("vkd3d", temporarySettings.vkd3d);
+                    runWineIntent.putExtra("esync", temporarySettings.wineESync);
+                    runWineIntent.putExtra("services", temporarySettings.wineServices);
+                    runWineIntent.putExtra("virtualDesktop", temporarySettings.wineVirtualDesktop);
+                    runWineIntent.putExtra("enableXInput", temporarySettings.enableXInput);
+                    runWineIntent.putExtra("enableDInput", temporarySettings.enableDInput);
+                    runWineIntent.putExtra("cpuAffinity", temporarySettings.cpuAffinity);
+
+                    requireContext().sendBroadcast(runWineIntent);
+                    startActivity(runActivityIntent);
                 }
             }
 

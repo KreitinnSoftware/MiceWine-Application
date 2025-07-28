@@ -50,7 +50,6 @@ import com.micewine.emu.fragments.EditGamePreferencesFragment;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class AdapterGame extends RecyclerView.Adapter<AdapterGame.ViewHolder> {
     private final FragmentActivity activity;
@@ -98,9 +97,7 @@ public class AdapterGame extends RecyclerView.Adapter<AdapterGame.ViewHolder> {
                     BitmapFactory.decodeResource(activity.getResources(), R.drawable.default_icon)
             );
         } else {
-            holder.gameImage.setImageBitmap(
-                    Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888)
-            );
+            holder.gameImage.setImageResource(R.drawable.unknown_exe);
         }
     }
 
@@ -271,85 +268,5 @@ public class AdapterGame extends RecyclerView.Adapter<AdapterGame.ViewHolder> {
             this.enableXInput = true;
             this.enableDInput = true;
         }
-
-        public GameItem(
-                String name,
-                String exePath,
-                String exeArguments,
-                String iconPath,
-                String box64Version,
-                String box64Preset,
-                ArrayList<String> controllersPreset,
-                ArrayList<Boolean> controllersEnableXInput,
-                ArrayList<Boolean> controllersXInputSwapAnalogs,
-                String virtualControllerPreset,
-                boolean virtualControllerEnableXInput,
-                String displayMode,
-                String displayResolution,
-                String vulkanDriver,
-                int vulkanDriverType,
-                String d3dxRenderer,
-                String dxvkVersion,
-                String wineD3DVersion,
-                String vkd3dVersion,
-                boolean wineESync,
-                boolean wineServices,
-                String cpuAffinityCores,
-                boolean wineVirtualDesktop,
-                boolean enableXInput
-        ) {
-            this.name = name;
-            this.exePath = exePath;
-            this.exeArguments = exeArguments;
-            this.iconPath = iconPath;
-            this.box64Version = box64Version;
-            this.box64Preset = box64Preset;
-            this.controllersPreset = controllersPreset;
-            this.controllersEnableXInput = controllersEnableXInput;
-            this.controllersXInputSwapAnalogs = controllersXInputSwapAnalogs;
-            this.virtualControllerPreset = virtualControllerPreset;
-            this.virtualControllerEnableXInput = virtualControllerEnableXInput;
-            this.displayMode = displayMode;
-            this.displayResolution = displayResolution;
-            this.vulkanDriver = vulkanDriver;
-            this.vulkanDriverType = vulkanDriverType;
-            this.d3dxRenderer = d3dxRenderer;
-            this.dxvkVersion = dxvkVersion;
-            this.wineD3DVersion = wineD3DVersion;
-            this.vkd3dVersion = vkd3dVersion;
-            this.wineESync = wineESync;
-            this.wineServices = wineServices;
-            this.cpuAffinityCores = cpuAffinityCores;
-            this.wineVirtualDesktop = wineVirtualDesktop;
-        }
     }
-
-    /*
-    data class GameItem(
-        var name: String,
-        var exePath: String,
-        var exeArguments: String,
-        var iconPath: String,
-        var box64Version: String,
-        var box64Preset: String,
-        var controllersPreset: MutableList<String>,
-        var controllersEnableXInput: MutableList<Boolean>,
-        var controllersXInputSwapAnalogs: MutableList<Boolean>,
-        var virtualControllerPreset: String,
-        var virtualControllerEnableXInput: Boolean,
-        var displayMode: String,
-        var displayResolution: String,
-        var vulkanDriver: String,
-        var vulkanDriverType: Int,
-        var d3dxRenderer: String,
-        var dxvkVersion: String,
-        var wineD3DVersion: String,
-        var vkd3dVersion: String,
-        var wineESync: Boolean,
-        var wineServices: Boolean,
-        var cpuAffinityCores: String,
-        var wineVirtualDesktop: Boolean,
-        var enableXInput: Boolean
-    )
-     */
 }

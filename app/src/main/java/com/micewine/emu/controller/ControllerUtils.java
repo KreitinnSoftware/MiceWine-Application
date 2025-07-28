@@ -743,11 +743,12 @@ public class ControllerUtils {
 
         try (DatagramSocket serverSocket = new DatagramSocket(CLIENT_PORT)) {
             while (inputServerRunning) {
-                Thread.sleep(2);
                 byte[] buffer = new byte[BUFFER_SIZE];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
                 serverSocket.receive(packet);
+
+                Thread.sleep(2);
 
                 ByteBuffer receivedBuffer = ByteBuffer.wrap(buffer);
                 switch (receivedBuffer.get(0) & 0xFF) {
