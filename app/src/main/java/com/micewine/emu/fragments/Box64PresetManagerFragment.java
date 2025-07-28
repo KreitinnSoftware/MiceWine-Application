@@ -107,7 +107,7 @@ public class Box64PresetManagerFragment extends Fragment {
 
     public static boolean deleteBox64Preset(String name) {
         int index = IntStream.range(0, presetList.size()).filter(i -> presetList.get(i).name.equals(name)).findFirst().orElse(-1);
-        if (index != -1 || presetList.size() == 1) return false;
+        if (index == -1 || presetList.size() == 1) return false;
 
         presetList.remove(index);
         presetListAdapters.remove(index);
