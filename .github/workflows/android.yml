@@ -43,7 +43,7 @@ jobs:
     
     - name: "Sign APK (Debug)"
       run: |
-        $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks micewine-key.jks --ks-key-alias ${{ secrets.KEYSTORE_ALIAS }} --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} --out app-universal-debug.apk app/build/outputs/apk/debug/app-debug.apk || cp app/build/outputs/apk/debug/app-debug.apk .
+        $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks micewine-key.jks --ks-key-alias ${{ secrets.KEYSTORE_ALIAS }} --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} --out app-universal-debug.apk app/build/outputs/apk/debug/app-universal-debug.apk || cp app/build/outputs/apk/debug/app-universal-debug.apk .
 
     - name: "Get Short SHA"
       run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
@@ -61,11 +61,11 @@ jobs:
         name: "MiceWine Application (${{ env.VERSION }})"
         tag_name: ${{ env.SHORT_SHA }}
         prerelease: false
-        files: ./app-debug.apk
+        files: ./app-universal-debug.apk
     
     - name: "Upload Artifact"
       if: env.VERSION_CHANGED == '0' || github.event_name == 'pull_request'
       uses: actions/upload-artifact@v4
       with:
         name: MiceWine-Application-(git-${{ env.SHORT_SHA }})
-        path: ./app-debug.apk
+        path: ./app-universal-debug.apk
