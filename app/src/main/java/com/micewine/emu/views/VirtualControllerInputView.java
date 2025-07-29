@@ -123,8 +123,11 @@ public class VirtualControllerInputView extends View {
             leftAnalog.x = Math.round(leftAnalog.x / 100F * multiplierWidth / GRID_SIZE) * (float) GRID_SIZE;
             leftAnalog.y = Math.round(leftAnalog.y / 100F * multiplierHeight / GRID_SIZE) * (float) GRID_SIZE;
 
-            dpad.x = Math.round(leftAnalog.x / 100F * multiplierWidth / GRID_SIZE) * (float) GRID_SIZE;
-            dpad.y = Math.round(leftAnalog.y / 100F * multiplierHeight / GRID_SIZE) * (float) GRID_SIZE;
+            rightTouchPad.x = Math.round(rightTouchPad.x / 100F * multiplierWidth / GRID_SIZE) * (float) GRID_SIZE;
+            rightTouchPad.y = Math.round(rightTouchPad.y / 100F * multiplierHeight / GRID_SIZE) * (float) GRID_SIZE;
+
+            dpad.x = Math.round(dpad.x / 100F * multiplierWidth / GRID_SIZE) * (float) GRID_SIZE;
+            dpad.y = Math.round(dpad.y / 100F * multiplierHeight / GRID_SIZE) * (float) GRID_SIZE;
         }
     }
 
