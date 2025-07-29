@@ -9,9 +9,11 @@ import static com.micewine.emu.activities.MainActivity.preferences;
 import static com.micewine.emu.activities.MainActivity.usrDir;
 import static com.micewine.emu.adapters.AdapterGame.selectedGameName;
 import static com.micewine.emu.core.RatPackageManager.listRatPackagesId;
+import static com.micewine.emu.core.WineWrapper.extractIcon;
 import static com.micewine.emu.fragments.DebugSettingsFragment.availableCPUs;
 import static com.micewine.emu.fragments.DeleteItemFragment.DELETE_GAME_ITEM;
 import static com.micewine.emu.fragments.EditGamePreferencesFragment.EDIT_GAME_PREFERENCES;
+import static com.micewine.emu.utils.FileUtils.getFileExtension;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -23,7 +25,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.graphics.drawable.Icon;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -54,6 +55,7 @@ import com.micewine.emu.activities.MainActivity;
 import com.micewine.emu.adapters.AdapterGame;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -705,20 +707,43 @@ public class ShortcutsFragment extends Fragment {
         }
     }
 
-    public static void setIconToGame(String name, Context context, Uri uri) {
+    public static void setIconToGame(String name, File iconFile) {
         int index = IntStream.range(0, gameList.size()).filter(i -> gameList.get(i).name.equals(name)).findFirst().orElse(-1);
         if (index == -1) return;
 
-        createIconCache(context, uri, name);
+        String fileExtension = getFileExtension(iconFile).toLowerCase();
+
+        File cacheIconFile = new File(usrDir, "/icons/" + name + "-icon");
+
+        switch (fileExtension) {
+            case "exe" -> extractIcon(iconFile.getPath(), cacheIconFile.getPath());
+            case "ico", "png", "jpg", "jpeg", "bmp" -> {
+                try {
+                    InputStream inputStream = new FileInputStream(iconFile);
+                    OutputStream outputStream = new FileOutputStream(cacheIconFile);
+
+                    copyFile(inputStream, outputStream);
+
+                    inputStream.close();
+                    outputStream.close();
+                } catch (IOException ignored) {
+                    return;
+                }
+            }
+        }
 
         gameList.get(index).iconPath = usrDir.getPath() + "/icons/" + name + "-icon";
 
         saveShortcuts();
 
-        RecyclerView.Adapter<?> adapter = recyclerView.getAdapter();
-        if (adapter != null) {
-            adapter.notifyItemChanged(index);
-        }
+        if (recyclerView == null) return;
+
+        recyclerView.post(() -> {
+            RecyclerView.Adapter<?> adapter = recyclerView.getAdapter();
+            if (adapter != null) {
+                adapter.notifyItemChanged(index);
+            }
+        });
     }
 
     public static Bitmap getGameIcon(String name) {
@@ -748,21 +773,6 @@ public class ShortcutsFragment extends Fragment {
         ArrayList<AdapterGame.GameItem> gameList = gson.fromJson(json, listType);
 
         return (gameList != null ? gameList : new ArrayList<>());
-    }
-
-    private static void createIconCache(Context context, Uri uri, String gameName) {
-        try {
-            InputStream inputStream = context.getContentResolver().openInputStream(uri);
-            if (inputStream == null) return;
-
-            OutputStream outputStream = new FileOutputStream(usrDir + "/icons/" + gameName + "-icon");
-
-            copyFile(inputStream, outputStream);
-
-            inputStream.close();
-            outputStream.close();
-        } catch (IOException ignored) {
-        }
     }
 
     public static void addGameToLauncher(Context context, String name) {

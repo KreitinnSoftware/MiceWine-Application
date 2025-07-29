@@ -84,6 +84,7 @@ import static com.micewine.emu.fragments.DebugSettingsFragment.availableCPUs;
 import static com.micewine.emu.fragments.EditGamePreferencesFragment.FILE_MANAGER_START_PREFERENCES;
 import static com.micewine.emu.fragments.FileManagerFragment.refreshFiles;
 import static com.micewine.emu.fragments.FloatingFileManagerFragment.OPERATION_SELECT_EXE;
+import static com.micewine.emu.fragments.FloatingFileManagerFragment.OPERATION_SELECT_ICON;
 import static com.micewine.emu.fragments.FloatingFileManagerFragment.OPERATION_SELECT_RAT;
 import static com.micewine.emu.fragments.SetupFragment.abortSetup;
 import static com.micewine.emu.fragments.ShortcutsFragment.ADRENO_TOOLS_DRIVER;
@@ -404,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
                         setupDone = true;
                     }).start();
                 }
-                case ACTION_SELECT_ICON -> openFilePicker();
+                case ACTION_SELECT_ICON -> new FloatingFileManagerFragment(OPERATION_SELECT_ICON, wineDisksFolder.getPath()).show(getSupportFragmentManager(), "");
                 case ACTION_SELECT_EXE_PATH -> new FloatingFileManagerFragment(OPERATION_SELECT_EXE, wineDisksFolder.getPath()).show(getSupportFragmentManager(), "");
                 case ACTION_CREATE_WINE_PREFIX -> {
                     String winePrefix = intent.getStringExtra("winePrefix");
@@ -680,28 +681,11 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 return;
             }
-        } else if (resultCode == Activity.RESULT_OK) {
-            if (data == null) return;
-            Uri uri = data.getData();
-            if (uri == null) return;
-            setIconToGame(selectedGameName, this, uri);
         }
 
         setSharedVars(this);
 
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    /** @noinspection deprecation*/
-    private void openFilePicker() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-
-        intent.setType("image/*");
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-        startActivityForResult(
-                Intent.createChooser(intent, "") , 0
-        );
     }
 
     private void installDXWrapper(String winePrefixName) {

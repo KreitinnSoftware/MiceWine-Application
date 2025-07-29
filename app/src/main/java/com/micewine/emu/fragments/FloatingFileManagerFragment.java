@@ -15,8 +15,10 @@ import static com.micewine.emu.fragments.CreatePresetFragment.BOX64_PRESET;
 import static com.micewine.emu.fragments.CreatePresetFragment.CONTROLLER_PRESET;
 import static com.micewine.emu.fragments.CreatePresetFragment.VIRTUAL_CONTROLLER_PRESET;
 import static com.micewine.emu.fragments.ShortcutsFragment.putExePath;
+import static com.micewine.emu.fragments.ShortcutsFragment.setIconToGame;
 import static com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.exportVirtualControllerPreset;
 import static com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.importVirtualControllerPreset;
+import static com.micewine.emu.utils.FileUtils.getFileExtension;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -181,6 +183,27 @@ public class FloatingFileManagerFragment extends DialogFragment {
                     dismiss();
                 }).start();
             }
+            case OPERATION_SELECT_ICON -> {
+                selectRootFSText.setVisibility(View.GONE);
+                editText.setVisibility(View.GONE);
+                saveButton.setVisibility(View.GONE);
+
+                new Thread(() -> {
+                    while (outputFile == null) {
+                        try {
+                            Thread.sleep(16);
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+
+                    setIconToGame(selectedGameName, outputFile);
+                    outputFile = null;
+
+                    getParentFragmentManager().setFragmentResult("invalidate", new Bundle());
+
+                    dismiss();
+                }).start();
+            }
         }
 
         return new AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create();
@@ -204,6 +227,7 @@ public class FloatingFileManagerFragment extends DialogFragment {
     public final static int OPERATION_EXPORT_PRESET = 1;
     public final static int OPERATION_IMPORT_PRESET = 2;
     public final static int OPERATION_SELECT_EXE = 3;
+    public final static int OPERATION_SELECT_ICON = 4;
 
     public static void refreshFiles() {
         recyclerView.post(() -> {
@@ -274,8 +298,17 @@ public class FloatingFileManagerFragment extends DialogFragment {
                             }
                         }
                         case OPERATION_SELECT_EXE -> {
-                            if (file.getName().toLowerCase().endsWith(".exe")) {
+                            String fileExtension = getFileExtension(file);
+                            if (fileExtension.equalsIgnoreCase("exe")) {
                                 fileList.add(
+                                        new AdapterFiles.FileList(file)
+                                );
+                            }
+                        }
+                        case OPERATION_SELECT_ICON -> {
+                            String fileExtension = getFileExtension(file).toLowerCase();
+                            switch (fileExtension) {
+                                case "exe", "ico", "png", "jpg", "jpeg", "bmp" -> fileList.add(
                                         new AdapterFiles.FileList(file)
                                 );
                             }

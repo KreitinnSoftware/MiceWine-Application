@@ -770,22 +770,18 @@ public class EditGamePreferencesFragment extends DialogFragment {
 
                 exePathText.setText(exePath);
             });
+            imageView.post(() -> {
+                Bitmap gameIcon = getGameIcon(selectedGameName);
+
+                if (gameIcon == null) return;
+
+                imageView.setImageBitmap(resizeBitmap(
+                        gameIcon, imageView.getLayoutParams().width, imageView.getLayoutParams().height
+                ));
+            });
         });
 
         return new AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        Bitmap gameIcon = getGameIcon(selectedGameName);
-
-        if (gameIcon == null) return;
-
-        imageView.setImageBitmap(resizeBitmap(
-                gameIcon, imageView.getLayoutParams().width, imageView.getLayoutParams().height
-        ));
     }
 
     @Override
