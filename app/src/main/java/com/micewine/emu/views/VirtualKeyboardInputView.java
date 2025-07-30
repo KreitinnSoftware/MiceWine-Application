@@ -371,6 +371,35 @@ public class VirtualKeyboardInputView extends View {
                 invalidate();
             }
             case MotionEvent.ACTION_POINTER_UP -> {
+                for (VirtualButton button : buttonList) {
+                    if (button.fingerId == event.getPointerId(event.getActionIndex())) {
+                        button.fingerId = -1;
+                        handleButton(button, false);
+                        break;
+                    }
+                }
+                for (VirtualAnalog analog : analogList) {
+                    if (analog.fingerId == event.getPointerId(event.getActionIndex())) {
+                        analog.fingerId = -1;
+                        analog.fingerX = 0F;
+                        analog.fingerY = 0F;
+                        analog.isPressed = false;
+                        virtualAxis(0F, 0F, analog);
+                        break;
+                    }
+                }
+                for (VirtualDPad dpad : dpadList) {
+                    if (dpad.fingerId == event.getPointerId(event.getActionIndex())) {
+                        dpad.fingerId = -1;
+                        dpad.fingerX = 0F;
+                        dpad.fingerY = 0F;
+                        dpad.isPressed = false;
+                        dpad.dpadStatus = 0;
+                        virtualAxis(0F, 0F, dpad);
+                        break;
+                    }
+                }
+
                 invalidate();
             }
             case MotionEvent.ACTION_UP -> {
