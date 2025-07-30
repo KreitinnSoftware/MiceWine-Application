@@ -195,22 +195,7 @@
         android:layout_width="match_parent"
         android:layout_height="55dp"
         style="@style/Widget.Material3.Button.TextButton"
-        app:icon="@drawable/ic_joystick"
-        app:iconTint="@color/textColor"
-        app:iconPadding="10dp"
-        app:iconGravity="start">
-    </com.google.android.material.button.MaterialButton>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/startControllerPresetManager"
-        android:text="@string/controller_mapper_title"
-        android:textSize="15sp"
-        android:textAlignment="textStart"
-        android:textColor="@color/textColor"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        style="@style/Widget.Material3.Button.TextButton"
-        app:icon="@drawable/ic_joystick"
+        app:icon="@drawable/ic_settings_outline"
         app:iconTint="@color/textColor"
         app:iconPadding="10dp"
         app:iconGravity="start">
@@ -219,6 +204,21 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/editVirtualControllerMapping"
         android:text="@string/virtual_controller_settings"
+        android:textSize="15sp"
+        android:textAlignment="textStart"
+        android:textColor="@color/textColor"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        style="@style/Widget.Material3.Button.TextButton"
+        app:icon="@drawable/ic_settings_outline"
+        app:iconTint="@color/textColor"
+        app:iconPadding="10dp"
+        app:iconGravity="start">
+    </com.google.android.material.button.MaterialButton>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/startControllerPresetManager"
+        android:text="@string/controller_mapper_title"
         android:textSize="15sp"
         android:textAlignment="textStart"
         android:textColor="@color/textColor"
