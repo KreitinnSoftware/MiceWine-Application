@@ -1311,6 +1311,14 @@ public class MainActivity extends AppCompatActivity {
             "3840x2160", "7680x4320"
     };
 
+    public static String[] resolutions18_9 = new String[] {
+            "720x360", "960x480",
+            "1080x540", "1440x720",
+            "1536x768", "1800x900",
+            "20160x1080", "2880x1440",
+            "4320x2160", "8640x4320"
+    };
+    
     public static String[] resolutions4_3 = new String[] {
             "640x480", "800x600",
             "1024x768", "1280x960",

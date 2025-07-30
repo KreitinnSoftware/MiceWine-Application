@@ -8,6 +8,7 @@ import static com.micewine.emu.activities.MainActivity.ACTION_SELECT_ICON;
 import static com.micewine.emu.activities.MainActivity.getNativeResolutions;
 import static com.micewine.emu.activities.MainActivity.preferences;
 import static com.micewine.emu.activities.MainActivity.resolutions16_9;
+import static com.micewine.emu.activities.MainActivity.resolutions18_9;
 import static com.micewine.emu.activities.MainActivity.resolutions4_3;
 import static com.micewine.emu.activities.MainActivity.selectedCpuAffinity;
 import static com.micewine.emu.activities.MainActivity.usrDir;
@@ -444,6 +445,7 @@ public class EditGamePreferencesFragment extends DialogFragment {
 
                 switch (selectedItem) {
                     case "16:9" -> resolutions = Arrays.asList(resolutions16_9);
+                    case "18:9" -> resolutions = Arrays.asList(resolutions18_9);
                     case "4:3" -> resolutions = Arrays.asList(resolutions4_3);
                     case "Native" -> resolutions = getNativeResolutions(requireActivity());
                     default -> resolutions = List.of();
@@ -797,7 +799,7 @@ public class EditGamePreferencesFragment extends DialogFragment {
     public final static int EDIT_GAME_PREFERENCES = 0;
     public final static int FILE_MANAGER_START_PREFERENCES = 1;
 
-    public static List<String> aspectRatios = List.of("16:9", "4:3", "Native");
+    public static List<String> aspectRatios = List.of("16:9", "18:9", "4:3", "Native");
     public static List<String> d3dxRenderers = List.of("DXVK", "WineD3D");
     private static final TemporarySettings temporarySettings = new TemporarySettings();
 
