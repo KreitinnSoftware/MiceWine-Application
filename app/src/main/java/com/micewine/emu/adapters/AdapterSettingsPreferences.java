@@ -72,11 +72,11 @@ public class AdapterSettingsPreferences extends RecyclerView.Adapter<AdapterSett
                 holder.seekBar.setVisibility(View.GONE);
                 holder.seekBarValue.setVisibility(View.GONE);
 
-                holder.settingsSwitch.setChecked(Boolean.parseBoolean(preferences.getString(item.key, item.defaultValue)));
+                holder.settingsSwitch.setChecked(preferences.getBoolean(item.key, Boolean.parseBoolean(item.defaultValue)));
                 holder.settingsSwitch.setOnClickListener((v) -> {
                     SharedPreferences.Editor editor = preferences.edit();
 
-                    editor.putBoolean(item.key, !Boolean.parseBoolean(preferences.getString(item.key, item.defaultValue)));
+                    editor.putBoolean(item.key, !preferences.getBoolean(item.key, Boolean.parseBoolean(item.defaultValue)));
                     editor.apply();
                 });
             }
