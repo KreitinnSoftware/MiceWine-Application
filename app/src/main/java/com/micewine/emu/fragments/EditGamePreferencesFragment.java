@@ -610,7 +610,7 @@ public class EditGamePreferencesFragment extends DialogFragment {
 
         wineServicesSwitch.setChecked(getWineServices(selectedGameName));
         wineServicesSwitch.setOnClickListener((v) -> {
-            temporarySettings.wineServices = wineESyncSwitch.isChecked();
+            temporarySettings.wineServices = wineServicesSwitch.isChecked();
         });
 
         if (!selectedGameName.equals(getString(R.string.desktop_mode_init))) {
