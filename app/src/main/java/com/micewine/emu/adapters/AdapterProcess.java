@@ -3,7 +3,9 @@ package com.micewine.emu.adapters;
 import static com.micewine.emu.core.ShellLoader.runCommand;
 import static com.micewine.emu.core.WineWrapper.getCpuHexMask;
 import static com.micewine.emu.core.WineWrapper.getProcessCPUAffinity;
+import static com.micewine.emu.core.WineWrapper.getWinPidByName;
 import static com.micewine.emu.core.WineWrapper.maskToCpuAffinity;
+import static com.micewine.emu.core.WineWrapper.wine;
 import static com.micewine.emu.fragments.DebugSettingsFragment.availableCPUs;
 
 import android.annotation.SuppressLint;
@@ -106,7 +108,8 @@ public class AdapterProcess extends RecyclerView.Adapter<AdapterProcess.ViewHold
                             strAffinity.deleteCharAt(0);
                         }
 
-                        runCommand("taskset -p " + getCpuHexMask(strAffinity.toString()) + " " + item.getUnixPid(), false);
+                        int winPid = getWinPidByName(item.getName());
+                        wine("set_process_affinity.exe " + winPid + " " + getCpuHexMask(strAffinity.toString()));
 
                         dialogInterface.dismiss();
                     });
