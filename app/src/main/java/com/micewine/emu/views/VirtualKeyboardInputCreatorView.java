@@ -332,25 +332,25 @@ public class VirtualKeyboardInputCreatorView extends View {
                     lastSelectedButton = 0;
                 }
 
-                buttonList.forEach((i) -> {
-                    if (detectClick(event, event.getActionIndex(), i.x, i.y, i.radius, i.shape)) {
+                for (VirtualButton button : buttonList) {
+                    if (detectClick(event, event.getActionIndex(), button.x, button.y, button.radius, button.shape)) {
                         if (selectedButton == 0) {
-                            selectedButton = i.id;
+                            selectedButton = button.id;
                             lastSelectedType = BUTTON;
-                            lastSelectedButton = i.id;
+                            lastSelectedButton = button.id;
                         }
                     }
-                });
-                analogList.forEach((i) -> {
-                    if (detectClick(event, event.getActionIndex(), i.x, i.y, i.radius, SHAPE_SQUARE)) {
+                }
+                for (VirtualAnalog virtualAnalog : analogList) {
+                    if (detectClick(event, event.getActionIndex(), virtualAnalog.x, virtualAnalog.y, virtualAnalog.radius, SHAPE_SQUARE)) {
                         if (selectedAxis == 0) {
-                            selectedAxis = i.id;
+                            selectedAxis = virtualAnalog.id;
                             lastSelectedType = ANALOG;
-                            lastSelectedButton = i.id;
+                            lastSelectedButton = virtualAnalog.id;
                         }
                     }
-                });
-                dpadList.forEach((i) -> {
+                }
+                for (VirtualDPad i : dpadList) {
                     if (detectClick(event, event.getActionIndex(), i.x, i.y, i.radius, SHAPE_SQUARE)) {
                         if (selectedDPad == 0) {
                             selectedDPad = i.id;
@@ -358,35 +358,38 @@ public class VirtualKeyboardInputCreatorView extends View {
                             lastSelectedButton = i.id;
                         }
                     }
-                });
+                }
 
                 invalidate();
             }
             case MotionEvent.ACTION_MOVE -> {
-                buttonList.forEach((i) -> {
-                    if (detectClick(event, event.getActionIndex(), i.x, i.y, i.radius, i.shape)) {
-                        if (selectedButton == i.id) {
-                            buttonList.get(i.id - 1).x = Math.round(event.getX(event.getActionIndex()) / GRID_SIZE) * GRID_SIZE;
-                            buttonList.get(i.id - 1).y = Math.round(event.getY(event.getActionIndex()) / GRID_SIZE) * GRID_SIZE;
+                for (VirtualButton button : buttonList) {
+                    if (detectClick(event, event.getActionIndex(), button.x, button.y, button.radius, button.shape)) {
+                        if (selectedButton == button.id) {
+                            buttonList.get(button.id - 1).x = Math.round(event.getX(event.getActionIndex()) / GRID_SIZE) * GRID_SIZE;
+                            buttonList.get(button.id - 1).y = Math.round(event.getY(event.getActionIndex()) / GRID_SIZE) * GRID_SIZE;
+                            break;
                         }
                     }
-                });
-                analogList.forEach((i) -> {
-                    if (detectClick(event, event.getActionIndex(), i.x, i.y, i.radius, SHAPE_SQUARE)) {
-                        if (selectedAxis == i.id) {
-                            analogList.get(i.id - 1).x = Math.round(event.getX(event.getActionIndex()) / GRID_SIZE) * GRID_SIZE;
-                            analogList.get(i.id - 1).y = Math.round(event.getY(event.getActionIndex()) / GRID_SIZE) * GRID_SIZE;
+                }
+                for (VirtualAnalog virtualAnalog : analogList) {
+                    if (detectClick(event, event.getActionIndex(), virtualAnalog.x, virtualAnalog.y, virtualAnalog.radius, SHAPE_SQUARE)) {
+                        if (selectedAxis == virtualAnalog.id) {
+                            analogList.get(virtualAnalog.id - 1).x = Math.round(event.getX(event.getActionIndex()) / GRID_SIZE) * GRID_SIZE;
+                            analogList.get(virtualAnalog.id - 1).y = Math.round(event.getY(event.getActionIndex()) / GRID_SIZE) * GRID_SIZE;
+                            break;
                         }
                     }
-                });
-                dpadList.forEach((i) -> {
-                    if (detectClick(event, event.getActionIndex(), i.x, i.y, i.radius, SHAPE_SQUARE)) {
-                        if (selectedDPad == i.id) {
-                            dpadList.get(i.id - 1).x = Math.round(event.getX(event.getActionIndex()) / GRID_SIZE) * GRID_SIZE;
-                            dpadList.get(i.id - 1).y = Math.round(event.getY(event.getActionIndex()) / GRID_SIZE) * GRID_SIZE;
+                }
+                for (VirtualDPad dpad : dpadList) {
+                    if (detectClick(event, event.getActionIndex(), dpad.x, dpad.y, dpad.radius, SHAPE_SQUARE)) {
+                        if (selectedDPad == dpad.id) {
+                            dpadList.get(dpad.id - 1).x = Math.round(event.getX(event.getActionIndex()) / GRID_SIZE) * GRID_SIZE;
+                            dpadList.get(dpad.id - 1).y = Math.round(event.getY(event.getActionIndex()) / GRID_SIZE) * GRID_SIZE;
+                            break;
                         }
                     }
-                });
+                }
 
                 invalidate();
             }

@@ -462,12 +462,12 @@ public class VirtualControllerInputView extends View {
                 invalidate();
             }
             case MotionEvent.ACTION_POINTER_UP -> {
-                buttonList.forEach((i) -> {
+                for (VirtualControllerButton i : buttonList) {
                     if (i.fingerId == event.getPointerId(event.getActionIndex())) {
                         i.fingerId = -1;
                         handleButton(i, false);
                     }
-                });
+                }
 
                 if (leftAnalog.fingerId == event.getPointerId(event.getActionIndex())) {
                     leftAnalog.fingerId = -1;
@@ -501,10 +501,12 @@ public class VirtualControllerInputView extends View {
                 invalidate();
             }
             case MotionEvent.ACTION_UP -> {
-                buttonList.forEach((i) -> {
-                    i.fingerId = -1;
-                    handleButton(i, false);
-                });
+                for (VirtualControllerButton i : buttonList) {
+                    if (i.isPressed) {
+                        i.fingerId = -1;
+                        handleButton(i, false);
+                    }
+                }
 
                 // Left Analog
                 leftAnalog.fingerId = -1;

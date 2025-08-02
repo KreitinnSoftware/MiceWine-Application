@@ -10,6 +10,8 @@ import static com.micewine.emu.controller.ControllerUtils.MOUSE;
 import static com.micewine.emu.controller.ControllerUtils.RIGHT;
 import static com.micewine.emu.controller.ControllerUtils.RIGHT_DOWN;
 import static com.micewine.emu.controller.ControllerUtils.RIGHT_UP;
+import static com.micewine.emu.controller.ControllerUtils.SCROLL_DOWN;
+import static com.micewine.emu.controller.ControllerUtils.SCROLL_UP;
 import static com.micewine.emu.controller.ControllerUtils.UP;
 import static com.micewine.emu.controller.ControllerUtils.getAxisStatus;
 import static com.micewine.emu.controller.ControllerUtils.handleAxis;
@@ -94,6 +96,8 @@ public class VirtualKeyboardInputView extends View {
                 case "M_Left" -> i.buttonMapping = new ButtonMapping(i.keyName, BUTTON_LEFT, BUTTON_LEFT, MOUSE);
                 case "M_Middle" -> i.buttonMapping = new ButtonMapping(i.keyName, BUTTON_MIDDLE, BUTTON_MIDDLE, MOUSE);
                 case "M_Right" -> i.buttonMapping = new ButtonMapping(i.keyName, BUTTON_RIGHT, BUTTON_RIGHT, MOUSE);
+                case "M_WheelUp" -> i.buttonMapping = new ButtonMapping(i.keyName, SCROLL_UP, SCROLL_UP, MOUSE);
+                case "M_WheelDown" -> i.buttonMapping = new ButtonMapping(i.keyName, SCROLL_DOWN, SCROLL_DOWN, MOUSE);
                 case "Mouse" -> i.buttonMapping = new ButtonMapping(i.keyName, MOUSE, MOUSE, MOUSE);
                 default -> i.buttonMapping = getMapping(i.keyName);
             }
@@ -320,6 +324,7 @@ public class VirtualKeyboardInputView extends View {
                     for (VirtualButton button : buttonList) {
                         if (button.isPressed && button.fingerId == event.getPointerId(i)) {
                             isFingerPressingButton = true;
+                            break;
                         }
                     }
 
@@ -337,6 +342,7 @@ public class VirtualKeyboardInputView extends View {
                             virtualAxis(lx, ly, analog);
 
                             isFingerPressingButton = true;
+                            break;
                         }
                     }
 
@@ -355,6 +361,7 @@ public class VirtualKeyboardInputView extends View {
                             virtualAxis(lx, ly, dpad);
 
                             isFingerPressingButton = true;
+                            break;
                         }
                     }
 
@@ -403,25 +410,31 @@ public class VirtualKeyboardInputView extends View {
                 invalidate();
             }
             case MotionEvent.ACTION_UP -> {
-                buttonList.forEach((i) -> {
-                    i.fingerId = -1;
-                    handleButton(i, false);
-                });
-                analogList.forEach((i) -> {
-                    i.fingerId = -1;
-                    i.fingerX = 0F;
-                    i.fingerY = 0F;
-                    i.isPressed = false;
-                    virtualAxis(0F, 0F, i);
-                });
-                dpadList.forEach((i) -> {
-                    i.fingerId = -1;
-                    i.fingerX = 0F;
-                    i.fingerY = 0F;
-                    i.isPressed = false;
-                    i.dpadStatus = 0;
-                    virtualAxis(0F, 0F, i);
-                });
+                for (VirtualButton button : buttonList) {
+                    if (button.isPressed) {
+                        button.fingerId = -1;
+                        handleButton(button, false);
+                    }
+                }
+                for (VirtualAnalog analog : analogList) {
+                    if (analog.isPressed) {
+                        analog.fingerId = -1;
+                        analog.fingerX = 0F;
+                        analog.fingerY = 0F;
+                        analog.isPressed = false;
+                        virtualAxis(0F, 0F, analog);
+                    }
+                }
+                for (VirtualDPad dpad : dpadList) {
+                    if (dpad.isPressed) {
+                        dpad.fingerId = -1;
+                        dpad.fingerX = 0F;
+                        dpad.fingerY = 0F;
+                        dpad.isPressed = false;
+                        dpad.dpadStatus = 0;
+                        virtualAxis(0F, 0F, dpad);
+                    }
+                }
 
                 invalidate();
             }

@@ -219,15 +219,13 @@ public class ControllerUtils {
             case KEYBOARD -> lorieView.sendKeyEvent(mapping.scanCode, mapping.keyCode, pressed);
             case MOUSE -> {
                 switch (mapping.scanCode) {
-                    case SCROLL_UP: {
-                        if (pressed) lorieView.sendMouseWheelEvent(0F, -10F);
+                    case SCROLL_UP -> {
+                        if (pressed) lorieView.sendMouseWheelEvent(0F, -100F);
                     }
-                    case SCROLL_DOWN: {
-                        if (pressed) lorieView.sendMouseWheelEvent(0F, 10F);
+                    case SCROLL_DOWN -> {
+                        if (pressed) lorieView.sendMouseWheelEvent(0F, 100F);
                     }
-                    default: {
-                        lorieView.sendMouseEvent(0F, 0F, mapping.scanCode, pressed, true);
-                    }
+                    default -> lorieView.sendMouseEvent(0F, 0F, mapping.scanCode, pressed, true);
                 }
             }
         }
