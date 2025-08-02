@@ -49,6 +49,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class FileManagerFragment extends Fragment {
@@ -79,6 +80,8 @@ public class FileManagerFragment extends Fragment {
                     }
 
                     if (newFileList != null) {
+                        Arrays.sort(newFileList, (f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName()));
+
                         for (File file : newFileList) {
                             if (file.isDirectory()) {
                                 fileList.add(

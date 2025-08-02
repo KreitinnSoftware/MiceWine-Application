@@ -7,11 +7,11 @@ import static com.micewine.emu.activities.MainActivity.fileManagerDefaultDir;
 import static com.micewine.emu.activities.MainActivity.selectedFile;
 import static com.micewine.emu.activities.MainActivity.usrDir;
 import static com.micewine.emu.core.WineWrapper.extractIcon;
-import static com.micewine.emu.fragments.FileManagerFragment.refreshFiles;
 import static com.micewine.emu.fragments.FloatingFileManagerFragment.outputFile;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -96,7 +96,10 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
                     extractIcon(item.file.getPath(), iconFile.getPath());
 
                     if (iconFile.exists() && iconFile.length() > 0) {
-                        holder.fileIcon.setImageBitmap(BitmapFactory.decodeFile(iconFile.getPath()));
+                        new Thread(() -> {
+                            Bitmap parsedIcon = decodeFileThumbnail(iconFile, holder.fileIcon.getLayoutParams().width, holder.fileIcon.getLayoutParams().height);
+                            holder.fileIcon.post(() -> holder.fileIcon.setImageBitmap(parsedIcon));
+                        }).start();
                     } else {
                         holder.fileIcon.setImageResource(R.drawable.unknown_exe);
                     }
@@ -132,11 +135,46 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
                 }
                 case "dll" -> holder.fileIcon.setImageResource(R.drawable.ic_dll);
                 case "bat" -> holder.fileIcon.setImageResource(R.drawable.ic_batch);
-                case "ico", "png", "jpg", "jpeg", "bmp" -> holder.fileIcon.setImageBitmap(BitmapFactory.decodeFile(item.file.getPath()));
+                case "ico", "png", "jpg", "jpeg", "bmp" -> new Thread(() -> {
+                    Bitmap parsedIcon = decodeFileThumbnail(item.file, holder.fileIcon.getLayoutParams().width, holder.fileIcon.getLayoutParams().height);
+                    holder.fileIcon.post(() -> holder.fileIcon.setImageBitmap(parsedIcon));
+                }).start();
                 case "mp3", "ogg", "wav", "flac", "aac", "wma", "aiff" -> holder.fileIcon.setImageResource(R.drawable.ic_music);
                 default -> holder.fileIcon.setImageResource(R.drawable.ic_log);
             }
         }
+    }
+
+    private Bitmap decodeFileThumbnail(File file, int width, int height) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+
+        options.inJustDecodeBounds = true;
+
+        BitmapFactory.decodeFile(file.getPath(), options);
+
+        options.inSampleSize = calculateInSampleSize(options, width, height);
+        options.inJustDecodeBounds = false;
+
+        return BitmapFactory.decodeFile(file.getPath(), options);
+    }
+
+    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        int height = options.outHeight;
+        int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            int halfHeight = height / 2;
+            int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 
     @Override

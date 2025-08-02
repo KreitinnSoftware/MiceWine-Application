@@ -233,7 +233,7 @@ public class FloatingFileManagerFragment extends DialogFragment {
         recyclerView.post(() -> {
             File[] newFileList = new File(fileManagerCwd).listFiles();
             if (newFileList == null) return;
-            Arrays.sort(newFileList);
+            Arrays.sort(newFileList, (f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName()));
 
             RecyclerView.Adapter<?> adapter = recyclerView.getAdapter();
             if (adapter != null) {
