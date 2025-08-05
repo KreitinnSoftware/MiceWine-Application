@@ -601,6 +601,7 @@ public class ShortcutsFragment extends Fragment {
 
         return gameList.get(index).exeArguments;
     }
+
     public static void putExePath(String name, String exePath) {
         int index = IntStream.range(0, gameList.size()).filter(i -> gameList.get(i).name.equals(name)).findFirst().orElse(-1);
         if (index == -1) return;

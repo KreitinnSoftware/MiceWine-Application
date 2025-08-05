@@ -108,7 +108,6 @@ import static com.micewine.emu.fragments.ShortcutsFragment.getWineD3DVersion;
 import static com.micewine.emu.fragments.ShortcutsFragment.getWineESync;
 import static com.micewine.emu.fragments.ShortcutsFragment.getWineServices;
 import static com.micewine.emu.fragments.ShortcutsFragment.getWineVirtualDesktop;
-import static com.micewine.emu.fragments.ShortcutsFragment.setIconToGame;
 import static com.micewine.emu.fragments.ShortcutsFragment.updateShortcuts;
 import static com.micewine.emu.fragments.SoundSettingsFragment.generatePAFile;
 import static com.micewine.emu.fragments.WinePrefixManagerFragment.createWinePrefix;
@@ -619,7 +618,7 @@ public class MainActivity extends AppCompatActivity {
             if (data == null) return;
             Uri uri = data.getData();
 
-            DriveUtils.DriveInfo driveInfo = DriveUtils.parseUnixPath(selectedFile);
+            DriveUtils.DriveInfo driveInfo = DriveUtils.parseUnixPath(selectedFilePath);
             if (driveInfo == null) return;
 
             ShellLink shellLink = new ShellLink();
@@ -669,7 +668,7 @@ public class MainActivity extends AppCompatActivity {
                     shellLink.getLinkInfo().serialize(byteWriter);
                 }
                 if (shellLink.getHeader().getLinkFlags().hasName()) {
-                    byteWriter.writeUnicodeString(new File(selectedFile).getName());
+                    byteWriter.writeUnicodeString(new File(selectedFilePath).getName());
                 }
                 if (shellLink.getHeader().getLinkFlags().hasWorkingDir()) {
                     byteWriter.writeUnicodeString(driveInfo.getWindowsPath());
@@ -1009,7 +1008,7 @@ public class MainActivity extends AppCompatActivity {
     public static String selectedWine = null;
     public static String fileManagerDefaultDir = "";
     public static String fileManagerCwd = null;
-    public static String selectedFile = "";
+    public static String selectedFilePath = "";
     public static String miceWineVersion = "MiceWine " + BuildConfig.VERSION_NAME + (BuildConfig.DEBUG ? " (git-" + BuildConfig.GIT_SHORT_SHA + ")" : "");
     public static String vulkanDriverDeviceName = null;
     public static String vulkanDriverDriverVersion = null;

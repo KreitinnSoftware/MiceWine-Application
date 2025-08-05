@@ -1,6 +1,6 @@
 package com.micewine.emu.fragments;
 
-import static com.micewine.emu.activities.MainActivity.selectedFile;
+import static com.micewine.emu.activities.MainActivity.selectedFilePath;
 import static com.micewine.emu.activities.MainActivity.selectedFragmentId;
 import static com.micewine.emu.adapters.AdapterGame.selectedGameName;
 import static com.micewine.emu.adapters.AdapterPreset.clickedPresetName;
@@ -53,7 +53,7 @@ public class DeleteItemFragment extends DialogFragment {
                     if (selectedFragmentId == 0) {
                         removeGameFromList(selectedGameName);
                     } else if (selectedFragmentId == 2) {
-                        deleteFile(selectedFile);
+                        deleteFile(selectedFilePath);
                     }
                     break;
                 }

@@ -1,6 +1,6 @@
 package com.micewine.emu.fragments;
 
-import static com.micewine.emu.activities.MainActivity.selectedFile;
+import static com.micewine.emu.activities.MainActivity.selectedFilePath;
 import static com.micewine.emu.adapters.AdapterPreset.clickedPresetName;
 import static com.micewine.emu.adapters.AdapterPreset.clickedPresetType;
 import static com.micewine.emu.fragments.Box64PresetManagerFragment.renameBox64Preset;
@@ -62,10 +62,10 @@ public class RenameFragment extends DialogFragment {
                     }
                 }
                 case RENAME_FILE -> {
-                    File file = new File(selectedFile);
+                    File file = new File(selectedFilePath);
                     File newFile = new File(file.getParentFile(), newName);
 
-                    renameFile(selectedFile, newFile.getPath(), requireContext());
+                    renameFile(selectedFilePath, newFile.getPath(), requireContext());
                 }
             }
 

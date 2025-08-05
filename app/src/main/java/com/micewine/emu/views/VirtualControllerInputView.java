@@ -453,9 +453,7 @@ public class VirtualControllerInputView extends View {
                         float deltaX = event.getX(i) - event.getHistoricalX(i, 0);
                         float deltaY = event.getY(i) - event.getHistoricalY(i, 0);
 
-                        if ((deltaX > 0.08 || deltaX < -0.08) && (deltaY > 0.08 || deltaY < -0.08)) {
-                            lorieView.sendMouseEvent(deltaX, deltaY, BUTTON_UNDEFINED, false, true);
-                        }
+                        lorieView.sendMouseEvent(deltaX, deltaY, BUTTON_UNDEFINED, false, true);
                     }
                 }
 

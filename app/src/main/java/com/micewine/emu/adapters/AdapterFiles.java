@@ -4,7 +4,7 @@ import static com.micewine.emu.activities.MainActivity.ACTION_SELECT_FILE_MANAGE
 import static com.micewine.emu.activities.MainActivity.customRootFSPath;
 import static com.micewine.emu.activities.MainActivity.fileManagerCwd;
 import static com.micewine.emu.activities.MainActivity.fileManagerDefaultDir;
-import static com.micewine.emu.activities.MainActivity.selectedFile;
+import static com.micewine.emu.activities.MainActivity.selectedFilePath;
 import static com.micewine.emu.activities.MainActivity.usrDir;
 import static com.micewine.emu.core.WineWrapper.extractIcon;
 import static com.micewine.emu.fragments.FloatingFileManagerFragment.outputFile;
@@ -228,9 +228,9 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
 
             FileList item = fileList.get(getAdapterPosition());
 
-            selectedFile = item.file.getPath();
+            selectedFilePath = item.file.getPath();
 
-            return (fileManagerCwd.equals(fileManagerDefaultDir)) || selectedFile.equals("..");
+            return (fileManagerCwd.equals(fileManagerDefaultDir)) || selectedFilePath.equals("..");
         }
     }
 

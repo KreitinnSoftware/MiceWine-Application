@@ -334,16 +334,14 @@ public class TouchInputHandler {
     }
 
     private void moveCursorByOffset(float deltaX, float deltaY) {
-        if ((deltaX > 0.08 || deltaX < -0.08) && (deltaY > 0.08 || deltaY < -0.08)) {
-            if (mInputStrategy instanceof InputStrategyInterface.TrackpadInputStrategy)
-                mInjector.sendCursorMove(-deltaX, -deltaY, true);
-            else if (mInputStrategy instanceof InputStrategyInterface.SimulatedTouchInputStrategy) {
-                PointF cursorPos = mRenderData.getCursorPosition();
-                cursorPos.offset(-deltaX, -deltaY);
-                cursorPos.set(MathUtils.clamp(cursorPos.x, 0, mRenderData.screenWidth), MathUtils.clamp(cursorPos.y, 0, mRenderData.screenHeight));
-                if (mRenderData.setCursorPosition(cursorPos.x, cursorPos.y))
-                    mInjector.sendCursorMove((int) cursorPos.x, (int) cursorPos.y, false);
-            }
+        if (mInputStrategy instanceof InputStrategyInterface.TrackpadInputStrategy)
+            mInjector.sendCursorMove(-deltaX, -deltaY, true);
+        else if (mInputStrategy instanceof InputStrategyInterface.SimulatedTouchInputStrategy) {
+            PointF cursorPos = mRenderData.getCursorPosition();
+            cursorPos.offset(-deltaX, -deltaY);
+            cursorPos.set(MathUtils.clamp(cursorPos.x, 0, mRenderData.screenWidth), MathUtils.clamp(cursorPos.y, 0, mRenderData.screenHeight));
+            if (mRenderData.setCursorPosition(cursorPos.x, cursorPos.y))
+                mInjector.sendCursorMove((int) cursorPos.x, (int) cursorPos.y, false);
         }
     }
 

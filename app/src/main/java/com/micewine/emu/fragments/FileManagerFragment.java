@@ -2,7 +2,7 @@ package com.micewine.emu.fragments;
 
 import static com.micewine.emu.activities.MainActivity.fileManagerCwd;
 import static com.micewine.emu.activities.MainActivity.fileManagerDefaultDir;
-import static com.micewine.emu.activities.MainActivity.selectedFile;
+import static com.micewine.emu.activities.MainActivity.selectedFilePath;
 import static com.micewine.emu.activities.MainActivity.usrDir;
 import static com.micewine.emu.activities.MainActivity.wineDisksFolder;
 import static com.micewine.emu.fragments.AskInstallPackageFragment.ADTOOLS_DRIVER_PACKAGE;
@@ -154,12 +154,12 @@ public class FileManagerFragment extends Fragment {
     public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        File file = new File(selectedFile);
-        String fileExtension = selectedFile.substring(selectedFile.lastIndexOf(".") + 1).toLowerCase();
+        File file = new File(selectedFilePath);
+        String fileExtension = selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).toLowerCase();
 
         switch (fileExtension) {
             case "rat" -> {
-                ratCandidate = new RatPackageManager.RatPackage(selectedFile);
+                ratCandidate = new RatPackageManager.RatPackage(selectedFilePath);
                 requireActivity().getMenuInflater().inflate(R.menu.file_list_context_menu_package, menu);
             }
             case "mwp" -> {
@@ -186,7 +186,7 @@ public class FileManagerFragment extends Fragment {
             }
             case "exe", "msi", "bat", "lnk" -> requireActivity().getMenuInflater().inflate(R.menu.file_list_context_menu_exe, menu);
             case "zip" -> {
-                adToolsDriverCandidate = new RatPackageManager.AdrenoToolsPackage(selectedFile);
+                adToolsDriverCandidate = new RatPackageManager.AdrenoToolsPackage(selectedFilePath);
 
                 boolean isValidAdToolsPackage = (adToolsDriverCandidate.getName() != null);
 
@@ -198,7 +198,7 @@ public class FileManagerFragment extends Fragment {
 
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
-        File file = new File(selectedFile);
+        File file = new File(selectedFilePath);
         String fileExtension = getFileExtension(file);
 
         if (item.getItemId() == R.id.addToHome) {
@@ -207,13 +207,13 @@ public class FileManagerFragment extends Fragment {
             if (fileExtension.equalsIgnoreCase("exe")) {
                 String iconPath = usrDir.getPath() + "/icons/" + fileNameWithoutExtension;
 
-                WineWrapper.extractIcon(selectedFile, iconPath);
+                WineWrapper.extractIcon(selectedFilePath, iconPath);
 
-                addGameToList(selectedFile, fileNameWithoutExtension, iconPath);
+                addGameToList(selectedFilePath, fileNameWithoutExtension, iconPath);
 
                 Toast.makeText(requireContext(), "'" + fileNameWithoutExtension + "' Added to Home Screen.", Toast.LENGTH_SHORT).show();
             } else if (fileExtension.equals("bat") || fileExtension.equals("msi")) {
-                addGameToList(selectedFile, fileNameWithoutExtension, "");
+                addGameToList(selectedFilePath, fileNameWithoutExtension, "");
             } else {
                 Toast.makeText(requireContext(), R.string.incompatible_selected_file, Toast.LENGTH_SHORT).show();
             }
