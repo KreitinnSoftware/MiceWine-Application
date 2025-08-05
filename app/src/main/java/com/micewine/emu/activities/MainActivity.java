@@ -405,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
                     }).start();
                 }
                 case ACTION_SELECT_ICON -> new FloatingFileManagerFragment(OPERATION_SELECT_ICON, wineDisksFolder.getPath()).show(getSupportFragmentManager(), "");
-                case ACTION_SELECT_EXE_PATH -> new FloatingFileManagerFragment(OPERATION_SELECT_EXE, wineDisksFolder.getPath()).show(getSupportFragmentManager(), "");
+                case ACTION_SELECT_EXE_PATH -> new FloatingFileManagerFragment(OPERATION_SELECT_EXE, new File(getExePath(selectedGameName)).getParent()).show(getSupportFragmentManager(), "");
                 case ACTION_CREATE_WINE_PREFIX -> {
                     String winePrefix = intent.getStringExtra("winePrefix");
                     String wine = intent.getStringExtra("wine");
