@@ -647,6 +647,10 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
     }
 
     public static ShellLoader.ViewModelAppLogs sharedLogs;
+    public static void appendLogs(String text) {
+        if (sharedLogs != null)
+            sharedLogs.appendText(text);
+    }
     private static void initSharedLogs(FragmentManager supportFragmentManager) {
         sharedLogs = new ShellLoader.ViewModelAppLogs(supportFragmentManager);
     }

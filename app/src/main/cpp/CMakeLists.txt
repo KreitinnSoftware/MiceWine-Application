@@ -80,3 +80,7 @@ set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_OLD})
 foreach(project xorgproto fontenc md pixman tirpc xshmfence Xdmcp Xau Xfont2 xkbcomp xserver)
     include(recipes/${project}.cmake)
 endforeach()
+
+add_library(micewine SHARED micewine/shell_loader.c)
+target_link_libraries(micewine PUBLIC android log)
+
