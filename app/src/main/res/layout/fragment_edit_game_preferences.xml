@@ -783,6 +783,30 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:text="@string/env_settings_title">
+            </TextView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewEnvVars"
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/addEnvVarButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/env_add_action">
+            </com.google.android.material.button.MaterialButton>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 android:text="@string/others">
             </TextView>
 

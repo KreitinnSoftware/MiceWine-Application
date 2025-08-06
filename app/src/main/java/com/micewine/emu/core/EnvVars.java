@@ -45,7 +45,9 @@ import static com.micewine.emu.activities.MainActivity.useAdrenoTools;
 import static com.micewine.emu.activities.MainActivity.usrDir;
 import static com.micewine.emu.activities.MainActivity.wineESync;
 import static com.micewine.emu.activities.MainActivity.wineLogLevel;
+import static com.micewine.emu.adapters.AdapterGame.selectedGameName;
 import static com.micewine.emu.fragments.EnvVarsSettingsFragment.getCustomEnvVars;
+import static com.micewine.emu.fragments.ShortcutsFragment.getEnvVars;
 
 import com.micewine.emu.adapters.AdapterEnvVar;
 
@@ -64,6 +66,7 @@ public class EnvVars {
             List<AdapterEnvVar.EnvVar> customEnvVars = getCustomEnvVars();
 
             customEnvVars.forEach((v) -> vars.add(v.key + "=" + v.value));
+            getEnvVars(selectedGameName).forEach((v) -> vars.add(v.key + "=" + v.value));
         }
 
         return "env " + String.join(" ", vars) + " ";

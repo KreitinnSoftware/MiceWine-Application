@@ -1,6 +1,11 @@
 package com.micewine.emu.adapters;
 
+import static com.micewine.emu.adapters.AdapterGame.selectedGameName;
+import static com.micewine.emu.fragments.EditGamePreferencesFragment.envVars;
+import static com.micewine.emu.fragments.EditGamePreferencesFragment.recyclerViewEnvVars;
 import static com.micewine.emu.fragments.EnvVarsSettingsFragment.deleteCustomEnvVar;
+import static com.micewine.emu.fragments.ShortcutsFragment.getEnvVars;
+import static com.micewine.emu.fragments.ShortcutsFragment.removeEnvVar;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,10 +25,12 @@ import java.util.ArrayList;
 public class AdapterEnvVar extends RecyclerView.Adapter<AdapterEnvVar.ViewHolder> {
     private final ArrayList<EnvVar> envVarsList;
     private final FragmentManager supportFragmentManager;
+    private final int mode;
 
-    public AdapterEnvVar(ArrayList<EnvVar> envVarsList, FragmentManager supportFragmentManager) {
+    public AdapterEnvVar(ArrayList<EnvVar> envVarsList, FragmentManager supportFragmentManager, int mode) {
         this.envVarsList = envVarsList;
         this.supportFragmentManager = supportFragmentManager;
+        this.mode = mode;
     }
 
     @NonNull
@@ -41,7 +48,23 @@ public class AdapterEnvVar extends RecyclerView.Adapter<AdapterEnvVar.ViewHolder
         holder.textViewValue.setText(item.value);
 
         holder.deleteButton.setOnClickListener((v) -> {
-            deleteCustomEnvVar(item.key);
+            if (mode == EditEnvVarFragment.MODE_EDIT_GLOBAL_VARS) {
+                deleteCustomEnvVar(item.key);
+            } else if (mode == EditEnvVarFragment.MODE_EDIT_GAME) {
+                removeEnvVar(selectedGameName, item.key);
+
+                envVars.clear();
+                envVars.addAll(getEnvVars(selectedGameName));
+
+                if (recyclerViewEnvVars != null) {
+                    recyclerViewEnvVars.post(() -> {
+                        RecyclerView.Adapter<?> adapter = recyclerViewEnvVars.getAdapter();
+                        if (adapter != null) {
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                }
+            }
         });
     }
 
@@ -62,7 +85,7 @@ public class AdapterEnvVar extends RecyclerView.Adapter<AdapterEnvVar.ViewHolder
 
         @Override
         public void onClick(View view) {
-            new EditEnvVarFragment(EditEnvVarFragment.OPERATION_EDIT_ENV_VAR, envVarsList.get(getAdapterPosition())).show(supportFragmentManager, "");
+            new EditEnvVarFragment(EditEnvVarFragment.OPERATION_EDIT_ENV_VAR, mode, envVarsList.get(getAdapterPosition())).show(supportFragmentManager, "");
         }
     }
 

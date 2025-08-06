@@ -32,6 +32,7 @@ import static com.micewine.emu.fragments.ShortcutsFragment.getDXVKVersion;
 import static com.micewine.emu.fragments.ShortcutsFragment.getDisplaySettings;
 import static com.micewine.emu.fragments.ShortcutsFragment.getEnableDInput;
 import static com.micewine.emu.fragments.ShortcutsFragment.getEnableXInput;
+import static com.micewine.emu.fragments.ShortcutsFragment.getEnvVars;
 import static com.micewine.emu.fragments.ShortcutsFragment.getExeArguments;
 import static com.micewine.emu.fragments.ShortcutsFragment.getExePath;
 import static com.micewine.emu.fragments.ShortcutsFragment.getGameExeArguments;
@@ -98,10 +99,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.micewine.emu.R;
 import com.micewine.emu.activities.EmulationActivity;
+import com.micewine.emu.adapters.AdapterEnvVar;
+import com.micewine.emu.core.EnvVars;
 import com.micewine.emu.core.RatPackageManager;
 
 import java.io.File;
@@ -157,6 +162,9 @@ public class EditGamePreferencesFragment extends DialogFragment {
     private Spinner onScreenControllerMappingTypeSpinner;
     private TextView onScreenControllerKeyboardPresetText;
     private Spinner onScreenControllerKeyboardPresetSpinner;
+    public static RecyclerView recyclerViewEnvVars;
+    private MaterialButton addEnvVarButton;
+    public static final ArrayList<AdapterEnvVar.EnvVar> envVars = new ArrayList<>();
     private final List<String> mappingTypes = List.of("MiceWine Controller", "Keyboard/Mouse");
     private final List<String> virtualControllerProfilesNames =
             getVirtualControllerPresets().stream()
@@ -326,6 +334,17 @@ public class EditGamePreferencesFragment extends DialogFragment {
         );
 
         updateControllersStatus();
+
+        addEnvVarButton = view.findViewById(R.id.addEnvVarButton);
+        addEnvVarButton.setOnClickListener((v) -> {
+            new EditEnvVarFragment(EditEnvVarFragment.OPERATION_ADD_ENV_VAR, EditEnvVarFragment.MODE_EDIT_GAME).show(requireActivity().getSupportFragmentManager(), "");
+        });
+
+        recyclerViewEnvVars = view.findViewById(R.id.recyclerViewEnvVars);
+        recyclerViewEnvVars.setAdapter(new AdapterEnvVar(envVars, requireActivity().getSupportFragmentManager(), EditEnvVarFragment.MODE_EDIT_GAME));
+
+        envVars.clear();
+        envVars.addAll(getEnvVars(selectedGameName));
 
         onScreenControllerMappingTypeText = view.findViewById(R.id.onScreenControllerMappingTypeText);
         onScreenControllerMappingTypeSpinner = view.findViewById(R.id.onScreenControllerMappingTypeSpinner);

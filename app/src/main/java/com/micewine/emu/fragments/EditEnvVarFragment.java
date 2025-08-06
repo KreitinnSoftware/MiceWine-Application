@@ -1,7 +1,13 @@
 package com.micewine.emu.fragments;
 
+import static com.micewine.emu.adapters.AdapterGame.selectedGameName;
+import static com.micewine.emu.fragments.EditGamePreferencesFragment.envVars;
+import static com.micewine.emu.fragments.EditGamePreferencesFragment.recyclerViewEnvVars;
 import static com.micewine.emu.fragments.EnvVarsSettingsFragment.addCustomEnvVar;
 import static com.micewine.emu.fragments.EnvVarsSettingsFragment.editCustomEnvVar;
+import static com.micewine.emu.fragments.ShortcutsFragment.addEnvVar;
+import static com.micewine.emu.fragments.ShortcutsFragment.editEnvVar;
+import static com.micewine.emu.fragments.ShortcutsFragment.getEnvVars;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -17,20 +23,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.micewine.emu.R;
 import com.micewine.emu.adapters.AdapterEnvVar;
 
 public class EditEnvVarFragment extends DialogFragment {
     private final int operation;
+    private final int mode;
     private AdapterEnvVar.EnvVar envVar = null;
 
-    public EditEnvVarFragment(int operation, AdapterEnvVar.EnvVar envVar) {
+    public EditEnvVarFragment(int operation, int mode, AdapterEnvVar.EnvVar envVar) {
         this.operation = operation;
+        this.mode = mode;
         this.envVar = envVar;
     }
 
-    public EditEnvVarFragment(int operation) {
+    public EditEnvVarFragment(int operation, int mode) {
+        this.mode = mode;
         this.operation = operation;
     }
 
@@ -81,10 +91,30 @@ public class EditEnvVarFragment extends DialogFragment {
                 return;
             }
 
-            if (operation == OPERATION_ADD_ENV_VAR) {
-                addCustomEnvVar(key, value);
-            } else if (operation == OPERATION_EDIT_ENV_VAR) {
-                editCustomEnvVar(key, value);
+            if (mode == MODE_EDIT_GLOBAL_VARS) {
+                if (operation == OPERATION_ADD_ENV_VAR) {
+                    addCustomEnvVar(key, value);
+                } else if (operation == OPERATION_EDIT_ENV_VAR) {
+                    editCustomEnvVar(envVar.key, key, value);
+                }
+            } else if (mode == MODE_EDIT_GAME) {
+                if (operation == OPERATION_ADD_ENV_VAR) {
+                    addEnvVar(selectedGameName, new AdapterEnvVar.EnvVar(key, value));
+                } else if (operation == OPERATION_EDIT_ENV_VAR) {
+                    editEnvVar(selectedGameName, envVar.key, key, value);
+                }
+
+                envVars.clear();
+                envVars.addAll(getEnvVars(selectedGameName));
+
+                if (recyclerViewEnvVars != null) {
+                    recyclerViewEnvVars.post(() -> {
+                        RecyclerView.Adapter<?> adapter = recyclerViewEnvVars.getAdapter();
+                        if (adapter != null) {
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                }
             }
 
             dismiss();
@@ -97,4 +127,6 @@ public class EditEnvVarFragment extends DialogFragment {
 
     public final static int OPERATION_ADD_ENV_VAR = 0;
     public final static int OPERATION_EDIT_ENV_VAR = 1;
+    public final static int MODE_EDIT_GLOBAL_VARS = 2;
+    public final static int MODE_EDIT_GAME = 3;
 }

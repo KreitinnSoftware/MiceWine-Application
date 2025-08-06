@@ -38,14 +38,14 @@ public class EnvVarsSettingsFragment extends Fragment {
         setAdapter();
 
         addEnvButton.setOnClickListener((v) -> {
-            new EditEnvVarFragment(EditEnvVarFragment.OPERATION_ADD_ENV_VAR).show(requireActivity().getSupportFragmentManager(), "");
+            new EditEnvVarFragment(EditEnvVarFragment.OPERATION_ADD_ENV_VAR, EditEnvVarFragment.MODE_EDIT_GLOBAL_VARS).show(requireActivity().getSupportFragmentManager(), "");
         });
 
         return rootView;
     }
 
     private void setAdapter() {
-        recyclerView.setAdapter(new AdapterEnvVar(envVarsList, requireActivity().getSupportFragmentManager()));
+        recyclerView.setAdapter(new AdapterEnvVar(envVarsList, requireActivity().getSupportFragmentManager(), EditEnvVarFragment.MODE_EDIT_GLOBAL_VARS));
     }
 
     public final static String ENV_VARS_KEY = "environmentVariables";
@@ -81,11 +81,11 @@ public class EnvVarsSettingsFragment extends Fragment {
         saveCustomEnvVars();
     }
 
-    public static void editCustomEnvVar(String key, String value) {
+    public static void editCustomEnvVar(String key, String newKey, String value) {
         int index = IntStream.range(0, envVarsList.size()).filter(i -> envVarsList.get(i).key.equals(key)).findFirst().orElse(-1);
         if (index == -1) return;
 
-        envVarsList.get(index).key = key;
+        envVarsList.get(index).key = newKey;
         envVarsList.get(index).value = value;
 
         recyclerView.post(() -> {

@@ -52,6 +52,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.reflect.TypeToken;
 import com.micewine.emu.R;
 import com.micewine.emu.activities.MainActivity;
+import com.micewine.emu.adapters.AdapterEnvVar;
 import com.micewine.emu.adapters.AdapterGame;
 
 import java.io.File;
@@ -648,6 +649,57 @@ public class ShortcutsFragment extends Fragment {
         if (index == -1) return true;
 
         return gameList.get(index).enableDInput;
+    }
+
+    public static void addEnvVar(String name, AdapterEnvVar.EnvVar envVar) {
+        int index = IntStream.range(0, gameList.size()).filter(i -> gameList.get(i).name.equals(name)).findFirst().orElse(-1);
+        if (index == -1) return;
+
+        gameList.get(index).envVars.add(envVar);
+
+        saveShortcuts();
+    }
+
+    public static void editEnvVar(String name, String varName, String newKey, String newValue) {
+        int index = IntStream.range(0, gameList.size()).filter(i -> gameList.get(i).name.equals(name)).findFirst().orElse(-1);
+        if (index == -1) return;
+
+        int bIndex = IntStream.range(0, gameList.get(index).envVars.size()).filter(i -> gameList.get(index).envVars.get(i).key.equals(varName)).findFirst().orElse(-1);
+        if (bIndex == -1) return;
+
+        gameList.get(index).envVars.get(bIndex).key = newKey;
+        gameList.get(index).envVars.get(bIndex).value = newValue;
+
+        saveShortcuts();
+    }
+
+    public static void removeEnvVar(String name, String varName) {
+        int index = IntStream.range(0, gameList.size()).filter(i -> gameList.get(i).name.equals(name)).findFirst().orElse(-1);
+        if (index == -1) return;
+
+        int bIndex = IntStream.range(0, gameList.get(index).envVars.size()).filter(i -> gameList.get(index).envVars.get(i).key.equals(varName)).findFirst().orElse(-1);
+        if (bIndex == -1) return;
+
+        gameList.get(index).envVars.remove(bIndex);
+
+        saveShortcuts();
+    }
+
+    public static void putEnvVars(String name, List<AdapterEnvVar.EnvVar> envVars) {
+        int index = IntStream.range(0, gameList.size()).filter(i -> gameList.get(i).name.equals(name)).findFirst().orElse(-1);
+        if (index == -1) return;
+
+        gameList.get(index).envVars.clear();
+        gameList.get(index).envVars.addAll(envVars);
+
+        saveShortcuts();
+    }
+
+    public static List<AdapterEnvVar.EnvVar> getEnvVars(String name) {
+        int index = IntStream.range(0, gameList.size()).filter(i -> gameList.get(i).name.equals(name)).findFirst().orElse(-1);
+        if (index == -1) return new ArrayList<>();
+
+        return gameList.get(index).envVars;
     }
 
     public static void addGameToList(String path, String prettyName, String iconPath) {

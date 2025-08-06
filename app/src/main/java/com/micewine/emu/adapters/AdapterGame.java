@@ -240,6 +240,7 @@ public class AdapterGame extends RecyclerView.Adapter<AdapterGame.ViewHolder> {
         public boolean wineVirtualDesktop;
         public boolean enableXInput;
         public boolean enableDInput;
+        public ArrayList<AdapterEnvVar.EnvVar> envVars;
 
         public GameItem(String name, String exePath, String exeArguments, String iconPath) {
             this.name = name;
@@ -267,6 +268,7 @@ public class AdapterGame extends RecyclerView.Adapter<AdapterGame.ViewHolder> {
             this.wineVirtualDesktop = false;
             this.enableXInput = true;
             this.enableDInput = true;
+            this.envVars = new ArrayList<>();
         }
     }
 }
