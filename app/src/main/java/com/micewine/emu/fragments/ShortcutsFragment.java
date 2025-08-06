@@ -766,7 +766,7 @@ public class ShortcutsFragment extends Fragment {
 
         String fileExtension = getFileExtension(iconFile).toLowerCase();
 
-        File cacheIconFile = new File(usrDir, "/icons/" + name + "-icon");
+        File cacheIconFile = new File(usrDir, "/icons/" + name + "-shortcut");
 
         switch (fileExtension) {
             case "exe" -> extractIcon(iconFile.getPath(), cacheIconFile.getPath());
@@ -785,7 +785,7 @@ public class ShortcutsFragment extends Fragment {
             }
         }
 
-        gameList.get(index).iconPath = usrDir.getPath() + "/icons/" + name + "-icon";
+        gameList.get(index).iconPath = cacheIconFile.getPath();
 
         saveShortcuts();
 

@@ -426,7 +426,7 @@ public class EditGamePreferencesFragment extends DialogFragment {
             case FILE_MANAGER_START_PREFERENCES -> {
                 String fileExtension = exeFile.getName().substring(exeFile.getName().lastIndexOf(".") + 1);
                 String fileName = exeFile.getName().replace("." + fileExtension, "");
-                File iconFile = new File(usrDir, "icons/" + fileName + "-icon");
+                File iconFile = new File(usrDir, "icons/" + fileName + "-thumbnail");
 
                 if (iconFile.exists() && iconFile.length() > 0) {
                     imageView.setImageBitmap(BitmapFactory.decodeFile(iconFile.getPath()));

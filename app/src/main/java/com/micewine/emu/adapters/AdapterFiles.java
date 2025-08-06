@@ -91,7 +91,7 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
 
             switch (fileExtension.toLowerCase()) {
                 case "exe" -> {
-                    File iconFile = new File(usrDir, "icons/" + item.file.getName().replace("." + fileExtension, "") + "-icon");
+                    File iconFile = new File(usrDir, "icons/" + item.file.getName().replace("." + fileExtension, "") + "-thumbnail");
 
                     extractIcon(item.file.getPath(), iconFile.getPath());
 
@@ -111,7 +111,7 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
 
                         if (drive != null) {
                             File file = new File(drive.getUnixPath());
-                            File iconFile = new File(usrDir, "icons/" + item.file.getName().replace("." + fileExtension, "") + "-icon");
+                            File iconFile = new File(usrDir, "icons/" + item.file.getName().replace("." + fileExtension, "") + "-thumbnail");
 
                             extractIcon(file.getPath(), iconFile.getPath());
 

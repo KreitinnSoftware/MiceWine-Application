@@ -231,7 +231,7 @@ public class WineWrapper {
                                 processName = processName.substring(1);
                                 String cwd = runCommandWithOutput("readlink " + process.toPath() + "/cwd", false).trim();
                                 String path = getProcessPath(processName, cwd);
-                                String iconPath = usrDir + "/icons/" + processName.substring(0, processName.indexOf(".exe")) + "-icon";
+                                String iconPath = usrDir + "/icons/" + processName.substring(0, processName.indexOf(".exe")) + "-thumbnail";
                                 int ramUsageKB = getProcessRamUsageKB(unixPid);
                                 float cpuUsage;
 
