@@ -23,12 +23,12 @@ public class AdapterTabPagerRatManager extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         return switch (position) {
-            case 0 -> new RatManagerFragment("VulkanDriver", VK_DRIVER, "?");
-            case 1 -> new RatManagerFragment("Box64", BOX64, "?");
-            case 2 -> new RatManagerFragment("Wine", WINE, "?");
-            case 3 -> new RatManagerFragment("DXVK", DXVK, "?");
-            case 4 -> new RatManagerFragment("WineD3D", WINED3D, "?");
-            case 5 -> new RatManagerFragment("VKD3D", VKD3D, "?");
+            case 0 -> new RatManagerFragment("VulkanDriver", VK_DRIVER, "AdrenoToolsDriver");
+            case 1 -> new RatManagerFragment("Box64", BOX64);
+            case 2 -> new RatManagerFragment("Wine", WINE);
+            case 3 -> new RatManagerFragment("DXVK", DXVK);
+            case 4 -> new RatManagerFragment("WineD3D", WINED3D);
+            case 5 -> new RatManagerFragment("VKD3D", VKD3D);
             default -> throw new IllegalArgumentException("Invalid Fragment for Position " + position);
         };
     }

@@ -326,7 +326,7 @@ public class RatPackageManager {
         if (files == null) return packagesList;
 
         for (File file : files) {
-            if (file.isDirectory() && (file.getName().startsWith(type + "-") || file.getName().startsWith(anotherType + "-"))) {
+            if (file.isDirectory() && ((file.getName().startsWith(type + "-") || file.getName().startsWith(anotherType + "-")) || type.isEmpty() || anotherType.isEmpty())) {
                 File pkgHeader = new File(file, "pkg-header");
                 if (!pkgHeader.exists()) continue;
 
