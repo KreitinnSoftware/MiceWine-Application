@@ -227,9 +227,6 @@ public class MainActivity extends AppCompatActivity {
                         driverName = preferences.getString(SELECTED_VULKAN_DRIVER, "");
                         driverType = getVulkanDriverType(driverName);
                     }
-                    if (box64Version.equals("Global")) {
-                        box64Version = preferences.getString(SELECTED_BOX64, "");
-                    }
 
                     String driverLibPath;
                     String adrenoToolsDriverPath = null;
@@ -894,16 +891,8 @@ public class MainActivity extends AppCompatActivity {
             selectedGameName = shortcutName;
 
             String driverName = getVulkanDriver(selectedGameName);
-            if (driverName.equals("Global")) {
-                driverName = (preferences != null ? preferences.getString(SELECTED_VULKAN_DRIVER, "") : "");
-            }
-
-            String box64Version = getBox64Version(selectedGameName);
-            if (box64Version.equals("Global")) {
-                box64Version = (preferences != null ? preferences.getString(SELECTED_BOX64, "") : "");
-            }
-
             int driverType = getVulkanDriverType(selectedGameName);
+            String box64Version = getBox64Version(selectedGameName);
 
             Intent runActivityIntent = new Intent(this, EmulationActivity.class);
             Intent runWineIntent = new Intent(ACTION_RUN_WINE);
@@ -1087,6 +1076,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         selectedBox64 = (box64Version != null ? box64Version : getBox64Version(selectedGameName));
+        if (selectedBox64.equals("Global")) {
+            selectedBox64 = preferences.getString(SELECTED_BOX64, "");
+        }
+
         box64LogLevel = preferences.getString(BOX64_LOG, String.valueOf(BOX64_LOG_DEFAULT_VALUE));
 
         box64ShowSegv = strBoolToNum(preferences.getBoolean(BOX64_SHOWSEGV, BOX64_SHOWSEGV_DEFAULT_VALUE));

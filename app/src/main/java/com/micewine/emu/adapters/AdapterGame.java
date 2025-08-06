@@ -168,16 +168,8 @@ public class AdapterGame extends RecyclerView.Adapter<AdapterGame.ViewHolder> {
             }
 
             String driverName = getVulkanDriver(selectedGameName);
-            if (driverName.equals("Global")) {
-                driverName = (preferences != null ? preferences.getString(SELECTED_VULKAN_DRIVER, "") : "");
-            }
-
-            String box64Version = getBox64Version(selectedGameName);
-            if (box64Version.equals("Global")) {
-                box64Version = (preferences != null ? preferences.getString(SELECTED_BOX64, "") : "");
-            }
-
             int driverType = getVulkanDriverType(selectedGameName);
+            String box64Version = getBox64Version(selectedGameName);
 
             Intent runActivityIntent = new Intent(activity, EmulationActivity.class);
             Intent runWineIntent = new Intent(ACTION_RUN_WINE);
