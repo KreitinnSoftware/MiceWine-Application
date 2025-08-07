@@ -1,6 +1,5 @@
 package com.micewine.emu.fragments;
 
-import static com.micewine.emu.activities.EmulationActivity.sharedLogs;
 import static com.micewine.emu.adapters.AdapterGame.selectedGameName;
 
 import android.os.Bundle;
@@ -14,32 +13,29 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 
 import com.google.android.material.button.MaterialButton;
 import com.micewine.emu.R;
+import com.micewine.emu.core.ShellLoader;
 
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class LogViewerFragment extends Fragment {
+public class LogViewerFragment extends Fragment implements ShellLoader.LogCallback {
+    private TextView logTextView;
+    private ScrollView scrollView;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_log_viewer, container, false);
 
-        TextView logTextView = rootView.findViewById(R.id.logsTextView);
-        ScrollView scrollView = rootView.findViewById(R.id.scrollView);
+        logTextView = rootView.findViewById(R.id.logsTextView);
+        scrollView = rootView.findViewById(R.id.scrollView);
         MaterialButton exportLogButton = rootView.findViewById(R.id.exportLogButton);
 
-        Observer<String> observer = o -> {
-            if (o != null) {
-                logTextView.append(o);
-                scrollView.post(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN));
-            }
-        };
+        ShellLoader.connectOutput(this);
 
-        sharedLogs.logsTextHead.observe(requireActivity(), observer);
         scrollView.fullScroll(ScrollView.FOCUS_DOWN);
 
         exportLogButton.setOnClickListener((v) -> {
@@ -54,5 +50,13 @@ public class LogViewerFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    @Override
+    public void appendLogs(String text) {
+        requireActivity().runOnUiThread(() -> {
+            logTextView.append(text);
+            scrollView.post(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN));
+        });
     }
 }

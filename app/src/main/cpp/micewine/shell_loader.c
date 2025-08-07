@@ -8,41 +8,41 @@
 
 #define log(prio, ...) __android_log_print(ANDROID_LOG_ ## prio, "ShellLoaderNative", __VA_ARGS__)
 
-static jclass emulationActivityClass = NULL;
+static jobject callbackInstance = NULL;
 static jmethodID appendLogsMethodID = NULL;
 
-void initAppendLogsCache(JNIEnv *env) {
-    if (emulationActivityClass == NULL) {
-        jclass localClass = (*env)->FindClass(env, "com/micewine/emu/activities/EmulationActivity");
-        if (localClass == NULL) {
-            return;
-        }
-
-        emulationActivityClass = (*env)->NewGlobalRef(env, localClass);
-        (*env)->DeleteLocalRef(env, localClass);
-
-        appendLogsMethodID = (*env)->GetStaticMethodID(env, emulationActivityClass, "appendLogs", "(Ljava/lang/String;)V");
-        if (appendLogsMethodID == NULL) {
-            return;
-        }
-    }
-}
-
 void appendLog(JNIEnv *env, const char *text) {
-    if (emulationActivityClass == NULL || appendLogsMethodID == NULL) {
-        initAppendLogsCache(env);
-        if (emulationActivityClass == NULL || appendLogsMethodID == NULL) {
-            return;
-        }
-    }
+    if (callbackInstance == NULL || appendLogsMethodID == NULL) return;
 
     jstring jText = (*env)->NewStringUTF(env, text);
-    (*env)->CallStaticVoidMethod(env, emulationActivityClass, appendLogsMethodID, jText);
+    (*env)->CallVoidMethod(env, callbackInstance, appendLogsMethodID, jText);
     (*env)->DeleteLocalRef(env, jText);
 }
 
 JNIEXPORT void JNICALL
-Java_com_micewine_emu_core_ShellLoader_runCommand(JNIEnv *env, jobject cls, jstring command, jboolean log) {
+Java_com_micewine_emu_core_ShellLoader_connectOutput(JNIEnv *env, jobject __unused cls, jobject callback) {
+    if (callbackInstance != NULL) {
+        (*env)->DeleteGlobalRef(env, callbackInstance);
+    }
+    callbackInstance = (*env)->NewGlobalRef(env, callback);
+
+    jclass class = (*env)->GetObjectClass(env, callbackInstance);
+    appendLogsMethodID = (*env)->GetMethodID(env, class, "appendLogs", "(Ljava/lang/String;)V");
+    (*env)->DeleteLocalRef(env, cls);
+}
+
+JNIEXPORT void JNICALL
+Java_com_micewine_emu_core_ShellLoader_cleanup(JNIEnv *env, __unused jobject cls) {
+    if (callbackInstance != NULL) {
+        (*env)->DeleteGlobalRef(env, callbackInstance);
+    }
+
+    callbackInstance = NULL;
+    appendLogsMethodID = NULL;
+}
+
+JNIEXPORT void JNICALL
+Java_com_micewine_emu_core_ShellLoader_runCommand(JNIEnv *env, __unused jobject cls, jstring command, jboolean log) {
     const char* parsedCommand;
     int pipe_in[2];
     int pipe_out[2];
@@ -116,7 +116,7 @@ Java_com_micewine_emu_core_ShellLoader_runCommand(JNIEnv *env, jobject cls, jstr
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_micewine_emu_core_ShellLoader_runCommandWithOutput(JNIEnv *env, jobject cls, jstring command, jboolean stdErrLog) {
+Java_com_micewine_emu_core_ShellLoader_runCommandWithOutput(JNIEnv *env, __unused jobject cls, jstring command, jboolean stdErrLog) {
     const char* parsedCommand;
     int pipe_in[2];
     int pipe_out[2];

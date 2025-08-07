@@ -22,6 +22,7 @@ import static com.micewine.emu.controller.ControllerUtils.disconnectController;
 import static com.micewine.emu.controller.ControllerUtils.prepareControllersMappings;
 import static com.micewine.emu.controller.ControllerUtils.updateAxisState;
 import static com.micewine.emu.controller.ControllerUtils.updateButtonsState;
+import static com.micewine.emu.core.ShellLoader.cleanup;
 import static com.micewine.emu.core.ShellLoader.runCommand;
 import static com.micewine.emu.fragments.CreatePresetFragment.CONTROLLER_PRESET;
 import static com.micewine.emu.fragments.CreatePresetFragment.VIRTUAL_CONTROLLER_PRESET;
@@ -66,7 +67,6 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.button.MaterialButton;
@@ -76,7 +76,6 @@ import com.micewine.emu.ICmdEntryInterface;
 import com.micewine.emu.LorieView;
 import com.micewine.emu.R;
 import com.micewine.emu.controller.ControllerUtils;
-import com.micewine.emu.core.ShellLoader;
 import com.micewine.emu.core.WineWrapper;
 import com.micewine.emu.fragments.ControllerSettingsFragment;
 import com.micewine.emu.fragments.LogViewerFragment;
@@ -139,8 +138,6 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
             preferences.registerOnSharedPreferenceChangeListener(preferencesChangedListener);
         }
 
-        initSharedLogs(getSupportFragmentManager());
-
         new Thread(() -> {
             if (enableCpuCounter) getCpuInfo();
         }).start();
@@ -183,6 +180,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
 
             disconnectController(virtualXInputControllerId);
             destroyInputServer();
+            cleanup();
 
             finishAffinity();
         });
@@ -644,14 +642,5 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
             if (!connected)
                 tryConnect();
         });
-    }
-
-    public static ShellLoader.ViewModelAppLogs sharedLogs;
-    public static void appendLogs(String text) {
-        if (sharedLogs != null)
-            sharedLogs.appendText(text);
-    }
-    private static void initSharedLogs(FragmentManager supportFragmentManager) {
-        sharedLogs = new ShellLoader.ViewModelAppLogs(supportFragmentManager);
     }
 }
