@@ -2,8 +2,9 @@ package com.micewine.emu.fragments;
 
 import static com.micewine.emu.activities.MainActivity.ACTION_SETUP;
 import static com.micewine.emu.activities.MainActivity.customRootFSPath;
-import static com.micewine.emu.activities.MainActivity.fileManagerCwd;
 import static com.micewine.emu.activities.MainActivity.fileManagerDefaultDir;
+import static com.micewine.emu.activities.MainActivity.floatingFileManagerCwd;
+import static com.micewine.emu.activities.MainActivity.selectedFilePath;
 import static com.micewine.emu.adapters.AdapterGame.selectedGameName;
 import static com.micewine.emu.adapters.AdapterPreset.clickedPresetName;
 import static com.micewine.emu.adapters.AdapterPreset.clickedPresetType;
@@ -18,6 +19,7 @@ import static com.micewine.emu.fragments.ShortcutsFragment.putExePath;
 import static com.micewine.emu.fragments.ShortcutsFragment.setIconToGame;
 import static com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.exportVirtualControllerPreset;
 import static com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.importVirtualControllerPreset;
+import static com.micewine.emu.utils.DriveUtils.parseWindowsPath;
 import static com.micewine.emu.utils.FileUtils.getFileExtension;
 
 import android.annotation.SuppressLint;
@@ -42,10 +44,19 @@ import com.micewine.emu.R;
 import com.micewine.emu.adapters.AdapterFiles;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import io.ByteWriter;
+import mslinks.LinkTargetIDList;
+import mslinks.ShellLink;
+import mslinks.ShellLinkException;
+import mslinks.data.ItemID;
+import mslinks.data.VolumeID;
 
 public class FloatingFileManagerFragment extends DialogFragment {
     private final int operationType;
@@ -73,7 +84,7 @@ public class FloatingFileManagerFragment extends DialogFragment {
         recyclerView  = view.findViewById(R.id.recyclerViewFiles);
         recyclerView.setAdapter(new AdapterFiles(fileList, requireContext(), true));
 
-        fileManagerCwd = initialCwd;
+        floatingFileManagerCwd = initialCwd;
         fmOperationType = operationType;
 
         refreshFiles();
@@ -109,7 +120,7 @@ public class FloatingFileManagerFragment extends DialogFragment {
                 }
 
                 saveButton.setOnClickListener((v) -> {
-                    outputFile = new File(fileManagerCwd, editText.getText().toString());
+                    outputFile = new File(floatingFileManagerCwd, editText.getText().toString());
 
                     if (outputFile.exists()) {
                         Toast.makeText(requireContext(), outputFile.getPath() + " " + getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
@@ -204,6 +215,67 @@ public class FloatingFileManagerFragment extends DialogFragment {
                     dismiss();
                 }).start();
             }
+            case OPERATION_CREATE_LNK -> {
+                selectRootFSText.setVisibility(View.GONE);
+                editText.setVisibility(View.VISIBLE);
+                saveButton.setVisibility(View.VISIBLE);
+
+                saveButton.setOnClickListener((v) -> {
+                    outputFile = new File(floatingFileManagerCwd, editText.getText().toString());
+
+                    if (outputFile.exists()) {
+                        Toast.makeText(requireContext(), outputFile.getPath() + " " + getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    ShellLink shellLink = new ShellLink();
+
+                    shellLink.getHeader().getLinkFlags().setHasLinkTargetIDList();
+                    String linkPath = parseWindowsPath(selectedFilePath).replace("\\", "/");
+
+                    LinkTargetIDList idList = new LinkTargetIDList();
+
+                    String[] pathSegments = linkPath.split("/");
+
+                    try {
+                        idList.add(new ItemID().setType(ItemID.TYPE_CLSID));
+                        idList.add(new ItemID().setType(ItemID.TYPE_DRIVE).setName(pathSegments[0]));
+                        for (int i = 1; i < pathSegments.length; i++) {
+                            idList.add(new ItemID().setType(ItemID.TYPE_DIRECTORY).setName(pathSegments[i]));
+                        }
+
+                        shellLink.createLinkInfo();
+                        shellLink.getLinkInfo().createVolumeID().setDriveType(VolumeID.DRIVE_FIXED);
+                        shellLink.getLinkInfo().setLocalBasePath(selectedFilePath);
+                    } catch (ShellLinkException ignored) {
+                        return;
+                    }
+
+                    try (OutputStream outputStream = new FileOutputStream(outputFile)) {
+                        ByteWriter byteWriter = new ByteWriter(outputStream);
+
+                        shellLink.getHeader().serialize(byteWriter);
+
+                        if (shellLink.getHeader().getLinkFlags().hasLinkTargetIDList()) {
+                            idList.serialize(byteWriter);
+                        }
+                        if (shellLink.getHeader().getLinkFlags().hasLinkInfo()) {
+                            shellLink.getLinkInfo().serialize(byteWriter);
+                        }
+                        if (shellLink.getHeader().getLinkFlags().hasName()) {
+                            byteWriter.writeUnicodeString(new File(selectedFilePath).getName());
+                        }
+                        if (shellLink.getHeader().getLinkFlags().hasWorkingDir()) {
+                            byteWriter.writeUnicodeString(linkPath);
+                        }
+                        byteWriter.write4bytes(0);
+                    } catch (IOException ignored) {
+                    }
+
+                    outputFile = null;
+                    dismiss();
+                });
+            }
         }
 
         return new AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create();
@@ -228,10 +300,11 @@ public class FloatingFileManagerFragment extends DialogFragment {
     public final static int OPERATION_IMPORT_PRESET = 2;
     public final static int OPERATION_SELECT_EXE = 3;
     public final static int OPERATION_SELECT_ICON = 4;
+    public final static int OPERATION_CREATE_LNK = 5;
 
     public static void refreshFiles() {
         recyclerView.post(() -> {
-            File[] newFileList = new File(fileManagerCwd).listFiles();
+            File[] newFileList = new File(floatingFileManagerCwd).listFiles();
             if (newFileList == null) return;
             Arrays.sort(newFileList, (f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName()));
 
@@ -242,7 +315,7 @@ public class FloatingFileManagerFragment extends DialogFragment {
 
             fileList.clear();
 
-            if (!fileManagerCwd.equals(fileManagerDefaultDir)) {
+            if (!floatingFileManagerCwd.equals(fileManagerDefaultDir)) {
                 fileList.add(
                         new AdapterFiles.FileList(new File(".."))
                 );

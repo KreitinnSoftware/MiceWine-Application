@@ -17,6 +17,7 @@ import static com.micewine.emu.adapters.AdapterGame.selectedGameName;
 import static com.micewine.emu.controller.ControllerUtils.connectedPhysicalControllers;
 import static com.micewine.emu.core.RatPackageManager.getPackageNameVersionById;
 import static com.micewine.emu.core.RatPackageManager.listRatPackages;
+import static com.micewine.emu.core.WineWrapper.extractIcon;
 import static com.micewine.emu.fragments.Box64PresetManagerFragment.getBox64Presets;
 import static com.micewine.emu.fragments.ControllerPresetManagerFragment.getControllerPresets;
 import static com.micewine.emu.fragments.ControllerSettingsFragment.ACTION_UPDATE_CONTROLLERS_STATUS;
@@ -67,6 +68,7 @@ import static com.micewine.emu.fragments.ShortcutsFragment.putWineServices;
 import static com.micewine.emu.fragments.ShortcutsFragment.putWineVirtualDesktop;
 import static com.micewine.emu.fragments.ShortcutsFragment.setGameName;
 import static com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.getVirtualControllerPresets;
+import static com.micewine.emu.utils.FileUtils.getFileExtension;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -424,14 +426,16 @@ public class EditGamePreferencesFragment extends DialogFragment {
                 }
             }
             case FILE_MANAGER_START_PREFERENCES -> {
-                String fileExtension = exeFile.getName().substring(exeFile.getName().lastIndexOf(".") + 1);
+                String fileExtension = getFileExtension(exeFile);
                 String fileName = exeFile.getName().replace("." + fileExtension, "");
                 File iconFile = new File(usrDir, "icons/" + fileName + "-thumbnail");
+
+                extractIcon(exeFile.getPath(), iconFile.getPath());
 
                 if (iconFile.exists() && iconFile.length() > 0) {
                     imageView.setImageBitmap(BitmapFactory.decodeFile(iconFile.getPath()));
                 } else {
-                    imageView.setImageResource(R.drawable.ic_log);
+                    imageView.setImageResource(R.drawable.unknown_exe);
                 }
 
                 editTextNewName.setText(fileName);

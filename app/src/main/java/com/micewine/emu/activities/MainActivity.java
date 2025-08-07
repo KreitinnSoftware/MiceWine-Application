@@ -115,6 +115,7 @@ import static com.micewine.emu.fragments.WinePrefixManagerFragment.getSelectedWi
 import static com.micewine.emu.fragments.SetupFragment.progressBarIsIndeterminate;
 import static com.micewine.emu.fragments.SetupFragment.dialogTitleText;
 import static com.micewine.emu.fragments.WinePrefixManagerFragment.getWinePrefixFile;
+import static com.micewine.emu.utils.DriveUtils.parseUnixPath;
 import static com.micewine.emu.utils.FileUtils.copyRecursively;
 import static com.micewine.emu.utils.FileUtils.deleteDirectoryRecursively;
 import static com.micewine.emu.utils.FileUtils.getFileExtension;
@@ -164,7 +165,6 @@ import com.micewine.emu.fragments.FloatingFileManagerFragment;
 import com.micewine.emu.fragments.SetupFragment;
 import com.micewine.emu.fragments.ShortcutsFragment;
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment;
-import com.micewine.emu.utils.DriveUtils;
 import com.micewine.emu.utils.FilePathResolver;
 
 import java.io.File;
@@ -177,12 +177,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import io.ByteWriter;
-import mslinks.LinkTargetIDList;
 import mslinks.ShellLink;
-import mslinks.ShellLinkException;
-import mslinks.data.ItemID;
-import mslinks.data.VolumeID;
 
 public class MainActivity extends AppCompatActivity {
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -270,7 +265,6 @@ public class MainActivity extends AppCompatActivity {
                 case ACTION_SELECT_FILE_MANAGER -> {
                     String fileName = intent.getStringExtra("selectedFile");
                     if (fileName == null) return;
-
                     if (fileName.equals("..")) {
                         fileManagerCwd = new File(fileManagerCwd).getParent();
                         refreshFiles(MainActivity.this);
@@ -284,14 +278,14 @@ public class MainActivity extends AppCompatActivity {
                             case "exe", "bat", "msi", "lnk" -> {
                                 if (fileExtension.equals("lnk")) {
                                     try {
-                                        DriveUtils.DriveInfo drive = DriveUtils.parseWindowsPath(new ShellLink(file).resolveTarget());
-
-                                        if (drive != null) {
-                                            file = new File(drive.getUnixPath());
-                                        }
-                                    } catch (IOException ignored) {
-                                    } catch (ShellLinkException e) {
-                                        Toast.makeText(MainActivity.this, getString(R.string.lnk_read_fail), Toast.LENGTH_SHORT).show();
+                                        ShellLink shellLink = new ShellLink(file);
+                                        String parsedUnixPath = parseUnixPath(shellLink.resolveTarget());
+                                        File targetFile = new File(parsedUnixPath);
+                                        new EditGamePreferencesFragment(FILE_MANAGER_START_PREFERENCES, targetFile).show(getSupportFragmentManager(), "");
+                                        return;
+                                    } catch (Exception ignored) {
+                                        Toast.makeText(MainActivity.this, R.string.lnk_read_fail, Toast.LENGTH_SHORT).show();
+                                        return;
                                     }
                                 }
 
@@ -421,6 +415,7 @@ public class MainActivity extends AppCompatActivity {
                         setSharedVars(MainActivity.this);
 
                         fileManagerCwd = fileManagerDefaultDir;
+                        floatingFileManagerCwd = fileManagerDefaultDir;
                         setupDone = true;
                     }).start();
                 }
@@ -609,81 +604,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == EXPORT_LNK_ACTION && resultCode == Activity.RESULT_OK) {
-            if (data == null) return;
-            Uri uri = data.getData();
-
-            DriveUtils.DriveInfo driveInfo = DriveUtils.parseUnixPath(selectedFilePath);
-            if (driveInfo == null) return;
-
-            ShellLink shellLink = new ShellLink();
-
-            shellLink.getHeader().getLinkFlags().setHasLinkTargetIDList();
-
-            String target = driveInfo.getWindowsPath().replace("\\", "/");
-
-            LinkTargetIDList idList = new LinkTargetIDList();
-
-            String[] pathSegments = target.split("/");
-
-            try {
-                idList.add(new ItemID().setType(ItemID.TYPE_CLSID));
-                idList.add(new ItemID().setType(ItemID.TYPE_DRIVE).setName(pathSegments[0]));
-                for (int i = 1; i < pathSegments.length; i++) {
-                    idList.add(new ItemID().setType(ItemID.TYPE_DIRECTORY).setName(pathSegments[i]));
-                }
-                idList.add(new ItemID().setType(ItemID.TYPE_FILE).setName(new File(driveInfo.getUnixPath()).getName()));
-            } catch (ShellLinkException ignored) {
-                return;
-            }
-
-            try {
-                shellLink.createLinkInfo();
-                shellLink.getLinkInfo().createVolumeID().setDriveType(VolumeID.DRIVE_FIXED);
-                shellLink.getLinkInfo().setLocalBasePath(driveInfo.getUnixPath());
-            } catch (ShellLinkException e) {
-                return;
-            }
-
-            if (uri == null) return;
-
-            try {
-                OutputStream outputStream = getContentResolver().openOutputStream(uri);
-
-                if (outputStream == null) return;
-
-                ByteWriter byteWriter = new ByteWriter(outputStream);
-
-                shellLink.getHeader().serialize(byteWriter);
-
-                if (shellLink.getHeader().getLinkFlags().hasLinkTargetIDList()) {
-                    idList.serialize(byteWriter);
-                }
-                if (shellLink.getHeader().getLinkFlags().hasLinkInfo()) {
-                    shellLink.getLinkInfo().serialize(byteWriter);
-                }
-                if (shellLink.getHeader().getLinkFlags().hasName()) {
-                    byteWriter.writeUnicodeString(new File(selectedFilePath).getName());
-                }
-                if (shellLink.getHeader().getLinkFlags().hasWorkingDir()) {
-                    byteWriter.writeUnicodeString(driveInfo.getWindowsPath());
-                }
-
-                byteWriter.write4bytes(0);
-
-                outputStream.close();
-            } catch (IOException e) {
-                return;
-            }
-        }
-
-        setSharedVars(this);
-
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
     private void installDXWrapper(String winePrefixName) {
         File winePrefix = getWinePrefixFile(winePrefixName);
 
@@ -766,18 +686,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 new Thread(() -> WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe " + getCpuHexMask(selectedCpuAffinity))).start();
 
-                if (exePath.endsWith(".lnk")) {
-                    try {
-                        DriveUtils.DriveInfo drive = DriveUtils.parseWindowsPath(new ShellLink(exePath).resolveTarget());
-                        if (drive != null) {
-                            Toast.makeText(this, getString(R.string.lnk_read_fail), Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                    } catch (IOException | ShellLinkException ignored) {
-                    }
-                } else {
-                    WineWrapper.wine("'" + getSanitizedPath(exePath) + "' " + exeArguments, "'" + getSanitizedPath(new File(exePath).getParent()) + "'");
-                }
+                WineWrapper.wine("'" + getSanitizedPath(exePath) + "' " + exeArguments, "'" + getSanitizedPath(new File(exePath).getParent()) + "'");
             }
         }
 
@@ -997,6 +906,7 @@ public class MainActivity extends AppCompatActivity {
     public static String selectedWine = null;
     public static String fileManagerDefaultDir = "";
     public static String fileManagerCwd = null;
+    public static String floatingFileManagerCwd = null;
     public static String selectedFilePath = "";
     public static String miceWineVersion = "MiceWine " + BuildConfig.VERSION_NAME + (BuildConfig.DEBUG ? " (git-" + BuildConfig.GIT_SHORT_SHA + ")" : "");
     public static String vulkanDriverDeviceName = null;
@@ -1076,7 +986,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         selectedBox64 = (box64Version != null ? box64Version : getBox64Version(selectedGameName));
-        if (selectedBox64.equals("Global")) {
+        if ("Global".equals(selectedBox64)) {
             selectedBox64 = preferences.getString(SELECTED_BOX64, "");
         }
 
@@ -1353,6 +1263,4 @@ public class MainActivity extends AppCompatActivity {
 
         return parsedResolutions;
     }
-
-    public static final int EXPORT_LNK_ACTION = 1;
 }

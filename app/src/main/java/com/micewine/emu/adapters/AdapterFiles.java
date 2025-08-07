@@ -4,10 +4,13 @@ import static com.micewine.emu.activities.MainActivity.ACTION_SELECT_FILE_MANAGE
 import static com.micewine.emu.activities.MainActivity.customRootFSPath;
 import static com.micewine.emu.activities.MainActivity.fileManagerCwd;
 import static com.micewine.emu.activities.MainActivity.fileManagerDefaultDir;
+import static com.micewine.emu.activities.MainActivity.floatingFileManagerCwd;
 import static com.micewine.emu.activities.MainActivity.selectedFilePath;
 import static com.micewine.emu.activities.MainActivity.usrDir;
 import static com.micewine.emu.core.WineWrapper.extractIcon;
 import static com.micewine.emu.fragments.FloatingFileManagerFragment.outputFile;
+import static com.micewine.emu.utils.DriveUtils.parseUnixPath;
+import static com.micewine.emu.utils.FileUtils.getFileExtension;
 
 import android.content.Context;
 import android.content.Intent;
@@ -54,10 +57,18 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         FileList item = fileList.get(position);
 
-        if (fileManagerCwd.equals(fileManagerDefaultDir)) {
-            holder.fileName.setText(item.file.getName().toUpperCase());
+        if (isFloatFilesDialog) {
+            if (floatingFileManagerCwd.equals(fileManagerDefaultDir)) {
+                holder.fileName.setText(item.file.getName().toUpperCase());
+            } else {
+                holder.fileName.setText(item.file.getName());
+            }
         } else {
-            holder.fileName.setText(item.file.getName());
+            if (fileManagerCwd.equals(fileManagerDefaultDir)) {
+                holder.fileName.setText(item.file.getName().toUpperCase());
+            } else {
+                holder.fileName.setText(item.file.getName());
+            }
         }
 
         holder.fileName.setSelected(true);
@@ -85,7 +96,7 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
             holder.fileDescription.setText(countText);
         } else if (item.file.isFile()) {
             double fileSize = item.file.length();
-            String fileExtension = item.file.getName().substring(item.file.getName().lastIndexOf(".") + 1);
+            String fileExtension = getFileExtension(item.file);
 
             holder.fileDescription.setText(formatSize(fileSize));
 
@@ -107,21 +118,17 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
                 case "lnk" -> {
                     try {
                         ShellLink shellLink = new ShellLink(item.file);
-                        DriveUtils.DriveInfo drive = DriveUtils.parseWindowsPath(shellLink.resolveTarget());
+                        String parsedUnixPath = parseUnixPath(shellLink.resolveTarget());
+                        File targetFile = new File(parsedUnixPath);
+                        String targetFileExtension = getFileExtension(targetFile);
+                        File iconFile = new File(usrDir, "icons/" + targetFile.getName().replace("." + targetFileExtension, "") + "-thumbnail");
 
-                        if (drive != null) {
-                            File file = new File(drive.getUnixPath());
-                            File iconFile = new File(usrDir, "icons/" + item.file.getName().replace("." + fileExtension, "") + "-thumbnail");
+                        extractIcon(targetFile.getPath(), iconFile.getPath());
 
-                            extractIcon(file.getPath(), iconFile.getPath());
-
-                            if (iconFile.exists() && iconFile.length() > 0) {
-                                holder.fileIcon.setImageBitmap(BitmapFactory.decodeFile(iconFile.getPath()));
-                            } else {
-                                holder.fileIcon.setImageResource(R.drawable.ic_log);
-                            }
+                        if (iconFile.exists() && iconFile.length() > 0) {
+                            holder.fileIcon.setImageBitmap(BitmapFactory.decodeFile(iconFile.getPath()));
                         } else {
-                            holder.fileIcon.setImageResource(R.drawable.ic_log);
+                            holder.fileIcon.setImageResource(R.drawable.unknown_exe);
                         }
                     } catch (Exception e) {
                         holder.fileIcon.setImageResource(R.drawable.ic_log);
@@ -201,7 +208,7 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
 
             if (isFloatFilesDialog) {
                 if (item.file.getName().equals("..")) {
-                    fileManagerCwd = new File(fileManagerCwd).getParent();
+                    floatingFileManagerCwd = new File(floatingFileManagerCwd).getParent();
                     FloatingFileManagerFragment.refreshFiles();
                 } else if (item.file.isFile()) {
                     if (item.file.getName().toLowerCase().endsWith(".rat")) {
@@ -210,7 +217,7 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
                         outputFile = item.file;
                     }
                 } else if (item.file.isDirectory()) {
-                    fileManagerCwd = item.file.getPath();
+                    floatingFileManagerCwd = item.file.getPath();
                     FloatingFileManagerFragment.refreshFiles();
                 }
             } else {

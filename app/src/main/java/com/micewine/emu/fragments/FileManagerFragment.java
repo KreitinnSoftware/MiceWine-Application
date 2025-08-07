@@ -1,6 +1,7 @@
 package com.micewine.emu.fragments;
 
 import static com.micewine.emu.activities.MainActivity.fileManagerCwd;
+import static com.micewine.emu.activities.MainActivity.floatingFileManagerCwd;
 import static com.micewine.emu.activities.MainActivity.fileManagerDefaultDir;
 import static com.micewine.emu.activities.MainActivity.selectedFilePath;
 import static com.micewine.emu.activities.MainActivity.usrDir;
@@ -16,8 +17,10 @@ import static com.micewine.emu.fragments.CreatePresetFragment.CONTROLLER_PRESET;
 import static com.micewine.emu.fragments.CreatePresetFragment.VIRTUAL_CONTROLLER_PRESET;
 import static com.micewine.emu.fragments.DeleteItemFragment.DELETE_GAME_ITEM;
 import static com.micewine.emu.fragments.EditGamePreferencesFragment.FILE_MANAGER_START_PREFERENCES;
+import static com.micewine.emu.fragments.FloatingFileManagerFragment.OPERATION_CREATE_LNK;
 import static com.micewine.emu.fragments.RenameFragment.RENAME_FILE;
 import static com.micewine.emu.fragments.ShortcutsFragment.addGameToList;
+import static com.micewine.emu.utils.DriveUtils.parseUnixPath;
 import static com.micewine.emu.utils.FileUtils.getFileExtension;
 
 import android.annotation.SuppressLint;
@@ -51,6 +54,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import mslinks.ShellLink;
 
 public class FileManagerFragment extends Fragment {
     private TextView currentFolderText;
@@ -218,17 +223,22 @@ public class FileManagerFragment extends Fragment {
                 Toast.makeText(requireContext(), R.string.incompatible_selected_file, Toast.LENGTH_SHORT).show();
             }
         } else if (item.getItemId() == R.id.createLnk) {
-            // TODO(Create New .lnk Support)
+            new FloatingFileManagerFragment(OPERATION_CREATE_LNK, "/storage/emulated/0").show(requireActivity().getSupportFragmentManager(), "");
         } else if (item.getItemId() == R.id.executeExe) {
-            File exeFile = null;
+            File targetFile = file;
 
             if (fileExtension.equals("lnk")) {
-                // TODO(Create New .lnk Support)
-            } else {
-                exeFile = file;
+                try {
+                    ShellLink shellLink = new ShellLink(file);
+                    String parsedUnixPath = parseUnixPath(shellLink.resolveTarget());
+                    targetFile = new File(parsedUnixPath);
+                } catch (Exception ignored) {
+                    Toast.makeText(requireContext(), R.string.lnk_read_fail, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
             }
 
-            new EditGamePreferencesFragment(FILE_MANAGER_START_PREFERENCES, exeFile).show(requireActivity().getSupportFragmentManager(), "");
+            new EditGamePreferencesFragment(FILE_MANAGER_START_PREFERENCES, targetFile).show(requireActivity().getSupportFragmentManager(), "");
 
         } else if (item.getItemId() == R.id.deleteFile) {
             new DeleteItemFragment(DELETE_GAME_ITEM).show(requireActivity().getSupportFragmentManager(), "");
