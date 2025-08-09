@@ -9,8 +9,10 @@ import static com.micewine.emu.controller.ControllerUtils.RIGHT;
 import static com.micewine.emu.controller.ControllerUtils.RIGHT_DOWN;
 import static com.micewine.emu.controller.ControllerUtils.RIGHT_UP;
 import static com.micewine.emu.controller.ControllerUtils.UP;
-import static com.micewine.emu.controller.ControllerUtils.connectedVirtualControllers;
+//import static com.micewine.emu.controller.ControllerUtils.connectedVirtualControllers;
 import static com.micewine.emu.controller.ControllerUtils.getAxisStatus;
+import static com.micewine.emu.controller.ControllerUtils.updateAxisStateNative;
+import static com.micewine.emu.controller.ControllerUtils.updateButtonsStateNative;
 import static com.micewine.emu.input.InputStub.BUTTON_UNDEFINED;
 import static com.micewine.emu.views.VirtualKeyboardInputCreatorView.GRID_SIZE;
 import static com.micewine.emu.views.VirtualKeyboardInputView.SHAPE_CIRCLE;
@@ -33,6 +35,7 @@ import androidx.annotation.NonNull;
 
 import com.micewine.emu.LorieView;
 import com.micewine.emu.R;
+import com.micewine.emu.controller.ControllerUtils;
 
 import java.util.ArrayList;
 
@@ -65,6 +68,11 @@ public class VirtualControllerInputView extends View {
     private VirtualXInputDPad dpad;
     private VirtualXInputAnalog leftAnalog;
     private VirtualXInputTouchPad rightTouchPad;
+
+    private byte buttonsStateA = 0;
+    private byte buttonsStateB = 0;
+    private float lt = 0;
+    private float rt = 0;
 
     private void init() {
         paint = new Paint();
@@ -348,6 +356,12 @@ public class VirtualControllerInputView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         if (virtualXInputControllerId == -1) return true;
 
+        float lx = 0F;
+        float ly = 0F;
+        float rx = 0F;
+        float ry = 0F;
+        byte dpadStatus = 0;
+
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_DOWN -> {
                 for (VirtualControllerButton i : buttonList) {
@@ -368,11 +382,8 @@ public class VirtualControllerInputView extends View {
                     leftAnalog.fingerY = posY;
                     leftAnalog.isPressed = true;
 
-                    float lx = (posX / (leftAnalog.radius / 4));
-                    float ly = (posY / (leftAnalog.radius / 4));
-
-                    connectedVirtualControllers[virtualXInputControllerId].state.lx = Math.max(-1F, Math.min(1F, lx));
-                    connectedVirtualControllers[virtualXInputControllerId].state.ly = Math.max(-1F, Math.min(1F, ly));
+                    lx = (posX / (leftAnalog.radius / 4));
+                    ly = (posY / (leftAnalog.radius / 4));
                 }
 
                 if (detectClick(event, event.getActionIndex(), rightTouchPad.x, rightTouchPad.y, rightTouchPad.radius, SHAPE_SQUARE)) {
@@ -390,8 +401,7 @@ public class VirtualControllerInputView extends View {
                     dpad.isPressed = true;
                     dpad.dpadStatus = getAxisStatus(posX / dpad.radius, posY / dpad.radius, 0.25F);
 
-                    connectedVirtualControllers[virtualXInputControllerId].state.dpadX = Math.max(-1F, Math.min(1F, posX / dpad.radius));
-                    connectedVirtualControllers[virtualXInputControllerId].state.dpadY = Math.max(-1F, Math.min(1F, posY / dpad.radius));
+                    dpadStatus = (byte) dpad.dpadStatus;
                 }
 
                 invalidate();
@@ -414,11 +424,8 @@ public class VirtualControllerInputView extends View {
                         leftAnalog.fingerX = posX;
                         leftAnalog.fingerY = posY;
 
-                        float lx = (posX / (leftAnalog.radius / 4));
-                        float ly = (posY / (leftAnalog.radius / 4));
-
-                        connectedVirtualControllers[virtualXInputControllerId].state.lx = Math.max(-1F, Math.min(1F, lx));
-                        connectedVirtualControllers[virtualXInputControllerId].state.ly = Math.max(-1F, Math.min(1F, ly));
+                        lx = (posX / (leftAnalog.radius / 4));
+                        ly = (posY / (leftAnalog.radius / 4));
 
                         isFingerPressingButton = true;
                     }
@@ -428,10 +435,10 @@ public class VirtualControllerInputView extends View {
                             float dx = (event.getX(i) - event.getHistoricalX(i, event.getHistorySize() - 1));
                             float dy = (event.getY(i) - event.getHistoricalY(i, event.getHistorySize() - 1));
 
-                            isFingerPressingButton = true;
+                            rx = dx;
+                            ry = dy;
 
-                            connectedVirtualControllers[virtualXInputControllerId].state.rx = Math.max(-1F, Math.min(1F, dx));
-                            connectedVirtualControllers[virtualXInputControllerId].state.ry = Math.max(-1F, Math.min(1F, dy));
+                            isFingerPressingButton = true;
                         }
                     }
 
@@ -443,8 +450,7 @@ public class VirtualControllerInputView extends View {
                         dpad.fingerY = posY;
                         dpad.dpadStatus = getAxisStatus(posX / dpad.radius, posY / dpad.radius, 0.25F);
 
-                        connectedVirtualControllers[virtualXInputControllerId].state.dpadX = Math.max(-1F, Math.min(1F, posX / dpad.radius));
-                        connectedVirtualControllers[virtualXInputControllerId].state.dpadY = Math.max(-1F, Math.min(1F, posY / dpad.radius));
+                        dpadStatus = (byte) dpad.dpadStatus;
 
                         isFingerPressingButton = true;
                     }
@@ -473,16 +479,16 @@ public class VirtualControllerInputView extends View {
                     leftAnalog.fingerY = 0F;
                     leftAnalog.isPressed = false;
 
-                    connectedVirtualControllers[virtualXInputControllerId].state.lx = 0F;
-                    connectedVirtualControllers[virtualXInputControllerId].state.ly = 0F;
+                    lx = 0F;
+                    ly = 0F;
                 }
 
                 if (rightTouchPad.fingerId == event.getPointerId(event.getActionIndex())) {
                     rightTouchPad.fingerId = -1;
                     rightTouchPad.isPressed = false;
 
-                    connectedVirtualControllers[virtualXInputControllerId].state.rx = 0F;
-                    connectedVirtualControllers[virtualXInputControllerId].state.ry = 0F;
+                    rx = 0F;
+                    ry = 0F;
                 }
 
                 if (dpad.fingerId == event.getPointerId(event.getActionIndex())) {
@@ -492,8 +498,7 @@ public class VirtualControllerInputView extends View {
                     dpad.isPressed = false;
                     dpad.dpadStatus = 0;
 
-                    connectedVirtualControllers[virtualXInputControllerId].state.dpadX = 0F;
-                    connectedVirtualControllers[virtualXInputControllerId].state.dpadY = 0F;
+                    dpadStatus = 0;
                 }
 
                 invalidate();
@@ -512,15 +517,15 @@ public class VirtualControllerInputView extends View {
                 leftAnalog.fingerY = 0F;
                 leftAnalog.isPressed = false;
 
-                connectedVirtualControllers[virtualXInputControllerId].state.lx = 0F;
-                connectedVirtualControllers[virtualXInputControllerId].state.ly = 0F;
+                lx = 0F;
+                ly = 0F;
 
                 // Right Analog TouchPad
                 rightTouchPad.fingerId = -1;
                 rightTouchPad.isPressed = false;
 
-                connectedVirtualControllers[virtualXInputControllerId].state.rx = 0F;
-                connectedVirtualControllers[virtualXInputControllerId].state.ry = 0F;
+                rx = 0F;
+                ry = 0F;
 
                 // D-Pad
                 dpad.fingerId = -1;
@@ -529,12 +534,14 @@ public class VirtualControllerInputView extends View {
                 dpad.isPressed = false;
                 dpad.dpadStatus = 0;
 
-                connectedVirtualControllers[virtualXInputControllerId].state.dpadX = 0F;
-                connectedVirtualControllers[virtualXInputControllerId].state.dpadY = 0F;
+                dpadStatus = 0;
 
                 invalidate();
             }
         }
+
+        updateAxisStateNative(virtualXInputControllerId, lx, ly, rx, ry, lt ,rt, dpadStatus);
+        updateButtonsStateNative(virtualXInputControllerId, buttonsStateA, buttonsStateB);
 
         return true;
     }
@@ -543,18 +550,48 @@ public class VirtualControllerInputView extends View {
         button.isPressed = isPressed;
 
         switch (button.id) {
-            case A_BUTTON -> connectedVirtualControllers[virtualXInputControllerId].state.aPressed = isPressed;
-            case B_BUTTON -> connectedVirtualControllers[virtualXInputControllerId].state.bPressed = isPressed;
-            case X_BUTTON -> connectedVirtualControllers[virtualXInputControllerId].state.xPressed = isPressed;
-            case Y_BUTTON -> connectedVirtualControllers[virtualXInputControllerId].state.yPressed = isPressed;
-            case START_BUTTON -> connectedVirtualControllers[virtualXInputControllerId].state.startPressed = isPressed;
-            case SELECT_BUTTON -> connectedVirtualControllers[virtualXInputControllerId].state.selectPressed = isPressed;
-            case LB_BUTTON -> connectedVirtualControllers[virtualXInputControllerId].state.lbPressed = isPressed;
-            case LT_BUTTON -> connectedVirtualControllers[virtualXInputControllerId].state.lt = isPressed ? 1F : 0F;
-            case RB_BUTTON -> connectedVirtualControllers[virtualXInputControllerId].state.rbPressed = isPressed;
-            case RT_BUTTON -> connectedVirtualControllers[virtualXInputControllerId].state.rt = isPressed ? 1F : 0F;
-            case LS_BUTTON -> connectedVirtualControllers[virtualXInputControllerId].state.lsPressed = isPressed;
-            case RS_BUTTON -> connectedVirtualControllers[virtualXInputControllerId].state.rsPressed = isPressed;
+            case A_BUTTON -> {
+                if (isPressed) buttonsStateA |= ControllerUtils.A_BUTTON;
+                else buttonsStateA &= ~ControllerUtils.A_BUTTON;
+            }
+            case B_BUTTON -> {
+                if (isPressed) buttonsStateA |= ControllerUtils.B_BUTTON;
+                else buttonsStateA &= ~ControllerUtils.B_BUTTON;
+            }
+            case X_BUTTON -> {
+                if (isPressed) buttonsStateA |= ControllerUtils.X_BUTTON;
+                else buttonsStateA &= ~ControllerUtils.X_BUTTON;
+            }
+            case Y_BUTTON -> {
+                if (isPressed) buttonsStateA |= ControllerUtils.Y_BUTTON;
+                else buttonsStateA &= ~ControllerUtils.Y_BUTTON;
+            }
+            case START_BUTTON -> {
+                if (isPressed) buttonsStateB |= ControllerUtils.START_BUTTON;
+                else buttonsStateB &= ~ControllerUtils.START_BUTTON;
+            }
+            case SELECT_BUTTON -> {
+                if (isPressed) buttonsStateB |= ControllerUtils.SELECT_BUTTON;
+                else buttonsStateB &= ~ControllerUtils.SELECT_BUTTON;
+            }
+            case LB_BUTTON -> {
+                if (isPressed) buttonsStateA |= ControllerUtils.LB_BUTTON;
+                else buttonsStateA &= ~ControllerUtils.LB_BUTTON;
+            }
+            case LT_BUTTON -> lt = isPressed ? 1F : 0F;
+            case RB_BUTTON -> {
+                if (isPressed) buttonsStateA |= ControllerUtils.RB_BUTTON;
+                else buttonsStateA &= ~ControllerUtils.RB_BUTTON;
+            }
+            case RT_BUTTON -> rt = isPressed ? 1F : 0F;
+            case LS_BUTTON -> {
+                if (isPressed) buttonsStateA |= ControllerUtils.LS_BUTTON;
+                else buttonsStateA &= ~ControllerUtils.LS_BUTTON;
+            }
+            case RS_BUTTON -> {
+                if (isPressed) buttonsStateA |= (byte) ControllerUtils.RS_BUTTON;
+                else buttonsStateA &= (byte) ~ControllerUtils.RS_BUTTON;
+            }
         }
     }
 

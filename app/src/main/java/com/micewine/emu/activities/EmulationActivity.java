@@ -17,11 +17,10 @@ import static com.micewine.emu.activities.MainActivity.setSharedVars;
 import static com.micewine.emu.activities.RatManagerActivity.generateMangoHUDConfFile;
 import static com.micewine.emu.adapters.AdapterGame.selectedGameName;
 import static com.micewine.emu.controller.ControllerUtils.connectController;
-import static com.micewine.emu.controller.ControllerUtils.destroyInputServer;
 import static com.micewine.emu.controller.ControllerUtils.disconnectController;
 import static com.micewine.emu.controller.ControllerUtils.prepareControllersMappings;
+import static com.micewine.emu.controller.ControllerUtils.stopInputServer;
 import static com.micewine.emu.controller.ControllerUtils.updateAxisState;
-import static com.micewine.emu.controller.ControllerUtils.updateButtonsState;
 import static com.micewine.emu.core.ShellLoader.cleanup;
 import static com.micewine.emu.core.ShellLoader.runCommand;
 import static com.micewine.emu.fragments.CreatePresetFragment.CONTROLLER_PRESET;
@@ -146,7 +145,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
             if (enableRamCounter) getMemoryInfo(this);
         }).start();
 
-        new Thread(ControllerUtils::startInputServer).start();
+        ControllerUtils.startInputServer();
 
         prepareControllersMappings();
 
@@ -179,7 +178,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
             WineWrapper.killAll();
 
             disconnectController(virtualXInputControllerId);
-            destroyInputServer();
+            stopInputServer();
             cleanup();
 
             finishAffinity();
@@ -374,7 +373,7 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
                 return true;
             }
 
-            updateButtonsState(e);
+            ControllerUtils.updateButtonsState(e);
 
             return mInputHandler.sendKeyEvent(e);
         };

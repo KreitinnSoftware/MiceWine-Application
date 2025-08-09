@@ -1,8 +1,6 @@
 package com.micewine.emu.controller;
 
 import static com.micewine.emu.activities.EmulationActivity.handler;
-import static com.micewine.emu.activities.MainActivity.enableDInput;
-import static com.micewine.emu.activities.MainActivity.enableXInput;
 import static com.micewine.emu.activities.PresetManagerActivity.AXIS_HAT_X_MINUS_KEY;
 import static com.micewine.emu.activities.PresetManagerActivity.AXIS_HAT_X_PLUS_KEY;
 import static com.micewine.emu.activities.PresetManagerActivity.AXIS_HAT_Y_MINUS_KEY;
@@ -40,7 +38,6 @@ import static com.micewine.emu.input.InputStub.BUTTON_MIDDLE;
 import static com.micewine.emu.input.InputStub.BUTTON_RIGHT;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -48,14 +45,11 @@ import android.view.MotionEvent;
 import com.micewine.emu.LorieView;
 import com.micewine.emu.input.InputStub;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-import java.nio.ByteBuffer;
+
+import dalvik.annotation.optimization.FastNative;
 
 public class ControllerUtils {
     public static final int KEYBOARD = 0;
@@ -244,125 +238,64 @@ public class ControllerUtils {
 
         if (pController == null) return;
 
+        byte buttonsStateA = 0;
+        byte buttonsStateB = 0;
+
         switch (e.getKeyCode()) {
             case KeyEvent.KEYCODE_BUTTON_Y -> {
                 pController.state.yPressed = pressed;
 
-                switch (pController.mappingType) {
-                    case MAPPING_TYPE_XINPUT: {
-                        int index = pController.virtualControllerID;
-                        if (index != -1) {
-                            connectedVirtualControllers[index].state.yPressed = pressed;
-                        }
-                    }
-                    case MAPPING_TYPE_KEYBOARD_MOUSE: {
-                        handleKey(pressed, pController.keyboardMapping.yButton);
-                    }
+                if (pController.mappingType == MAPPING_TYPE_KEYBOARD_MOUSE) {
+                    handleKey(pressed, pController.keyboardMapping.yButton);
                 }
             }
             case KeyEvent.KEYCODE_BUTTON_A -> {
                 pController.state.aPressed = pressed;
 
-                switch (pController.mappingType) {
-                    case MAPPING_TYPE_XINPUT: {
-                        int index = pController.virtualControllerID;
-                        if (index != -1) {
-                            connectedVirtualControllers[index].state.aPressed = pressed;
-                        }
-                    }
-                    case MAPPING_TYPE_KEYBOARD_MOUSE: {
-                        handleKey(pressed, pController.keyboardMapping.aButton);
-                    }
+                if (pController.mappingType == MAPPING_TYPE_KEYBOARD_MOUSE) {
+                    handleKey(pressed, pController.keyboardMapping.aButton);
                 }
             }
             case KeyEvent.KEYCODE_BUTTON_B -> {
                 pController.state.bPressed = pressed;
 
-                switch (pController.mappingType) {
-                    case MAPPING_TYPE_XINPUT: {
-                        int index = pController.virtualControllerID;
-                        if (index != -1) {
-                            connectedVirtualControllers[index].state.bPressed = pressed;
-                        }
-                    }
-                    case MAPPING_TYPE_KEYBOARD_MOUSE: {
-                        handleKey(pressed, pController.keyboardMapping.bButton);
-                    }
+                if (pController.mappingType == MAPPING_TYPE_KEYBOARD_MOUSE) {
+                    handleKey(pressed, pController.keyboardMapping.bButton);
                 }
             }
             case KeyEvent.KEYCODE_BUTTON_X -> {
                 pController.state.xPressed = pressed;
 
-                switch (pController.mappingType) {
-                    case MAPPING_TYPE_XINPUT: {
-                        int index = pController.virtualControllerID;
-                        if (index != -1) {
-                            connectedVirtualControllers[index].state.xPressed = pressed;
-                        }
-                    }
-                    case MAPPING_TYPE_KEYBOARD_MOUSE: {
-                        handleKey(pressed, pController.keyboardMapping.xButton);
-                    }
+                if (pController.mappingType == MAPPING_TYPE_KEYBOARD_MOUSE) {
+                    handleKey(pressed, pController.keyboardMapping.xButton);
                 }
             }
             case KeyEvent.KEYCODE_BUTTON_START -> {
                 pController.state.startPressed = pressed;
 
-                switch (pController.mappingType) {
-                    case MAPPING_TYPE_XINPUT: {
-                        int index = pController.virtualControllerID;
-                        if (index != -1) {
-                            connectedVirtualControllers[index].state.startPressed = pressed;
-                        }
-                    }
-                    case MAPPING_TYPE_KEYBOARD_MOUSE: {
-                        handleKey(pressed, pController.keyboardMapping.startButton);
-                    }
+                if (pController.mappingType == MAPPING_TYPE_KEYBOARD_MOUSE) {
+                    handleKey(pressed, pController.keyboardMapping.startButton);
                 }
             }
             case KeyEvent.KEYCODE_BUTTON_SELECT -> {
                 pController.state.selectPressed = pressed;
 
-                switch (pController.mappingType) {
-                    case MAPPING_TYPE_XINPUT: {
-                        int index = pController.virtualControllerID;
-                        if (index != -1) {
-                            connectedVirtualControllers[index].state.selectPressed = pressed;
-                        }
-                    }
-                    case MAPPING_TYPE_KEYBOARD_MOUSE: {
-                        handleKey(pressed, pController.keyboardMapping.selectButton);
-                    }
+                if (pController.mappingType == MAPPING_TYPE_KEYBOARD_MOUSE) {
+                    handleKey(pressed, pController.keyboardMapping.selectButton);
                 }
             }
             case KeyEvent.KEYCODE_BUTTON_R1 -> {
                 pController.state.rbPressed = pressed;
 
-                switch (pController.mappingType) {
-                    case MAPPING_TYPE_XINPUT: {
-                        int index = pController.virtualControllerID;
-                        if (index != -1) {
-                            connectedVirtualControllers[index].state.rbPressed = pressed;
-                        }
-                    }
-                    case MAPPING_TYPE_KEYBOARD_MOUSE: {
-                        handleKey(pressed, pController.keyboardMapping.rbButton);
-                    }
+                if (pController.mappingType == MAPPING_TYPE_KEYBOARD_MOUSE) {
+                    handleKey(pressed, pController.keyboardMapping.rbButton);
                 }
             }
             case KeyEvent.KEYCODE_BUTTON_L1 -> {
                 pController.state.lbPressed = pressed;
 
-                switch (pController.mappingType) {
-                    case MAPPING_TYPE_XINPUT: {
-                        int index = pController.virtualControllerID;
-                        if (index != -1) {
-                            connectedVirtualControllers[index].state.lbPressed = pressed;
-                        }
-                    }
-                    case MAPPING_TYPE_KEYBOARD_MOUSE: {
-                        handleKey(pressed, pController.keyboardMapping.lbButton);
-                    }
+                if (pController.mappingType == MAPPING_TYPE_KEYBOARD_MOUSE) {
+                    handleKey(pressed, pController.keyboardMapping.lbButton);
                 }
             }
             case KeyEvent.KEYCODE_BUTTON_R2 -> {
@@ -370,16 +303,8 @@ public class ControllerUtils {
 
                 pController.state.rt = pressed ? 1F : 0F;
 
-                switch (pController.mappingType) {
-                    case MAPPING_TYPE_XINPUT: {
-                        int index = pController.virtualControllerID;
-                        if (index != -1) {
-                            connectedVirtualControllers[index].state.rt = pressed ? 1F : 0F;
-                        }
-                    }
-                    case MAPPING_TYPE_KEYBOARD_MOUSE: {
-                        handleKey(pressed, pController.keyboardMapping.rtButton);
-                    }
+                if (pController.mappingType == MAPPING_TYPE_KEYBOARD_MOUSE) {
+                    handleKey(pressed, pController.keyboardMapping.rtButton);
                 }
             }
             case KeyEvent.KEYCODE_BUTTON_L2 -> {
@@ -387,48 +312,39 @@ public class ControllerUtils {
 
                 pController.state.lt = pressed ? 1F : 0F;
 
-                switch (pController.mappingType) {
-                    case MAPPING_TYPE_XINPUT: {
-                        int index = pController.virtualControllerID;
-                        if (index != -1) {
-                            connectedVirtualControllers[index].state.lt = pressed ? 1F : 0F;
-                        }
-                    }
-                    case MAPPING_TYPE_KEYBOARD_MOUSE: {
-                        handleKey(pressed, pController.keyboardMapping.ltButton);
-                    }
+                if (pController.mappingType == MAPPING_TYPE_KEYBOARD_MOUSE) {
+                    handleKey(pressed, pController.keyboardMapping.ltButton);
                 }
             }
             case KeyEvent.KEYCODE_BUTTON_THUMBR -> {
                 pController.state.rsPressed = pressed;
 
-                switch (pController.mappingType) {
-                    case MAPPING_TYPE_XINPUT: {
-                        int index = pController.virtualControllerID;
-                        if (index != -1) {
-                            connectedVirtualControllers[index].state.rsPressed = pressed;
-                        }
-                    }
-                    case MAPPING_TYPE_KEYBOARD_MOUSE: {
-                        handleKey(pressed, pController.keyboardMapping.rsButton);
-                    }
+                if (pController.mappingType == MAPPING_TYPE_KEYBOARD_MOUSE) {
+                    handleKey(pressed, pController.keyboardMapping.rsButton);
                 }
             }
             case KeyEvent.KEYCODE_BUTTON_THUMBL -> {
                 pController.state.lsPressed = pressed;
 
-                switch (pController.mappingType) {
-                    case MAPPING_TYPE_XINPUT: {
-                        int index = pController.virtualControllerID;
-                        if (index != -1) {
-                            connectedVirtualControllers[index].state.lsPressed = pressed;
-                        }
-                    }
-                    case MAPPING_TYPE_KEYBOARD_MOUSE: {
-                        handleKey(pressed, pController.keyboardMapping.lsButton);
-                    }
+                if (pController.mappingType == MAPPING_TYPE_KEYBOARD_MOUSE) {
+                    handleKey(pressed, pController.keyboardMapping.lsButton);
                 }
             }
+        }
+
+        if (pController.mappingType == MAPPING_TYPE_XINPUT) {
+            buttonsStateA |= (byte) (pController.state.aPressed ? A_BUTTON : 0);
+            buttonsStateA |= (byte) (pController.state.bPressed ? B_BUTTON : 0);
+            buttonsStateA |= (byte) (pController.state.xPressed ? X_BUTTON : 0);
+            buttonsStateA |= (byte) (pController.state.yPressed ? Y_BUTTON : 0);
+            buttonsStateA |= (byte) (pController.state.lbPressed ? LB_BUTTON : 0);
+            buttonsStateA |= (byte) (pController.state.rbPressed ? RB_BUTTON : 0);
+            buttonsStateA |= (byte) (pController.state.lsPressed ? LS_BUTTON : 0);
+            buttonsStateA |= (byte) (pController.state.rsPressed ? RS_BUTTON : 0);
+            buttonsStateB |= (byte) (pController.state.startPressed ? START_BUTTON : 0);
+            buttonsStateB |= (byte) (pController.state.selectPressed ? SELECT_BUTTON : 0);
+
+            updateButtonsStateNative(pController.virtualControllerID, buttonsStateA, buttonsStateB);
         }
     }
 
@@ -560,24 +476,10 @@ public class ControllerUtils {
                 int index = pController.virtualControllerID;
                 if (index != -1) {
                     if (pController.swapAnalogs) {
-                        connectedVirtualControllers[index].state.lx = pController.state.rx;
-                        connectedVirtualControllers[index].state.ly = pController.state.ry;
-                        connectedVirtualControllers[index].state.rx = pController.state.lx;
-                        connectedVirtualControllers[index].state.ry = pController.state.ly;
+                        updateAxisStateNative(index, pController.state.rx, pController.state.ry, pController.state.lx, pController.state.ly, pController.state.lt, pController.state.rt, (byte) getAxisStatus(pController.state.dpadX, pController.state.dpadY, 0.25F));
                     } else {
-                        connectedVirtualControllers[index].state.lx = pController.state.lx;
-                        connectedVirtualControllers[index].state.ly = pController.state.ly;
-                        connectedVirtualControllers[index].state.rx = pController.state.rx;
-                        connectedVirtualControllers[index].state.ry = pController.state.ry;
+                        updateAxisStateNative(index, pController.state.lx, pController.state.ly, pController.state.rx, pController.state.ry, pController.state.lt, pController.state.rt, (byte) getAxisStatus(pController.state.dpadX, pController.state.dpadY, 0.25F));
                     }
-
-                    if (pController.supportAxisTrigger) {
-                        connectedVirtualControllers[index].state.lt = pController.state.lt;
-                        connectedVirtualControllers[index].state.rt = pController.state.rt;
-                    }
-
-                    connectedVirtualControllers[index].state.dpadX = pController.state.dpadX;
-                    connectedVirtualControllers[index].state.dpadY = pController.state.dpadY;
                 }
             }
             case MAPPING_TYPE_KEYBOARD_MOUSE: {
@@ -696,173 +598,31 @@ public class ControllerUtils {
         }
     }
 
-    public static class VirtualController {
-        public boolean connected = false;
-        public ControllerState state = new ControllerState();
+    public final static int A_BUTTON = 0x01;
+    public final static int B_BUTTON = 0x02;
+    public final static int X_BUTTON = 0x04;
+    public final static int Y_BUTTON = 0x08;
+    public final static int RB_BUTTON = 0x10;
+    public final static int LB_BUTTON = 0x20;
+    public final static int LS_BUTTON = 0x40;
+    public final static int RS_BUTTON = 0x80;
+    public final static int START_BUTTON = 0x01;
+    public final static int SELECT_BUTTON = 0x02;
+
+    static {
+        System.loadLibrary("micewine");
     }
 
-    public static VirtualController[] connectedVirtualControllers = {
-            new VirtualController(), new VirtualController(), new VirtualController(), new VirtualController(),
-    };
-
-    public static int connectController() {
-        for (int i = 0; i < connectedVirtualControllers.length; i++) {
-            if (!connectedVirtualControllers[i].connected) {
-                Log.d("ControllerDebug", "Connected Controller on Port " + i);
-                connectedVirtualControllers[i].connected = true;
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    public static void disconnectController(int index) {
-        if (index != -1) {
-            Log.d("ControllerDebug", "Disconnected Controller on Port " + index);
-            connectedVirtualControllers[index].connected = false;
-        }
-    }
-
-    private static final int CLIENT_PORT = 7941;
-    private static final int BUFFER_SIZE = 44;
-    private static final int GET_CONNECTION = 1;
-    private static final int GET_GAMEPAD_STATE = 2;
-    private static final int GET_GAMEPAD_STATE_DINPUT = 3;
-
-    private static boolean inputServerRunning = false;
-
-    public static void startInputServer() {
-        if (inputServerRunning) return;
-
-        Log.d("ControllerDebug", "Input Server Initialized.");
-
-        inputServerRunning = true;
-
-        try (DatagramSocket serverSocket = new DatagramSocket(CLIENT_PORT)) {
-            while (inputServerRunning) {
-                byte[] buffer = new byte[BUFFER_SIZE];
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-
-                serverSocket.receive(packet);
-
-                Thread.sleep(2);
-
-                ByteBuffer receivedBuffer = ByteBuffer.wrap(buffer);
-                switch (receivedBuffer.get(0) & 0xFF) {
-                    case GET_CONNECTION -> {
-                        DatagramPacket responsePacket = new DatagramPacket(buffer, buffer.length, packet.getAddress(), packet.getPort());
-                        serverSocket.send(responsePacket);
-                    }
-                    case GET_GAMEPAD_STATE -> {
-                        for (int i = 0; i < connectedVirtualControllers.length; i++) {
-                            buffer[i * 11] = (byte) GET_GAMEPAD_STATE;
-                            buffer[1 + (i * 11)] = (byte) (((connectedVirtualControllers[i].connected || i == 0) && enableXInput) ? 1 : 0);
-
-                            int buttonsState1 = 0;
-                            
-                            buttonsState1 |= (connectedVirtualControllers[i].state.aPressed ? A_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.bPressed ? B_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.xPressed ? X_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.yPressed ? Y_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.lbPressed ? LB_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.rbPressed ? RB_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.lsPressed ? LS_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.rsPressed ? RS_BUTTON : 0);
-
-                            int buttonsState2 = 0;
-
-                            buttonsState2 |= (connectedVirtualControllers[i].state.startPressed ? START_BUTTON : 0);
-                            buttonsState2 |= (connectedVirtualControllers[i].state.selectPressed ? SELECT_BUTTON : 0);
-                            
-                            buffer[2 + (i * 11)] = (byte) buttonsState1;
-                            buffer[3 + (i * 11)] = (byte) buttonsState2;
-                            buffer[4 + (i * 11)] = (byte) getAxisStatus(connectedVirtualControllers[i].state.dpadX, connectedVirtualControllers[i].state.dpadY, 0.25F);
-
-                            int lx = (int) ((connectedVirtualControllers[i].state.lx + 1F) * 127.5F);
-                            int ly = (int) ((-connectedVirtualControllers[i].state.ly + 1F) * 127.5F);
-                            int rx = (int) ((connectedVirtualControllers[i].state.rx + 1F) * 127.5F);
-                            int ry = (int) ((-connectedVirtualControllers[i].state.ry + 1F) * 127.5F);
-                            int lt = (int) ((connectedVirtualControllers[i].state.lt * 2F) * 127.5F);
-                            int rt = (int) ((connectedVirtualControllers[i].state.rt * 2F) * 127.5F);
-
-                            buffer[5 + (i * 11)] = (byte) lx;
-                            buffer[6 + (i * 11)] = (byte) ly;
-                            buffer[7 + (i * 11)] = (byte) rx;
-                            buffer[8 + (i * 11)] = (byte) ry;
-                            buffer[9 + (i * 11)] = (byte) lt;
-                            buffer[10 + (i * 11)] = (byte) rt;
-                        }
-
-                        DatagramPacket responsePacket = new DatagramPacket(buffer, buffer.length, packet.getAddress(), packet.getPort());
-                        serverSocket.send(responsePacket);
-                    }
-                    case GET_GAMEPAD_STATE_DINPUT -> {
-                        for (int i = 0; i < connectedVirtualControllers.length; i++) {
-                            buffer[i * 11] = (byte) GET_GAMEPAD_STATE_DINPUT;
-                            buffer[1 + (i * 11)] = (byte) (((connectedVirtualControllers[i].connected || i == 0) && enableDInput) ? 1 : 0);
-
-                            int buttonsState1 = 0;
-
-                            buttonsState1 |= (connectedVirtualControllers[i].state.aPressed ? A_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.bPressed ? B_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.xPressed ? X_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.yPressed ? Y_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.lbPressed ? LB_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.rbPressed ? RB_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.lsPressed ? LS_BUTTON : 0);
-                            buttonsState1 |= (connectedVirtualControllers[i].state.rsPressed ? RS_BUTTON : 0);
-
-                            int buttonsState2 = 0;
-
-                            buttonsState2 |= (connectedVirtualControllers[i].state.startPressed ? START_BUTTON : 0);
-                            buttonsState2 |= (connectedVirtualControllers[i].state.selectPressed ? SELECT_BUTTON : 0);
-
-                            buffer[2 + (i * 11)] = (byte) buttonsState1;
-                            buffer[3 + (i * 11)] = (byte) buttonsState2;
-                            buffer[4 + (i * 11)] = (byte) getAxisStatus(connectedVirtualControllers[i].state.dpadX, connectedVirtualControllers[i].state.dpadY, 0.25F);
-
-                            int lx = (int) ((connectedVirtualControllers[i].state.lx + 1F) * 127.5F);
-                            int ly = (int) ((-connectedVirtualControllers[i].state.ly + 1F) * 127.5F);
-                            int rx = (int) ((connectedVirtualControllers[i].state.rx + 1F) * 127.5F);
-                            int ry = (int) ((-connectedVirtualControllers[i].state.ry + 1F) * 127.5F);
-                            int lt = (int) ((connectedVirtualControllers[i].state.lt * 2F) * 127.5F);
-                            int rt = (int) ((connectedVirtualControllers[i].state.rt * 2F) * 127.5F);
-
-                            buffer[5 + (i * 11)] = (byte) lx;
-                            buffer[6 + (i * 11)] = (byte) ly;
-                            buffer[7 + (i * 11)] = (byte) rx;
-                            buffer[8 + (i * 11)] = (byte) ry;
-                            buffer[9 + (i * 11)] = (byte) lt;
-                            buffer[10 + (i * 11)] = (byte) rt;
-                        }
-
-                        DatagramPacket responsePacket = new DatagramPacket(buffer, buffer.length, packet.getAddress(), packet.getPort());
-                        serverSocket.send(responsePacket);
-                    }
-                }
-            }
-        } catch (SocketException e) {
-            Log.e("ControllerDebug", "Failed to create socket. " + e.getMessage());
-        } catch (IOException e) {
-            Log.e("ControllerDebug", "IOException: " + e.getMessage());
-        } catch (InterruptedException e) {
-            Log.e("ControllerDebug", "InterruptedException: " + e.getMessage());
-        }
-    }
-
-    public static void destroyInputServer() {
-        inputServerRunning = false;
-    }
-
-    private final static int A_BUTTON = 0x01;
-    private final static int B_BUTTON = 0x02;
-    private final static int X_BUTTON = 0x04;
-    private final static int Y_BUTTON = 0x08;
-    private final static int RB_BUTTON = 0x10;
-    private final static int LB_BUTTON = 0x20;
-    private final static int LS_BUTTON = 0x40;
-    private final static int RS_BUTTON = 0x80;
-    private final static int START_BUTTON = 0x01;
-    private final static int SELECT_BUTTON = 0x02;
+    @FastNative
+    public static native int connectController();
+    @FastNative
+    public static native void disconnectController(int index);
+    @FastNative
+    public static native void updateAxisStateNative(int index, float lx, float ly, float rx, float ry, float lt, float rt, byte dpadStatus);
+    @FastNative
+    public static native void updateButtonsStateNative(int index, int buttons, int buttonsB);
+    @FastNative
+    public static native void startInputServer();
+    @FastNative
+    public static native void stopInputServer();
 }

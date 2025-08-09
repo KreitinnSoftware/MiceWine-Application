@@ -1,7 +1,6 @@
 package com.micewine.emu.activities;
 
 import static com.micewine.emu.controller.ControllerUtils.updateAxisState;
-import static com.micewine.emu.controller.ControllerUtils.updateButtonsState;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -15,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.micewine.emu.R;
+import com.micewine.emu.controller.ControllerUtils;
 import com.micewine.emu.databinding.ActivityControllerViewBinding;
 import com.micewine.emu.fragments.ControllerViewFragment;
 
@@ -76,7 +76,7 @@ public class ControllerTestActivity extends AppCompatActivity {
         }
 
         if (event == null) return true;
-        updateButtonsState(event);
+        ControllerUtils.updateButtonsState(event);
 
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
         for (Fragment fragment : fragments) {
