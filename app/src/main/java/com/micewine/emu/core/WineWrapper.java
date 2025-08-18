@@ -193,7 +193,7 @@ public class WineWrapper {
 
     public static int getWinPidByName(String processName) {
         String[] taskList = runCommandWithOutput(
-                getEnv() + "BOX64_LOG=0 WINEPREFIX='" + winePrefixesDir + "/" + winePrefix + "' " + IS_BOX64 + " wine tasklist" , true
+                getEnv() + "BOX64_LOG=0 WINEPREFIX='" + winePrefixesDir + "/" + winePrefix + "' " + IS_BOX64 + " wine tasklist" , false
         ).split("\n");
 
         for (String s : taskList) {
