@@ -57,6 +57,8 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         FileList item = fileList.get(position);
 
+        holder.fileIcon.setImageResource(0);
+
         if (isFloatFilesDialog) {
             if (floatingFileManagerCwd.equals(fileManagerDefaultDir)) {
                 holder.fileName.setText(item.file.getName().toUpperCase());
@@ -75,25 +77,26 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
 
         if (item.file.isDirectory()) {
             holder.fileIcon.setImageResource(R.drawable.ic_folder);
-
-            File[] fileList = item.file.listFiles();
-            if (fileList == null) return;
-
-            int fileCount = fileList.length;
-
             holder.fileDescription.setVisibility(View.VISIBLE);
 
-            String countText;
+            new Thread(() -> {
+                File[] fileList = item.file.listFiles();
+                if (fileList == null) return;
 
-            if (fileCount == 0) {
-                countText = context.getString(R.string.empty_text);
-            } else if (fileCount == 1) {
-                countText = fileCount + " " + context.getString(R.string.item_text);
-            } else {
-                countText = fileCount + " " + context.getString(R.string.items_text);
-            }
+                int fileCount = fileList.length;
 
-            holder.fileDescription.setText(countText);
+                String countText;
+
+                if (fileCount == 0) {
+                    countText = context.getString(R.string.empty_text);
+                } else if (fileCount == 1) {
+                    countText = fileCount + " " + context.getString(R.string.item_text);
+                } else {
+                    countText = fileCount + " " + context.getString(R.string.items_text);
+                }
+
+                holder.fileDescription.post(() -> holder.fileDescription.setText(countText));
+            }).start();
         } else if (item.file.isFile()) {
             double fileSize = item.file.length();
             String fileExtension = getFileExtension(item.file);
@@ -101,21 +104,19 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
             holder.fileDescription.setText(formatSize(fileSize));
 
             switch (fileExtension.toLowerCase()) {
-                case "exe" -> {
+                case "exe" -> new Thread(() -> {
                     File iconFile = new File(usrDir, "icons/" + item.file.getName().replace("." + fileExtension, "") + "-thumbnail");
 
                     extractIcon(item.file.getPath(), iconFile.getPath());
 
                     if (iconFile.exists() && iconFile.length() > 0) {
-                        new Thread(() -> {
-                            Bitmap parsedIcon = decodeFileThumbnail(iconFile, holder.fileIcon.getLayoutParams().width, holder.fileIcon.getLayoutParams().height);
-                            holder.fileIcon.post(() -> holder.fileIcon.setImageBitmap(parsedIcon));
-                        }).start();
+                        Bitmap parsedIcon = decodeFileThumbnail(iconFile, holder.fileIcon.getLayoutParams().width, holder.fileIcon.getLayoutParams().height);
+                        holder.fileIcon.post(() -> holder.fileIcon.setImageBitmap(parsedIcon));
                     } else {
-                        holder.fileIcon.setImageResource(R.drawable.unknown_exe);
+                        holder.fileIcon.post(() -> holder.fileIcon.setImageResource(R.drawable.unknown_exe));
                     }
-                }
-                case "lnk" -> {
+                }).start();
+                case "lnk" -> new Thread(() -> {
                     try {
                         ShellLink shellLink = new ShellLink(item.file);
                         String parsedUnixPath = parseUnixPath(shellLink.resolveTarget());
@@ -126,14 +127,14 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
                         extractIcon(targetFile.getPath(), iconFile.getPath());
 
                         if (iconFile.exists() && iconFile.length() > 0) {
-                            holder.fileIcon.setImageBitmap(BitmapFactory.decodeFile(iconFile.getPath()));
+                            holder.fileIcon.post(() -> holder.fileIcon.setImageBitmap(BitmapFactory.decodeFile(iconFile.getPath())));
                         } else {
-                            holder.fileIcon.setImageResource(R.drawable.unknown_exe);
+                            holder.fileIcon.post(() -> holder.fileIcon.setImageResource(R.drawable.unknown_exe));
                         }
                     } catch (Exception e) {
-                        holder.fileIcon.setImageResource(R.drawable.ic_log);
+                        holder.fileIcon.post(() -> holder.fileIcon.setImageResource(R.drawable.ic_log));
                     }
-                }
+                }).start();
                 case "rat", "mwp" -> holder.fileIcon.setImageResource(R.drawable.ic_rat_package);
                 case "zip" -> {
                     boolean isAdrenoToolsPackage = new RatPackageManager.AdrenoToolsPackage(item.file.getPath()).getName() != null;
