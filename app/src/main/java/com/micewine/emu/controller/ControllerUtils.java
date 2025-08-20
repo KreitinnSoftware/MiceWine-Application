@@ -504,7 +504,7 @@ public class ControllerUtils {
         String name;
         public int id;
         public int mappingType = MAPPING_TYPE_KEYBOARD_MOUSE;
-        public int virtualControllerID;
+        public int virtualControllerID = -1;
         boolean supportAxisTrigger;
         public boolean swapAnalogs = false;
         public float deadZone = 0.25F;
