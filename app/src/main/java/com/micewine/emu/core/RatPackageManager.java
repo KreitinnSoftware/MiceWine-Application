@@ -16,7 +16,6 @@ import static java.util.UUID.randomUUID;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.micewine.emu.R;
 
@@ -178,6 +177,7 @@ public class RatPackageManager {
                             installRat(new RatPackage(vulkanDriverFile.getPath()), context);
                         }
                     }
+                    vulkanDriversFolder.delete();
                 }
                 if (adrenoToolsFolder.exists()) {
                     File[] installedAdrenoToolsDrivers = adrenoToolsFolder.listFiles();
@@ -186,6 +186,7 @@ public class RatPackageManager {
                             installRat(new RatPackage(adrenoToolsDriverFile.getPath()), context);
                         }
                     }
+                    adrenoToolsFolder.delete();
                 }
 
                 dialogTitleText = context.getString(R.string.installing_box64);
@@ -197,6 +198,7 @@ public class RatPackageManager {
                             installRat(new RatPackage(box64File.getPath()), context);
                         }
                     }
+                    box64Folder.delete();
                 }
 
                 dialogTitleText = context.getString(R.string.installing_wine);
@@ -208,6 +210,7 @@ public class RatPackageManager {
                             installRat(new RatPackage(wineFile.getPath()), context);
                         }
                     }
+                    wineFolder.delete();
                 }
 
                 installingRootFS = false;
