@@ -38,7 +38,7 @@ public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.Vi
     private final ArrayList<Item> ratPackagesList;
     private final Context context;
     private final boolean isRepositoryPackage;
-    private int selectedItemId = -1;
+    public static int selectedItemId = -1;
 
     public AdapterRatPackage(ArrayList<Item> ratPackagesList, Context context, boolean isRepositoryPackage) {
         this.ratPackagesList = ratPackagesList;
@@ -112,6 +112,10 @@ public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.Vi
                         textAsBitmap("VKD3D", 80F, Color.WHITE)
                 );
             }
+            case ROOTFS -> {
+                holder.radioButton.setVisibility(View.VISIBLE);
+                holder.imageView.setImageResource(R.drawable.ic_rat_package);
+            }
         }
 
         holder.deleteRatPackageButton.setVisibility(item.isExternalPackage ? View.VISIBLE : View.GONE);
@@ -121,7 +125,12 @@ public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.Vi
         }
 
         holder.settingsName.setText(item.titleSettings);
-        holder.settingsDescription.setText(item.descriptionSettings);
+
+        if (item.descriptionSettings.isEmpty()) {
+            holder.settingsDescription.setVisibility(View.GONE);
+        } else {
+            holder.settingsDescription.setText(item.descriptionSettings);
+        }
 
         holder.radioButton.setChecked(position == selectedItemId);
         holder.radioButton.setOnClickListener((v) -> {
@@ -264,4 +273,5 @@ public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.Vi
     public static final int DXVK = 4;
     public static final int WINED3D = 5;
     public static final int VKD3D = 6;
+    public static final int ROOTFS = 7;
 }

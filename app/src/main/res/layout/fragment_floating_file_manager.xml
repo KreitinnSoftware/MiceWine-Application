@@ -24,7 +24,7 @@
             android:textAlignment="center"
             android:fontFamily="@font/quicksand"
             android:textSize="15sp"
-            android:text="@string/select_rootfs_file">
+            android:text="@string/select_rootfs">
         </TextView>
 
         <androidx.recyclerview.widget.RecyclerView

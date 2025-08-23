@@ -113,7 +113,7 @@
     <string name="create_shortcut_on_home">Создать ярлык на главном экране</string>
     <string name="execute_exe">Запустить</string>
     <string name="creating_wine_prefix">Создание префикса Wine…</string>
-    <string name="select_rootfs_file">Выберите файл RootFS</string>
+    <string name="select_rootfs">Выберите файл RootFS</string>
     <string name="enable_debug_info">Включить информацию об отладке</string>
     <string name="enable_debug_info_desc">Включить отображение информацию об отладке на экране</string>
     <string name="open_log_viewer">Открыть лог</string>
@@ -220,4 +220,44 @@
     <string name="enable_xinput">Включить XInput</string>
     <string name="enable_directinput">Включить DirectInput</string>
     <string name="other_controller_settings">Другие настройки контроллера</string>
+    <string name="downloading_rootfs">Загрузка RootFS</string>
+    <string name="download_successful">Загрузка завершена успешно!</string>
+    <string name="select_rootfs_file">Выберите файл RootFS</string>
+
+    <plurals name="seconds_ago">
+        <item quantity="one">%d секунду назад</item>
+        <item quantity="few">%d секунды назад</item>
+        <item quantity="many">%d секунд назад</item>
+        <item quantity="other">%d секунд назад</item>
+    </plurals>
+    <plurals name="minutes_ago">
+        <item quantity="one">%d минуту назад</item>
+        <item quantity="few">%d минуты назад</item>
+        <item quantity="many">%d минут назад</item>
+        <item quantity="other">%d минут назад</item>
+    </plurals>
+    <plurals name="hours_ago">
+        <item quantity="one">%d час назад</item>
+        <item quantity="few">%d часа назад</item>
+        <item quantity="many">%d часов назад</item>
+        <item quantity="other">%d часов назад</item>
+    </plurals>
+    <plurals name="days_ago">
+        <item quantity="one">%d день назад</item>
+        <item quantity="few">%d дня назад</item>
+        <item quantity="many">%d дней назад</item>
+        <item quantity="other">%d дней назад</item>
+    </plurals>
+    <plurals name="months_ago">
+        <item quantity="one">%d месяц назад</item>
+        <item quantity="few">%d месяца назад</item>
+        <item quantity="many">%d месяцев назад</item>
+        <item quantity="other">%d месяцев назад</item>
+    </plurals>
+    <plurals name="years_ago">
+        <item quantity="one">%d год назад</item>
+        <item quantity="few">%d года назад</item>
+        <item quantity="many">%d лет назад</item>
+        <item quantity="other">%d лет назад</item>
+    </plurals>
 </resources>

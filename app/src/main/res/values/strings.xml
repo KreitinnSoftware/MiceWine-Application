@@ -140,7 +140,7 @@
     <string name="create_shortcut_on_home">Create Shortcut on Home</string>
     <string name="execute_exe">Execute</string>
     <string name="creating_wine_prefix">Creating Wine Prefix…</string>
-    <string name="select_rootfs_file">Select RootFS File</string>
+    <string name="select_rootfs">Select RootFS</string>
     <string name="enable_debug_info">Enable/Disable Debug Info</string>
     <string name="enable_debug_info_desc">Enable or Disable Debug Info on Screen</string>
     <string name="open_log_viewer">Open Log Viewer</string>
@@ -247,4 +247,32 @@
     <string name="enable_xinput">Enable XInput</string>
     <string name="enable_directinput">Enable DirectInput</string>
     <string name="other_controller_settings">Other Controller Settings</string>
+    <string name="downloading_rootfs">Downloading RootFS</string>
+    <string name="download_successful">Download Successful!</string>
+    <string name="select_rootfs_file">Select RootFS File</string>
+
+    <plurals name="seconds_ago">
+        <item quantity="one">%d second ago</item>
+        <item quantity="other">%d seconds ago</item>
+    </plurals>
+    <plurals name="minutes_ago">
+        <item quantity="one">%d minute ago</item>
+        <item quantity="other">%d minutes ago</item>
+    </plurals>
+    <plurals name="hours_ago">
+        <item quantity="one">%d hour ago</item>
+        <item quantity="other">%d hours ago</item>
+    </plurals>
+    <plurals name="days_ago">
+        <item quantity="one">%d day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
+    <plurals name="months_ago">
+        <item quantity="one">%d month ago</item>
+        <item quantity="other">%d months ago</item>
+    </plurals>
+    <plurals name="years_ago">
+        <item quantity="one">%d year ago</item>
+        <item quantity="other">%d years ago</item>
+    </plurals>
 </resources>

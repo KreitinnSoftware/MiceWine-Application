@@ -177,7 +177,7 @@ public class RatPackageManager {
                             installRat(new RatPackage(vulkanDriverFile.getPath()), context);
                         }
                     }
-                    vulkanDriversFolder.delete();
+                    deleteDirectoryRecursively(vulkanDriversFolder.toPath());
                 }
                 if (adrenoToolsFolder.exists()) {
                     File[] installedAdrenoToolsDrivers = adrenoToolsFolder.listFiles();
@@ -186,7 +186,7 @@ public class RatPackageManager {
                             installRat(new RatPackage(adrenoToolsDriverFile.getPath()), context);
                         }
                     }
-                    adrenoToolsFolder.delete();
+                    deleteDirectoryRecursively(adrenoToolsFolder.toPath());
                 }
 
                 dialogTitleText = context.getString(R.string.installing_box64);
@@ -198,7 +198,7 @@ public class RatPackageManager {
                             installRat(new RatPackage(box64File.getPath()), context);
                         }
                     }
-                    box64Folder.delete();
+                    deleteDirectoryRecursively(box64Folder.toPath());
                 }
 
                 dialogTitleText = context.getString(R.string.installing_wine);

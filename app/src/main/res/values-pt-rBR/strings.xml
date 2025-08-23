@@ -116,7 +116,7 @@
     <string name="create_shortcut_on_home">Criar Atalho no Início</string>
     <string name="execute_exe">Executar</string>
     <string name="creating_wine_prefix">Criando Prefixo Wine…</string>
-    <string name="select_rootfs_file">Selecione arquivo da RootFS</string>
+    <string name="select_rootfs">Selecione a RootFS</string>
     <string name="enable_debug_info">Ativa/Desativa Info de Debug</string>
     <string name="enable_debug_info_desc">Ativa ou Desativa Info de Debug na Tela</string>
     <string name="open_log_viewer">Abrir Visualizador de Logs</string>
@@ -224,4 +224,32 @@
     <string name="enable_xinput">Ativar XInput</string>
     <string name="enable_directinput">Ativar DirectInput</string>
     <string name="other_controller_settings">Outras Configurações de Controle</string>
+    <string name="downloading_rootfs">Baixando RootFS</string>
+    <string name="download_successful">Download Concluido!</string>
+    <string name="select_rootfs_file">Selecionar Arquivo RootFS</string>
+
+    <plurals name="seconds_ago">
+        <item quantity="one">há %d segundo</item>
+        <item quantity="other">há %d segundos</item>
+    </plurals>
+    <plurals name="minutes_ago">
+        <item quantity="one">há %d minuto</item>
+        <item quantity="other">há %d minutos</item>
+    </plurals>
+    <plurals name="hours_ago">
+        <item quantity="one">há %d hora</item>
+        <item quantity="other">há %d horas</item>
+    </plurals>
+    <plurals name="days_ago">
+        <item quantity="one">há %d dia</item>
+        <item quantity="other">há %d dias</item>
+    </plurals>
+    <plurals name="months_ago">
+        <item quantity="one">há %d mês</item>
+        <item quantity="other">há %d meses</item>
+    </plurals>
+    <plurals name="years_ago">
+        <item quantity="one">há %d ano</item>
+        <item quantity="other">há %d anos</item>
+    </plurals>
 </resources>

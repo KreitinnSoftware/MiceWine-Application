@@ -86,6 +86,7 @@ import static com.micewine.emu.fragments.FileManagerFragment.refreshFiles;
 import static com.micewine.emu.fragments.FloatingFileManagerFragment.OPERATION_SELECT_EXE;
 import static com.micewine.emu.fragments.FloatingFileManagerFragment.OPERATION_SELECT_ICON;
 import static com.micewine.emu.fragments.FloatingFileManagerFragment.OPERATION_SELECT_RAT;
+import static com.micewine.emu.fragments.RootFSDownloaderFragment.rootFSIsDownloaded;
 import static com.micewine.emu.fragments.SetupFragment.abortSetup;
 import static com.micewine.emu.fragments.ShortcutsFragment.ADRENO_TOOLS_DRIVER;
 import static com.micewine.emu.fragments.ShortcutsFragment.MESA_DRIVER;
@@ -128,7 +129,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
 import android.hardware.input.InputManager;
 import android.net.Uri;
 import android.os.Build;
@@ -173,7 +173,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -336,14 +335,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 case ACTION_SETUP -> new Thread(() -> {
-                    String rootFSPath = "";
-
-                    if (!appBuiltinRootfs) {
-                        new SetupFragment().show(getSupportFragmentManager(), "");
-                        rootFSPath = customRootFSPath;
-                    }
-
-                    setupMiceWine(rootFSPath);
+                    new SetupFragment().show(getSupportFragmentManager(), "");
+                    setupMiceWine();
                 }).start();
                 case ACTION_INSTALL_RAT -> {
                     if (!(ratCandidate.getArchitecture().equals(deviceArch) || ratCandidate.getArchitecture().equals("any")) && !ratCandidate.getCategory().equals("Wine")) {
@@ -570,8 +563,8 @@ public class MainActivity extends AppCompatActivity {
         updateShortcuts();
 
         if (!setupDone && finishedWelcomeScreen) {
-            if (appBuiltinRootfs) {
-                new SetupFragment().show(getSupportFragmentManager() , "");
+            if (rootFSIsDownloaded) {
+                sendBroadcast(new Intent(ACTION_SETUP));
             } else {
                 new FloatingFileManagerFragment(OPERATION_SELECT_RAT, "/storage/emulated/0").show(getSupportFragmentManager(), "");
             }
@@ -720,7 +713,7 @@ public class MainActivity extends AppCompatActivity {
         return getApplicationInfo().nativeLibraryDir;
     }
 
-    private void setupMiceWine(String rootFs) {
+    private void setupMiceWine() {
         appRootDir.mkdirs();
         ratPackagesDir.mkdirs();
 
@@ -728,17 +721,11 @@ public class MainActivity extends AppCompatActivity {
 
         RatPackageManager.RatPackage ratFile;
 
-        if (appBuiltinRootfs && rootFs.isEmpty()) {
-            dialogTitleText = getString(R.string.extracting_from_assets);
-
-            copyAssets(this, "rootfs.rat", appRootDir.getPath());
-
+        if (rootFSIsDownloaded) {
             dialogTitleText = getString(R.string.checking_rat_type);
-
             ratFile = new RatPackageManager.RatPackage(appRootDir.getPath() + "/rootfs.rat");
         } else {
             dialogTitleText = getString(R.string.checking_rat_type);
-
             ratFile = new RatPackageManager.RatPackage(customRootFSPath);
         }
 
@@ -766,7 +753,7 @@ public class MainActivity extends AppCompatActivity {
 
         installRat(ratFile, this);
 
-        if (appBuiltinRootfs && rootFs.isEmpty()) {
+        if (rootFSIsDownloaded) {
             new File(appRootDir.getPath() + "/rootfs.rat").delete();
         }
 
@@ -850,7 +837,6 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("SdCardPath")
     public static final File appRootDir = new File("/data/data/com.micewine.emu/files");
     public static File ratPackagesDir = new File(appRootDir + "/packages");
-    public static boolean appBuiltinRootfs = false;
     public static String deviceArch = Build.SUPPORTED_ABIS[0].replace("arm64-v8a", "aarch64");
     public static final String unixUsername = runCommandWithOutput("whoami", false).replace("\n", "");
     public static String customRootFSPath = null;
@@ -947,7 +933,6 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String APP_VERSION = "appVersion";
 
-    private static final String ADRENOTOOLS_LD_PRELOAD = "adrenoToolsLdPreload";
 
     public static int strBoolToNum(boolean strBool) {
         return (strBool ? 1 : 0);
@@ -982,13 +967,6 @@ public class MainActivity extends AppCompatActivity {
         adrenoToolsDriverFile = (adrenoToolsDriverPath != null ? new File(adrenoToolsDriverPath) : null);
 
         appLang = activity.getResources().getString(R.string.app_lang);
-
-        try {
-            String[] assetList = activity.getAssets().list("");
-            appBuiltinRootfs = (assetList != null && Arrays.asList(assetList).contains("rootfs.rat"));
-        } catch (IOException ignored) {
-            appBuiltinRootfs = false;
-        }
 
         selectedBox64 = (box64Version != null ? box64Version : getBox64Version(selectedGameName));
         if ("Global".equals(selectedBox64)) {
@@ -1074,30 +1052,6 @@ public class MainActivity extends AppCompatActivity {
         box64DynarecDirty = getBox64Dirty(selectedBox64Preset);
         box64DynarecForward = getBox64Forward(selectedBox64Preset);
         box64DynarecDF = strBoolToNum(getBox64DF(selectedBox64Preset));
-    }
-
-    public static void copyAssets(Activity activity, String filename, String outputPath) {
-        dialogTitleText = activity.getString(R.string.extracting_from_assets);
-
-        AssetManager assetManager = activity.getAssets();
-
-        if (appBuiltinRootfs) {
-            InputStream input = null;
-            OutputStream out = null;
-            try {
-                input = assetManager.open(filename);
-                File outFile = new File(outputPath, filename);
-                out = Files.newOutputStream(outFile.toPath());
-                copyFile(input, out);
-            } catch (IOException ignored) {
-            } finally {
-                try {
-                    if (input != null) input.close();
-                    if (out != null) out.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
     }
 
     public static void copyFile(InputStream input, OutputStream out) throws IOException {

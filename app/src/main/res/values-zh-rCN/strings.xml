@@ -116,7 +116,7 @@
     <string name="create_shortcut_on_home">在主页上创建快捷方式</string>
     <string name="execute_exe">执行</string>
     <string name="creating_wine_prefix">正在创建 Wine 前缀…</string>
-    <string name="select_rootfs_file">选择 RootFS 文件</string>
+    <string name="select_rootfs">選擇 RootFS</string>
     <string name="enable_debug_info">启用/禁用调试信息</string>
     <string name="enable_debug_info_desc">在屏幕上启用或禁用调试信息</string>
     <string name="open_log_viewer">打开日志查看器</string>
@@ -224,4 +224,26 @@
     <string name="enable_xinput">启用 XInput</string>
     <string name="enable_directinput">启用 DirectInput</string>
     <string name="other_controller_settings">其他控制器设置</string>
+    <string name="downloading_rootfs">正在下载 RootFS</string>
+    <string name="download_successful">下载成功！</string>
+    <string name="select_rootfs_file">选择 RootFS 文件</string>
+
+    <plurals name="seconds_ago">
+        <item quantity="other">%d 秒前</item>
+    </plurals>
+    <plurals name="minutes_ago">
+        <item quantity="other">%d 分钟前</item>
+    </plurals>
+    <plurals name="hours_ago">
+        <item quantity="other">%d 小时前</item>
+    </plurals>
+    <plurals name="days_ago">
+        <item quantity="other">%d 天前</item>
+    </plurals>
+    <plurals name="months_ago">
+        <item quantity="other">%d 个月前</item>
+    </plurals>
+    <plurals name="years_ago">
+        <item quantity="other">%d 年前</item>
+    </plurals>
 </resources>
