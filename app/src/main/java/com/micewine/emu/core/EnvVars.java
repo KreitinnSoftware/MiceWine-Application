@@ -29,7 +29,6 @@ import static com.micewine.emu.activities.MainActivity.box64ShowSegv;
 import static com.micewine.emu.activities.MainActivity.box64Sse42;
 import static com.micewine.emu.activities.MainActivity.deviceArch;
 import static com.micewine.emu.activities.MainActivity.enableDRI3;
-import static com.micewine.emu.activities.MainActivity.getLdPreloadWorkaround;
 import static com.micewine.emu.activities.MainActivity.homeDir;
 import static com.micewine.emu.activities.MainActivity.preferences;
 import static com.micewine.emu.activities.MainActivity.ratPackagesDir;
@@ -79,7 +78,6 @@ public class EnvVars {
         vars.add("XDG_CONFIG_HOME=" + homeDir + "/.config");
         vars.add("DISPLAY=:0");
         vars.add("PULSE_LATENCY_MSEC=60");
-        vars.add("LD_LIBRARY_PATH=/system/lib64:" + usrDir + "/lib");
         vars.add("PATH=$PATH:" + usrDir + "/bin:" + ratPackagesDir + "/" + selectedWine + "/files/wine/bin:" + ratPackagesDir + "/" + selectedBox64 + "/files/usr/bin");
         vars.add("PREFIX=" + usrDir);
         vars.add("MESA_SHADER_CACHE_DIR=" + homeDir + "/.cache");
@@ -159,8 +157,8 @@ public class EnvVars {
             vars.add("USE_ADRENOTOOLS=1");
             vars.add("ADRENOTOOLS_CUSTOM_DRIVER_DIR=" + adrenoToolsDriverFile.getParent() + "/");
             vars.add("ADRENOTOOLS_CUSTOM_DRIVER_NAME=" + adrenoToolsDriverFile.getName());
-            // Workaround for dlopen error (at least on my device)
-            vars.add(getLdPreloadWorkaround());
+            // Fix Segfault (at least on my device)
+            vars.add("LD_PRELOAD=/system/lib64/libEGL.so");
         }
 
         // Force SDL Games to use DInput/XInput (RawInput and WGI don't works)

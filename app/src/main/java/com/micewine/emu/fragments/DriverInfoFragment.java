@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -53,14 +54,18 @@ public class DriverInfoFragment extends Fragment {
                 String driverId = vulkanDriversId.get(driverSpinner.getSelectedItemPosition());
 
                 String driverPath;
-                File packagesDir = new File(ratPackagesDir, appRootDir.getPath() + "/packages");
                 String adrenoToolsDriverPath = null;
 
                 if (driverId.contains("AdrenoToolsDriver")) {
-                    RatPackage adrenoToolsWrapper = listRatPackages("AdrenoTools").get(0);
-                    RatPackage ratPackage = getPackageById(driverId);
-                    driverPath = (adrenoToolsWrapper != null ? adrenoToolsWrapper.getDriverLib() : null);
-                    adrenoToolsDriverPath = (ratPackage != null ? ratPackage.getDriverLib() : null);
+                    try {
+                        RatPackage adrenoToolsWrapper = listRatPackages("AdrenoTools").get(0);
+                        RatPackage ratPackage = getPackageById(driverId);
+                        driverPath = (adrenoToolsWrapper != null ? adrenoToolsWrapper.getDriverLib() : null);
+                        adrenoToolsDriverPath = (ratPackage != null ? ratPackage.getDriverLib() : null);
+                    } catch (IndexOutOfBoundsException e) {
+                        Toast.makeText(requireContext(), "AdrenoTools Provider Not Found", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                 } else {
                     RatPackage ratPackage = getPackageById(driverId);
                     driverPath = (ratPackage != null ? ratPackage.getDriverLib() : null);

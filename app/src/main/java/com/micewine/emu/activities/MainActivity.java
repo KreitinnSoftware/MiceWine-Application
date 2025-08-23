@@ -229,8 +229,13 @@ public class MainActivity extends AppCompatActivity {
                     if (driverType == MESA_DRIVER) {
                         driverLibPath = getPackageById(driverName).getDriverLib();
                     } else if (driverType == ADRENO_TOOLS_DRIVER) {
-                        driverLibPath = listRatPackages("AdrenoTools").get(0).getDriverLib();
-                        adrenoToolsDriverPath = getPackageById(driverName).getDriverLib();
+                        try {
+                            driverLibPath = listRatPackages("AdrenoTools").get(0).getDriverLib();
+                            adrenoToolsDriverPath = getPackageById(driverName).getDriverLib();
+                        } catch (IndexOutOfBoundsException e) {
+                            Toast.makeText(MainActivity.this, "AdrenoTools Provider Not Found", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     } else {
                         driverLibPath = "";
                     }
@@ -1150,59 +1155,6 @@ public class MainActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         }
-    }
-
-    private static final StringBuilder driverWorkaroundLdPreload = new StringBuilder();
-    private static boolean findingLdPreloadWorkaround = false;
-
-    private static String locateLibraryBySymbol(String symbol) {
-        File[] files = new File("/system/lib64").listFiles();
-
-        if (files != null) {
-            for (File file : files) {
-                if (file.isFile() && file.getName().endsWith(".so")) {
-                    String readElf = runCommandWithOutput("echo $(readelf --dyn-syms " + file.getPath() + " | grep " + symbol + ")", true);
-                    if (readElf.contains(symbol) && !(readElf.contains("FUNC GLOBAL DEFAULT UND"))) {
-                        return file.getPath();
-                    }
-                }
-            }
-        }
-
-        return "";
-    }
-
-    public static String getLdPreloadWorkaround() {
-        if (findingLdPreloadWorkaround) return "LD_PRELOAD=" + driverWorkaroundLdPreload;
-
-        String savedLdPreload = preferences.getString(ADRENOTOOLS_LD_PRELOAD, "");
-        if (!savedLdPreload.isEmpty()) return "LD_PRELOAD=" + savedLdPreload;
-
-        driverWorkaroundLdPreload.setLength(0);
-
-        findingLdPreloadWorkaround = true;
-
-        while (true) {
-            String res = getVulkanDriverInfo("", true);
-            if (res.contains("cannot locate symbol")) {
-                String symbolName = res.split("\"")[1];
-                driverWorkaroundLdPreload.append(locateLibraryBySymbol(symbolName)).append(":");
-            } else if (res.contains("cannot find")) {
-                String libName = res.split("\"")[1];
-                driverWorkaroundLdPreload.append("/system/lib64/").append(libName).append(":");
-            } else {
-                break;
-            }
-        }
-
-        findingLdPreloadWorkaround = false;
-
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putString(ADRENOTOOLS_LD_PRELOAD, driverWorkaroundLdPreload.toString());
-        editor.apply();
-
-        return "LD_PRELOAD=" + driverWorkaroundLdPreload;
     }
 
     public static String[] resolutions16_9 = new String[] {
