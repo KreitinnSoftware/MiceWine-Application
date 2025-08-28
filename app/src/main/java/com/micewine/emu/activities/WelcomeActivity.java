@@ -3,11 +3,15 @@ package com.micewine.emu.activities;
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
 
 import static com.micewine.emu.adapters.AdapterRatPackage.selectedItemId;
+import static com.micewine.emu.core.NotificationHelper.createNotificationBuilder;
+import static com.micewine.emu.core.NotificationHelper.removeAllNotifications;
 import static com.micewine.emu.fragments.RootFSDownloaderFragment.downloadingRootFS;
 import static com.micewine.emu.fragments.RootFSDownloaderFragment.rootFSIsDownloaded;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -21,6 +25,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
@@ -28,6 +33,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.micewine.emu.R;
 import com.micewine.emu.adapters.AdapterWelcomeFragments;
+import com.micewine.emu.core.NotificationHelper;
 import com.micewine.emu.databinding.ActivityWelcomeBinding;
 import com.micewine.emu.fragments.RootFSDownloaderFragment;
 
@@ -70,19 +76,20 @@ public class WelcomeActivity extends AppCompatActivity {
                 downloader.textView.setText(R.string.downloading_rootfs);
                 downloadingRootFS = true;
 
+                NotificationCompat.Builder builder = createNotificationBuilder(this);
+
                 new Thread(() -> {
-                    int status = downloader.downloadRootFS(downloader.rootFsList.get(selectedItemId).itemFolderId);
+                    int status = downloader.downloadRootFS(downloader.rootFsList.get(selectedItemId).itemFolderId, builder);
                     if (status != 0) {
-                        runOnUiThread(() -> {
-                            Toast.makeText(this, "Error on Downloading RootFS, Returned Error " + status, Toast.LENGTH_SHORT).show();
-                            button.setVisibility(View.VISIBLE);
-                        });
+                        removeAllNotifications();
+                        runOnUiThread(() -> button.setVisibility(View.VISIBLE));
                         return;
                     }
 
                     rootFSIsDownloaded = true;
                     downloadingRootFS = false;
 
+                    removeAllNotifications();
                     runOnUiThread(() -> {
                         button.setVisibility(View.VISIBLE);
                         downloader.progressBarProgress.setText("100%");
@@ -116,13 +123,9 @@ public class WelcomeActivity extends AppCompatActivity {
         if (keyCode == KeyEvent.KEYCODE_BACK && !downloadingRootFS) {
             viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
             button.setEnabled(true);
-
-            return true;
         }
 
-        finish();
-
-        return super.onKeyDown(keyCode, event);
+        return true;
     }
 
     private Fragment getCurrentFragment() {

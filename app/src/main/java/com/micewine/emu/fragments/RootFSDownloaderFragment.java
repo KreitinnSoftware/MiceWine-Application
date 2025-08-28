@@ -5,6 +5,7 @@ import static com.micewine.emu.activities.MainActivity.deviceArch;
 import static com.micewine.emu.activities.MainActivity.gson;
 import static com.micewine.emu.adapters.AdapterFiles.MEGABYTE;
 import static com.micewine.emu.adapters.AdapterRatPackage.ROOTFS;
+import static com.micewine.emu.core.NotificationHelper.updateNotification;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,6 +36,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -227,14 +230,18 @@ public class RootFSDownloaderFragment extends Fragment {
     private static long lastTimeStamp = 0;
 
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
-    public int downloadRootFS(String commit) {
+    public int downloadRootFS(String commit, NotificationCompat.Builder builder) {
         progressBar.post(() -> {
             recyclerView.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
             progressBarProgress.setVisibility(View.VISIBLE);
         });
 
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .retryOnConnectionFailure(true)
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .build();
 
         Request request = new Request.Builder()
                 .url("https://github.com/KreitinnSoftware/MiceWine-RootFS-Generator/releases/download/" + commit + "/MiceWine-RootFS-" + commit + "-" + deviceArch + ".rat")
@@ -257,6 +264,10 @@ public class RootFSDownloaderFragment extends Fragment {
 
                 String progressBarText = String.format("%s%% - %.2fM/%.2fM - %.2f MB/s", progress, (float) bytesRead / MEGABYTE, (float) contentLength / MEGABYTE, megabytesPerSecond);
 
+                builder.setProgress(100, progress, false);
+                builder.setContentText(progressBarText);
+                updateNotification(builder);
+
                 progressBar.post(() -> {
                     progressBar.setProgress(progress);
                     progressBarProgress.setText(progressBarText);
@@ -270,13 +281,17 @@ public class RootFSDownloaderFragment extends Fragment {
             ) {
                 byte[] buffer = new byte[8192];
                 int read;
-                while ((read = source.inputStream().read(buffer)) != -1) {
+                while ((read = source.read(buffer)) != -1) {
                     output.write(buffer, 0, read);
                 }
             }
 
             return 0;
         } catch (IOException e) {
+            progressBar.post(() -> {
+                progressBar.setProgress(0);
+                progressBarProgress.setText("IOException: " + e.getMessage());
+            });
             return -1;
         }
     }
