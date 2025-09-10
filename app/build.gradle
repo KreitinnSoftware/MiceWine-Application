@@ -13,8 +13,8 @@ android {
         minSdk 28
         //noinspection ExpiredTargetSdkVersion
         targetSdk 28
-        versionCode 11
-        versionName "v0.4.0"
+        versionCode 12
+        versionName "v0.5.0"
         buildConfigField "String", "GIT_SHORT_SHA", "\"" + ("git rev-parse --short HEAD\n".execute().getText().trim() ?: (System.getenv('CURRENT_COMMIT') ?: "NO_COMMIT")) + "\""
     }
 
