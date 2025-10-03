@@ -21,11 +21,12 @@ public class NotificationHelper {
         NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
                 NOTIFICATION_NAME,
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_LOW
         );
-        channel.enableLights(true);
+        channel.enableLights(false);
         channel.setLightColor(Color.BLUE);
-        channel.enableVibration(true);
+        channel.enableVibration(false);
+        channel.setSound(null, null);
 
         NotificationManager manager = context.getSystemService(NotificationManager.class);
         manager.createNotificationChannel(channel);
