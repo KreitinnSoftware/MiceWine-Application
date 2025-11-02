@@ -21,7 +21,7 @@ public class NotificationHelper {
         NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
                 NOTIFICATION_NAME,
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_DEFAULT
         );
         channel.enableLights(false);
         channel.setLightColor(Color.BLUE);
@@ -49,7 +49,7 @@ public class NotificationHelper {
         builder.setSmallIcon(android.R.drawable.stat_sys_download);
         builder.setOngoing(true);
         builder.setContentIntent(pendingIntent);
-        builder.setProgress(100, 0, false);;
+        builder.setProgress(100, 0, false);
 
         return builder;
     }

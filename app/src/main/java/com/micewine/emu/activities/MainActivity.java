@@ -154,7 +154,6 @@ import com.micewine.emu.BuildConfig;
 import com.micewine.emu.R;
 import com.micewine.emu.adapters.AdapterBottomNavigation;
 import com.micewine.emu.controller.ControllerUtils;
-import com.micewine.emu.core.NotificationHelper;
 import com.micewine.emu.core.RatPackageManager;
 import com.micewine.emu.core.WineWrapper;
 import com.micewine.emu.databinding.ActivityMainBinding;

@@ -3,16 +3,18 @@ package com.micewine.emu.activities;
 import static android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION;
 
 import static com.micewine.emu.adapters.AdapterRatPackage.selectedItemId;
-import static com.micewine.emu.core.NotificationHelper.createNotificationBuilder;
-import static com.micewine.emu.core.NotificationHelper.removeAllNotifications;
+import static com.micewine.emu.core.RootFSDownloaderService.DOWNLOAD_DONE;
+import static com.micewine.emu.core.RootFSDownloaderService.DOWNLOAD_FAILED;
+import static com.micewine.emu.core.RootFSDownloaderService.DOWNLOAD_START;
 import static com.micewine.emu.fragments.RootFSDownloaderFragment.downloadingRootFS;
 import static com.micewine.emu.fragments.RootFSDownloaderFragment.rootFSIsDownloaded;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -25,7 +27,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
@@ -33,13 +34,26 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.micewine.emu.R;
 import com.micewine.emu.adapters.AdapterWelcomeFragments;
-import com.micewine.emu.core.NotificationHelper;
+import com.micewine.emu.core.RootFSDownloaderService;
 import com.micewine.emu.databinding.ActivityWelcomeBinding;
 import com.micewine.emu.fragments.RootFSDownloaderFragment;
 
 public class WelcomeActivity extends AppCompatActivity {
     private ViewPager2 viewPager;
     private FloatingActionButton button;
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (DOWNLOAD_DONE.equals(intent.getAction())) {
+                runOnUiThread(() -> button.setVisibility(View.VISIBLE));
+            } else if (DOWNLOAD_FAILED.equals(intent.getAction())) {
+                runOnUiThread(() -> button.setVisibility(View.VISIBLE));
+            } else if (DOWNLOAD_START.equals(intent.getAction())) {
+                downloadingRootFS = true;
+                runOnUiThread(() -> button.setVisibility(View.GONE));
+            }
+        }
+    };
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -70,37 +84,28 @@ public class WelcomeActivity extends AppCompatActivity {
                     return;
                 }
 
-                button.setVisibility(View.GONE);
+                Intent serviceIntent = new Intent(this, RootFSDownloaderService.class);
+                serviceIntent.putExtra("commit", downloader.rootFsList.get(selectedItemId).itemFolderId);
 
-                downloader.imageView.setVisibility(View.VISIBLE);
-                downloader.textView.setText(R.string.downloading_rootfs);
-                downloadingRootFS = true;
+                startForegroundService(serviceIntent);
 
-                NotificationCompat.Builder builder = createNotificationBuilder(this);
-
-                new Thread(() -> {
-                    int status = downloader.downloadRootFS(downloader.rootFsList.get(selectedItemId).itemFolderId, builder);
-                    if (status != 0) {
-                        removeAllNotifications();
-                        runOnUiThread(() -> button.setVisibility(View.VISIBLE));
-                        return;
-                    }
-
-                    rootFSIsDownloaded = true;
-                    downloadingRootFS = false;
-
-                    removeAllNotifications();
-                    runOnUiThread(() -> {
-                        button.setVisibility(View.VISIBLE);
-                        downloader.progressBarProgress.setText("100%");
-                        downloader.textView.setText(R.string.download_successful);
-                    });
-                }).start();
                 return;
             }
 
             viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
         });
+
+        registerReceiver(broadcastReceiver, new IntentFilter() {{
+            addAction(DOWNLOAD_DONE);
+            addAction(DOWNLOAD_START);
+            addAction(DOWNLOAD_FAILED);
+        }});
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(broadcastReceiver);
     }
 
     @Override

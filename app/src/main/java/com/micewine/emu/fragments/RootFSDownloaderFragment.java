@@ -1,13 +1,17 @@
 package com.micewine.emu.fragments;
 
-import static com.micewine.emu.activities.MainActivity.appRootDir;
-import static com.micewine.emu.activities.MainActivity.deviceArch;
 import static com.micewine.emu.activities.MainActivity.gson;
-import static com.micewine.emu.adapters.AdapterFiles.MEGABYTE;
 import static com.micewine.emu.adapters.AdapterRatPackage.ROOTFS;
-import static com.micewine.emu.core.NotificationHelper.updateNotification;
+import static com.micewine.emu.core.RootFSDownloaderService.DOWNLOAD_DONE;
+import static com.micewine.emu.core.RootFSDownloaderService.DOWNLOAD_FAILED;
+import static com.micewine.emu.core.RootFSDownloaderService.DOWNLOAD_START;
+import static com.micewine.emu.core.RootFSDownloaderService.UPDATE_PROGRESS_BAR;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +22,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,27 +29,17 @@ import com.google.gson.reflect.TypeToken;
 import com.micewine.emu.R;
 import com.micewine.emu.adapters.AdapterRatPackage;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
-import okio.Buffer;
-import okio.BufferedSource;
-import okio.ForwardingSource;
-import okio.Okio;
 
 public class RootFSDownloaderFragment extends Fragment {
     public final ArrayList<AdapterRatPackage.Item> rootFsList = new ArrayList<>();
@@ -57,6 +50,45 @@ public class RootFSDownloaderFragment extends Fragment {
     public ImageView imageView;
     public static boolean rootFSIsDownloaded = false;
     public static boolean downloadingRootFS = false;
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @SuppressLint("SetTextI18n")
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (DOWNLOAD_START.equals(intent.getAction())) {
+                requireActivity().runOnUiThread(() -> {
+                    imageView.setVisibility(View.VISIBLE);
+                    textView.setText(R.string.downloading_rootfs);
+                    recyclerView.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.VISIBLE);
+                    progressBarProgress.setVisibility(View.VISIBLE);
+                });
+            } else if (UPDATE_PROGRESS_BAR.equals(intent.getAction())) {
+                String progressBarText = intent.getStringExtra("progressText");
+                int progress = intent.getIntExtra("progress", 0);
+
+                requireActivity().runOnUiThread(() -> {
+                    progressBar.setProgress(progress);
+                    progressBarProgress.setText(progressBarText);
+                });
+            } else if (DOWNLOAD_DONE.equals(intent.getAction())) {
+                rootFSIsDownloaded = true;
+                downloadingRootFS = false;
+
+                requireActivity().runOnUiThread(() -> {
+                    progressBarProgress.setText("100%");
+                    textView.setText(R.string.download_successful);
+                });
+            } else if (DOWNLOAD_FAILED.equals(intent.getAction())) {
+                String errorMessage = intent.getStringExtra("errorMessage");
+
+                requireActivity().runOnUiThread(() -> {
+                    progressBar.setProgress(0);
+                    progressBarProgress.setText("IOException: " + errorMessage);
+                });
+            }
+        }
+    };
+
 
     @Nullable
     @Override
@@ -70,7 +102,20 @@ public class RootFSDownloaderFragment extends Fragment {
 
         setAdapter();
 
+        requireActivity().registerReceiver(broadcastReceiver, new IntentFilter() {{
+            addAction(DOWNLOAD_START);
+            addAction(UPDATE_PROGRESS_BAR);
+            addAction(DOWNLOAD_FAILED);
+            addAction(DOWNLOAD_DONE);
+        }});
+
         return rootView;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        requireActivity().unregisterReceiver(broadcastReceiver);
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -178,121 +223,6 @@ public class RootFSDownloaderFragment extends Fragment {
             this.version = version;
             this.date = date;
             this.isPreRelease = isPreRelease;
-        }
-    }
-
-    private interface ProgressListener {
-        void onProgress(long bytesRead, long contentLength, boolean done);
-    }
-
-    private static class ProgressResponseBody extends ResponseBody {
-        private final ResponseBody responseBody;
-        private final ProgressListener progressListener;
-        private BufferedSource bufferedSource;
-
-        public ProgressResponseBody(ResponseBody responseBody, ProgressListener progressListener) {
-            this.responseBody = responseBody;
-            this.progressListener = progressListener;
-        }
-
-        @Override
-        public MediaType contentType() {
-            return responseBody.contentType();
-        }
-
-        @Override
-        public long contentLength() {
-            return responseBody.contentLength();
-        }
-
-        @NonNull
-        @Override
-        public BufferedSource source() {
-            if (bufferedSource == null) {
-                bufferedSource = Okio.buffer(new ForwardingSource(responseBody.source()) {
-                    long totalBytesRead = 0;
-
-                    @Override
-                    public long read(@NonNull Buffer sink, long byteCount) throws IOException {
-                        long bytesRead = super.read(sink, byteCount);
-                        totalBytesRead += (bytesRead != -1) ? bytesRead : 0;
-                        progressListener.onProgress(totalBytesRead, responseBody.contentLength(), bytesRead == -1);
-                        return bytesRead;
-                    }
-                });
-            }
-            return bufferedSource;
-        }
-    }
-
-    private static float megabytesPerSecond = 0;
-    private static float lastBytesRead = 0;
-    private static long lastTimeStamp = 0;
-
-    @SuppressLint({"SetTextI18n", "DefaultLocale"})
-    public int downloadRootFS(String commit, NotificationCompat.Builder builder) {
-        progressBar.post(() -> {
-            recyclerView.setVisibility(View.GONE);
-            progressBar.setVisibility(View.VISIBLE);
-            progressBarProgress.setVisibility(View.VISIBLE);
-        });
-
-        OkHttpClient client = new OkHttpClient.Builder()
-                .retryOnConnectionFailure(true)
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(60, TimeUnit.SECONDS)
-                .build();
-
-        Request request = new Request.Builder()
-                .url("https://github.com/KreitinnSoftware/MiceWine-RootFS-Generator/releases/download/" + commit + "/MiceWine-RootFS-" + commit + "-" + deviceArch + ".rat")
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) return response.code();
-
-            ProgressResponseBody progressBody = new ProgressResponseBody(response.body(), (bytesRead, contentLength, done) -> {
-                int progress = (contentLength > 0) ? (int) (bytesRead * 100 / contentLength) : 0;
-
-                long now = System.currentTimeMillis();
-                long deltaTime = now - lastTimeStamp;
-                if (deltaTime > 500) {
-                    float deltaSeconds = deltaTime / 1000F;
-                    megabytesPerSecond = ((bytesRead - lastBytesRead) / (float) MEGABYTE) / deltaSeconds;
-                    lastTimeStamp = now;
-                    lastBytesRead = bytesRead;
-                }
-
-                String progressBarText = String.format("%s%% - %.2fM/%.2fM - %.2f MB/s", progress, (float) bytesRead / MEGABYTE, (float) contentLength / MEGABYTE, megabytesPerSecond);
-
-                builder.setProgress(100, progress, false);
-                builder.setContentText(progressBarText);
-                updateNotification(builder);
-
-                progressBar.post(() -> {
-                    progressBar.setProgress(progress);
-                    progressBarProgress.setText(progressBarText);
-                });
-            });
-
-            File file = new File(appRootDir, "rootfs.rat");
-
-            try (BufferedSource source = progressBody.source();
-                 OutputStream output = new FileOutputStream(file)
-            ) {
-                byte[] buffer = new byte[8192];
-                int read;
-                while ((read = source.read(buffer)) != -1) {
-                    output.write(buffer, 0, read);
-                }
-            }
-
-            return 0;
-        } catch (IOException e) {
-            progressBar.post(() -> {
-                progressBar.setProgress(0);
-                progressBarProgress.setText("IOException: " + e.getMessage());
-            });
-            return -1;
         }
     }
 }
