@@ -79,7 +79,7 @@ public class EnvVars {
         vars.add("DISPLAY=:0");
         vars.add("PULSE_LATENCY_MSEC=60");
         vars.add("LD_LIBRARY_PATH=/system/lib64:" + usrDir + "/lib");
-        vars.add("PATH=$PATH:" + usrDir + "/bin:" + ratPackagesDir + "/" + selectedWine + "/files/wine/bin:" + ratPackagesDir + "/" + selectedBox64 + "/files/usr/bin");
+        vars.add("PATH=$PATH:" + usrDir + "/bin:" + ratPackagesDir + "/" + selectedWine + "/files/wine/bin:" + ratPackagesDir + "/" + selectedWine + "/files/wine/lib/wine/x86_64-unix:" + ratPackagesDir + "/" + selectedBox64 + "/files/usr/bin");
         vars.add("PREFIX=" + usrDir);
         vars.add("MESA_SHADER_CACHE_DIR=" + homeDir + "/.cache");
         vars.add("MESA_VK_WSI_PRESENT_MODE=" + selectedMesaVkWsiPresentMode);
