@@ -7,6 +7,9 @@ import static com.micewine.emu.activities.MainActivity.gson;
 import static com.micewine.emu.activities.MainActivity.preferences;
 import static com.micewine.emu.activities.MainActivity.ratPackagesDir;
 import static com.micewine.emu.core.ShellLoader.runCommand;
+import static com.micewine.emu.core.TarUtils.getFileStreamFromTarXZ;
+import static com.micewine.emu.core.TarUtils.isXZ;
+import static com.micewine.emu.core.TarUtils.untar;
 import static com.micewine.emu.fragments.SetupFragment.progressBarIsIndeterminate;
 import static com.micewine.emu.fragments.SetupFragment.progressBarValue;
 import static com.micewine.emu.fragments.SetupFragment.dialogTitleText;
@@ -26,6 +29,8 @@ import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.progress.ProgressMonitor;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -40,14 +45,9 @@ import java.util.stream.Collectors;
 public class RatPackageManager {
     public static void installRat(RatPackage ratPackage, Context context) {
         progressBarIsIndeterminate = false;
+        progressBarValue = 0;
 
         String extractDir = appRootDir.getParent();
-
-        if (ratPackage.ratFile == null) return;
-
-        ZipFile ratFile = ratPackage.ratFile;
-
-        ratFile.setRunInThread(true);
 
         if (ratPackage.category.equals("rootfs")) {
             installingRootFS = true;
@@ -56,15 +56,24 @@ public class RatPackageManager {
             if (!new File(extractDir).mkdirs()) return;
         }
 
-        try {
-            ratFile.extractAll(extractDir);
-
-            while (!ratFile.getProgressMonitor().getState().equals(ProgressMonitor.State.READY)) {
-                progressBarValue = ratFile.getProgressMonitor().getPercentDone();
-                Thread.sleep(125);
+        if (ratPackage.isTarXZRat) {
+            try {
+                untar(ratPackage.ratFile.getPath(), extractDir);
+            } catch (IOException e) {
+                return;
             }
-        } catch (ZipException | InterruptedException ignored) {
-            return;
+        } else {
+            try (ZipFile ratFile = new ZipFile(ratPackage.ratFile)) {
+                ratFile.setRunInThread(true);
+                ratFile.extractAll(extractDir);
+
+                while (!ratFile.getProgressMonitor().getState().equals(ProgressMonitor.State.READY)) {
+                    progressBarValue = ratFile.getProgressMonitor().getPercentDone();
+                    Thread.sleep(125);
+                }
+            } catch (Exception ignored) {
+                return;
+            }
         }
 
         progressBarValue = 0;
@@ -75,7 +84,7 @@ public class RatPackageManager {
         new File(extractDir, "makeSymlinks.sh").delete();
 
         switch (ratPackage.category) {
-            case "rootfs": {
+            case "rootfs" -> {
                 new File(extractDir, "pkg-header").renameTo(new File(ratPackagesDir, "rootfs-pkg-header"));
 
                 File adrenoToolsFolder = new File(extractDir, "adrenoTools");
@@ -95,12 +104,12 @@ public class RatPackageManager {
 
                 if (installedDXVKs != null) {
                     for (File dxvkFile : installedDXVKs) {
-                        File dxvkDir = new File(ratPackagesDir, "DXVK-" + randomUUID());
-                        dxvkDir.mkdirs();
-                        File dxvkFilesDir = new File(dxvkDir, "files");
-                        dxvkFilesDir.mkdirs();
-
                         String dxvkVersion = dxvkFile.getName().substring(dxvkFile.getName().indexOf("-") + 1);
+
+                        File dxvkDir = new File(ratPackagesDir, "DXVK-" + randomUUID());
+                        File dxvkFilesDir = new File(dxvkDir, "files");
+                        dxvkDir.mkdirs();
+                        dxvkFilesDir.mkdirs();
 
                         dxvkFile.renameTo(dxvkFilesDir);
 
@@ -108,23 +117,23 @@ public class RatPackageManager {
 
                         try (FileWriter writer = new FileWriter(pkgHeader)) {
                             writer.write(
-                                    "name=DXVK\n" +
-                                    "category=DXVK\n" +
-                                    "version=" + dxvkVersion + "\n" +
-                                    "architecture=any\n" +
-                                    "vkDriverLib=\n");
+                                "name=DXVK\n" +
+                                "category=DXVK\n" +
+                                "version=" + dxvkVersion + "\n" +
+                                "architecture=any\n" +
+                                "vkDriverLib=\n");
                         } catch (IOException ignored) {
                         }
                     }
                 }
                 if (installedWineD3Ds != null) {
                     for (File wineD3DFile : installedWineD3Ds) {
-                        File wineD3DDir = new File(ratPackagesDir, "WineD3D-" + randomUUID());
-                        wineD3DDir.mkdirs();
-                        File wineD3DFilesFir = new File(wineD3DDir, "files");
-                        wineD3DFilesFir.mkdirs();
-
                         String wineD3DVersion = wineD3DFile.getName().substring(wineD3DFile.getName().indexOf("-") + 1);
+
+                        File wineD3DDir = new File(ratPackagesDir, "WineD3D-" + randomUUID());
+                        File wineD3DFilesFir = new File(wineD3DDir, "files");
+                        wineD3DDir.mkdirs();
+                        wineD3DFilesFir.mkdirs();
 
                         wineD3DFile.renameTo(wineD3DFilesFir);
 
@@ -132,11 +141,11 @@ public class RatPackageManager {
 
                         try (FileWriter writer = new FileWriter(pkgHeader)) {
                             writer.write(
-                                    "name=WineD3D\n" +
-                                    "category=WineD3D\n" +
-                                    "version=" + wineD3DVersion + "\n" +
-                                    "architecture=any\n" +
-                                    "vkDriverLib=\n"
+                                "name=WineD3D\n" +
+                                "category=WineD3D\n" +
+                                "version=" + wineD3DVersion + "\n" +
+                                "architecture=any\n" +
+                                "vkDriverLib=\n"
                             );
                         } catch (IOException ignored) {
                         }
@@ -144,12 +153,12 @@ public class RatPackageManager {
                 }
                 if (installedVKD3Ds != null) {
                     for (File vkd3dFile : installedVKD3Ds) {
-                        File vkd3dDir = new File(ratPackagesDir, "VKD3D-" + randomUUID());
-                        vkd3dDir.mkdirs();
-                        File vkd3dFilesDir = new File(vkd3dDir, "files");
-                        vkd3dFilesDir.mkdirs();
-
                         String vkd3dVersion = vkd3dFile.getName().substring(vkd3dFile.getName().indexOf("-") + 1);
+
+                        File vkd3dDir = new File(ratPackagesDir, "VKD3D-" + randomUUID());
+                        File vkd3dFilesDir = new File(vkd3dDir, "files");
+                        vkd3dDir.mkdirs();
+                        vkd3dFilesDir.mkdirs();
 
                         vkd3dFile.renameTo(vkd3dFilesDir);
 
@@ -157,11 +166,11 @@ public class RatPackageManager {
 
                         try (FileWriter writer = new FileWriter(pkgHeader)) {
                             writer.write(
-                                    "name=VKD3D\n" +
-                                    "category=VKD3D\n" +
-                                    "version=" + vkd3dVersion + "\n" +
-                                    "architecture=any\nv" +
-                                    "kDriverLib=\n"
+                                "name=VKD3D\n" +
+                                "category=VKD3D\n" +
+                                "version=" + vkd3dVersion + "\n" +
+                                "architecture=any\nv" +
+                                "kDriverLib=\n"
                             );
                         } catch (IOException ignored) {
                         }
@@ -214,9 +223,8 @@ public class RatPackageManager {
                 }
 
                 installingRootFS = false;
-                break;
             }
-            case "Box64": {
+            case "Box64" -> {
                 if (preferences != null) {
                     if (preferences.getString(SELECTED_BOX64, "").isEmpty()) {
                         if (extractDir != null) {
@@ -246,9 +254,8 @@ public class RatPackageManager {
                     } catch (IOException ignored) {
                     }
                 }
-                break;
             }
-            case "VulkanDriver", "AdrenoTools": {
+            case "VulkanDriver", "AdrenoTools" -> {
                 if (preferences != null) {
                     if (preferences.getString(SELECTED_VULKAN_DRIVER, "").isEmpty()) {
                         if (extractDir != null) {
@@ -278,9 +285,8 @@ public class RatPackageManager {
                     } catch (IOException ignored) {
                     }
                 }
-                break;
             }
-            case "Wine", "DXVK", "WineD3D", "VKD3D": {
+            case "Wine", "DXVK", "WineD3D", "VKD3D" -> {
                 File pkgHeader = new File(extractDir, "pkg-header");
 
                 try (FileWriter writer = new FileWriter(pkgHeader)) {
@@ -300,7 +306,6 @@ public class RatPackageManager {
                     } catch (IOException ignored) {
                     }
                 }
-                break;
             }
         }
     }
@@ -309,7 +314,6 @@ public class RatPackageManager {
         RatPackage ratPackage = getPackageById(id);
 
         if (ratPackage == null) return;
-
         if (ratPackage.isUserInstalled) {
             deleteDirectoryRecursively(new File(ratPackagesDir, id).toPath());
         }
@@ -439,6 +443,7 @@ public class RatPackageManager {
 
     public static void installADToolsDriver(AdrenoToolsPackage adrenoToolsPackage) {
         progressBarIsIndeterminate = false;
+        progressBarValue = 0;
 
         ZipFile adrenoToolsFile = adrenoToolsPackage.adrenoToolsFile;
 
@@ -456,8 +461,6 @@ public class RatPackageManager {
         } catch (ZipException | InterruptedException ignored) {
             return;
         }
-
-        progressBarValue = 0;
 
         runCommand("chmod -R 700 " + extractDir, false);
 
@@ -489,27 +492,23 @@ public class RatPackageManager {
         public AdrenoToolsPackage(String path) {
             adrenoToolsFile = new ZipFile(path);
 
-            FileHeader metaHeader;
-
             try {
-                if (adrenoToolsFile.isValidZipFile()) {
-                    metaHeader = adrenoToolsFile.getFileHeader("meta.json");
-                    if (metaHeader != null) {
-                        ZipInputStream inputStream = adrenoToolsFile.getInputStream(metaHeader);
-                        if (inputStream != null) {
-                            String json;
-                            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                                json = reader.lines().collect(Collectors.joining("\n"));
-                                AdrenoToolsMetaInfo meta = gson.fromJson(json, AdrenoToolsMetaInfo.class);
+                if (!adrenoToolsFile.isValidZipFile()) return;
 
-                                name = meta.name;
-                                version = meta.driverVersion;
-                                description = meta.description;
-                                driverLib = meta.libraryName;
-                                author = meta.author;
-                            }
-                        }
-                    }
+                FileHeader metaHeader = adrenoToolsFile.getFileHeader("meta.json");
+                ZipInputStream inputStream = adrenoToolsFile.getInputStream(metaHeader);
+
+                String json;
+
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                    json = reader.lines().collect(Collectors.joining("\n"));
+                    AdrenoToolsMetaInfo meta = gson.fromJson(json, AdrenoToolsMetaInfo.class);
+
+                    name = meta.name;
+                    version = meta.driverVersion;
+                    description = meta.description;
+                    driverLib = meta.libraryName;
+                    author = meta.author;
                 }
             } catch (IOException ignored) {
             }
@@ -525,10 +524,6 @@ public class RatPackageManager {
 
         public String getDescription() {
             return description;
-        }
-
-        public String getDriverLib() {
-            return driverLib;
         }
     }
 
@@ -547,36 +542,49 @@ public class RatPackageManager {
         String architecture;
         String driverLib;
         boolean isUserInstalled;
+        boolean isTarXZRat;
+        File ratFile;
         String folderName;
-        ZipFile ratFile;
 
         public RatPackage(String ratPath) {
-            File file = new File(ratPath);
-            ratFile = new ZipFile(file);
+            ratFile = new File(ratPath);
+            InputStream inputStream = null;
 
-            FileHeader ratHeader;
+            isTarXZRat = isXZ(ratPath);
 
-            try {
-                if (!ratFile.isValidZipFile() && !ratFile.isValidZipFile()) return;
+            if (isTarXZRat) {
+                inputStream = getFileStreamFromTarXZ(ratPath, "pkg-header");
+            } else {
+                try (ZipFile zipFile = new ZipFile(ratFile)) {
+                    if (!zipFile.isValidZipFile() && !zipFile.isValidZipFile()) return;
 
-                ratHeader = ratFile.getFileHeader("pkg-header");
-                if (ratHeader == null) return;
+                    FileHeader ratHeader = zipFile.getFileHeader("pkg-header");
 
-                InputStream inputStream = ratFile.getInputStream(ratHeader);
-                if (inputStream == null) return;
-
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                    List<String> lines = reader.lines().collect(Collectors.toList());
-                    if (lines.size() < 5) return;
-
-                    name = lines.get(0).substring(lines.get(0).indexOf("=") + 1);
-                    category = lines.get(1).substring(lines.get(1).indexOf("=") + 1);
-                    version = lines.get(2).substring(lines.get(2).indexOf("=") + 1);
-                    architecture = lines.get(3).substring(lines.get(3).indexOf("=") + 1);
-                    driverLib = lines.get(4).substring(lines.get(4).indexOf("=") + 1);
+                    try (InputStream is = zipFile.getInputStream(ratHeader)) {
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        byte[] buffer = new byte[8196];
+                        int len;
+                        while ((len = is.read(buffer)) != -1) {
+                            byteArrayOutputStream.write(buffer, 0, len);
+                        }
+                        inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                    }
+                } catch (IOException ignored) {
                 }
-            } catch (IOException ignored) {
+            }
 
+            if (inputStream == null) return;
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                List<String> lines = reader.lines().collect(Collectors.toList());
+                if (lines.size() < 5) return;
+
+                name = lines.get(0).substring(lines.get(0).indexOf("=") + 1);
+                category = lines.get(1).substring(lines.get(1).indexOf("=") + 1);
+                version = lines.get(2).substring(lines.get(2).indexOf("=") + 1);
+                architecture = lines.get(3).substring(lines.get(3).indexOf("=") + 1);
+                driverLib = lines.get(4).substring(lines.get(4).indexOf("=") + 1);
+            } catch (IOException ignored) {
             }
         }
 
