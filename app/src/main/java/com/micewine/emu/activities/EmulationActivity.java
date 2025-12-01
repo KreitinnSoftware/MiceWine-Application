@@ -582,6 +582,8 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
 
         getLorieView().requestFocus();
 
+        virtualKeyboardInputView.loadPreset(getSelectedVirtualControllerPreset(selectedGameName));
+
         prepareControllersMappings();
     }
 
