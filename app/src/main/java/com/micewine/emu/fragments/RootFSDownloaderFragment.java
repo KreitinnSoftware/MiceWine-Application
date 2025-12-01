@@ -130,7 +130,11 @@ public class RootFSDownloaderFragment extends Fragment {
             if (packageList == null) return;
 
             for (RootFSPackage rootFSPackage : packageList) {
-                addToAdapter(rootFSPackage.name + (rootFSPackage.isPreRelease ? " (Testing)" : ""), rootFSPackage.date, rootFSPackage.version);
+                if (!rootFSPackage.isPreRelease) addToAdapter(rootFSPackage.name, rootFSPackage.date, rootFSPackage.version);
+            }
+
+            for (RootFSPackage rootFSPackage : packageList) {
+                if (rootFSPackage.isPreRelease) addToAdapter(rootFSPackage.name + " (Testing)", rootFSPackage.date, rootFSPackage.version);
             }
 
             addToAdapter(getString(R.string.select_rootfs_file), "", "Manual");
