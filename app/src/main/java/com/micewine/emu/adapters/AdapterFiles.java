@@ -59,18 +59,10 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
 
         holder.fileIcon.setImageResource(0);
 
-        if (isFloatFilesDialog) {
-            if (floatingFileManagerCwd.equals(fileManagerDefaultDir)) {
-                holder.fileName.setText(item.file.getName().toUpperCase());
-            } else {
-                holder.fileName.setText(item.file.getName());
-            }
+        if (isFloatFilesDialog ? floatingFileManagerCwd.equals(fileManagerDefaultDir) : fileManagerCwd.equals(fileManagerDefaultDir)) {
+            holder.fileName.setText(item.file.getName().toUpperCase());
         } else {
-            if (fileManagerCwd.equals(fileManagerDefaultDir)) {
-                holder.fileName.setText(item.file.getName().toUpperCase());
-            } else {
-                holder.fileName.setText(item.file.getName());
-            }
+            holder.fileName.setText(item.file.getName());
         }
 
         holder.fileName.setSelected(true);
@@ -100,7 +92,6 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
         } else if (item.file.isFile()) {
             double fileSize = item.file.length();
             String fileExtension = getFileExtension(item.file);
-
             holder.fileDescription.setText(formatSize(fileSize));
 
             switch (fileExtension.toLowerCase()) {
@@ -136,11 +127,11 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
                     }
                 }).start();
                 case "rat", "mwp" -> holder.fileIcon.setImageResource(R.drawable.ic_rat_package);
-                case "zip" -> {
+                case "zip" -> new Thread(() -> {
                     boolean isAdrenoToolsPackage = new RatPackageManager.AdrenoToolsPackage(item.file.getPath()).getName() != null;
 
-                    holder.fileIcon.setImageResource(isAdrenoToolsPackage ? R.drawable.ic_rat_package : R.drawable.ic_log);
-                }
+                    holder.fileIcon.post(() -> holder.fileIcon.setImageResource(isAdrenoToolsPackage ? R.drawable.ic_rat_package : R.drawable.ic_log));
+                }).start();
                 case "dll" -> holder.fileIcon.setImageResource(R.drawable.ic_dll);
                 case "bat" -> holder.fileIcon.setImageResource(R.drawable.ic_batch);
                 case "ico", "png", "jpg", "jpeg", "bmp" -> new Thread(() -> {

@@ -15,8 +15,6 @@
         android:layout_marginBottom="12dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="16sp"
-        android:singleLine="true"
-        android:ellipsize="marquee"
         android:scrollHorizontally="true"
         android:marqueeRepeatLimit="marquee_forever"
         android:gravity="center_vertical">
