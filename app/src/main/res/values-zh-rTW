@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">MiceWine</string>
+    <string name="app_lang">zh_TW</string>
+
+    <string name="box64_bigblock_title" translatable="false">BOX64_DYNAREC_BIGBLOCK</string>
+    <string name="box64_bigblock_description">啟用/停用 Box64 的 Dynarec 大區塊建構</string>
+    <string name="box64_strongmem_title" translatable="false">BOX64_DYNAREC_STRONGMEM</string>
+    <string name="box64_strongmem_description">啟用/停用強記憶體模型模擬</string>
+    <string name="box64_weakbarrier_title" translatable="false">BOX64_DYNAREC_WEAKBARRIER</string>
+    <string name="box64_weakbarrier_description">調整記憶體屏障以減少使用 STRONGMEM 對效能的影響</string>
+    <string name="box64_pause_title" translatable="false">BOX64_DYNAREC_PAUSE</string>
+    <string name="box64_pause_description">啟用/停用 x86 PAUSE 模擬，可提高自旋鎖效能</string>
+    <string name="box64_x87double_title" translatable="false">BOX64_DYNAREC_X87DOUBLE</string>
+    <string name="box64_x87double_description">強制使用 Double 來模擬 x87</string>
+    <string name="box64_fastnan_title" translatable="false">BOX64_DYNAREC_FASTNAN</string>
+    <string name="box64_fastnan_description">啟用/停用 -NAN 的生成</string>
+    <string name="box64_fastround_title" translatable="false">BOX64_DYNAREC_FASTROUND</string>
+    <string name="box64_fastround_description">啟用/停用精確的 x86 四捨五入生成</string>
+    <string name="box64_safeflags_title" translatable="false">BOX64_DYNAREC_SAFEFLAGS</string>
+    <string name="box64_safeflags_description">處理 CALL/RET 操作碼中的旗標</string>
+    <string name="box64_callret_title" translatable="false">BOX64_DYNAREC_CALLRET</string>
+    <string name="box64_callret_description">最佳化 CALL/RET 操作碼（不相容 jit/dynarec/smc）</string>
+    <string name="box64_aligned_atomics_title" translatable="false">BOX64_DYNAREC_ALIGNED_ATOMICS</string>
+    <string name="box64_aligned_atomics_description">僅為對齊的原子操作生成程式碼</string>
+    <string name="box64_nativeflags_title" translatable="false">BOX64_DYNAREC_NATIVEFLAGS</string>
+    <string name="box64_nativeflags_description">生成的程式碼將盡可能使用本機旗標</string>
+    <string name="box64_bleeding_edge_title" translatable="false">BOX64_DYNAREC_BLEEDING_EDGE</string>
+    <string name="box64_bleeding_edge_description">偵測 MonoBleedingEdge 並套用保守設定</string>
+    <string name="box64_dynarec_wait_title" translatable="false">BOX64_DYNAREC_WAIT</string>
+    <string name="box64_dynarec_wait_description">當 FillBlock 不可用時的行為（FillBlock 建立 Dynarec 區塊並非多執行緒）</string>
+    <string name="box64_dynarec_dirty_title" translatable="false">BOX64_DYNAREC_DIRTY</string>
+    <string name="box64_dynarec_dirty_description">允許繼續執行一個未受保護且可能存在問題的區塊</string>
+    <string name="box64_dynarec_forward_title" translatable="false">BOX64_DYNAREC_FORWARD</string>
+    <string name="box64_dynarec_forward_description">定義建構區塊時允許的最大前進值</string>
+    <string name="box64_log_title" translatable="false">BOX64_LOG</string>
+    <string name="box64_log_description">Box64 日誌等級</string>
+    <string name="box64_avx_title" translatable="false">BOX64_AVX</string>
+    <string name="box64_avx_description">啟用或停用 Box64 的 AVX 或 AVX2 模擬</string>
+    <string name="box64_sse42_title" translatable="false">BOX64_SSE42</string>
+    <string name="box64_sse42_description">啟用或停用 SSE4.2 功能</string>
+    <string name="box64_mmap32_title" translatable="false">BOX64_MMAP32</string>
+    <string name="box64_mmap32_description">啟用或停用針對不支援 \'VK_EXT_map_memory_placed\' 擴充功能的 Vulkan 驅動程式的解決方案</string>
+    <string name="box64_show_segv_title" translatable="false">BOX64_SHOWSEGV</string>
+    <string name="box64_show_segv_description">即使存在訊號處理程式，也顯示 Segfault 訊號</string>
+    <string name="box64_no_sigsegv_title" translatable="false">BOX64_NOSIGSEGV</string>
+    <string name="box64_no_sigsegv_description">停用 SigSEGV 處理（非常適合除錯）</string>
+    <string name="box64_show_bt_title" translatable="false">BOX64_SHOWBT</string>
+    <string name="box64_show_bt_description">當捕獲訊號（SEGV、ILL 或 BUS）時顯示回溯（原生和模擬）</string>
+    <string name="box64_no_sigill_title" translatable="false">BOX64_NOSIGILL</string>
+    <string name="box64_no_sigill_description">停用 SigILL 處理（主要用於更方便地除錯）</string>
+
+    <string name="full_screen">全螢幕</string>
+    <string name="settings_title">設定</string>
+    <string name="settings_description">設定 MiceWine</string>
+    <string name="app_close">退出</string>
+    <string name="log_title">日誌</string>
+    <string name="log_description">查看 MiceWine 日誌</string>
+    <string name="clear_log">清除</string>
+    <string name="desktop_mode_init">桌面</string>
+    <string name="about_title">關於</string>
+    <string name="home_title">首頁</string>
+    <string name="about_description">關於 MiceWine</string>
+    <string name="general_settings">一般設定</string>
+    <string name="exit">退出</string>
+    <string name="open_keyboard">開啟鍵盤</string>
+    <string name="box64_settings_title">Box64 設定</string>
+    <string name="box64_settings_description">設定 Box64</string>
+    <string name="wine_settings_title">Wine 設定</string>
+    <string name="wine_settings_description">設定 Wine</string>
+    <string name="display_settings_title">顯示設定</string>
+    <string name="display_settings_description">設定顯示</string>
+    <string name="driver_settings_title">驅動設定</string>
+    <string name="driver_settings_description">設定 GPU 驅動</string>
+    <string name="env_settings_title">環境設定</string>
+    <string name="env_settings_description">修改環境變數</string>
+    <string name="env_add_action">新增環境變數</string>
+    <string name="env_edit_action">編輯環境變數</string>
+    <string name="env_key">名稱</string>
+    <string name="env_value">值</string>
+    <string name="shortcuts_title">捷徑</string>
+    <string name="stretch_display">延展螢幕</string>
+    <string name="display_resolution_title">顯示解析度</string>
+    <string name="display_resolution_description">變更虛擬顯示解析度</string>
+    <string name="select_driver_title">選擇驅動</string>
+    <string name="select_driver_description">選擇要使用的驅動</string>
+    <string name="null_description">" "</string>
+    <string name="select_dxvk_title">選擇 DXVK 版本</string>
+    <string name="select_wined3d_title">選擇 WineD3D 版本</string>
+    <string name="select_d3dx_title">選擇 DirectX 9/10/11 渲染器</string>
+    <string name="select_gl_profile_title">選擇 OpenGL 設定檔</string>
+    <string name="select_gl_profile_description">選擇 OpenGL 設定檔</string>
+    <string name="select_wined3d_description">選擇 WineD3D 版本</string>
+    <string name="select_dxvk_hud_preset_title">選擇 DXVK HUD 預設</string>
+    <string name="select_dxvk_hud_preset_description">選擇 DXVK HUD 預設以顯示更多或更少資訊</string>
+    <string name="controller_mapper_title">控制器映射器</string>
+    <string name="controller_mapper_description">設定您的遊戲控制器</string>
+    <string name="no_controllers_connected">未連接任何控制器</string>
+    <string name="connected_controller">已連接的控制器：%1$s</string>
+    <string name="dead_zone_title">死區</string>
+    <string name="mouse_sensibility_title">虛擬滑鼠靈敏度</string>
+    <string name="open_overlay">開啟/關閉覆疊層</string>
+    <string name="welcome_text">歡迎使用 MiceWine！</string>
+    <string name="continue_text">繼續</string>
+    <string name="confirm_text">確認</string>
+    <string name="get_file_permission_text">允許檔案管理權限</string>
+    <string name="extracting_resources_text">"正在解壓縮檔案…\n這可能需要一些時間"</string>
+    <string name="extracted_resources_text">解壓縮完成！</string>
+    <string name="extracting_from_assets">從資源解壓縮中…</string>
+    <string name="checking_rat_type">檢查 Rat 檔案類型…</string>
+    <string name="invalid_rootfs_rat_file">無效的 RootFS Rat 檔案</string>
+    <string name="edit_controller_mapping">編輯控制器映射偏好設定</string>
+    <string name="edit_virtual_controller_mapping">編輯虛擬控制器映射</string>
+    <string name="remove_game_item">刪除</string>
+    <string name="executable_already_added">可執行檔已新增</string>
+    <string name="select_executable_file">選擇一個 .exe/.bat 檔案</string>
+    <string name="rename_game_item">重新命名</string>
+    <string name="incompatible_selected_file">選擇的檔案不相容</string>
+    <string name="new_name_text">輸入新名稱</string>
+    <string name="enable_ram_counter">啟用/停用 RAM 計數器</string>
+    <string name="enable_ram_counter_description">在螢幕上啟用或停用 RAM 計數器</string>
+    <string name="selected_controller_preset">已選擇的控制器預設</string>
+    <string name="mouse_text">滑鼠</string>
+    <string name="keyboard_text">鍵盤</string>
+    <string name="controller_preset_create_text">輸入名稱</string>
+    <string name="remove_last_preset_error">最後一個預設無法移除</string>
+    <string name="edit_game_icon">編輯圖示</string>
+    <string name="edit">編輯</string>
+    <string name="add_game_to_home">在啟動器上建立捷徑</string>
+    <string name="cancel_text">取消</string>
+    <string name="remove_game_item_warning">您確定要移除它嗎？</string>
+    <string name="enable_cpu_counter">啟用/停用 CPU 使用計數器</string>
+    <string name="enable_cpu_counter_description">在螢幕上啟用或停用 CPU 使用率</string>
+    <string name="virtual_controller_mapper_title">虛擬控制器映射器</string>
+    <string name="mesa_vk_wsi_present_mode_title" translatable="false">MESA_VK_WSI_PRESENT_MODE</string>
+    <string name="tu_debug_title" translatable="false">TU_DEBUG</string>
+    <string name="add_button">新增按鈕</string>
+    <string name="add_virtual_axis">新增虛擬搖桿</string>
+    <string name="file_manager_title">檔案管理器</string>
+    <string name="create_shortcut_on_home">在首頁建立捷徑</string>
+    <string name="execute_exe">執行</string>
+    <string name="creating_wine_prefix">正在建立 Wine 前綴…</string>
+    <string name="select_rootfs_file">選擇 RootFS 檔案</string>
+    <string name="enable_debug_info">啟用/停用除錯資訊</string>
+    <string name="enable_debug_info_description">在螢幕上啟用或停用除錯資訊</string>
+    <string name="open_log_viewer">開啟日誌檢視器</string>
+    <string name="controller_virtual_mapper_description">設定螢幕上的控制器</string>
+    <string name="select_vkd3d_title">選擇 VKD3D 版本</string>
+    <string name="wine_esync_title">啟用或停用 Wine ESync（實驗性）</string>
+    <string name="wine_log_level_title">Wine 日誌等級</string>
+    <string name="save_text">儲存</string>
+    <string name="wine_is_closed">Wine 行程已關閉</string>
+    <string name="button_size">按鈕大小</string>
+    <string name="driver_manager_title">驅動管理器</string>
+    <string name="driver_manager_description">管理驅動</string>
+    <string name="install_rat_package_warning">您想安裝</string>
+    <string name="enable_dri3">啟用 DRI3</string>
+    <string name="enable_mangohud_title">啟用 MangoHud</string>
+    <string name="invalid_architecture_rat_file">無效的架構 Rat 檔案</string>
+    <string name="lnk_read_fail">讀取 .lnk 檔案失敗</string>
+    <string name="create_lnk">建立 .lnk 檔案</string>
+    <string name="item_text">項目</string>
+    <string name="items_text">項目</string>
+    <string name="empty_text">空</string>
+    <string name="enable_wine_services_title">啟用 Wine 服務</string>
+    <string name="box64_manager_title">Box64 管理器</string>
+    <string name="box64_manager_description">管理 Box64 版本</string>
+    <string name="mouse_captured">滑鼠已捕獲，按下返回鍵或 ESC 鍵釋放</string>
+    <string name="cpu_affinity_title">CPU 親和性</string>
+    <string name="action_search">搜尋</string>
+    <string name="highlight_nav_shortcuts">管理捷徑</string>
+    <string name="highlight_nav_settings">管理設定</string>
+    <string name="highlight_nav_files">瀏覽並開啟檔案</string>
+    <string name="highlight_nav_files_description">點擊開啟可執行檔，長按以建立捷徑</string>
+    <string name="highlight_shortcuts">點擊開啟，長按以重新排序或存取更多選項</string>
+    <string name="box64_version">Box64 版本</string>
+    <string name="application_version">應用程式版本</string>
+    <string name="rootfs_version">RootFS 版本</string>
+    <string name="wine_version">Wine 版本</string>
+    <string name="display_mode_title">顯示模式</string>
+    <string name="display_mode_description">變更顯示比例模式</string>
+    <string name="name">名稱</string>
+    <string name="edit_game">編輯捷徑</string>
+    <string name="unlimited">無限制</string>
+    <string name="fps_limit_title">FPS 限制</string>
+    <string name="app_arguments">啟動參數</string>
+    <string name="deleting_wine_prefix">正在刪除 Wine 前綴…</string>
+    <string name="remove_last_wine_prefix_error">您無法刪除最後一個前綴</string>
+    <string name="wine_manager_title">Wine 管理器</string>
+    <string name="wine_manager_description">管理 Wine 版本</string>
+    <string name="installing_drivers">正在安裝驅動程式…</string>
+    <string name="installing_box64">正在安裝 Box64…</string>
+    <string name="installing_wine">正在安裝 Wine…</string>
+    <string name="box64_preset_manager_title">Box64 預設管理器</string>
+    <string name="box64_preset_manager_description">管理 Box64 預設</string>
+    <string name="selected_box64_profile">已選擇 Box64 設定檔</string>
+    <string name="selected_virtual_controller_profile">已選擇虛擬控制器設定檔</string>
+    <string name="selected_controller_profile">已選擇控制器設定檔</string>
+    <string name="export_preset">匯出預設</string>
+    <string name="invalid_controller_preset_file">無效的控制器預設檔案</string>
+    <string name="invalid_box64_preset_file">無效的 Box64 預設檔案</string>
+    <string name="invalid_virtual_controller_preset_file">無效的虛擬控制器預設檔案</string>
+    <string name="sound_settings_title">音效設定</string>
+    <string name="sound_settings_description">管理音效設定</string>
+    <string name="select_audio_sink">選擇 PulseAudio 輸出</string>
+    <string name="others">其他</string>
+    <string name="enable_xinput_title">啟用 XInput 遊戲控制器</string>
+    <string name="enable_wine_virtual_desktop">啟用 Wine 虛擬桌面</string>
+    <string name="shape_text">形狀</string>
+    <string name="button_mapping_text">按鈕映射</string>
+    <string name="add_virtual_dpad">新增虛擬方向鍵</string>
+    <string name="rat_manager_title">Rat 套件管理器</string>
+    <string name="rat_manager_description">管理已安裝的 Rat 套件</string>
+    <string name="grant_files_permission_error">授予檔案權限以繼續</string>
+    <string name="debug_settings_title">除錯設定</string>
+    <string name="debug_settings_description">變更除錯設定</string>
+    <string name="wine_log_level_description">設定 Wine 日誌等級</string>
+    <string name="rat_downloader_title">Rat 套件下載器</string>
+    <string name="rat_downloader_description">從儲存庫下載 Rat 套件</string>
+    <string name="package_already_installed">套件已安裝</string>
+    <string name="unknown_package_category">未知的套件類別</string>
+    <string name="error_install_rootfs_file_manager">安裝後無法再次安裝 RootFS</string>
+    <string name="driver_info_title">驅動資訊</string>
+    <string name="driver_info_description">取得 Vulkan 驅動資訊</string>
+    <string name="controller_settings">控制器設定</string>
+    <string name="selected_box64">已選擇 Box64</string>
+</resources>
