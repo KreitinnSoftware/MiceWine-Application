@@ -23,7 +23,9 @@ import java.io.IOException;
 
 public class LogViewerFragment extends Fragment implements ShellLoader.LogCallback {
     private TextView logTextView;
+    private final StringBuilder logs = new StringBuilder();
     private ScrollView scrollView;
+    private boolean logViewerIsOpened = false;
 
     @Nullable
     @Override
@@ -42,7 +44,7 @@ public class LogViewerFragment extends Fragment implements ShellLoader.LogCallba
             String logPath = "/storage/emulated/0/MiceWine/MiceWine-" + selectedGameName + "-Log-" + System.currentTimeMillis() / 1000 + ".txt";
 
             try (FileWriter writer = new FileWriter(logPath)) {
-                writer.write(logTextView.getText().toString());
+                writer.write(logs.toString());
             } catch (IOException ignored) {
             }
 
@@ -52,8 +54,38 @@ public class LogViewerFragment extends Fragment implements ShellLoader.LogCallba
         return rootView;
     }
 
+    private String getLastLines(StringBuilder sb) {
+        int count = 0;
+        int i = sb.length() - 1;
+
+        while (i >= 0 && count < 500) {
+            if (sb.charAt(i) == '\n') {
+                count++;
+            }
+            i--;
+        }
+
+        int start = Math.max(0, i + 2);
+
+        return sb.substring(start);
+    }
+
+    public void populate() {
+        logViewerIsOpened = true;
+        logTextView.post(() -> logTextView.setText(getLastLines(logs)));
+    }
+
+    public void cleanup() {
+        logViewerIsOpened = false;
+        logTextView.post(() -> logTextView.setText(""));
+    }
+
     @Override
     public void appendLogs(String text) {
+        logs.append(text);
+
+        if (!logViewerIsOpened) return;
+
         requireActivity().runOnUiThread(() -> {
             logTextView.append(text);
             scrollView.post(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN));

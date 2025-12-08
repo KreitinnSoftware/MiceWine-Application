@@ -160,8 +160,30 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-        transaction.replace(R.id.logViewerContent, new LogViewerFragment());
+        LogViewerFragment logViewerFragment = new LogViewerFragment();
+
+        transaction.replace(R.id.logViewerContent, logViewerFragment);
         transaction.commit();
+
+        drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+                logViewerFragment.populate();
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                logViewerFragment.cleanup();
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+            }
+        });
 
         virtualKeyboardInputView = findViewById(R.id.overlayView);
         virtualKeyboardInputView.loadPreset(getSelectedVirtualControllerPreset(selectedGameName));
