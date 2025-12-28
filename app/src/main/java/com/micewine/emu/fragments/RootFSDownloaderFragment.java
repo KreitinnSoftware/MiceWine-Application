@@ -76,6 +76,7 @@ public class RootFSDownloaderFragment extends Fragment {
 
                 requireActivity().runOnUiThread(() -> {
                     progressBarProgress.setText("100%");
+                    progressBar.setProgress(100);
                     textView.setText(R.string.download_successful);
                 });
             } else if (DOWNLOAD_FAILED.equals(intent.getAction())) {

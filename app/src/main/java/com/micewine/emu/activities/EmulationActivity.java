@@ -172,7 +172,11 @@ public class EmulationActivity extends AppCompatActivity implements View.OnApply
 
             @Override
             public void onDrawerOpened(@NonNull View drawerView) {
-                logViewerFragment.populate();
+                DrawerLayout.LayoutParams layoutParams = (DrawerLayout.LayoutParams) drawerView.getLayoutParams();
+
+                if ((layoutParams.gravity & GravityCompat.END) == GravityCompat.END) {
+                    logViewerFragment.populate();
+                }
             }
 
             @Override
