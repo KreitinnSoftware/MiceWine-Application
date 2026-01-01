@@ -28,7 +28,6 @@ import static com.micewine.emu.activities.PresetManagerActivity.BUTTON_X_KEY;
 import static com.micewine.emu.activities.PresetManagerActivity.BUTTON_Y_KEY;
 import static com.micewine.emu.activities.PresetManagerActivity.SELECTED_CONTROLLER_PRESET;
 import static com.micewine.emu.adapters.AdapterPreset.selectedPresetId;
-import static com.micewine.emu.fragments.CreatePresetFragment.BOX64_PRESET;
 import static com.micewine.emu.fragments.CreatePresetFragment.CONTROLLER_PRESET;
 
 import android.content.Context;

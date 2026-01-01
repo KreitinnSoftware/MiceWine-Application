@@ -107,12 +107,12 @@ public class FileManagerFragment extends Fragment {
                         ViewPropertyAnimator animator = recyclerView.animate();
 
                         animator.alpha(0F);
-                        animator.setDuration(70L);
+                        animator.setDuration(35L);
                         animator.withEndAction(() -> {
                             RecyclerView.Adapter<?> adapter = recyclerView.getAdapter();
                             if (adapter != null) adapter.notifyDataSetChanged();
                             animator.alpha(1F);
-                            animator.setDuration(70L);
+                            animator.setDuration(35L);
                             animator.start();
                         });
                         animator.start();
