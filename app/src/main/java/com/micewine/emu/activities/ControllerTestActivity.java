@@ -79,6 +79,7 @@ public class ControllerTestActivity extends AppCompatActivity {
         ControllerUtils.updateButtonsState(event);
 
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
+
         for (Fragment fragment : fragments) {
             if (fragment instanceof ControllerViewFragment) {
                 ((ControllerViewFragment) fragment).invalidateControllerView();
