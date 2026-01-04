@@ -10,6 +10,9 @@ import static com.micewine.emu.core.ShellLoader.runCommand;
 import static com.micewine.emu.core.ShellLoader.runCommandWithOutput;
 import static com.micewine.emu.fragments.DebugSettingsFragment.availableCPUs;
 
+import android.system.ErrnoException;
+import android.system.Os;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -153,9 +156,7 @@ public class WineWrapper {
 
     private static int getProcessRamUsageKB(int pid) {
         File statusFile = new File("/proc/" + pid + "/status");
-        if (!statusFile.exists()) {
-            return 0;
-        }
+        if (!statusFile.exists()) return 0;
 
         try {
             List<String> lines = Files.readAllLines(statusFile.toPath());
@@ -173,9 +174,7 @@ public class WineWrapper {
 
     public static String getProcessCPUAffinity(int pid) {
         File statusFile = new File("/proc/" + pid + "/status");
-        if (!statusFile.exists()) {
-            return "0";
-        }
+        if (!statusFile.exists()) return "0";
 
         try {
             List<String> lines = Files.readAllLines(statusFile.toPath());
@@ -191,18 +190,16 @@ public class WineWrapper {
         return "0";
     }
 
-    public static int getWinPidByName(String processName) {
+    public static int getWinPidByIndex(int index) {
+        if (index < 0) return -1;
+
         String[] taskList = runCommandWithOutput(
-                getEnv() + "BOX64_LOG=0 WINEPREFIX='" + winePrefixesDir + "/" + winePrefix + "' " + IS_BOX64 + " wine tasklist" , false
+                getEnv() + "WINEDEBUG=0 BOX64_LOG=0 WINEPREFIX='" + winePrefixesDir + "/" + winePrefix + "' " + IS_BOX64 + " wine tasklist | grep .exe", false
         ).split("\n");
 
-        for (String s : taskList) {
-            if (s.contains(processName)) {
-                return Integer.parseInt(s.trim().replaceAll("  +", " ").split(" ")[1]);
-            }
-        }
+        if (index > taskList.length) return -1;
 
-        return -1;
+        return Integer.parseInt(taskList[index].replaceAll(" +", " ").split(" ")[1]);
     }
 
     public static List<ExeProcess> getExeProcesses() {
@@ -210,46 +207,54 @@ public class WineWrapper {
 
         File[] processes = new File("/proc").listFiles();
 
-        if (processes != null) {
-            for (File process : processes) {
-                if (process.isDirectory()) {
-                    Integer unixPid;
+        if (processes == null) return exeProcesses;
+
+        for (File processFile : processes) {
+            if (processFile.isDirectory()) {
+                int unixPid;
+
+                try {
+                    unixPid = Integer.parseInt(processFile.getName());
+                } catch (NumberFormatException ignored) {
+                    continue;
+                }
+
+                File cmdlineFile = new File(processFile, "cmdline");
+                if (!cmdlineFile.exists()) continue;
+
+                try {
+                    String cmdline = Files.readAllLines(cmdlineFile.toPath()).toString().trim();
+                    String processName = cmdline.split("\u0000")[0].substring(1);
+
+                    if (!processName.toLowerCase().endsWith(".exe")) continue;
+
+                    processName = processName.substring(processName.lastIndexOf("\\") + 1);
+
+                    String cwd;
 
                     try {
-                        unixPid = Integer.parseInt(process.getName());
+                        cwd = Os.readlink(processFile.toPath() + "/cwd");
+                    } catch (ErrnoException ignored) {
+                        cwd = "/";
+                    }
+
+                    String processPath = getProcessPath(processName, cwd);
+                    String iconPath = usrDir + "/icons/" + processName.substring(0, processName.indexOf(".exe")) + "-thumbnail";
+                    int ramUsageKB = getProcessRamUsageKB(unixPid);
+                    float cpuUsage;
+
+                    try {
+                        cpuUsage = Float.parseFloat(runCommandWithOutput("ps -p " + unixPid + " -o %cpu=", false).trim());
                     } catch (NumberFormatException ignored) {
-                        unixPid = null;
+                        cpuUsage = 0F;
                     }
 
-                    File cmdlineFile = new File(process, "cmdline");
-                    if (cmdlineFile.exists() && unixPid != null) {
-                        try {
-                            String cmdline = Files.readAllLines(cmdlineFile.toPath()).toString().trim();
-                            String processName = cmdline.split("\u0000")[0];
+                    extractIcon(processPath, iconPath);
 
-                            if (processName != null && processName.toLowerCase().endsWith(".exe")) {
-                                processName = processName.substring(1);
-                                String cwd = runCommandWithOutput("readlink " + process.toPath() + "/cwd", false).trim();
-                                String path = getProcessPath(processName, cwd);
-                                String iconPath = usrDir + "/icons/" + processName.substring(0, processName.indexOf(".exe")) + "-thumbnail";
-                                int ramUsageKB = getProcessRamUsageKB(unixPid);
-                                float cpuUsage;
-
-                                try {
-                                    cpuUsage = Float.parseFloat(runCommandWithOutput("ps -p " + unixPid + " -o %cpu=", false).trim());
-                                } catch (NumberFormatException ignored) {
-                                    cpuUsage = 0F;
-                                }
-
-                                extractIcon(path, iconPath);
-
-                                exeProcesses.add(
-                                        new ExeProcess(processName, unixPid, cwd, path, iconPath, ramUsageKB, cpuUsage / availableCPUs.length)
-                                );
-                            }
-                        } catch (IOException ignored) {
-                        }
-                    }
+                    exeProcesses.add(
+                            new ExeProcess(processName, unixPid, cwd, processPath, iconPath, ramUsageKB, cpuUsage / availableCPUs.length)
+                    );
+                } catch (IOException ignored) {
                 }
             }
         }

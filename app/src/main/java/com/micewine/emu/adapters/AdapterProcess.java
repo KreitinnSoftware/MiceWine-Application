@@ -1,9 +1,10 @@
 package com.micewine.emu.adapters;
 
+import static com.micewine.emu.activities.MainActivity.wineServices;
 import static com.micewine.emu.core.ShellLoader.runCommand;
 import static com.micewine.emu.core.WineWrapper.getCpuHexMask;
 import static com.micewine.emu.core.WineWrapper.getProcessCPUAffinity;
-import static com.micewine.emu.core.WineWrapper.getWinPidByName;
+import static com.micewine.emu.core.WineWrapper.getWinPidByIndex;
 import static com.micewine.emu.core.WineWrapper.maskToCpuAffinity;
 import static com.micewine.emu.core.WineWrapper.wine;
 import static com.micewine.emu.fragments.DebugSettingsFragment.availableCPUs;
@@ -15,7 +16,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
@@ -108,8 +108,10 @@ public class AdapterProcess extends RecyclerView.Adapter<AdapterProcess.ViewHold
                             strAffinity.deleteCharAt(0);
                         }
 
-                        int winPid = getWinPidByName(item.getName());
+                        int winPid = getWinPidByIndex(position);
                         wine("set_process_affinity.exe " + winPid + " " + getCpuHexMask(strAffinity.toString()));
+
+                        if (!wineServices) runCommand("pkill -9 services.exe", false);
 
                         dialogInterface.dismiss();
                     });
@@ -117,9 +119,9 @@ public class AdapterProcess extends RecyclerView.Adapter<AdapterProcess.ViewHold
                     dialog.show();
 
                     return true;
-                } else {
-                    return false;
                 }
+
+                return false;
             });
 
             popup.show();

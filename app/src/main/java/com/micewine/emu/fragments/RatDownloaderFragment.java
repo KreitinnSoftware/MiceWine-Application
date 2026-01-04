@@ -106,23 +106,22 @@ public class RatDownloaderFragment extends Fragment {
         Type type = new TypeToken<Map<String, RatPackageModel>>() {}.getType();
 
         try (Response response = client.newCall(request).execute()) {
-            if (response.isSuccessful()) {
-                if (response.body() != null) {
-                    Map<String, RatPackageModel> map = gson.fromJson(response.body().string(), type);
-                    Map<String, RatPackageModel> filteredMap = new TreeMap<>();
+            if (!response.isSuccessful()) return null;
 
-                    for (Map.Entry<String, RatPackageModel> entry : map.entrySet()) {
-                        RatPackageModel value = entry.getValue();
+            Map<String, RatPackageModel> map = gson.fromJson(response.body().string(), type);
+            Map<String, RatPackageModel> filteredMap = new TreeMap<>();
 
-                        if (deviceArch.equals(value.architecture) || "any".equals(value.architecture)) {
-                            filteredMap.put(entry.getKey(), value);
-                        }
-                    }
+            for (Map.Entry<String, RatPackageModel> entry : map.entrySet()) {
+                RatPackageModel value = entry.getValue();
 
-                    return filteredMap;
+                if (deviceArch.equals(value.architecture) || "any".equals(value.architecture)) {
+                    filteredMap.put(entry.getKey(), value);
                 }
             }
-        } catch (IOException ignored) {
+
+            return filteredMap;
+        } catch (IOException e) {
+            System.out.println("IOException: " + e.getMessage());
         }
 
         return null;
