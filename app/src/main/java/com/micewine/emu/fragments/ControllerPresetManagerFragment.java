@@ -87,7 +87,7 @@ public class ControllerPresetManagerFragment extends Fragment {
     private final static ArrayList<AdapterPreset.Item> presetListAdapters = new ArrayList<>();
     private static ArrayList<ControllerPreset> presetList = new ArrayList<>();
     private static boolean editShortcut = false;
-    private final static Type listType = new TypeToken<ArrayList<ControllerPreset>>() {}.getType();
+    private final static Type listType = new TypeToken<ControllerPreset>() {}.getType();
 
     public static void initialize(boolean editable) {
         editShortcut = editable;
