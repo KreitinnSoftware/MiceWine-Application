@@ -78,7 +78,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 RootFSDownloaderFragment downloader = (RootFSDownloaderFragment) getCurrentFragment();
                 boolean selectCustomRootFS = (selectedItemId == downloader.rootFsList.size() - 1);
 
-                if (rootFSIsDownloaded || selectCustomRootFS) {
+                if (rootFSIsDownloaded || selectCustomRootFS || selectedItemId == -1) {
                     finishedWelcomeScreen = true;
                     finish();
                     return;
