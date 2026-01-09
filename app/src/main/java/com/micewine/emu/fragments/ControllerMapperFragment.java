@@ -91,7 +91,7 @@ public class ControllerMapperFragment extends Fragment {
         SeekBar mouseSensibilitySeekBar = rootView.findViewById(R.id.mouseSensibilitySeekBar);
 
         mouseSensibilitySeekBar.setMin(25);
-        mouseSensibilitySeekBar.setMin(350);
+        mouseSensibilitySeekBar.setMax(350);
         mouseSensibilitySeekBar.setProgress(getMouseSensibility(clickedPresetName));
 
         TextView mouseSensibilityValue = rootView.findViewById(R.id.mouseSensibilityValue);
