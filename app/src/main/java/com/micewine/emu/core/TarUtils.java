@@ -1,7 +1,6 @@
 package com.micewine.emu.core;
 
-import static com.micewine.emu.fragments.SetupFragment.progressBarIsIndeterminate;
-import static com.micewine.emu.fragments.SetupFragment.progressBarValue;
+import com.micewine.emu.fragments.SetupFragment;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -77,16 +76,16 @@ public class TarUtils {
         }
     }
 
-    public static void untar(String filePath, String outputDir) throws IOException {
+    public static void untar(String filePath, String outputDir, SetupFragment.ProgressCallback callback) throws IOException {
         AtomicBoolean isExtracting = new AtomicBoolean(true);
         AtomicLong bytesExtracted = new AtomicLong(0);
         long totalBytes = getTarXZFileSize(filePath);
 
-        progressBarIsIndeterminate = false;
+        callback.setProgressBarIndeterminate(false);
 
         new Thread(() -> {
             while (isExtracting.get()) {
-                progressBarValue = (int) ((float) bytesExtracted.get() / (float) totalBytes * 100F);
+                callback.onProgressChanged((int) ((float) bytesExtracted.get() / (float) totalBytes * 100F));
                 try {
                     Thread.sleep(125);
                 } catch (InterruptedException ignored) {

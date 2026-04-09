@@ -45,11 +45,4 @@
         android:layout_height="match_parent">
     </androidx.viewpager2.widget.ViewPager2>
 
-    <FrameLayout
-        android:id="@+id/rat_manager_content"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-    </FrameLayout>
-
 </LinearLayout>

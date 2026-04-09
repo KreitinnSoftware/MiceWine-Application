@@ -148,7 +148,7 @@
     <string name="highlight_shortcuts">Нажмите для открытия, удерживайте для перестановки или доступа к дополнительным опциям</string>
     <string name="box64_version">Версия Box64</string>
     <string name="application_version">Версия приложения</string>
-    <string name="rootfs_version">Версия RootFS</string>
+    <string name="app_build_date">Дата сборки приложения</string>
     <string name="wine_version">Версия Wine</string>
     <string name="display_mode_title">Режим отображения</string>
     <string name="display_mode_desc">Изменить режим соотношения сторон экрана</string>
@@ -163,9 +163,7 @@
     <string name="wine_manager_desc">Управление версиями Wine</string>
     <string name="wine_prefix_manager_title">Менеджер префиксов Wine</string>
     <string name="wine_prefix_manager_desc">Управление префиксами Wine</string>
-    <string name="installing_drivers">Установка драйверов…</string>
-    <string name="installing_box64">Установка Box64…</string>
-    <string name="installing_wine">Установка Wine…</string>
+    <string name="installing">Установка</string>
     <string name="box64_preset_manager_title">Менеджер предустановок Box64</string>
     <string name="box64_preset_manager_desc">Управление предустановками Box64</string>
     <string name="selected_box64_profile">Выбранный профиль Box64</string>
@@ -220,7 +218,7 @@
     <string name="enable_xinput">Включить XInput</string>
     <string name="enable_directinput">Включить DirectInput</string>
     <string name="other_controller_settings">Другие настройки контроллера</string>
-    <string name="downloading_rootfs">Загрузка RootFS</string>
+    <string name="downloading_packages">Загрузка пакетов</string>
     <string name="download_successful">Загрузка завершена успешно!</string>
     <string name="select_rootfs_file">Выберите файл RootFS</string>
 

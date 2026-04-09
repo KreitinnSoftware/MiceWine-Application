@@ -1,5 +1,6 @@
 package com.micewine.emu.fragments;
 
+import static com.micewine.emu.core.RatPackageManager.getRatCategoryString;
 import static com.micewine.emu.core.RatPackageManager.listRatPackages;
 
 import android.os.Bundle;
@@ -24,14 +25,14 @@ public class RatManagerFragment extends Fragment {
     private final String anotherPrefix;
     private final int type;
 
-    public RatManagerFragment(String prefix, int type) {
-        this.prefix = prefix;
+    public RatManagerFragment(int type) {
+        this.prefix = getRatCategoryString(type);
         this.type = type;
         this.anotherPrefix = prefix;
     }
 
-    public RatManagerFragment(String prefix, int type, String anotherPrefix) {
-        this.prefix = prefix;
+    public RatManagerFragment(int type, String anotherPrefix) {
+        this.prefix = getRatCategoryString(type);
         this.type = type;
         this.anotherPrefix = anotherPrefix;
     }
@@ -52,7 +53,7 @@ public class RatManagerFragment extends Fragment {
     }
 
     private void setAdapter() {
-        recyclerView.setAdapter(new AdapterRatPackage(ratList, requireActivity(), false));
+        recyclerView.setAdapter(new AdapterRatPackage(ratList, requireActivity(), false, false));
 
         ratList.clear();
 

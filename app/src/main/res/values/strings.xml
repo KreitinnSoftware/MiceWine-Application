@@ -175,7 +175,7 @@
     <string name="highlight_shortcuts">Tap to open, hold to reorder or access more options</string>
     <string name="box64_version">Box64 Version</string>
     <string name="application_version">Application Version</string>
-    <string name="rootfs_version">RootFS Version</string>
+    <string name="app_build_date">Application Build Date</string>
     <string name="wine_version">Wine Version</string>
     <string name="display_mode_title">Display Mode</string>
     <string name="display_mode_desc">Change Display Aspect Ratio Mode</string>
@@ -190,9 +190,7 @@
     <string name="wine_manager_desc">Manage Wine Versions</string>
     <string name="wine_prefix_manager_title">Wine Prefix Manager</string>
     <string name="wine_prefix_manager_desc">Manage Wine Prefixes</string>
-    <string name="installing_drivers">Installing Drivers…</string>
-    <string name="installing_box64">Installing Box64…</string>
-    <string name="installing_wine">Installing Wine…</string>
+    <string name="installing">Installing</string>
     <string name="box64_preset_manager_title">Box64 Preset Manager</string>
     <string name="box64_preset_manager_desc">Manage Box64 Presets</string>
     <string name="selected_box64_profile">Selected Box64 Profile</string>
@@ -247,7 +245,7 @@
     <string name="enable_xinput">Enable XInput</string>
     <string name="enable_directinput">Enable DirectInput</string>
     <string name="other_controller_settings">Other Controller Settings</string>
-    <string name="downloading_rootfs">Downloading RootFS</string>
+    <string name="downloading_packages">Downloading Packages</string>
     <string name="download_successful">Download Successful!</string>
     <string name="select_rootfs_file">Select RootFS File</string>
 

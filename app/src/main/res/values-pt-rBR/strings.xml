@@ -152,7 +152,7 @@
     <string name="highlight_shortcuts">Toque para abrir, segure para reorganizar ou acessar mais opções</string>
     <string name="box64_version">Versão do Box64</string>
     <string name="application_version">Versão do Aplicativo</string>
-    <string name="rootfs_version">Versão do RootFS</string>
+    <string name="app_build_date">Data de Compilação do Aplicativo</string>
     <string name="wine_version">Versão do Wine</string>
     <string name="display_mode_title">Modo do Display</string>
     <string name="display_mode_desc">Alterar o Modo de Proporção de Tela</string>
@@ -167,9 +167,7 @@
     <string name="wine_manager_desc">Gerenciar Versões do Wine</string>
     <string name="wine_prefix_manager_title">Gerenciador de Prefixos Wine</string>
     <string name="wine_prefix_manager_desc">Gerenciar Prefixos Wine</string>
-    <string name="installing_drivers">Instalando Drivers…</string>
-    <string name="installing_box64">Instalando Box64…</string>
-    <string name="installing_wine">Instalando Wine…</string>
+    <string name="installing">Instalando</string>
     <string name="box64_preset_manager_title">Gerenciador de Perfis do Box64</string>
     <string name="box64_preset_manager_desc">Gerenciar Perfis do Box64</string>
     <string name="selected_box64_profile">Perfil do Box64 Selecionado</string>
@@ -224,7 +222,7 @@
     <string name="enable_xinput">Ativar XInput</string>
     <string name="enable_directinput">Ativar DirectInput</string>
     <string name="other_controller_settings">Outras Configurações de Controle</string>
-    <string name="downloading_rootfs">Baixando RootFS</string>
+    <string name="downloading_packages">Baixando Pacotes</string>
     <string name="download_successful">Download Concluido!</string>
     <string name="select_rootfs_file">Selecionar Arquivo RootFS</string>
 

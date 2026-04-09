@@ -34,7 +34,6 @@ import static com.micewine.emu.fragments.ShortcutsFragment.getDisplaySettings;
 import static com.micewine.emu.fragments.ShortcutsFragment.getEnableDInput;
 import static com.micewine.emu.fragments.ShortcutsFragment.getEnableXInput;
 import static com.micewine.emu.fragments.ShortcutsFragment.getEnvVars;
-import static com.micewine.emu.fragments.ShortcutsFragment.getExeArguments;
 import static com.micewine.emu.fragments.ShortcutsFragment.getExePath;
 import static com.micewine.emu.fragments.ShortcutsFragment.getGameExeArguments;
 import static com.micewine.emu.fragments.ShortcutsFragment.getGameIcon;
@@ -108,7 +107,6 @@ import com.google.android.material.materialswitch.MaterialSwitch;
 import com.micewine.emu.R;
 import com.micewine.emu.activities.EmulationActivity;
 import com.micewine.emu.adapters.AdapterEnvVar;
-import com.micewine.emu.core.EnvVars;
 import com.micewine.emu.core.RatPackageManager;
 
 import java.io.File;
@@ -394,9 +392,7 @@ public class EditGamePreferencesFragment extends DialogFragment {
                 editTextArguments.setText(getGameExeArguments(selectedGameName));
 
                 String exePath = getExePath(selectedGameName);
-                String prefix = wineDisksFolder + "/";
-                exePath = exePath.startsWith(prefix) ? exePath.substring(prefix.length()) : exePath;
-                exePath = !exePath.isEmpty() ? Character.toUpperCase(exePath.charAt(0)) + exePath.substring(1) : exePath;
+                exePath = exePath.substring(0, 1).toUpperCase() + exePath.substring(1);
 
                 exePathText.setText(exePath);
                 exePathText.setSelected(true);
@@ -789,9 +785,6 @@ public class EditGamePreferencesFragment extends DialogFragment {
         getParentFragmentManager().setFragmentResultListener("invalidate", this, (requestKey, result) -> {
             exePathText.post(() -> {
                 String exePath = getExePath(selectedGameName);
-                String prefix = wineDisksFolder + "/";
-                exePath = exePath.startsWith(prefix) ? exePath.substring(prefix.length()) : exePath;
-                exePath = !exePath.isEmpty() ? Character.toUpperCase(exePath.charAt(0)) + exePath.substring(1) : exePath;
 
                 exePathText.setText(exePath);
             });

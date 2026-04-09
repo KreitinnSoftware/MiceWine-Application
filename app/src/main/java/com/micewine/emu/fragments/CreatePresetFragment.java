@@ -1,15 +1,12 @@
 package com.micewine.emu.fragments;
 
 import static com.micewine.emu.activities.MainActivity.setSharedVars;
-import static com.micewine.emu.activities.MainActivity.setupDone;
 import static com.micewine.emu.core.RatPackageManager.listRatPackages;
 import static com.micewine.emu.fragments.Box64PresetManagerFragment.addBox64Preset;
 import static com.micewine.emu.fragments.ControllerPresetManagerFragment.addControllerPreset;
 import static com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.addVirtualControllerPreset;
 import static com.micewine.emu.fragments.WinePrefixManagerFragment.createWinePrefix;
 import static com.micewine.emu.fragments.WinePrefixManagerFragment.putSelectedWinePrefix;
-import static com.micewine.emu.fragments.SetupFragment.progressBarIsIndeterminate;
-import static com.micewine.emu.fragments.SetupFragment.dialogTitleText;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -81,19 +78,19 @@ public class CreatePresetFragment extends DialogFragment {
 
             switch (presetType) {
                 case WINE_PREFIX_PRESET -> {
+                    SetupFragment setupFragment = new SetupFragment();
+
+                    setupFragment.show(requireActivity().getSupportFragmentManager(), "");
+
+                    setupFragment.setupProgressCallback.setDialogText(getString(R.string.creating_wine_prefix) + "\n\t1/2");
+                    setupFragment.setupProgressCallback.setProgressBarIndeterminate(true);
+
                     putSelectedWinePrefix(newName);
                     setSharedVars(requireActivity());
 
-                    setupDone = false;
-
-                    new SetupFragment().show(requireActivity().getSupportFragmentManager(), "");
-
-                    dialogTitleText = getString(R.string.creating_wine_prefix);
-                    progressBarIsIndeterminate = true;
-
                     new Thread(() -> {
                         createWinePrefix(newName, winePackages.get(wineVersionSpinner.getSelectedItemPosition()).getFolderName());
-                        setupDone = true;
+                        setupFragment.dismiss();
                     }).start();
                 }
                 case CONTROLLER_PRESET -> addControllerPreset(requireContext(), newName);

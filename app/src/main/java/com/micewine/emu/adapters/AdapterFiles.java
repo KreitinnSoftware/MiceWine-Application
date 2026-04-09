@@ -1,10 +1,10 @@
 package com.micewine.emu.adapters;
 
 import static com.micewine.emu.activities.MainActivity.ACTION_SELECT_FILE_MANAGER;
-import static com.micewine.emu.activities.MainActivity.customRootFSPath;
 import static com.micewine.emu.activities.MainActivity.fileManagerCwd;
 import static com.micewine.emu.activities.MainActivity.fileManagerDefaultDir;
 import static com.micewine.emu.activities.MainActivity.floatingFileManagerCwd;
+import static com.micewine.emu.activities.MainActivity.homeDir;
 import static com.micewine.emu.activities.MainActivity.selectedFilePath;
 import static com.micewine.emu.activities.MainActivity.usrDir;
 import static com.micewine.emu.core.WineWrapper.extractIcon;
@@ -28,7 +28,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.micewine.emu.R;
 import com.micewine.emu.core.RatPackageManager;
 import com.micewine.emu.fragments.FloatingFileManagerFragment;
-import com.micewine.emu.utils.DriveUtils;
 
 import java.io.File;
 import java.util.List;
@@ -96,7 +95,7 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
 
             switch (fileExtension.toLowerCase()) {
                 case "exe" -> new Thread(() -> {
-                    File iconFile = new File(usrDir, "icons/" + item.file.getName().replace("." + fileExtension, "") + "-thumbnail");
+                    File iconFile = new File(homeDir, "icons/" + item.file.getName().replace("." + fileExtension, "") + "-thumbnail");
 
                     extractIcon(item.file.getPath(), iconFile.getPath());
 
@@ -203,11 +202,7 @@ public class AdapterFiles extends RecyclerView.Adapter<AdapterFiles.ViewHolder> 
                     floatingFileManagerCwd = new File(floatingFileManagerCwd).getParent();
                     FloatingFileManagerFragment.refreshFiles();
                 } else if (item.file.isFile()) {
-                    if (item.file.getName().toLowerCase().endsWith(".rat")) {
-                        customRootFSPath = item.file.getPath();
-                    } else {
-                        outputFile = item.file;
-                    }
+                    outputFile = item.file;
                 } else if (item.file.isDirectory()) {
                     floatingFileManagerCwd = item.file.getPath();
                     FloatingFileManagerFragment.refreshFiles();

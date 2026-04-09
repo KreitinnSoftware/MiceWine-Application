@@ -33,6 +33,7 @@ import static com.micewine.emu.activities.MainActivity.homeDir;
 import static com.micewine.emu.activities.MainActivity.preferences;
 import static com.micewine.emu.activities.MainActivity.ratPackagesDir;
 import static com.micewine.emu.activities.MainActivity.selectedBox64;
+import static com.micewine.emu.activities.MainActivity.selectedCore;
 import static com.micewine.emu.activities.MainActivity.selectedDXVKHud;
 import static com.micewine.emu.activities.MainActivity.selectedGLProfile;
 import static com.micewine.emu.activities.MainActivity.selectedMesaVkWsiPresentMode;
@@ -73,7 +74,7 @@ public class EnvVars {
 
     private static void setEnv(ArrayList<String> vars) {
         vars.add("LANG=" + appLang + ".UTF-8");
-        vars.add("TMPDIR=" + tmpDir);
+        vars.add("TMPDIR=" + ratPackagesDir + "/" + selectedCore + "/files/usr/tmp/");
         vars.add("HOME=" + homeDir);
         vars.add("XDG_CONFIG_HOME=" + homeDir + "/.config");
         vars.add("DISPLAY=:0");

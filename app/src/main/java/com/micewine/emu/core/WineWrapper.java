@@ -1,7 +1,7 @@
 package com.micewine.emu.core;
 
 import static com.micewine.emu.activities.MainActivity.deviceArch;
-import static com.micewine.emu.activities.MainActivity.usrDir;
+import static com.micewine.emu.activities.MainActivity.iconsDir;
 import static com.micewine.emu.activities.MainActivity.wineDisksFolder;
 import static com.micewine.emu.activities.MainActivity.winePrefix;
 import static com.micewine.emu.activities.MainActivity.winePrefixesDir;
@@ -60,13 +60,13 @@ public class WineWrapper {
 
     public static void waitForProcess(String name) {
         while (true) {
-            List<ExeProcess> exeProcesses = getExeProcesses();
-            for (ExeProcess exeProcess : exeProcesses) {
-                if (exeProcess.name.equals(name)) {
-                    return;
-                }
-            }
             try {
+                List<ExeProcess> exeProcesses = getExeProcesses();
+                for (ExeProcess exeProcess : exeProcesses) {
+                    if (exeProcess.name.equals(name)) {
+                        return;
+                    }
+                }
                 Thread.sleep(125);
             } catch (InterruptedException ignored) {
             }
@@ -119,6 +119,14 @@ public class WineWrapper {
         }
 
         return availableDisks;
+    }
+
+    public static String getWindowsPath(String unixPath) {
+        return unixPath.replace(wineDisksFolder.getPath() + "/", "").replace("/", "\\");
+    }
+
+    public static String getUnixPath(String windowsPath) {
+        return wineDisksFolder.getPath() + "/" + windowsPath.replace("\\", "/");
     }
 
     public static void extractIcon(String exePath, String output) {
@@ -239,7 +247,7 @@ public class WineWrapper {
                     }
 
                     String processPath = getProcessPath(processName, cwd);
-                    String iconPath = usrDir + "/icons/" + processName.substring(0, processName.indexOf(".exe")) + "-thumbnail";
+                    String iconPath = iconsDir + "/" + processName.substring(0, processName.indexOf(".exe")) + "-thumbnail";
                     int ramUsageKB = getProcessRamUsageKB(unixPid);
                     float cpuUsage;
 

@@ -1,11 +1,11 @@
 package com.micewine.emu.adapters;
 
 import static com.micewine.emu.activities.MainActivity.deviceArch;
+import static com.micewine.emu.adapters.AdapterRatPackage.BOX64;
 import static com.micewine.emu.adapters.AdapterRatPackage.CORE;
 import static com.micewine.emu.adapters.AdapterRatPackage.DXVK;
 import static com.micewine.emu.adapters.AdapterRatPackage.VKD3D;
 import static com.micewine.emu.adapters.AdapterRatPackage.VK_DRIVER;
-import static com.micewine.emu.adapters.AdapterRatPackage.BOX64;
 import static com.micewine.emu.adapters.AdapterRatPackage.WINE;
 import static com.micewine.emu.adapters.AdapterRatPackage.WINED3D;
 
@@ -14,10 +14,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.micewine.emu.fragments.RatManagerFragment;
+import com.micewine.emu.fragments.RatDownloaderFragment;
 
-public class AdapterTabPagerRatManager extends FragmentStateAdapter {
-    public AdapterTabPagerRatManager(@NonNull FragmentActivity fragmentActivity) {
+public class AdapterTabPagerCoreComponentsSelector extends FragmentStateAdapter {
+    public AdapterTabPagerCoreComponentsSelector(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
     }
 
@@ -26,23 +26,23 @@ public class AdapterTabPagerRatManager extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         if (deviceArch.equals("x86_64")) {
             return switch (position) {
-                case 0 -> new RatManagerFragment(CORE);
-                case 1 -> new RatManagerFragment(VK_DRIVER);
-                case 2 -> new RatManagerFragment(WINE);
-                case 3 -> new RatManagerFragment(DXVK);
-                case 4 -> new RatManagerFragment(WINED3D);
-                case 5 -> new RatManagerFragment(VKD3D);
+                case 0 -> new RatDownloaderFragment(CORE, true);
+                case 1 -> new RatDownloaderFragment(VK_DRIVER, true);
+                case 2 -> new RatDownloaderFragment(WINE, true);
+                case 3 -> new RatDownloaderFragment(DXVK, true);
+                case 4 -> new RatDownloaderFragment(WINED3D, true);
+                case 5 -> new RatDownloaderFragment(VKD3D, true);
                 default -> throw new IllegalArgumentException("Invalid Fragment for Position " + position);
             };
         } else {
             return switch (position) {
-                case 0 -> new RatManagerFragment(CORE);
-                case 1 -> new RatManagerFragment(VK_DRIVER, "AdrenoToolsDriver");
-                case 2 -> new RatManagerFragment(BOX64);
-                case 3 -> new RatManagerFragment(WINE);
-                case 4 -> new RatManagerFragment(DXVK);
-                case 5 -> new RatManagerFragment(WINED3D);
-                case 6 -> new RatManagerFragment(VKD3D);
+                case 0 -> new RatDownloaderFragment(CORE, true);
+                case 1 -> new RatDownloaderFragment(VK_DRIVER, "AdrenoTools", true);
+                case 2 -> new RatDownloaderFragment(BOX64, true);
+                case 3 -> new RatDownloaderFragment(WINE, true);
+                case 4 -> new RatDownloaderFragment(DXVK, true);
+                case 5 -> new RatDownloaderFragment(WINED3D, true);
+                case 6 -> new RatDownloaderFragment(VKD3D, true);
                 default -> throw new IllegalArgumentException("Invalid Fragment for Position " + position);
             };
         }

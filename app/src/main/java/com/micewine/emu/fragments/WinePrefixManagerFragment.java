@@ -1,9 +1,9 @@
 package com.micewine.emu.fragments;
 
+import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_CORE;
 import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_WINE_PREFIX;
 import static com.micewine.emu.activities.GeneralSettingsActivity.WINE_DPI;
 import static com.micewine.emu.activities.GeneralSettingsActivity.WINE_DPI_DEFAULT_VALUE;
-import static com.micewine.emu.activities.MainActivity.appRootDir;
 import static com.micewine.emu.activities.MainActivity.preferences;
 import static com.micewine.emu.activities.MainActivity.ratPackagesDir;
 import static com.micewine.emu.activities.MainActivity.selectedWine;
@@ -87,10 +87,8 @@ public class WinePrefixManagerFragment extends Fragment {
     }
 
     public static String getSelectedWinePrefix() {
-        if (preferences != null) {
-            return preferences.getString(SELECTED_WINE_PREFIX, "default");
-        }
-        return "default";
+        if (preferences == null) return "default";
+        return preferences.getString(SELECTED_WINE_PREFIX, "default");
     }
 
     public static void putSelectedWinePrefix(String name) {
@@ -116,7 +114,7 @@ public class WinePrefixManagerFragment extends Fragment {
         File winePrefix = getWinePrefixFile(name);
         if (!winePrefix.exists()) {
             File driveC = new File(winePrefix, "drive_c");
-            File wineUtils = new File(appRootDir, "wine-utils");
+            File wineUtils = new File(ratPackagesDir + "/" + preferences.getString(SELECTED_CORE, "") + "/files", "wine-utils");
             File startMenu = new File(driveC, "ProgramData/Microsoft/Windows/Start Menu");
             File userSharedFolder = new File("/storage/emulated/0/MiceWine");
             boolean isProton = new File(driveC, "users/steamuser").exists();

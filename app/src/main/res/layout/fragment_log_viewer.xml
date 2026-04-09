@@ -1,34 +1,50 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/menu_bg"
     android:theme="@style/Theme.MiceWine"
     android:orientation="vertical"
     android:padding="8dp">
 
-    <ScrollView
-        android:id="@+id/scrollView"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true">
+        android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/logsTextView"
+        <ScrollView
+            android:id="@+id/scrollView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textIsSelectable="true"
-            android:maxLines="10000"
-            android:background="@drawable/top_rounded_shape"
-            android:theme="@style/Theme.MiceWine">
-        </TextView>
+            android:layout_height="match_parent"
+            android:fillViewport="true">
 
-    </ScrollView>
+            <TextView
+                android:id="@+id/logsTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textIsSelectable="true"
+                android:maxLines="10000"
+                android:background="@drawable/top_rounded_shape"
+                android:theme="@style/Theme.MiceWine">
+            </TextView>
+
+        </ScrollView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/syncLogs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="8dp"
+            android:src="@drawable/l_down"
+            app:shapeAppearance="@style/RoundTopCorners">
+        </com.google.android.material.floatingactionbutton.FloatingActionButton>
+
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

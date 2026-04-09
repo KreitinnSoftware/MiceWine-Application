@@ -3,6 +3,7 @@ package com.micewine.emu.fragments;
 import static com.micewine.emu.activities.MainActivity.fileManagerCwd;
 import static com.micewine.emu.activities.MainActivity.floatingFileManagerCwd;
 import static com.micewine.emu.activities.MainActivity.fileManagerDefaultDir;
+import static com.micewine.emu.activities.MainActivity.iconsDir;
 import static com.micewine.emu.activities.MainActivity.selectedFilePath;
 import static com.micewine.emu.activities.MainActivity.usrDir;
 import static com.micewine.emu.activities.MainActivity.wineDisksFolder;
@@ -210,7 +211,7 @@ public class FileManagerFragment extends Fragment {
             String fileNameWithoutExtension = file.getName().replace("." + fileExtension, "");
 
             if (fileExtension.equalsIgnoreCase("exe")) {
-                String iconPath = usrDir.getPath() + "/icons/" + fileNameWithoutExtension;
+                String iconPath = iconsDir + "/" + fileNameWithoutExtension + "-thumbnail";
 
                 WineWrapper.extractIcon(selectedFilePath, iconPath);
 

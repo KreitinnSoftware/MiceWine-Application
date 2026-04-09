@@ -1,29 +1,32 @@
 package com.micewine.emu.core;
 
 import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_BOX64;
+import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_CORE;
 import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_VULKAN_DRIVER;
 import static com.micewine.emu.activities.MainActivity.appRootDir;
 import static com.micewine.emu.activities.MainActivity.gson;
 import static com.micewine.emu.activities.MainActivity.preferences;
 import static com.micewine.emu.activities.MainActivity.ratPackagesDir;
+import static com.micewine.emu.adapters.AdapterRatPackage.BOX64;
+import static com.micewine.emu.adapters.AdapterRatPackage.CORE;
+import static com.micewine.emu.adapters.AdapterRatPackage.DXVK;
+import static com.micewine.emu.adapters.AdapterRatPackage.VKD3D;
+import static com.micewine.emu.adapters.AdapterRatPackage.VK_DRIVER;
+import static com.micewine.emu.adapters.AdapterRatPackage.WINE;
+import static com.micewine.emu.adapters.AdapterRatPackage.WINED3D;
 import static com.micewine.emu.core.ShellLoader.runCommand;
 import static com.micewine.emu.core.TarUtils.getFileStreamFromTarXZ;
 import static com.micewine.emu.core.TarUtils.isXZ;
 import static com.micewine.emu.core.TarUtils.untar;
-import static com.micewine.emu.fragments.SetupFragment.progressBarIsIndeterminate;
-import static com.micewine.emu.fragments.SetupFragment.progressBarValue;
-import static com.micewine.emu.fragments.SetupFragment.dialogTitleText;
 import static com.micewine.emu.utils.FileUtils.deleteDirectoryRecursively;
 
 import static java.util.UUID.randomUUID;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.micewine.emu.R;
+import com.micewine.emu.fragments.SetupFragment;
 
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.io.inputstream.ZipInputStream;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.progress.ProgressMonitor;
@@ -43,22 +46,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RatPackageManager {
-    public static void installRat(RatPackage ratPackage, Context context) {
-        progressBarIsIndeterminate = false;
-        progressBarValue = 0;
+    public static void installRat(RatPackage ratPackage, SetupFragment.ProgressCallback callback) {
+        callback.setProgressBarIndeterminate(false);
+        callback.onProgressChanged(0);
 
-        String extractDir = appRootDir.getParent();
-
-        if (ratPackage.category.equals("rootfs")) {
-            installingRootFS = true;
-        } else {
-            extractDir = ratPackagesDir + "/" + ratPackage.category + "-" + randomUUID();
-            if (!new File(extractDir).mkdirs()) return;
-        }
+        String extractDir = ratPackagesDir + "/" + ratPackage.category + "-" + randomUUID();
+        if (!new File(extractDir).mkdirs()) return;
 
         if (ratPackage.isTarXZRat) {
             try {
-                untar(ratPackage.ratFile.getPath(), extractDir);
+                untar(ratPackage.ratFile.getPath(), extractDir, callback);
             } catch (IOException e) {
                 return;
             }
@@ -68,7 +65,7 @@ public class RatPackageManager {
                 ratFile.extractAll(extractDir);
 
                 while (!ratFile.getProgressMonitor().getState().equals(ProgressMonitor.State.READY)) {
-                    progressBarValue = ratFile.getProgressMonitor().getPercentDone();
+                    callback.onProgressChanged(ratFile.getProgressMonitor().getPercentDone());
                     Thread.sleep(125);
                 }
             } catch (Exception ignored) {
@@ -76,194 +73,36 @@ public class RatPackageManager {
             }
         }
 
-        progressBarValue = 0;
+        callback.onProgressChanged(0);
 
         runCommand("chmod -R 700 " + extractDir, false);
-        runCommand("sh " + extractDir + "/makeSymlinks.sh", false);
+        runCommand("sh " + extractDir + "/makeSymlinks.sh " + extractDir + "/", false);
 
         new File(extractDir, "makeSymlinks.sh").delete();
 
         switch (ratPackage.category) {
-            case "rootfs" -> {
-                new File(extractDir, "pkg-header").renameTo(new File(ratPackagesDir, "rootfs-pkg-header"));
-
-                File adrenoToolsFolder = new File(extractDir, "adrenoTools");
-                File vulkanDriversFolder = new File(extractDir, "vulkanDrivers");
-                File box64Folder = new File(extractDir, "box64");
-                File wineFolder = new File(extractDir, "wine");
-
-                File wineUtilsDir = new File(appRootDir, "wine-utils");
-
-                File installedDXVKsDir = new File(wineUtilsDir, "DXVK");
-                File installedWineD3DsDir = new File(wineUtilsDir, "WineD3D");
-                File installedVKD3DsDir = new File(wineUtilsDir, "VKD3D");
-
-                File[] installedDXVKs = installedDXVKsDir.listFiles();
-                File[] installedWineD3Ds = installedWineD3DsDir.listFiles();
-                File[] installedVKD3Ds = installedVKD3DsDir.listFiles();
-
-                if (installedDXVKs != null) {
-                    for (File dxvkFile : installedDXVKs) {
-                        String dxvkVersion = dxvkFile.getName().substring(dxvkFile.getName().indexOf("-") + 1);
-
-                        File dxvkDir = new File(ratPackagesDir, "DXVK-" + randomUUID());
-                        File dxvkFilesDir = new File(dxvkDir, "files");
-                        dxvkDir.mkdirs();
-                        dxvkFilesDir.mkdirs();
-
-                        dxvkFile.renameTo(dxvkFilesDir);
-
-                        File pkgHeader = new File(dxvkDir, "pkg-header");
-
-                        try (FileWriter writer = new FileWriter(pkgHeader)) {
-                            writer.write(
-                                "name=DXVK\n" +
-                                "category=DXVK\n" +
-                                "version=" + dxvkVersion + "\n" +
-                                "architecture=any\n" +
-                                "vkDriverLib=\n");
-                        } catch (IOException ignored) {
-                        }
-                    }
+            case "Core" -> {
+                if (preferences == null) return;
+                if (preferences.getString(SELECTED_CORE, "").isEmpty()) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(SELECTED_CORE, new File(extractDir).getName());
+                    editor.apply();
                 }
-                if (installedWineD3Ds != null) {
-                    for (File wineD3DFile : installedWineD3Ds) {
-                        String wineD3DVersion = wineD3DFile.getName().substring(wineD3DFile.getName().indexOf("-") + 1);
-
-                        File wineD3DDir = new File(ratPackagesDir, "WineD3D-" + randomUUID());
-                        File wineD3DFilesFir = new File(wineD3DDir, "files");
-                        wineD3DDir.mkdirs();
-                        wineD3DFilesFir.mkdirs();
-
-                        wineD3DFile.renameTo(wineD3DFilesFir);
-
-                        File pkgHeader = new File(wineD3DDir, "pkg-header");
-
-                        try (FileWriter writer = new FileWriter(pkgHeader)) {
-                            writer.write(
-                                "name=WineD3D\n" +
-                                "category=WineD3D\n" +
-                                "version=" + wineD3DVersion + "\n" +
-                                "architecture=any\n" +
-                                "vkDriverLib=\n"
-                            );
-                        } catch (IOException ignored) {
-                        }
-                    }
-                }
-                if (installedVKD3Ds != null) {
-                    for (File vkd3dFile : installedVKD3Ds) {
-                        String vkd3dVersion = vkd3dFile.getName().substring(vkd3dFile.getName().indexOf("-") + 1);
-
-                        File vkd3dDir = new File(ratPackagesDir, "VKD3D-" + randomUUID());
-                        File vkd3dFilesDir = new File(vkd3dDir, "files");
-                        vkd3dDir.mkdirs();
-                        vkd3dFilesDir.mkdirs();
-
-                        vkd3dFile.renameTo(vkd3dFilesDir);
-
-                        File pkgHeader = new File(vkd3dDir, "pkg-header");
-
-                        try (FileWriter writer = new FileWriter(pkgHeader)) {
-                            writer.write(
-                                "name=VKD3D\n" +
-                                "category=VKD3D\n" +
-                                "version=" + vkd3dVersion + "\n" +
-                                "architecture=any\nv" +
-                                "kDriverLib=\n"
-                            );
-                        } catch (IOException ignored) {
-                        }
-                    }
-                }
-
-                dialogTitleText = context.getString(R.string.installing_drivers);
-
-                if (vulkanDriversFolder.exists()) {
-                    File[] installedVulkanDrivers = vulkanDriversFolder.listFiles();
-                    if (installedVulkanDrivers != null) {
-                        for (File vulkanDriverFile : installedVulkanDrivers) {
-                            installRat(new RatPackage(vulkanDriverFile.getPath()), context);
-                        }
-                    }
-                    deleteDirectoryRecursively(vulkanDriversFolder.toPath());
-                }
-                if (adrenoToolsFolder.exists()) {
-                    File[] installedAdrenoToolsDrivers = adrenoToolsFolder.listFiles();
-                    if (installedAdrenoToolsDrivers != null) {
-                        for (File adrenoToolsDriverFile : installedAdrenoToolsDrivers) {
-                            installRat(new RatPackage(adrenoToolsDriverFile.getPath()), context);
-                        }
-                    }
-                    deleteDirectoryRecursively(adrenoToolsFolder.toPath());
-                }
-
-                dialogTitleText = context.getString(R.string.installing_box64);
-
-                if (box64Folder.exists()) {
-                    File[] installedBox64s = box64Folder.listFiles();
-                    if (installedBox64s != null) {
-                        for (File box64File : installedBox64s) {
-                            installRat(new RatPackage(box64File.getPath()), context);
-                        }
-                    }
-                    deleteDirectoryRecursively(box64Folder.toPath());
-                }
-
-                dialogTitleText = context.getString(R.string.installing_wine);
-
-                if (wineFolder.exists()) {
-                    File[] installedWines = wineFolder.listFiles();
-                    if (installedWines != null) {
-                        for (File wineFile : installedWines) {
-                            installRat(new RatPackage(wineFile.getPath()), context);
-                        }
-                    }
-                    wineFolder.delete();
-                }
-
-                installingRootFS = false;
             }
             case "Box64" -> {
-                if (preferences != null) {
-                    if (preferences.getString(SELECTED_BOX64, "").isEmpty()) {
-                        if (extractDir != null) {
-                            SharedPreferences.Editor editor = preferences.edit();
-                            editor.putString(SELECTED_BOX64, new File(extractDir).getName());
-                            editor.apply();
-                        }
-                    }
-                }
-
-                File pkgHeader = new File(extractDir, "pkg-header");
-
-                try (FileWriter writer = new FileWriter(pkgHeader)) {
-                    writer.write(
-                            "name=" + ratPackage.name + "\n" +
-                            "category=" + ratPackage.category + "\n" +
-                            "version=" + ratPackage.version + "\n" +
-                            "architecture=" + ratPackage.architecture + "\nv" +
-                            "vkDriverLib=\n"
-                    );
-                } catch (IOException ignored) {
-                }
-
-                if (!installingRootFS) {
-                    try (FileWriter writer = new FileWriter(new File(extractDir, "pkg-external"))) {
-                        writer.write("");
-                    } catch (IOException ignored) {
-                    }
+                if (preferences == null) return;
+                if (preferences.getString(SELECTED_BOX64, "").isEmpty()) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(SELECTED_BOX64, new File(extractDir).getName());
+                    editor.apply();
                 }
             }
             case "VulkanDriver", "AdrenoTools" -> {
-                if (preferences != null) {
-                    if (preferences.getString(SELECTED_VULKAN_DRIVER, "").isEmpty()) {
-                        if (extractDir != null) {
-                            SharedPreferences.Editor editor = preferences.edit();
-                            editor.putString(SELECTED_VULKAN_DRIVER, new File(extractDir).getName());
-                            editor.apply();
-                        }
-                    }
+                if (preferences == null) return;
+                if (preferences.getString(SELECTED_VULKAN_DRIVER, "").isEmpty()) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(SELECTED_VULKAN_DRIVER, new File(extractDir).getName());
+                    editor.apply();
                 }
 
                 File pkgHeader = new File(extractDir, "pkg-header");
@@ -278,36 +117,10 @@ public class RatPackageManager {
                     );
                 } catch (IOException ignored) {
                 }
-
-                if (!installingRootFS) {
-                    try (FileWriter writer = new FileWriter(new File(extractDir, "pkg-external"))) {
-                        writer.write("");
-                    } catch (IOException ignored) {
-                    }
-                }
-            }
-            case "Wine", "DXVK", "WineD3D", "VKD3D" -> {
-                File pkgHeader = new File(extractDir, "pkg-header");
-
-                try (FileWriter writer = new FileWriter(pkgHeader)) {
-                    writer.write(
-                            "name=" + ratPackage.name + "\n" +
-                            "category=" + ratPackage.category + "\n" +
-                            "version=" + ratPackage.version + "\n" +
-                            "architecture=" + ratPackage.architecture + "\n" +
-                            "vkDriverLib=\n"
-                    );
-                } catch (IOException ignored) {
-                }
-
-                if (!installingRootFS) {
-                    try (FileWriter writer = new FileWriter(new File(extractDir, "pkg-external"))) {
-                        writer.write("");
-                    } catch (IOException ignored) {
-                    }
-                }
             }
         }
+
+        setPackageExternal(extractDir);
     }
 
     public static void deleteRatPackageById(String id) {
@@ -319,11 +132,23 @@ public class RatPackageManager {
         }
     }
 
-    public static List<RatPackage> listRatPackages(String type) {
-        return listRatPackages(type, type);
+    public static boolean haveAnyPackageByCategory(int category) {
+        return !listRatPackages(getRatCategoryString(category)).isEmpty();
     }
 
-    public static List<RatPackage> listRatPackages(String type, String anotherType) {
+    public static List<RatPackage> listRatPackages(int category) {
+        return listRatPackages(getRatCategoryString(category), getRatCategoryString(category));
+    }
+
+    public static List<RatPackage> listRatPackages(int category, int anotherCategory) {
+        return listRatPackages(getRatCategoryString(category), getRatCategoryString(anotherCategory));
+    }
+
+    public static List<RatPackage> listRatPackages(String category) {
+        return listRatPackages(category, category);
+    }
+
+    public static List<RatPackage> listRatPackages(String category, String anotherCategory) {
         ArrayList<RatPackage> packagesList = new ArrayList<>();
 
         File packagesDir = new File(appRootDir, "packages");
@@ -333,7 +158,7 @@ public class RatPackageManager {
         if (files == null) return packagesList;
 
         for (File file : files) {
-            if (file.isDirectory() && ((file.getName().startsWith(type + "-") || file.getName().startsWith(anotherType + "-")) || type.isEmpty() || anotherType.isEmpty())) {
+            if (file.isDirectory() && ((file.getName().startsWith(category + "-") || file.getName().startsWith(anotherCategory + "-")) || category.isEmpty() || anotherCategory.isEmpty())) {
                 File pkgHeader = new File(file, "pkg-header");
                 if (!pkgHeader.exists()) continue;
 
@@ -364,6 +189,14 @@ public class RatPackageManager {
         }
 
         return packagesList;
+    }
+
+    public static List<String> listRatPackagesId(int category) {
+        return listRatPackagesId(getRatCategoryString(category), getRatCategoryString(category));
+    }
+
+    public static List<String> listRatPackagesId(int category, int anotherCategory) {
+        return listRatPackagesId(getRatCategoryString(category), getRatCategoryString(anotherCategory));
     }
 
     public static List<String> listRatPackagesId(String type) {
@@ -441,24 +274,23 @@ public class RatPackageManager {
         return false;
     }
 
-    public static void installADToolsDriver(AdrenoToolsPackage adrenoToolsPackage) {
-        progressBarIsIndeterminate = false;
-        progressBarValue = 0;
+    public static void installADToolsDriver(AdrenoToolsPackage adrenoToolsPackage, SetupFragment.ProgressCallback callback) {
+        callback.setProgressBarIndeterminate(false);
+        callback.onProgressChanged(0);
 
         ZipFile adrenoToolsFile = adrenoToolsPackage.adrenoToolsFile;
-
-        adrenoToolsFile.setRunInThread(true);
 
         String extractDir = ratPackagesDir + "/AdrenoToolsDriver-" + randomUUID();
 
         try {
+            adrenoToolsFile.setRunInThread(true);
             adrenoToolsFile.extractAll(extractDir);
 
             while (!adrenoToolsFile.getProgressMonitor().getState().equals(ProgressMonitor.State.READY)) {
-                progressBarValue = adrenoToolsFile.getProgressMonitor().getPercentDone();
+                callback.onProgressChanged(adrenoToolsFile.getProgressMonitor().getPercentDone());
                 Thread.sleep(125);
             }
-        } catch (ZipException | InterruptedException ignored) {
+        } catch (Exception ignored) {
             return;
         }
 
@@ -473,11 +305,13 @@ public class RatPackageManager {
         } catch (IOException ignored) {
         }
 
-        if (!installingRootFS) {
-            try (FileWriter writer = new FileWriter(new File(extractDir, "pkg-external"))) {
-                writer.write("");
-            } catch (IOException ignored) {
-            }
+        setPackageExternal(extractDir);
+    }
+
+    private static void setPackageExternal(String extractDir) {
+        try (FileWriter writer = new FileWriter(new File(extractDir, "pkg-external"))) {
+            writer.write("");
+        } catch (IOException ignored) {
         }
     }
 
@@ -626,7 +460,31 @@ public class RatPackageManager {
         }
     }
 
-    private static boolean installingRootFS = false;
+    public static Set<String> installablePackagesCategories = Set.of("Core", "VulkanDriver", "Box64", "Wine", "DXVK", "WineD3D", "VKD3D");
 
-    public static Set<String> installablePackagesCategories = Set.of("VulkanDriver", "Box64", "Wine", "DXVK", "WineD3D", "VKD3D");
+    public static int getRatCategoryId(String category) {
+        return switch (category) {
+            case "Core" -> CORE;
+            case "VulkanDriver" -> VK_DRIVER;
+            case "Box64" -> BOX64;
+            case "Wine" -> WINE;
+            case "DXVK" -> DXVK;
+            case "WineD3D" -> WINED3D;
+            case "VKD3D" -> VKD3D;
+            default -> -1;
+        };
+    }
+
+    public static String getRatCategoryString(int category) {
+        return switch (category) {
+            case CORE -> "Core";
+            case VK_DRIVER -> "VulkanDriver";
+            case BOX64 -> "Box64";
+            case WINE -> "Wine";
+            case DXVK -> "DXVK";
+            case WINED3D -> "WineD3D";
+            case VKD3D -> "VKD3D";
+            default -> "";
+        };
+    }
 }

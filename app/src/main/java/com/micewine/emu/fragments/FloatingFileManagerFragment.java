@@ -1,7 +1,5 @@
 package com.micewine.emu.fragments;
 
-import static com.micewine.emu.activities.MainActivity.ACTION_SETUP;
-import static com.micewine.emu.activities.MainActivity.customRootFSPath;
 import static com.micewine.emu.activities.MainActivity.fileManagerDefaultDir;
 import static com.micewine.emu.activities.MainActivity.floatingFileManagerCwd;
 import static com.micewine.emu.activities.MainActivity.selectedFilePath;
@@ -24,8 +22,6 @@ import static com.micewine.emu.utils.FileUtils.getFileExtension;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,25 +85,9 @@ public class FloatingFileManagerFragment extends DialogFragment {
 
         refreshFiles();
 
-        setCancelable(operationType != OPERATION_SELECT_RAT);
+        setCancelable(true);
 
         switch (operationType) {
-            case OPERATION_SELECT_RAT -> {
-                selectRootFSText.setVisibility(View.VISIBLE);
-                editText.setVisibility(View.GONE);
-                saveButton.setVisibility(View.GONE);
-
-                new Thread(() -> {
-                    while (customRootFSPath == null) {
-                        try {
-                            Thread.sleep(16);
-                        } catch (InterruptedException ignored) {
-                        }
-                    }
-
-                    dismiss();
-                }).start();
-            }
             case OPERATION_EXPORT_PRESET -> {
                 selectRootFSText.setVisibility(View.GONE);
                 editText.setVisibility(View.VISIBLE);
@@ -281,21 +261,10 @@ public class FloatingFileManagerFragment extends DialogFragment {
         return new AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create();
     }
 
-    @Override
-    public void onDismiss(@NonNull DialogInterface dialog) {
-        super.onDismiss(dialog);
-
-        if (!calledSetup && operationType == OPERATION_SELECT_RAT) {
-            calledSetup = true;
-            requireContext().sendBroadcast(new Intent(ACTION_SETUP));
-        }
-    }
-
     public static boolean calledSetup = false;
     public static File outputFile = null;
     public static int fmOperationType = -1;
 
-    public final static int OPERATION_SELECT_RAT = 0;
     public final static int OPERATION_EXPORT_PRESET = 1;
     public final static int OPERATION_IMPORT_PRESET = 2;
     public final static int OPERATION_SELECT_EXE = 3;
@@ -331,13 +300,6 @@ public class FloatingFileManagerFragment extends DialogFragment {
             for (File file : newFileList) {
                 if (file.isFile()) {
                     switch (fmOperationType) {
-                        case OPERATION_SELECT_RAT -> {
-                            if (file.getName().toLowerCase().endsWith(".rat")) {
-                                fileList.add(
-                                        new AdapterFiles.FileList(file)
-                                );
-                            }
-                        }
                         case OPERATION_IMPORT_PRESET -> {
                             if (file.getName().toLowerCase().endsWith(".mwp")) {
                                 try {

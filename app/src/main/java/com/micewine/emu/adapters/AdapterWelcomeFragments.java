@@ -6,7 +6,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.micewine.emu.R;
-import com.micewine.emu.fragments.RootFSDownloaderFragment;
+import com.micewine.emu.fragments.CoreComponentsDownloaderFragment;
+import com.micewine.emu.fragments.CoreComponentsSelectorFragment;
 import com.micewine.emu.fragments.WelcomeFragment;
 
 public class AdapterWelcomeFragments extends FragmentStateAdapter {
@@ -20,13 +21,14 @@ public class AdapterWelcomeFragments extends FragmentStateAdapter {
         return switch (position) {
             case 0 -> new WelcomeFragment(R.layout.fragment_welcome);
             case 1 -> new WelcomeFragment(R.layout.fragment_welcome_2);
-            case 2 -> new RootFSDownloaderFragment();
+            case 2 -> new CoreComponentsSelectorFragment();
+            case 3 -> new CoreComponentsDownloaderFragment();
             default -> throw new IllegalArgumentException("Invalid Fragment for Position " + position);
         };
     }
 
     @Override
     public int getItemCount() {
-        return 3;
+        return 4;
     }
 }

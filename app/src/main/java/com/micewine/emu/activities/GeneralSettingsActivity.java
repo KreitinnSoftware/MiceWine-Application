@@ -174,6 +174,7 @@ public class GeneralSettingsActivity extends AppCompatActivity {
     public final static String BOX64_NOSIGILL = "BOX64_NOSIGILL";
     public final static boolean BOX64_NOSIGILL_DEFAULT_VALUE = false;
 
+    public final static String SELECTED_CORE = "selectedCore";
     public final static String SELECTED_BOX64 = "selectedBox64";
     public final static String SELECTED_VULKAN_DRIVER = "selectedVulkanDriver";
     public final static String SELECTED_WINE_PREFIX = "selectedWinePrefix";

@@ -18,15 +18,9 @@ import static com.micewine.emu.activities.GeneralSettingsActivity.BOX64_DYNAREC_
 import static com.micewine.emu.activities.GeneralSettingsActivity.BOX64_DYNAREC_X87DOUBLE;
 import static com.micewine.emu.activities.GeneralSettingsActivity.BOX64_MMAP32;
 import static com.micewine.emu.activities.GeneralSettingsActivity.BOX64_SSE42;
-import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_BOX64;
-import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_VULKAN_DRIVER;
 import static com.micewine.emu.activities.GeneralSettingsActivity.SPINNER;
 import static com.micewine.emu.activities.GeneralSettingsActivity.SWITCH;
-import static com.micewine.emu.activities.MainActivity.preferences;
-import static com.micewine.emu.activities.MainActivity.tmpDir;
 import static com.micewine.emu.adapters.AdapterPreset.clickedPresetName;
-import static com.micewine.emu.core.RatPackageManager.deleteRatPackageById;
-import static com.micewine.emu.core.RatPackageManager.installRat;
 import static com.micewine.emu.core.RatPackageManager.listRatPackages;
 import static com.micewine.emu.fragments.Box64PresetManagerFragment.getBox64AlignedAtomics;
 import static com.micewine.emu.fragments.Box64PresetManagerFragment.getBox64Avx;
@@ -64,24 +58,12 @@ import static com.micewine.emu.fragments.Box64PresetManagerFragment.putBox64Stro
 import static com.micewine.emu.fragments.Box64PresetManagerFragment.putBox64Wait;
 import static com.micewine.emu.fragments.Box64PresetManagerFragment.putBox64WeakBarrier;
 import static com.micewine.emu.fragments.Box64PresetManagerFragment.putBox64X87Double;
-import static com.micewine.emu.fragments.RatDownloaderFragment.downloadPackage;
-import static com.micewine.emu.utils.FileUtils.deleteDirectoryRecursively;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -92,9 +74,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.micewine.emu.R;
-import com.micewine.emu.core.RatPackageManager;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 

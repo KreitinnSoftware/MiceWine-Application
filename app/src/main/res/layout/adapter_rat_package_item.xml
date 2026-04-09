@@ -24,6 +24,12 @@
                 android:layout_height="match_parent">
             </RadioButton>
 
+            <CheckBox
+                android:id="@+id/checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+            </CheckBox>
+
             <ImageView
                 android:id="@+id/image_view"
                 android:layout_width="40dp"
@@ -58,7 +64,7 @@
                     android:ellipsize="marquee"
                     android:text="Description Settings"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     tools:ignore="HardcodedText" />
             </LinearLayout>
 
@@ -82,11 +88,20 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/progressText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textAlignment="center">
+        </TextView>
+
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:padding="4dp"
             style="?android:attr/progressBarStyleHorizontal">
         </ProgressBar>
 

@@ -4,12 +4,17 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.content.Context.SHORTCUT_SERVICE;
 
 import static com.micewine.emu.activities.MainActivity.copyFile;
+import static com.micewine.emu.activities.MainActivity.fileManagerDefaultDir;
 import static com.micewine.emu.activities.MainActivity.gson;
+import static com.micewine.emu.activities.MainActivity.iconsDir;
 import static com.micewine.emu.activities.MainActivity.preferences;
-import static com.micewine.emu.activities.MainActivity.usrDir;
+import static com.micewine.emu.activities.MainActivity.wineDisksFolder;
+import static com.micewine.emu.activities.MainActivity.winePrefix;
+import static com.micewine.emu.activities.MainActivity.winePrefixesDir;
 import static com.micewine.emu.adapters.AdapterGame.selectedGameName;
 import static com.micewine.emu.core.RatPackageManager.listRatPackagesId;
 import static com.micewine.emu.core.WineWrapper.extractIcon;
+import static com.micewine.emu.core.WineWrapper.getWindowsPath;
 import static com.micewine.emu.fragments.DebugSettingsFragment.availableCPUs;
 import static com.micewine.emu.fragments.DeleteItemFragment.DELETE_GAME_ITEM;
 import static com.micewine.emu.fragments.EditGamePreferencesFragment.EDIT_GAME_PREFERENCES;
@@ -607,7 +612,7 @@ public class ShortcutsFragment extends Fragment {
         int index = IntStream.range(0, gameList.size()).filter(i -> gameList.get(i).name.equals(name)).findFirst().orElse(-1);
         if (index == -1) return;
 
-        gameList.get(index).exePath = exePath;
+        gameList.get(index).exePath = getWindowsPath(exePath);
 
         saveShortcuts();
     }
@@ -707,7 +712,7 @@ public class ShortcutsFragment extends Fragment {
         if (gameExists) return;
 
         gameList.add(
-                new AdapterGame.GameItem(prettyName, path, "", iconPath)
+                new AdapterGame.GameItem(prettyName, getWindowsPath(path), "", iconPath)
         );
 
         saveShortcuts();
@@ -766,7 +771,7 @@ public class ShortcutsFragment extends Fragment {
 
         String fileExtension = getFileExtension(iconFile).toLowerCase();
 
-        File cacheIconFile = new File(usrDir, "/icons/" + name + "-shortcut");
+        File cacheIconFile = new File(iconsDir, name + "-shortcut");
 
         switch (fileExtension) {
             case "exe" -> extractIcon(iconFile.getPath(), cacheIconFile.getPath());

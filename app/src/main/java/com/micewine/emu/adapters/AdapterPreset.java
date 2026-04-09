@@ -120,7 +120,7 @@ public class AdapterPreset extends RecyclerView.Adapter<AdapterPreset.ViewHolder
         holder.moreButton.setOnClickListener((v) -> {
             PopupMenu popupMenu = new PopupMenu(context, holder.moreButton);
             MenuInflater inflater = popupMenu.getMenuInflater();
-            inflater.inflate(R.menu.preset_more_options_menu, popupMenu.getMenu());
+            inflater.inflate(item.type == WINE_PREFIX_PRESET ? R.menu.wine_prefix_more_options_menu : R.menu.preset_more_options_menu, popupMenu.getMenu());
 
             popupMenu.setOnMenuItemClickListener(menuItem -> {
                 if (menuItem.getItemId() == R.id.editPreset) {

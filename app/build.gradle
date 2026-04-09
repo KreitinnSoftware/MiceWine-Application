@@ -15,7 +15,8 @@ android {
         targetSdk 28
         versionCode 12
         versionName "v0.5.0"
-        buildConfigField "String", "GIT_SHORT_SHA", "\"" + ("git rev-parse --short HEAD\n".execute().getText().trim() ?: (System.getenv('CURRENT_COMMIT') ?: "NO_COMMIT")) + "\""
+        buildConfigField "String", "GIT_SHORT_SHA", "\"" + ("git rev-parse --short HEAD".execute().text.trim() ?: (System.getenv('CURRENT_COMMIT') ?: "NO_COMMIT")) + "\""
+        buildConfigField "String", "APP_BUILD_DATE", "\"" + ("date".execute().text.trim() ?: "DD/MM/YYYY XX:XX:XX") + "\""
     }
 
     splits.abi {

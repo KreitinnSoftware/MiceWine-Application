@@ -1,6 +1,7 @@
 package com.micewine.emu.adapters;
 
 import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_BOX64;
+import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_CORE;
 import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_VULKAN_DRIVER;
 import static com.micewine.emu.activities.MainActivity.preferences;
 import static com.micewine.emu.activities.MainActivity.tmpDir;
@@ -8,8 +9,8 @@ import static com.micewine.emu.core.RatPackageManager.deleteRatPackageById;
 import static com.micewine.emu.core.RatPackageManager.installRat;
 import static com.micewine.emu.core.RatPackageManager.listRatPackages;
 import static com.micewine.emu.fragments.RatDownloaderFragment.downloadPackage;
-import static com.micewine.emu.utils.FileUtils.deleteDirectoryRecursively;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -19,6 +20,7 @@ import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -30,20 +32,32 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.micewine.emu.R;
 import com.micewine.emu.core.RatPackageManager;
+import com.micewine.emu.fragments.SetupFragment;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.ViewHolder> {
     private final ArrayList<Item> ratPackagesList;
     private final Context context;
     private final boolean isRepositoryPackage;
     public static int selectedItemId = -1;
+    public boolean isInitialSetup;
+    public static List<HashSet<Integer>> selectedItemsId = new ArrayList<>(7);
 
-    public AdapterRatPackage(ArrayList<Item> ratPackagesList, Context context, boolean isRepositoryPackage) {
+    static {
+        for (int i = 0; i < 7; i++) {
+            selectedItemsId.add(new HashSet<>());
+        }
+    }
+
+    public AdapterRatPackage(ArrayList<Item> ratPackagesList, Context context, boolean isRepositoryPackage, boolean isInitialSetup) {
         this.ratPackagesList = ratPackagesList;
         this.context = context;
         this.isRepositoryPackage = isRepositoryPackage;
+        this.isInitialSetup = isInitialSetup;
     }
 
     @NonNull
@@ -53,6 +67,7 @@ public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.Vi
         return new ViewHolder(itemView);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Item item = ratPackagesList.get(position);
@@ -65,11 +80,13 @@ public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.Vi
                 holder.downloadRatPackageButton.setEnabled(true);
                 holder.downloadRatPackageButton.setImageResource(R.drawable.ic_download);
             }
-        } else {
-            holder.downloadRatPackageButton.setVisibility(View.GONE);
         }
 
         holder.progressBar.setVisibility(View.GONE);
+        holder.progressText.setVisibility(View.GONE);
+
+        holder.checkBox.setVisibility(isInitialSetup ? View.VISIBLE : View.GONE);
+        holder.downloadRatPackageButton.setVisibility(isInitialSetup || !isRepositoryPackage ? View.GONE : View.VISIBLE);
 
         String selectedItem = "";
 
@@ -97,23 +114,27 @@ public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.Vi
             case DXVK -> {
                 holder.radioButton.setVisibility(View.GONE);
                 holder.imageView.setImageBitmap(
-                        textAsBitmap("DXVK", 80F, Color.WHITE)
+                        textAsBitmap("DXVK")
                 );
             }
             case WINED3D -> {
                 holder.radioButton.setVisibility(View.GONE);
                 holder.imageView.setImageBitmap(
-                        textAsBitmap("WineD3D", 80F, Color.WHITE)
+                        textAsBitmap("WineD3D")
                 );
             }
             case VKD3D -> {
                 holder.radioButton.setVisibility(View.GONE);
                 holder.imageView.setImageBitmap(
-                        textAsBitmap("VKD3D", 80F, Color.WHITE)
+                        textAsBitmap("VKD3D")
                 );
             }
-            case ROOTFS -> {
-                holder.radioButton.setVisibility(View.VISIBLE);
+            case CORE -> {
+                selectedItem = preferences.getString(SELECTED_CORE, "");
+
+                if (isRepositoryPackage) {
+                    holder.radioButton.setVisibility(View.GONE);
+                }
                 holder.imageView.setImageResource(R.drawable.ic_rat_package);
             }
         }
@@ -132,8 +153,17 @@ public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.Vi
             holder.settingsDescription.setText(item.descriptionSettings);
         }
 
-        holder.radioButton.setChecked(position == selectedItemId);
-        holder.radioButton.setOnClickListener((v) -> {
+        holder.checkBox.setChecked(selectedItemsId.get(item.type).contains(holder.getAdapterPosition()));
+        holder.checkBox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            if (isChecked) {
+                selectedItemsId.get(item.type).add(holder.getAdapterPosition());
+            } else {
+                selectedItemsId.get(item.type).remove(holder.getAdapterPosition());
+            }
+        });
+
+        holder.radioButton.setChecked(holder.getAdapterPosition() == selectedItemId);
+        holder.radioButton.setOnCheckedChangeListener((compoundButton, isChecked) -> {
             SharedPreferences.Editor editor = preferences.edit();
 
             switch (item.type) {
@@ -144,7 +174,15 @@ public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.Vi
             editor.apply();
 
             selectedItemId = holder.getAdapterPosition();
-            notifyItemRangeChanged(0, ratPackagesList.size());
+
+            compoundButton.post(() ->
+                    notifyItemRangeChanged(0, ratPackagesList.size(), PAYLOAD_UPDATE_CHECKED)
+            );
+        });
+
+        holder.itemView.setOnClickListener((view) -> {
+            if (holder.radioButton.getVisibility() == View.VISIBLE) holder.radioButton.setChecked(!holder.radioButton.isChecked());
+            if (holder.checkBox.getVisibility() == View.VISIBLE) holder.checkBox.setChecked(!holder.checkBox.isChecked());
         });
 
         holder.deleteRatPackageButton.setOnClickListener((v) -> {
@@ -162,44 +200,74 @@ public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.Vi
 
                 editor.apply();
 
-                notifyItemChanged(0);
+                notifyItemChanged(0, PAYLOAD_UPDATE_CHECKED);
             }
 
             deleteRatPackageById(item.itemFolderId);
-
             ratPackagesList.remove(holder.getAdapterPosition());
             notifyItemRemoved(holder.getAdapterPosition());
         });
 
         holder.downloadRatPackageButton.setOnClickListener((v) -> {
-            deleteDirectoryRecursively(tmpDir.toPath());
-            tmpDir.mkdirs();
+            holder.downloadRatPackageButton.setVisibility(View.INVISIBLE);
 
             new Thread(() -> {
-                boolean status = downloadPackage(item.repoRatName, holder.progressBar);
+                tmpDir.mkdirs();
+
+                boolean status = downloadPackage(item.repoRatName, holder.progressBar, holder.progressText);
                 File file = new File(tmpDir, item.repoRatName);
 
                 if (status && file.exists()) {
                     holder.progressBar.post(() -> {
+                        holder.progressText.setVisibility(View.VISIBLE);
                         holder.progressBar.setVisibility(View.VISIBLE);
-                        holder.progressBar.setIndeterminate(true);
                     });
 
-                    installRat(new RatPackageManager.RatPackage(file.getPath()), context);
+                    SetupFragment.ProgressCallback callback = new SetupFragment.ProgressCallback() {
+                        @Override
+                        public void onProgressChanged(int progress) {
+                            holder.progressText.post(() -> holder.progressText.setText(context.getText(R.string.installing) + " - " + progress + "%"));
+                            holder.progressBar.post(() -> holder.progressBar.setProgress(progress));
+                        }
+
+                        @Override
+                        public void setProgressBarIndeterminate(boolean indeterminate) {
+                            holder.progressBar.post(() -> holder.progressBar.setIndeterminate(indeterminate));
+                        }
+
+                        @Override
+                        public void setDialogText(String text) {
+                        }
+                    };
+
+                    installRat(new RatPackageManager.RatPackage(file.getPath()), callback);
+
+                    file.delete();
 
                     holder.progressBar.post(() -> {
+                        holder.downloadRatPackageButton.setVisibility(View.VISIBLE);
                         holder.downloadRatPackageButton.setEnabled(false);
                         holder.downloadRatPackageButton.setImageResource(android.R.drawable.checkbox_on_background);
 
+                        holder.progressText.setVisibility(View.GONE);
                         holder.progressBar.setVisibility(View.GONE);
-                        holder.progressBar.setIndeterminate(false);
                     });
                 }
-
-                deleteDirectoryRecursively(tmpDir.toPath());
-                tmpDir.mkdirs();
             }).start();
         });
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull List<Object> payloads) {
+        Item item = ratPackagesList.get(position);
+
+        if (!payloads.isEmpty() && payloads.contains(PAYLOAD_UPDATE_CHECKED)) {
+            holder.checkBox.setChecked(selectedItemsId.get(item.type).contains(holder.getAdapterPosition()));
+            holder.radioButton.setChecked(holder.getAdapterPosition() == selectedItemId);
+            return;
+        }
+
+        onBindViewHolder(holder, position);
     }
 
     @Override
@@ -207,18 +275,20 @@ public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.Vi
         return ratPackagesList.size();
     }
 
+
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         RadioButton radioButton = itemView.findViewById(R.id.radio_button);
+        CheckBox checkBox = itemView.findViewById(R.id.checkbox);
         TextView settingsName = itemView.findViewById(R.id.preset_title);
         TextView settingsDescription = itemView.findViewById(R.id.rat_package_desc);
         ImageView imageView = itemView.findViewById(R.id.image_view);
         ImageButton deleteRatPackageButton = itemView.findViewById(R.id.rat_package_delete);
         ImageView downloadRatPackageButton = itemView.findViewById(R.id.rat_package_download);
         ProgressBar progressBar = itemView.findViewById(R.id.progressBar);
+        TextView progressText = itemView.findViewById(R.id.progressText);
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            itemView.setOnClickListener(this);
         }
 
         @Override
@@ -246,11 +316,11 @@ public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.Vi
         }
     }
 
-    private Bitmap textAsBitmap(String text, float size, int color) {
+    private Bitmap textAsBitmap(String text) {
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-        paint.setTextSize(size);
-        paint.setColor(color);
+        paint.setTextSize((float) 80.0);
+        paint.setColor(Color.WHITE);
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(context.getResources().getFont(R.font.quicksand));
 
@@ -267,11 +337,12 @@ public class AdapterRatPackage extends RecyclerView.Adapter<AdapterRatPackage.Vi
         return bitmap;
     }
 
-    public static final int VK_DRIVER = 1;
-    public static final int BOX64 = 2;
-    public static final int WINE = 3;
-    public static final int DXVK = 4;
-    public static final int WINED3D = 5;
-    public static final int VKD3D = 6;
-    public static final int ROOTFS = 7;
+    public static final int VK_DRIVER = 0;
+    public static final int BOX64 = 1;
+    public static final int WINE = 2;
+    public static final int DXVK = 3;
+    public static final int WINED3D = 4;
+    public static final int VKD3D = 5;
+    public static final int CORE = 6;
+    public static final int PAYLOAD_UPDATE_CHECKED = 7;
 }

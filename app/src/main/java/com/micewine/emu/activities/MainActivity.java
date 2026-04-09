@@ -18,6 +18,7 @@ import static com.micewine.emu.activities.GeneralSettingsActivity.FPS_LIMIT;
 import static com.micewine.emu.activities.GeneralSettingsActivity.PA_SINK;
 import static com.micewine.emu.activities.GeneralSettingsActivity.PA_SINK_DEFAULT_VALUE;
 import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_BOX64;
+import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_CORE;
 import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_DXVK_HUD_PRESET;
 import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_DXVK_HUD_PRESET_DEFAULT_VALUE;
 import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_GL_PROFILE;
@@ -38,12 +39,14 @@ import static com.micewine.emu.activities.RatManagerActivity.generateICDFile;
 import static com.micewine.emu.activities.RatManagerActivity.generateMangoHUDConfFile;
 import static com.micewine.emu.activities.WelcomeActivity.finishedWelcomeScreen;
 import static com.micewine.emu.adapters.AdapterGame.selectedGameName;
+import static com.micewine.emu.adapters.AdapterRatPackage.CORE;
 import static com.micewine.emu.controller.ControllerUtils.connectedPhysicalControllers;
 import static com.micewine.emu.controller.ControllerUtils.disconnectController;
 import static com.micewine.emu.controller.ControllerUtils.prepareControllersMappings;
 import static com.micewine.emu.core.EnvVars.getEnv;
 import static com.micewine.emu.core.RatPackageManager.checkPackageInstalled;
 import static com.micewine.emu.core.RatPackageManager.getPackageById;
+import static com.micewine.emu.core.RatPackageManager.haveAnyPackageByCategory;
 import static com.micewine.emu.core.RatPackageManager.installADToolsDriver;
 import static com.micewine.emu.core.RatPackageManager.installRat;
 import static com.micewine.emu.core.RatPackageManager.installablePackagesCategories;
@@ -52,6 +55,7 @@ import static com.micewine.emu.core.ShellLoader.runCommand;
 import static com.micewine.emu.core.ShellLoader.runCommandWithOutput;
 import static com.micewine.emu.core.WineWrapper.getCpuHexMask;
 import static com.micewine.emu.core.WineWrapper.getSanitizedPath;
+import static com.micewine.emu.core.WineWrapper.getUnixPath;
 import static com.micewine.emu.fragments.AskInstallPackageFragment.ADTOOLS_DRIVER_PACKAGE;
 import static com.micewine.emu.fragments.AskInstallPackageFragment.MWP_PRESET_PACKAGE;
 import static com.micewine.emu.fragments.AskInstallPackageFragment.RAT_PACKAGE;
@@ -85,9 +89,6 @@ import static com.micewine.emu.fragments.EditGamePreferencesFragment.FILE_MANAGE
 import static com.micewine.emu.fragments.FileManagerFragment.refreshFiles;
 import static com.micewine.emu.fragments.FloatingFileManagerFragment.OPERATION_SELECT_EXE;
 import static com.micewine.emu.fragments.FloatingFileManagerFragment.OPERATION_SELECT_ICON;
-import static com.micewine.emu.fragments.FloatingFileManagerFragment.OPERATION_SELECT_RAT;
-import static com.micewine.emu.fragments.RootFSDownloaderFragment.rootFSIsDownloaded;
-import static com.micewine.emu.fragments.SetupFragment.abortSetup;
 import static com.micewine.emu.fragments.ShortcutsFragment.ADRENO_TOOLS_DRIVER;
 import static com.micewine.emu.fragments.ShortcutsFragment.MESA_DRIVER;
 import static com.micewine.emu.fragments.ShortcutsFragment.addGameToList;
@@ -113,12 +114,9 @@ import static com.micewine.emu.fragments.ShortcutsFragment.updateShortcuts;
 import static com.micewine.emu.fragments.SoundSettingsFragment.generatePAFile;
 import static com.micewine.emu.fragments.WinePrefixManagerFragment.createWinePrefix;
 import static com.micewine.emu.fragments.WinePrefixManagerFragment.getSelectedWinePrefix;
-import static com.micewine.emu.fragments.SetupFragment.progressBarIsIndeterminate;
-import static com.micewine.emu.fragments.SetupFragment.dialogTitleText;
 import static com.micewine.emu.fragments.WinePrefixManagerFragment.getWinePrefixFile;
 import static com.micewine.emu.utils.DriveUtils.parseUnixPath;
 import static com.micewine.emu.utils.FileUtils.copyRecursively;
-import static com.micewine.emu.utils.FileUtils.deleteDirectoryRecursively;
 import static com.micewine.emu.utils.FileUtils.getFileExtension;
 
 import android.annotation.SuppressLint;
@@ -214,7 +212,6 @@ public class MainActivity extends AppCompatActivity {
                     if (vkd3d == null) vkd3d = listRatPackages("VKD3D").get(0).getFolderName();
                     if (cpuAffinity == null) cpuAffinity = String.join(",", availableCPUs);
 
-                    deleteDirectoryRecursively(tmpDir.toPath());
                     tmpDir.mkdirs();
 
                     if (driverName.equals("Global")) {
@@ -334,18 +331,9 @@ public class MainActivity extends AppCompatActivity {
                         refreshFiles(MainActivity.this);
                     }
                 }
-                case ACTION_SETUP -> new Thread(() -> {
-                    new SetupFragment().show(getSupportFragmentManager(), "");
-                    setupMiceWine();
-                }).start();
                 case ACTION_INSTALL_RAT -> {
                     if (!(ratCandidate.getArchitecture().equals(deviceArch) || ratCandidate.getArchitecture().equals("any")) && !ratCandidate.getCategory().equals("Wine")) {
                         Toast.makeText(context, R.string.invalid_architecture_rat_file, Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    if (ratCandidate.getCategory().equals("rootfs")) {
-                        Toast.makeText(context, R.string.error_install_rootfs_file_manager, Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -360,16 +348,16 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     new Thread(() -> {
-                        setupDone = false;
+                        SetupFragment setupFragment = new SetupFragment();
 
-                        new SetupFragment().show(getSupportFragmentManager(), "");
+                        setupFragment.setupProgressCallback.setDialogText(getString(R.string.installing) + " " + ratCandidate.getName() + " (" + ratCandidate.getVersion() + ")...");
+                        setupFragment.setupProgressCallback.setProgressBarIndeterminate(true);
 
-                        dialogTitleText = "Installing " + ratCandidate.getName() + " (" + ratCandidate.getVersion() + ")...";
-                        progressBarIsIndeterminate = true;
+                        setupFragment.show(getSupportFragmentManager(), "");
 
-                        installRat(ratCandidate, context);
+                        installRat(ratCandidate, setupFragment.setupProgressCallback);
 
-                        setupDone = true;
+                        setupFragment.dismiss();
                     }).start();
                 }
                 case ACTION_INSTALL_ADTOOLS_DRIVER -> {
@@ -381,32 +369,32 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     new Thread(() -> {
-                        setupDone = false;
+                        SetupFragment setupFragment = new SetupFragment();
 
-                        new SetupFragment().show(getSupportFragmentManager(), "");
+                        setupFragment.setupProgressCallback.setDialogText(getString(R.string.installing) + " " + adToolsDriverCandidate.getName() + " (" + adToolsDriverCandidate.getVersion() + ")...");
+                        setupFragment.setupProgressCallback.setProgressBarIndeterminate(true);
 
-                        dialogTitleText = "Installing " + adToolsDriverCandidate.getName() + " (" + adToolsDriverCandidate.getVersion() + ")...";
-                        progressBarIsIndeterminate = true;
+                        setupFragment.show(getSupportFragmentManager(), "");
 
-                        installADToolsDriver(adToolsDriverCandidate);
+                        installADToolsDriver(adToolsDriverCandidate, setupFragment.setupProgressCallback);
 
-                        setupDone = true;
+                        setupFragment.dismiss();
                     }).start();
                 }
                 case ACTION_SELECT_ICON -> new FloatingFileManagerFragment(OPERATION_SELECT_ICON, wineDisksFolder.getPath()).show(getSupportFragmentManager(), "");
-                case ACTION_SELECT_EXE_PATH -> new FloatingFileManagerFragment(OPERATION_SELECT_EXE, new File(getExePath(selectedGameName)).getParent()).show(getSupportFragmentManager(), "");
+                case ACTION_SELECT_EXE_PATH -> new FloatingFileManagerFragment(OPERATION_SELECT_EXE, new File(getUnixPath(getExePath(selectedGameName))).getParent()).show(getSupportFragmentManager(), "");
                 case ACTION_CREATE_WINE_PREFIX -> {
                     String winePrefix = intent.getStringExtra("winePrefix");
                     String wine = intent.getStringExtra("wine");
 
                     runXServer();
 
-                    setupDone = false;
+                    SetupFragment setupFragment = new SetupFragment();
 
-                    new SetupFragment().show(getSupportFragmentManager(), "");
+                    setupFragment.setupProgressCallback.setDialogText(getString(R.string.creating_wine_prefix));
+                    setupFragment.setupProgressCallback.setProgressBarIndeterminate(true);
 
-                    dialogTitleText = getString(R.string.creating_wine_prefix);
-                    progressBarIsIndeterminate = true;
+                    setupFragment.show(getSupportFragmentManager(), "");
 
                     new Thread(() -> {
                         createWinePrefix(winePrefix, wine);
@@ -414,7 +402,8 @@ public class MainActivity extends AppCompatActivity {
 
                         fileManagerCwd = fileManagerDefaultDir;
                         floatingFileManagerCwd = fileManagerDefaultDir;
-                        setupDone = true;
+
+                        setupFragment.dismiss();
                     }).start();
                 }
             }
@@ -515,7 +504,6 @@ public class MainActivity extends AppCompatActivity {
 
         registerReceiver(receiver, new IntentFilter() {{
             addAction(ACTION_RUN_WINE);
-            addAction(ACTION_SETUP);
             addAction(ACTION_INSTALL_RAT);
             addAction(ACTION_INSTALL_ADTOOLS_DRIVER);
             addAction(ACTION_SELECT_FILE_MANAGER);
@@ -547,10 +535,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        if (!usrDir.exists()) {
+        boolean hasCore = haveAnyPackageByCategory(CORE);
+        boolean hasWine = !listRatPackages("Wine").isEmpty();
+        boolean hasVulkanDriver = !listRatPackages("VulkanDriver").isEmpty();
+        boolean hasDXVK = !listRatPackages("DXVK").isEmpty();
+        boolean hasVKD3D = !listRatPackages("VKD3D").isEmpty();
+        boolean hasWineD3D = !listRatPackages("WineD3D").isEmpty();
+        boolean hasBox64 = !listRatPackages("Box64").isEmpty();
+        boolean canProceed = (hasCore && hasWine && hasVulkanDriver && hasDXVK && hasVKD3D && hasWineD3D && (deviceArch.equals("x86_64") || hasBox64));
+
+        if (!canProceed) {
             startActivity(new Intent(this, WelcomeActivity.class));
-        } else {
-            setupDone = true;
         }
     }
 
@@ -559,15 +554,10 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         runXServer();
-
         updateShortcuts();
 
-        if (!setupDone && finishedWelcomeScreen) {
-            if (rootFSIsDownloaded) {
-                sendBroadcast(new Intent(ACTION_SETUP));
-            } else {
-                new FloatingFileManagerFragment(OPERATION_SELECT_RAT, "/storage/emulated/0").show(getSupportFragmentManager(), "");
-            }
+        if (finishedWelcomeScreen) {
+            setupMiceWine();
         }
     }
 
@@ -666,7 +656,7 @@ public class MainActivity extends AppCompatActivity {
 
         File skCodec = new File("/system/lib64/libskcodec.so");
         if (skCodec.exists()) {
-            runCommand(getEnv() + "LD_PRELOAD=$skCodec $usrDir/bin/pulseaudio --start --exit-idle=-1", true);
+            runCommand(getEnv() + "LD_PRELOAD=" + skCodec + " " + usrDir + "/bin/pulseaudio --start --exit-idle=-1", true);
         }
 
         if (!wineServices) {
@@ -696,9 +686,11 @@ public class MainActivity extends AppCompatActivity {
     private boolean runningXServer = false;
 
     private void runXServer() {
-        if (runningXServer || !setupDone) return;
+        if (runningXServer) return;
 
         runningXServer = true;
+
+        tmpDir.mkdirs();
 
         new Thread(() -> runCommand(
                 "env CLASSPATH=" + getClassPath() + " /system/bin/app_process / com.micewine.emu.CmdEntryPoint :0 &> /dev/null", true
@@ -717,62 +709,18 @@ public class MainActivity extends AppCompatActivity {
         appRootDir.mkdirs();
         ratPackagesDir.mkdirs();
 
-        progressBarIsIndeterminate = true;
-
-        RatPackageManager.RatPackage ratFile;
-
-        if (rootFSIsDownloaded) {
-            dialogTitleText = getString(R.string.checking_rat_type);
-            ratFile = new RatPackageManager.RatPackage(appRootDir.getPath() + "/rootfs.rat");
-        } else {
-            dialogTitleText = getString(R.string.checking_rat_type);
-            ratFile = new RatPackageManager.RatPackage(customRootFSPath);
-        }
-
-        if (!ratFile.getCategory().equals("rootfs")) {
-            abortSetup = true;
-
-            runOnUiThread(() -> Toast.makeText(this, R.string.invalid_rootfs_rat_file, Toast.LENGTH_SHORT).show());
-
-            new FloatingFileManagerFragment(OPERATION_SELECT_RAT, "/storage/emulated/0").show(getSupportFragmentManager(), "");
-
-            return;
-        }
-
-        if (!ratFile.getArchitecture().equals(deviceArch)) {
-            abortSetup = true;
-
-            runOnUiThread(() -> Toast.makeText(this, R.string.invalid_architecture_rat_file, Toast.LENGTH_SHORT).show());
-
-            new FloatingFileManagerFragment(OPERATION_SELECT_RAT, "/storage/emulated/0").show(getSupportFragmentManager(), "");
-
-            return;
-        }
-
-        dialogTitleText = getString(R.string.extracting_resources_text);
-
-        installRat(ratFile, this);
-
-        if (rootFSIsDownloaded) {
-            new File(appRootDir.getPath() + "/rootfs.rat").delete();
-        }
-
         tmpDir.mkdirs();
         homeDir.mkdirs();
+        iconsDir.mkdirs();
         winePrefixesDir.mkdirs();
 
         runCommand("chmod 700 -R " + appRootDir.getPath(), false);
 
-        new File(usrDir.getPath() + "/icons").mkdirs();
-
         addGameToList(getString(R.string.desktop_mode_init), getString(R.string.desktop_mode_init), "");
 
-        dialogTitleText = getString(R.string.creating_wine_prefix);
-        progressBarIsIndeterminate = true;
+        setSharedVars(this);
 
         runXServer();
-
-        setSharedVars(this);
 
         String wine = listRatPackages("Wine").get(0).getFolderName();
         Intent createWinePrefixIntent = new Intent(ACTION_CREATE_WINE_PREFIX);
@@ -839,11 +787,10 @@ public class MainActivity extends AppCompatActivity {
     public static File ratPackagesDir = new File(appRootDir + "/packages");
     public static String deviceArch = Build.SUPPORTED_ABIS[0].replace("arm64-v8a", "aarch64");
     public static final String unixUsername = runCommandWithOutput("whoami", false).replace("\n", "");
-    public static String customRootFSPath = null;
     public static File usrDir = new File(appRootDir + "/usr");
     public static File tmpDir = new File(usrDir + "/tmp");
     public static File homeDir = new File(appRootDir + "/home");
-    public static boolean setupDone = false;
+    public static File iconsDir = new File(homeDir, "/icons");
     public static boolean enableRamCounter = false;
     public static boolean enableCpuCounter = false;
     public static boolean enableDebugInfo = false;
@@ -894,6 +841,7 @@ public class MainActivity extends AppCompatActivity {
     public static boolean wineServices = false;
     public static String selectedCpuAffinity = null;
     public static boolean enableWineVirtualDesktop = false;
+    public static String selectedCore = null;
     public static String selectedWine = null;
     public static String fileManagerDefaultDir = "";
     public static String fileManagerCwd = null;
@@ -914,7 +862,6 @@ public class MainActivity extends AppCompatActivity {
     public static final Gson gson = new Gson();
 
     public static final String ACTION_RUN_WINE = "com.micewine.emu.ACTION_RUN_WINE";
-    public static final String ACTION_SETUP = "com.micewine.emu.ACTION_SETUP";
     public static final String ACTION_INSTALL_RAT = "com.micewine.emu.ACTION_INSTALL_RAT";
     public static final String ACTION_INSTALL_ADTOOLS_DRIVER = "com.micewine.emu.ACTION_INSTALL_ADTOOLS_DRIVER";
     public static final String ACTION_SELECT_FILE_MANAGER = "com.micewine.emu.ACTION_SELECT_FILE_MANAGER";
@@ -968,10 +915,17 @@ public class MainActivity extends AppCompatActivity {
 
         appLang = activity.getResources().getString(R.string.app_lang);
 
-        selectedBox64 = (box64Version != null ? box64Version : getBox64Version(selectedGameName));
-        if ("Global".equals(selectedBox64)) {
-            selectedBox64 = preferences.getString(SELECTED_BOX64, "");
+        selectedCore = preferences.getString(SELECTED_CORE, "");
+
+        if (!selectedCore.isEmpty()) {
+            runCommand("rm -rf " + usrDir, false);
+            runCommand("ln -sf " + ratPackagesDir + "/" + selectedCore + "/files/usr " + usrDir, false);
         }
+
+        tmpDir.mkdirs();
+
+        selectedBox64 = (box64Version != null ? box64Version : getBox64Version(selectedGameName));
+        if ("Global".equals(selectedBox64)) selectedBox64 = preferences.getString(SELECTED_BOX64, "");
 
         box64LogLevel = preferences.getString(BOX64_LOG, String.valueOf(BOX64_LOG_DEFAULT_VALUE));
 
@@ -1011,8 +965,8 @@ public class MainActivity extends AppCompatActivity {
         screenFpsLimit = (int) ((WindowManager) activity.getSystemService(WINDOW_SERVICE)).getDefaultDisplay().getRefreshRate();
         fpsLimit = preferences.getInt(FPS_LIMIT, screenFpsLimit);
 
-        vulkanDriverDeviceName = getVulkanDriverInfo("deviceName", false) + (useAdrenoTools ? " (AdrenoTools)" : "");
-        vulkanDriverDriverVersion = getVulkanDriverInfo("driverVersion", false).split(" ")[0];
+        vulkanDriverDeviceName = getVulkanDriverInfo("deviceName") + (useAdrenoTools ? " (AdrenoTools)" : "");
+        vulkanDriverDriverVersion = getVulkanDriverInfo("driverVersion").split(" ")[0];
 
         winePrefix = getSelectedWinePrefix();
         wineDisksFolder = new File(winePrefixesDir + "/" + winePrefix + "/dosdevices/");
@@ -1062,8 +1016,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private static String getVulkanDriverInfo(String info, boolean stdErr) {
-        return runCommandWithOutput("echo $(" + getEnv() + " DISPLAY= vulkaninfo | grep " + info + " | cut -d '=' -f 2)", stdErr);
+    private static String getVulkanDriverInfo(String info) {
+        return runCommandWithOutput("echo $(" + getEnv() + " DISPLAY= vulkaninfo | grep " + info + " | cut -d '=' -f 2)", false);
     }
 
     public static void getMemoryInfo(Context context) {

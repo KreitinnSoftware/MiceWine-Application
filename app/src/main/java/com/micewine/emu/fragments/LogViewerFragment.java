@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.micewine.emu.R;
 import com.micewine.emu.core.ShellLoader;
 
@@ -25,6 +26,7 @@ public class LogViewerFragment extends Fragment implements ShellLoader.LogCallba
     private TextView logTextView;
     private final StringBuilder logs = new StringBuilder();
     private ScrollView scrollView;
+    private FloatingActionButton floatingActionButton;
     private boolean logViewerIsOpened = false;
 
     @Nullable
@@ -34,11 +36,25 @@ public class LogViewerFragment extends Fragment implements ShellLoader.LogCallba
 
         logTextView = rootView.findViewById(R.id.logsTextView);
         scrollView = rootView.findViewById(R.id.scrollView);
+        floatingActionButton = rootView.findViewById(R.id.syncLogs);
         MaterialButton exportLogButton = rootView.findViewById(R.id.exportLogButton);
 
         ShellLoader.connectOutput(this);
 
-        scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+        scrollView.setOnScrollChangeListener((view, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+            View content = scrollView.getChildAt(0);
+            int diff = content.getBottom() - (scrollView.getHeight() + scrollY);
+            if (diff > 0) {
+                floatingActionButton.setVisibility(View.VISIBLE);
+            } else {
+                floatingActionButton.setVisibility(View.GONE);
+            }
+        });
+
+        floatingActionButton.setOnClickListener((view) -> {
+            scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            floatingActionButton.setVisibility(View.GONE);
+        });
 
         exportLogButton.setOnClickListener((v) -> {
             String logPath = "/storage/emulated/0/MiceWine/MiceWine-" + selectedGameName + "-Log-" + System.currentTimeMillis() / 1000 + ".txt";
@@ -88,7 +104,12 @@ public class LogViewerFragment extends Fragment implements ShellLoader.LogCallba
 
         requireActivity().runOnUiThread(() -> {
             logTextView.append(text);
-            scrollView.post(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN));
+
+            View content = scrollView.getChildAt(0);
+            int diff = content.getBottom() - (scrollView.getHeight() + scrollView.getScrollY());
+            if (diff == 0) {
+                scrollView.post(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN));
+            }
         });
     }
 }

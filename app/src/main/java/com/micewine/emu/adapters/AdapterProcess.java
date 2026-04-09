@@ -128,6 +128,24 @@ public class AdapterProcess extends RecyclerView.Adapter<AdapterProcess.ViewHold
         });
     }
 
+    @SuppressLint("DefaultLocale")
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull List<Object> payloads) {
+        WineWrapper.ExeProcess item = processList.get(position);
+
+        if (!payloads.isEmpty() && payloads.contains(PAYLOAD_UPDATE_CPU_RAM)) {
+            holder.processRamUsage.setText(
+                    String.format("%.2f MB", item.getRamUsageKB() / 1024F)
+            );
+            holder.processCPUUsage.setText(
+                    String.format("%.2f %%", item.getCpuUsage())
+            );
+            return;
+        }
+
+        onBindViewHolder(holder, position);
+    }
+
     @Override
     public int getItemCount() {
         return processList.size();
@@ -165,4 +183,6 @@ public class AdapterProcess extends RecyclerView.Adapter<AdapterProcess.ViewHold
         @Override
         public void onClick(View view) {}
     }
+
+    public final static int PAYLOAD_UPDATE_CPU_RAM = 0;
 }

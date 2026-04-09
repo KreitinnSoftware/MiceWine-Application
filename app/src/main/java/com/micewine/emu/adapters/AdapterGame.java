@@ -1,10 +1,8 @@
 package com.micewine.emu.adapters;
 
-import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_BOX64;
-import static com.micewine.emu.activities.GeneralSettingsActivity.SELECTED_VULKAN_DRIVER;
 import static com.micewine.emu.activities.MainActivity.ACTION_RUN_WINE;
-import static com.micewine.emu.activities.MainActivity.preferences;
 import static com.micewine.emu.core.RatPackageManager.listRatPackagesId;
+import static com.micewine.emu.core.WineWrapper.getUnixPath;
 import static com.micewine.emu.fragments.DebugSettingsFragment.availableCPUs;
 import static com.micewine.emu.fragments.ShortcutsFragment.MESA_DRIVER;
 import static com.micewine.emu.fragments.ShortcutsFragment.getBox64Preset;
@@ -83,7 +81,7 @@ public class AdapterGame extends RecyclerView.Adapter<AdapterGame.ViewHolder> {
             Bitmap imgBitmap = BitmapFactory.decodeFile(item.iconPath);
             if (imgBitmap != null) {
                 Bitmap newBitmap;
-                if (new File(item.exePath).exists()) {
+                if (new File(getUnixPath(item.exePath)).exists()) {
                     newBitmap = Bitmap.createScaledBitmap(imgBitmap, holder.itemView.getLayoutParams().width - 10, holder.itemView.getLayoutParams().width - 10, false);
                 } else {
                     newBitmap = toGrayScale(
@@ -151,9 +149,9 @@ public class AdapterGame extends RecyclerView.Adapter<AdapterGame.ViewHolder> {
 
             selectedGameName = gameItem.name;
 
-            File exeFile =  new File(gameItem.exePath);
+            File exeFile =  new File(getUnixPath(gameItem.exePath));
 
-            String exePath = gameItem.exePath;
+            String exePath = exeFile.getPath();
             String exeArguments = gameItem.exeArguments;
 
             if (!exeFile.exists()) {

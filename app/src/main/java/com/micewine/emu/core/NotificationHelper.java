@@ -45,7 +45,7 @@ public class NotificationHelper {
 
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        builder.setContentTitle(context.getString(R.string.downloading_rootfs));
+        builder.setContentTitle(context.getString(R.string.downloading_packages));
         builder.setSmallIcon(android.R.drawable.stat_sys_download);
         builder.setOngoing(true);
         builder.setContentIntent(pendingIntent);
