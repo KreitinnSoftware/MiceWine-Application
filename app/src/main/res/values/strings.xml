@@ -248,6 +248,7 @@
     <string name="downloading_packages">Downloading Packages</string>
     <string name="download_successful">Download Successful!</string>
     <string name="select_rootfs_file">Select RootFS File</string>
+    <string name="waiting">Waiting</string>
 
     <plurals name="seconds_ago">
         <item quantity="one">%d second ago</item>

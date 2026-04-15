@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -73,7 +72,6 @@ public class FloatingFileManagerFragment extends DialogFragment {
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.fragment_floating_file_manager, null);
 
-        TextView selectRootFSText = view.findViewById(R.id.selectRootFSFileText);
         EditText editText = view.findViewById(R.id.editText);
         MaterialButton saveButton = view.findViewById(R.id.saveButton);
 
@@ -89,7 +87,6 @@ public class FloatingFileManagerFragment extends DialogFragment {
 
         switch (operationType) {
             case OPERATION_EXPORT_PRESET -> {
-                selectRootFSText.setVisibility(View.GONE);
                 editText.setVisibility(View.VISIBLE);
                 saveButton.setVisibility(View.VISIBLE);
 
@@ -121,7 +118,6 @@ public class FloatingFileManagerFragment extends DialogFragment {
                 });
             }
             case OPERATION_IMPORT_PRESET -> {
-                selectRootFSText.setVisibility(View.GONE);
                 editText.setVisibility(View.GONE);
                 saveButton.setVisibility(View.GONE);
 
@@ -154,7 +150,6 @@ public class FloatingFileManagerFragment extends DialogFragment {
                 }).start();
             }
             case OPERATION_SELECT_EXE -> {
-                selectRootFSText.setVisibility(View.GONE);
                 editText.setVisibility(View.GONE);
                 saveButton.setVisibility(View.GONE);
 
@@ -175,7 +170,6 @@ public class FloatingFileManagerFragment extends DialogFragment {
                 }).start();
             }
             case OPERATION_SELECT_ICON -> {
-                selectRootFSText.setVisibility(View.GONE);
                 editText.setVisibility(View.GONE);
                 saveButton.setVisibility(View.GONE);
 
@@ -196,7 +190,6 @@ public class FloatingFileManagerFragment extends DialogFragment {
                 }).start();
             }
             case OPERATION_CREATE_LNK -> {
-                selectRootFSText.setVisibility(View.GONE);
                 editText.setVisibility(View.VISIBLE);
                 saveButton.setVisibility(View.VISIBLE);
 
@@ -261,7 +254,6 @@ public class FloatingFileManagerFragment extends DialogFragment {
         return new AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog).setView(view).create();
     }
 
-    public static boolean calledSetup = false;
     public static File outputFile = null;
     public static int fmOperationType = -1;
 

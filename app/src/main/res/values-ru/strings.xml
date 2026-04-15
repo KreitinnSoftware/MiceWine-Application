@@ -221,6 +221,7 @@
     <string name="downloading_packages">Загрузка пакетов</string>
     <string name="download_successful">Загрузка завершена успешно!</string>
     <string name="select_rootfs_file">Выберите файл RootFS</string>
+    <string name="waiting">Ожидание</string>
 
     <plurals name="seconds_ago">
         <item quantity="one">%d секунду назад</item>

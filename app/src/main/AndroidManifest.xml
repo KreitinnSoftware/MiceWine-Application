@@ -100,10 +100,5 @@
             android:theme="@style/Theme.MiceWine.FullScreen"
             android:windowSoftInputMode="stateHidden">
         </activity>
-        <service
-            android:name=".core.RootFSDownloaderService"
-            android:enabled="true"
-            android:exported="false">
-        </service>
     </application>
 </manifest>

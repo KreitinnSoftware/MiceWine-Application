@@ -39,7 +39,13 @@ import static com.micewine.emu.activities.RatManagerActivity.generateICDFile;
 import static com.micewine.emu.activities.RatManagerActivity.generateMangoHUDConfFile;
 import static com.micewine.emu.activities.WelcomeActivity.finishedWelcomeScreen;
 import static com.micewine.emu.adapters.AdapterGame.selectedGameName;
+import static com.micewine.emu.adapters.AdapterRatPackage.BOX64;
 import static com.micewine.emu.adapters.AdapterRatPackage.CORE;
+import static com.micewine.emu.adapters.AdapterRatPackage.DXVK;
+import static com.micewine.emu.adapters.AdapterRatPackage.VKD3D;
+import static com.micewine.emu.adapters.AdapterRatPackage.VK_DRIVER;
+import static com.micewine.emu.adapters.AdapterRatPackage.WINE;
+import static com.micewine.emu.adapters.AdapterRatPackage.WINED3D;
 import static com.micewine.emu.controller.ControllerUtils.connectedPhysicalControllers;
 import static com.micewine.emu.controller.ControllerUtils.disconnectController;
 import static com.micewine.emu.controller.ControllerUtils.prepareControllersMappings;
@@ -115,6 +121,7 @@ import static com.micewine.emu.fragments.SoundSettingsFragment.generatePAFile;
 import static com.micewine.emu.fragments.WinePrefixManagerFragment.createWinePrefix;
 import static com.micewine.emu.fragments.WinePrefixManagerFragment.getSelectedWinePrefix;
 import static com.micewine.emu.fragments.WinePrefixManagerFragment.getWinePrefixFile;
+import static com.micewine.emu.fragments.WinePrefixManagerFragment.getWinePrefixes;
 import static com.micewine.emu.utils.DriveUtils.parseUnixPath;
 import static com.micewine.emu.utils.FileUtils.copyRecursively;
 import static com.micewine.emu.utils.FileUtils.getFileExtension;
@@ -536,13 +543,14 @@ public class MainActivity extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
 
         boolean hasCore = haveAnyPackageByCategory(CORE);
-        boolean hasWine = !listRatPackages("Wine").isEmpty();
-        boolean hasVulkanDriver = !listRatPackages("VulkanDriver").isEmpty();
-        boolean hasDXVK = !listRatPackages("DXVK").isEmpty();
-        boolean hasVKD3D = !listRatPackages("VKD3D").isEmpty();
-        boolean hasWineD3D = !listRatPackages("WineD3D").isEmpty();
-        boolean hasBox64 = !listRatPackages("Box64").isEmpty();
-        boolean canProceed = (hasCore && hasWine && hasVulkanDriver && hasDXVK && hasVKD3D && hasWineD3D && (deviceArch.equals("x86_64") || hasBox64));
+        boolean hasWine = haveAnyPackageByCategory(WINE);
+        boolean hasVulkanDriver = haveAnyPackageByCategory(VK_DRIVER);
+        boolean hasDXVK = haveAnyPackageByCategory(DXVK);
+        boolean hasVKD3D = haveAnyPackageByCategory(VKD3D);
+        boolean hasWineD3D = haveAnyPackageByCategory(WINED3D);
+        boolean hasBox64 = haveAnyPackageByCategory(BOX64);
+        boolean hasWinePrefix = !(getWinePrefixes().isEmpty());
+        boolean canProceed = (hasCore && hasWine && hasWinePrefix && hasVulkanDriver && hasDXVK && hasVKD3D && hasWineD3D && (deviceArch.equals("x86_64") || hasBox64));
 
         if (!canProceed) {
             startActivity(new Intent(this, WelcomeActivity.class));

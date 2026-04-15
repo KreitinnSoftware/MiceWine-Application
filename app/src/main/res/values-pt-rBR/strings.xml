@@ -225,6 +225,7 @@
     <string name="downloading_packages">Baixando Pacotes</string>
     <string name="download_successful">Download Concluido!</string>
     <string name="select_rootfs_file">Selecionar Arquivo RootFS</string>
+    <string name="waiting">Aguardando</string>
 
     <plurals name="seconds_ago">
         <item quantity="one">há %d segundo</item>

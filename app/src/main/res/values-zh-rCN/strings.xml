@@ -225,6 +225,7 @@
     <string name="downloading_packages">正在下载软件包</string>
     <string name="download_successful">下载成功！</string>
     <string name="select_rootfs_file">选择 RootFS 文件</string>
+    <string name="waiting">等待中</string>
 
     <plurals name="seconds_ago">
         <item quantity="other">%d 秒前</item>

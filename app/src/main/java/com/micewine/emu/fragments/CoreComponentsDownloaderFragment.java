@@ -136,9 +136,10 @@ public class CoreComponentsDownloaderFragment extends Fragment {
                 installRat(new RatPackageManager.RatPackage(file.getPath()), installCallback);
 
                 file.delete();
-                requireActivity().runOnUiThread(() ->
-                        adapter.notifyItemChanged(buttonIndex, AdapterRatPackageDownload.PAYLOAD_MARK_INSTALLED)
-                );
+                requireActivity().runOnUiThread(() -> {
+                    ratList.get(buttonIndex).installed = true;
+                    adapter.notifyItemChanged(buttonIndex, AdapterRatPackageDownload.PAYLOAD_MARK_INSTALLED);
+                });
             });
         }
 

@@ -64,14 +64,26 @@ public class AdapterRatPackageDownload extends RecyclerView.Adapter<AdapterRatPa
             holder.settingsDescription.setText(item.descriptionSettings);
         }
 
-        if (item.installed) return;
+        if (item.installed) {
+            holder.downloadRatPackageButton.setVisibility(View.VISIBLE);
+            holder.downloadRatPackageButton.setImageResource(android.R.drawable.checkbox_on_background);
+
+            holder.progressText.setVisibility(View.GONE);
+            holder.progressBar.setVisibility(View.GONE);
+
+            return;
+        }
 
         String progressBarText;
 
         if (item.installing) {
             progressBarText = context.getString(R.string.installing) + " - " + item.progress + "%";
         } else {
-            progressBarText = String.format("%s%% - %.2fM/%.2fM - %.2f MB/s", item.progress, (float) item.bytesRead / MEGABYTE, (float) item.contentLength / MEGABYTE, item.megabytesPerSecond);
+            if (item.contentLength == 0) {
+                progressBarText = context.getString(R.string.waiting);
+            } else {
+                progressBarText = String.format("%s%% - %.2fM/%.2fM - %.2f MB/s", item.progress, (float) item.bytesRead / MEGABYTE, (float) item.contentLength / MEGABYTE, item.megabytesPerSecond);
+            }
         }
 
         holder.progressText.setText(progressBarText);
@@ -99,7 +111,8 @@ public class AdapterRatPackageDownload extends RecyclerView.Adapter<AdapterRatPa
 
             return;
         } else if (!payloads.isEmpty() && payloads.contains(PAYLOAD_MARK_INSTALLED)) {
-            item.installed = true;
+            holder.downloadRatPackageButton.setVisibility(View.VISIBLE);
+            holder.downloadRatPackageButton.setImageResource(android.R.drawable.checkbox_on_background);
 
             holder.progressText.setVisibility(View.GONE);
             holder.progressBar.setVisibility(View.GONE);

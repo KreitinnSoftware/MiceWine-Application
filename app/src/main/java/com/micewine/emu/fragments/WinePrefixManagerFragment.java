@@ -47,7 +47,6 @@ public class WinePrefixManagerFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_general_settings, container, false);
         recyclerView = rootView.findViewById(R.id.recyclerViewGeneralSettings);
 
-        initialize();
         setAdapter();
 
         return rootView;
@@ -63,13 +62,9 @@ public class WinePrefixManagerFragment extends Fragment {
     }
 
     private static final ArrayList<AdapterPreset.Item> prefixListNames = new ArrayList<>();
-    private static ArrayList<String> prefixList = new ArrayList<>();
+    private static final ArrayList<String> prefixList = getWinePrefixes();
 
-    private static void initialize() {
-        prefixList = getWinePrefixes();
-    }
-
-    private static ArrayList<String> getWinePrefixes() {
+    public static ArrayList<String> getWinePrefixes() {
         File[] winePrefixesFiles = winePrefixesDir.listFiles();
         ArrayList<String> winePrefixesNames = new ArrayList<>();
 
@@ -171,14 +166,13 @@ public class WinePrefixManagerFragment extends Fragment {
                     new AdapterPreset.Item(name, WINE_PREFIX_PRESET, true, true)
             );
 
-            if (recyclerView != null) {
-                recyclerView.post(() -> {
-                    AdapterPreset adapter = (AdapterPreset) recyclerView.getAdapter();
-                    if (adapter != null) {
-                        adapter.notifyItemInserted(prefixListNames.size());
-                    }
-                });
-            }
+            if (recyclerView == null) return;
+
+            recyclerView.post(() -> {
+                AdapterPreset adapter = (AdapterPreset) recyclerView.getAdapter();
+                if (adapter == null) return;
+                adapter.notifyItemInserted(prefixListNames.size());
+            });
         }
     }
 
@@ -202,21 +196,17 @@ public class WinePrefixManagerFragment extends Fragment {
 
         AdapterPreset adapter = (AdapterPreset) recyclerView.getAdapter();
 
-        if (adapter != null) {
-            adapter.notifyItemRemoved(index);
-        }
+        if (adapter != null) adapter.notifyItemRemoved(index);
 
         if (index == selectedPresetId) {
-            if (preferences != null) {
-                SharedPreferences.Editor editor = preferences.edit();
+            if (preferences == null) return true;
 
-                editor.putString(SELECTED_WINE_PREFIX, prefixListNames.get(0).getTitleSettings());
-                editor.apply();
+            SharedPreferences.Editor editor = preferences.edit();
 
-                if (adapter != null) {
-                    adapter.notifyItemChanged(0);
-                }
-            }
+            editor.putString(SELECTED_WINE_PREFIX, prefixListNames.get(0).getTitleSettings());
+            editor.apply();
+
+            if (adapter != null) adapter.notifyItemChanged(0);
         }
 
         return true;
