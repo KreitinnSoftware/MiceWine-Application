@@ -84,10 +84,10 @@ public class WelcomeActivity extends AppCompatActivity {
             }
             selectedItemsId.get(WINE).add(0);
 
-            selectedItemsId.get(VK_DRIVER).add(getRepoRatIdByInfo(VK_DRIVER, "Wrapper", "25.1.4", packagesList));
+            selectedItemsId.get(VK_DRIVER).add(getRepoRatIdByInfo(VK_DRIVER, "Wrapper", "", packagesList));
 
             if (!deviceArch.equals("x86_64")) {
-                selectedItemsId.get(VK_DRIVER).add(getRepoRatIdByInfo(VK_DRIVER, "Turnip", "25.1.4", packagesList));
+                selectedItemsId.get(VK_DRIVER).add(getRepoRatIdByInfo(VK_DRIVER, "Turnip", "", packagesList));
                 selectedItemsId.get(VK_DRIVER).add(getRepoRatIdByInfo(VK_DRIVER, "Wrapper", "adrenotools", packagesList));
             }
 
@@ -111,9 +111,9 @@ public class WelcomeActivity extends AppCompatActivity {
             } else if (viewPager.getCurrentItem() == 2) {
                 selectedRatPackages.clear();
 
-                for (int i = 0; i < 7; i++) {
-                    for (int a : selectedItemsId.get(i)) {
-                        selectedRatPackages.add(getRepoRat(i, a, packagesList));
+                for (int category = 0; category < 7; category++) {
+                    for (int i : selectedItemsId.get(category)) {
+                        selectedRatPackages.add(getRepoRat(category, i, packagesList));
                     }
                 }
 
@@ -158,9 +158,10 @@ public class WelcomeActivity extends AppCompatActivity {
         List<RepoRatPackage> filteredList = new ArrayList<>();
 
         for (RepoRatPackage repoRatPackage : packageList) {
-            if (repoRatPackage.ratPackage.category.equals(getRatCategoryString(category))) {
-                filteredList.add(repoRatPackage);
-            }
+            boolean isAdrenoTools = (category == VK_DRIVER && repoRatPackage.ratPackage.category.equals("AdrenoTools"));
+            boolean matchPackage = (repoRatPackage.ratPackage.category.equals(getRatCategoryString(category)));
+
+            if (isAdrenoTools || matchPackage) filteredList.add(repoRatPackage);
         }
 
         return filteredList.get(index);
@@ -174,16 +175,14 @@ public class WelcomeActivity extends AppCompatActivity {
         List<RepoRatPackage> filteredList = new ArrayList<>();
 
         for (RepoRatPackage repoRatPackage : packageList) {
-            if (category == VK_DRIVER && repoRatPackage.ratPackage.category.equals("AdrenoTools")) {
-                filteredList.add(repoRatPackage);
-            }
-            if (repoRatPackage.ratPackage.category.equals(getRatCategoryString(category))) {
-                filteredList.add(repoRatPackage);
-            }
+            boolean isAdrenoTools = (category == VK_DRIVER && repoRatPackage.ratPackage.category.equals("AdrenoTools"));
+            boolean matchPackage = (repoRatPackage.ratPackage.category.equals(getRatCategoryString(category)));
+
+            if (isAdrenoTools || matchPackage) filteredList.add(repoRatPackage);
         }
 
         for (int i = 0; i < filteredList.size(); i++) {
-            if (filteredList.get(i).ratPackage.version.contains(version) && filteredList.get(i).ratPackage.name.contains(name)) {
+            if (filteredList.get(i).ratPackage.version.toLowerCase().contains(version.toLowerCase()) && filteredList.get(i).ratPackage.name.toLowerCase().contains(name.toLowerCase())) {
                 return i;
             }
         }
