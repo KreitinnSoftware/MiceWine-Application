@@ -188,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() == null) return;
+
             switch (intent.getAction()) {
                 case ACTION_RUN_WINE -> {
                     String exePath = intent.getStringExtra("exePath");
@@ -214,9 +215,9 @@ public class MainActivity extends AppCompatActivity {
                     if (box64Preset == null) box64Preset = "default";
                     if (displayResolution == null) displayResolution = "1280x720";
                     if (d3dxRenderer == null) d3dxRenderer = "DXVK";
-                    if (wineD3D == null) wineD3D = listRatPackages("WineD3D").get(0).getFolderName();
-                    if (dxvk == null) dxvk = listRatPackages("DXVK").get(0).getFolderName();
-                    if (vkd3d == null) vkd3d = listRatPackages("VKD3D").get(0).getFolderName();
+                    if (wineD3D == null) wineD3D = listRatPackages(WINED3D).get(0).getFolderName();
+                    if (dxvk == null) dxvk = listRatPackages(DXVK).get(0).getFolderName();
+                    if (vkd3d == null) vkd3d = listRatPackages(VKD3D).get(0).getFolderName();
                     if (cpuAffinity == null) cpuAffinity = String.join(",", availableCPUs);
 
                     tmpDir.mkdirs();
@@ -229,16 +230,22 @@ public class MainActivity extends AppCompatActivity {
                     String driverLibPath;
                     String adrenoToolsDriverPath = null;
 
+                    RatPackageManager.RatPackage driverPackage = getPackageById(driverName);
+
+                    if (driverPackage == null) return;
+
                     if (driverType == MESA_DRIVER) {
-                        driverLibPath = getPackageById(driverName).getDriverLib();
+                        driverLibPath = driverPackage.getDriverLib();
                     } else if (driverType == ADRENO_TOOLS_DRIVER) {
-                        try {
-                            driverLibPath = listRatPackages("AdrenoTools").get(0).getDriverLib();
-                            adrenoToolsDriverPath = getPackageById(driverName).getDriverLib();
-                        } catch (IndexOutOfBoundsException e) {
+                        List<RatPackageManager.RatPackage> adrenoToolsProviders = listRatPackages("AdrenoTools");
+
+                        if (adrenoToolsProviders.isEmpty()) {
                             Toast.makeText(MainActivity.this, "AdrenoTools Provider Not Found", Toast.LENGTH_SHORT).show();
                             return;
                         }
+
+                        driverLibPath = adrenoToolsProviders.get(0).getDriverLib();
+                        adrenoToolsDriverPath = driverPackage.getDriverLib();
                     } else {
                         driverLibPath = "";
                     }
@@ -265,13 +272,12 @@ public class MainActivity extends AppCompatActivity {
                             adrenoToolsDriverPath
                     );
 
-                    runXServer();
-
                     String finalExeArguments = exeArguments;
                     new Thread(() -> runWine(exePath, finalExeArguments)).start();
                 }
                 case ACTION_SELECT_FILE_MANAGER -> {
                     String fileName = intent.getStringExtra("selectedFile");
+
                     if (fileName == null) return;
                     if (fileName.equals("..")) {
                         fileManagerCwd = new File(fileManagerCwd).getParent();
@@ -290,11 +296,11 @@ public class MainActivity extends AppCompatActivity {
                                         String parsedUnixPath = parseUnixPath(shellLink.resolveTarget());
                                         File targetFile = new File(parsedUnixPath);
                                         new EditGamePreferencesFragment(FILE_MANAGER_START_PREFERENCES, targetFile).show(getSupportFragmentManager(), "");
-                                        return;
                                     } catch (Exception ignored) {
                                         Toast.makeText(MainActivity.this, R.string.lnk_read_fail, Toast.LENGTH_SHORT).show();
-                                        return;
                                     }
+
+                                    return;
                                 }
 
                                 new EditGamePreferencesFragment(FILE_MANAGER_START_PREFERENCES, file).show(getSupportFragmentManager(), "");
@@ -302,16 +308,16 @@ public class MainActivity extends AppCompatActivity {
                             case "rat" -> {
                                 ratCandidate = new RatPackageManager.RatPackage(file.getPath());
 
-                                if (ratCandidate.getName() != null) {
-                                    new AskInstallPackageFragment(RAT_PACKAGE).show(getSupportFragmentManager(), "");
-                                }
+                                if (ratCandidate.getName() == null) return;
+
+                                new AskInstallPackageFragment(RAT_PACKAGE).show(getSupportFragmentManager(), "");
                             }
                             case "zip" -> {
                                 adToolsDriverCandidate = new RatPackageManager.AdrenoToolsPackage(file.getPath());
 
-                                if (adToolsDriverCandidate.getName() != null) {
-                                    new AskInstallPackageFragment(ADTOOLS_DRIVER_PACKAGE).show(getSupportFragmentManager(), "");
-                                }
+                                if (adToolsDriverCandidate.getName() == null) return;
+
+                                new AskInstallPackageFragment(ADTOOLS_DRIVER_PACKAGE).show(getSupportFragmentManager(), "");
                             }
                             case "mwp" -> {
                                 List<String> mwpLines;
@@ -393,8 +399,6 @@ public class MainActivity extends AppCompatActivity {
                 case ACTION_CREATE_WINE_PREFIX -> {
                     String winePrefix = intent.getStringExtra("winePrefix");
                     String wine = intent.getStringExtra("wine");
-
-                    runXServer();
 
                     SetupFragment setupFragment = new SetupFragment();
 
@@ -527,15 +531,16 @@ public class MainActivity extends AppCompatActivity {
 
                 for (StorageVolume volume : storageVolumes) {
                     if (volume.isRemovable()) {
+                        File volumeDirectory = volume.getDirectory();
+                        if (volumeDirectory == null) return;
+
                         WineWrapper.addDrive(volume.getDirectory().getPath());
                     }
                 }
             }
         }
 
-        if (savedInstanceState == null) {
-            onNewIntent(getIntent());
-        }
+        if (savedInstanceState == null) onNewIntent(getIntent());
     }
 
     @Override
@@ -552,9 +557,7 @@ public class MainActivity extends AppCompatActivity {
         boolean hasWinePrefix = !(getWinePrefixes().isEmpty());
         boolean canProceed = (hasCore && hasWine && hasWinePrefix && hasVulkanDriver && hasDXVK && hasVKD3D && hasWineD3D && (deviceArch.equals("x86_64") || hasBox64));
 
-        if (!canProceed) {
-            startActivity(new Intent(this, WelcomeActivity.class));
-        }
+        if (!canProceed) startActivity(new Intent(this, WelcomeActivity.class));
     }
 
     @Override
@@ -564,9 +567,7 @@ public class MainActivity extends AppCompatActivity {
         runXServer();
         updateShortcuts();
 
-        if (finishedWelcomeScreen) {
-            setupMiceWine();
-        }
+        if (finishedWelcomeScreen) setupMiceWine();
     }
 
     @Override
@@ -694,15 +695,19 @@ public class MainActivity extends AppCompatActivity {
     private boolean runningXServer = false;
 
     private void runXServer() {
+        if (!haveAnyPackageByCategory(CORE)) return;
         if (runningXServer) return;
-
-        runningXServer = true;
 
         tmpDir.mkdirs();
 
-        new Thread(() -> runCommand(
-                "env CLASSPATH=" + getClassPath() + " /system/bin/app_process / com.micewine.emu.CmdEntryPoint :0 &> /dev/null", true
-        )).start();
+        runningXServer = true;
+
+        new Thread(() -> {
+            runCommand(
+                    "env CLASSPATH=" + getClassPath() + " /system/bin/app_process / com.micewine.emu.CmdEntryPoint :0 &> /dev/null", true
+            );
+            runningXServer = false;
+        }).start();
     }
 
     private String getClassPath() {
@@ -728,9 +733,11 @@ public class MainActivity extends AppCompatActivity {
 
         setSharedVars(this);
 
-        runXServer();
+        List<RatPackageManager.RatPackage> winePackages = listRatPackages("Wine");
 
-        String wine = listRatPackages("Wine").get(0).getFolderName();
+        if (winePackages.isEmpty()) return;
+
+        String wine = winePackages.get(0).getFolderName();
         Intent createWinePrefixIntent = new Intent(ACTION_CREATE_WINE_PREFIX);
 
         createWinePrefixIntent.putExtra("wine", wine);
@@ -744,21 +751,18 @@ public class MainActivity extends AppCompatActivity {
         super.onNewIntent(intent);
 
         String shortcutName = intent.getStringExtra("shortcutName");
+
         if (shortcutName != null) {
             selectedGameName = shortcutName;
-
-            String driverName = getVulkanDriver(selectedGameName);
-            int driverType = getVulkanDriverType(selectedGameName);
-            String box64Version = getBox64Version(selectedGameName);
 
             Intent runActivityIntent = new Intent(this, EmulationActivity.class);
             Intent runWineIntent = new Intent(ACTION_RUN_WINE);
 
             runWineIntent.putExtra("exePath", getExePath(shortcutName));
             runWineIntent.putExtra("exeArguments", getExeArguments(shortcutName));
-            runWineIntent.putExtra("driverName", driverName);
-            runWineIntent.putExtra("driverType", driverType);
-            runWineIntent.putExtra("box64Version", box64Version);
+            runWineIntent.putExtra("driverName", getVulkanDriver(selectedGameName));
+            runWineIntent.putExtra("driverType", getVulkanDriverType(selectedGameName));
+            runWineIntent.putExtra("box64Version", getBox64Version(selectedGameName));
             runWineIntent.putExtra("box64Preset", getBox64Preset(selectedGameName));
             runWineIntent.putExtra("displayResolution", getDisplaySettings(selectedGameName).get(1));
             runWineIntent.putExtra("virtualControllerPreset", getSelectedVirtualControllerPreset(selectedGameName));
@@ -780,14 +784,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Uri uri = intent.getData();
+        if (uri == null) return;
 
-        if (uri != null) {
-            String filePath = FilePathResolver.resolvePath(this, uri);
+        String filePath = FilePathResolver.resolvePath(this, uri);
+        if (filePath == null) return;
 
-            if (filePath != null) {
-                new EditGamePreferencesFragment(FILE_MANAGER_START_PREFERENCES, new File(filePath)).show(getSupportFragmentManager(), "");
-            }
-        }
+        new EditGamePreferencesFragment(FILE_MANAGER_START_PREFERENCES, new File(filePath)).show(getSupportFragmentManager(), "");
     }
 
     @SuppressLint("SdCardPath")

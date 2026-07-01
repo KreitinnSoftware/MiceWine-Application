@@ -56,14 +56,14 @@ public class AdapterEnvVar extends RecyclerView.Adapter<AdapterEnvVar.ViewHolder
                 envVars.clear();
                 envVars.addAll(getEnvVars(selectedGameName));
 
-                if (recyclerViewEnvVars != null) {
-                    recyclerViewEnvVars.post(() -> {
-                        RecyclerView.Adapter<?> adapter = recyclerViewEnvVars.getAdapter();
-                        if (adapter != null) {
-                            adapter.notifyDataSetChanged();
-                        }
-                    });
-                }
+                if (recyclerViewEnvVars == null) return;
+
+                recyclerViewEnvVars.post(() -> {
+                    RecyclerView.Adapter<?> adapter = recyclerViewEnvVars.getAdapter();
+                    if (adapter == null) return;
+
+                    adapter.notifyDataSetChanged();
+                });
             }
         });
     }
